@@ -6,9 +6,11 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using Terraria.Graphics.Shaders;
+using Terraria.Audio;
 
 namespace Everware.Content.PreHardmode.Kilnstone;
 
+#region Armor Pieces
 [AutoloadEquip(EquipType.Head)]
 public class KilnstoneHelmet : EverItem
 {
@@ -88,28 +90,51 @@ public class KilnstoneChausses : EverItem
         }
     }
 }
+#endregion
 
 public class KilnstoneSetBonus : ModPlayer
 {
     public bool kilnstoneSetBonus = false;
     public float kilnstoneSetActive = 0f;
+    public float kilnstoneTimer = 0f;
+
+    bool soundIsPlaying;
 
     public override void ResetEffects()
     {
         kilnstoneSetBonus = false;
+    }
+    public override void PostUpdate()
+    {
+        if (!soundIsPlaying && kilnstoneSetBonus)
+        {
+            SoundStyle snd = new SoundStyle("Everware/Sounds/Gear/Armor/KilnstoneSmoke");
+            snd.IsLooped = true;
+            SoundEngine.PlaySound(snd, Player.Center, Sound => {
+                Sound.Position = Player.Center;
+                Sound.Pitch = UseSpeedMult * 4f;
+                Sound.Volume = UseSpeedMult * 0.5f;
+                bool b = kilnstoneSetBonus && !Main.gameInactive;
+                if (!b) soundIsPlaying = false;
+                return b;
+            });
+            soundIsPlaying = true;
+        }
+        if (!kilnstoneSetBonus)
+        {
+            soundIsPlaying = false;
+        }
         kilnstoneSetActive -= 0.2f;
         kilnstoneSetActive = Math.Clamp(kilnstoneSetActive, 0, 100);
+        kilnstoneTimer++;
 
         if (kilnstoneSetActive > 10)
         {
-            float randomChance = UseSpeedMult * 2f;
-            float dustSpeed = UseSpeedMult * 2f;
-            float dustSize = 1.5f + UseSpeedMult * 1.5f;
-            int dustAlpha = 255 - (int)(UseSpeedMult * 200f);
+            int dustAlpha = 255 - (int)(UseSpeedMult * 255f * 2f);
 
-            if (Main.rand.NextFloat() < randomChance)
+            if (kilnstoneTimer % 6 == 0)
             {
-                Dust d = Dust.NewDustPerfect(Player.Top + new Vector2(0, -4), DustID.Smoke, new Vector2(0, -dustSpeed), dustAlpha, Scale: dustSize);
+                Dust d = Dust.NewDustPerfect(Player.Top + new Vector2(-3 + Main.rand.NextFloat(4), -5), ModContent.DustType<KilnstoneSmoke>(), new Vector2(0, -0.5f), dustAlpha, Scale: 0f);
                 d.fadeIn = -3f;
             }
         }
@@ -123,19 +148,19 @@ public class KilnstoneSetBonus : ModPlayer
         On_Player.GetPickaxeDamage -= On_Player_GetPickaxeDamage;
     }
 
-    float UseSpeedMult => Player.HeldItem.pick != 0 ? Easing.KeyFloat(kilnstoneSetActive, 0f, 100f, 0f, 0.5f, Easing.Linear) : 0f;
+    float UseSpeedMult => Easing.KeyFloat(kilnstoneSetActive, 0f, 100f, 0f, 0.5f, Easing.Linear);
 
     public override float UseTimeMultiplier(Item item)
     {
-        return base.UseSpeedMultiplier(item) * (1 - (UseSpeedMult / 2f));
+        return base.UseSpeedMultiplier(item) * (Player.HeldItem.pick != 0 ? (1 - (UseSpeedMult * 0.25f)) : 1f);
     }
     public override float UseAnimationMultiplier(Item item)
     {
-        return base.UseAnimationMultiplier(item) * (1 - (UseSpeedMult / 2f));
+        return base.UseAnimationMultiplier(item) * (1 - ((Player.HeldItem.pick != 0 ? UseSpeedMult : 0f) * 0.25f));
     }
     public override float UseSpeedMultiplier(Item item)
     {
-        return base.UseSpeedMultiplier(item) + UseSpeedMult;
+        return base.UseSpeedMultiplier(item) + UseSpeedMult * 0.5f;
     }
 
     private int On_Player_GetPickaxeDamage(On_Player.orig_GetPickaxeDamage orig, Player self, int x, int y, int pickPower, int hitBufferIndex, Tile tileTarget)
@@ -143,7 +168,7 @@ public class KilnstoneSetBonus : ModPlayer
         if (self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetBonus)
         {
             int type = tileTarget.TileType;
-            if (TileID.Sets.Dirt[type] || TileID.Sets.Stone[type] || type == TileID.ClayBlock || type == TileID.Mud || type == TileID.Sand)
+            if (TileID.Sets.Dirt[type] || TileID.Sets.Stone[type] || TileID.Sets.Grass[type] || type == TileID.ClayBlock || type == TileID.Mud || type == TileID.Sand)
                 self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += 5;
         }
         return orig(self, x, y, pickPower, hitBufferIndex, tileTarget);

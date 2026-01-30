@@ -7,8 +7,28 @@
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnstonearmor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\items\\everitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\items\\everitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnbrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnbrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\dusts\\everdust.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\dusts\\everdust.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnstone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnstone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\dusts\\everanimateddust.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\dusts\\everanimateddust.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnstonesmoke.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnstonesmoke.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnpowderdusts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnpowderdusts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnstoneblock.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -19,8 +39,8 @@
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnbrickblock.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnbrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnbrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\items\\everitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\items\\everitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnstoneblock.png||{58961B49-13E0-48C0-9258-13CBC4D40279}",
@@ -28,14 +48,6 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Varia\\Content\\Tiles\\SpiderStoneBrick.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnstone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnstone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\kilnstone\\kilnpowderdusts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\kilnstone\\kilnpowderdusts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\CalamityMod\\Items\\Armor\\Aerospec\\AerospecBreastplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
@@ -69,10 +81,6 @@
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:utils\\easingcurves.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\dusts\\everdust.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\dusts\\everdust.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\everware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:everware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -84,32 +92,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "KilnBrickBlock.cs",
-              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
-              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
-              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
-              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAsAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "EverAnimatedDust.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Dusts\\EverAnimatedDust.cs",
+              "RelativeDocumentMoniker": "Content\\Base\\Dusts\\EverAnimatedDust.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Dusts\\EverAnimatedDust.cs",
+              "RelativeToolTip": "Content\\Base\\Dusts\\EverAnimatedDust.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAqwBoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T18:03:05.964Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "KilnstoneBlock.cs",
-              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
-              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
-              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
-              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T23:56:32.198Z",
+              "WhenOpened": "2026-01-30T10:34:42.962Z",
               "EditorCaption": ""
             },
             {
@@ -120,7 +115,7 @@
               "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnstoneArmor.cs",
               "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneArmor.cs",
               "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnstoneArmor.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAcwHkAAAA7AAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAuwGQAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-30T01:42:39.171Z",
               "EditorCaption": ""
@@ -128,19 +123,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "EverItem.cs",
-              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Items\\EverItem.cs",
-              "RelativeDocumentMoniker": "Content\\Base\\Items\\EverItem.cs",
-              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Items\\EverItem.cs",
-              "RelativeToolTip": "Content\\Base\\Items\\EverItem.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBYAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T16:55:55.576Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
               "Title": "KilnBrick.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnBrick.cs",
               "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnBrick.cs",
@@ -153,19 +135,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "KilnstoneBlock.png",
-              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
-              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
-              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
-              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
-              "WhenOpened": "2026-01-30T01:40:51.436Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 11,
               "Title": "SpiderStoneBrick.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Varia\\Content\\Tiles\\SpiderStoneBrick.cs",
               "RelativeDocumentMoniker": "..\\Varia\\Content\\Tiles\\SpiderStoneBrick.cs",
@@ -173,12 +143,24 @@
               "RelativeToolTip": "..\\Varia\\Content\\Tiles\\SpiderStoneBrick.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-30T02:10:19.748Z",
+              "WhenOpened": "2026-01-30T02:10:19.748Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "KilnPowderDusts.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
+              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
+              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwBgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T17:14:24.812Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 3,
               "Title": "Kilnstone.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\Kilnstone.cs",
               "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\Kilnstone.cs",
@@ -191,20 +173,81 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "KilnPowderDusts.cs",
-              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
-              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
-              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
-              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnPowderDusts.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADMAAAAvAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "EverDust.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Dusts\\EverDust.cs",
+              "RelativeDocumentMoniker": "Content\\Base\\Dusts\\EverDust.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Dusts\\EverDust.cs",
+              "RelativeToolTip": "Content\\Base\\Dusts\\EverDust.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAADjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T17:14:24.812Z",
+              "WhenOpened": "2026-01-29T17:14:45.974Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "KilnstoneSmoke.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneSmoke.cs",
+              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnstoneSmoke.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneSmoke.cs",
+              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnstoneSmoke.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABMAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-30T10:40:46.509Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "KilnBrickBlock.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
+              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
+              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnBrickBlock.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T18:03:05.964Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "KilnstoneBlock.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
+              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
+              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T23:56:32.198Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "KilnstoneBlock.png",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
+              "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
+              "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\KilnstoneBlock.png",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
+              "WhenOpened": "2026-01-30T01:40:51.436Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 9,
+              "Title": "EverItem.cs",
+              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Items\\EverItem.cs",
+              "RelativeDocumentMoniker": "Content\\Base\\Items\\EverItem.cs",
+              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Items\\EverItem.cs",
+              "RelativeToolTip": "Content\\Base\\Items\\EverItem.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBYAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T16:55:55.576Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
               "Title": "AerospecBreastplate.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\CalamityMod\\Items\\Armor\\Aerospec\\AerospecBreastplate.cs",
               "RelativeDocumentMoniker": "..\\CalamityMod\\Items\\Armor\\Aerospec\\AerospecBreastplate.cs",
@@ -212,12 +255,11 @@
               "RelativeToolTip": "..\\CalamityMod\\Items\\Armor\\Aerospec\\AerospecBreastplate.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-30T01:44:27.845Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-30T01:44:27.845Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "EverItemExtensions.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Items\\EverItemExtensions.cs",
               "RelativeDocumentMoniker": "Content\\Base\\Items\\EverItemExtensions.cs",
@@ -225,36 +267,33 @@
               "RelativeToolTip": "Content\\Base\\Items\\EverItemExtensions.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-30T01:46:44.307Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-30T01:46:44.307Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "RawKilnPowderDust.png",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\RawKilnPowderDust.png",
               "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\RawKilnPowderDust.png",
               "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\RawKilnPowderDust.png",
               "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\RawKilnPowderDust.png",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
-              "WhenOpened": "2026-01-30T01:40:45.924Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-30T01:40:45.924Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 15,
               "Title": "Kilnstone.png",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\Kilnstone.png",
               "RelativeDocumentMoniker": "Content\\PreHardmode\\Kilnstone\\Kilnstone.png",
               "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Kilnstone\\Kilnstone.png",
               "RelativeToolTip": "Content\\PreHardmode\\Kilnstone\\Kilnstone.png",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
-              "WhenOpened": "2026-01-29T23:55:51.959Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-29T23:55:51.959Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "en-US_Mods.Everware.hjson",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Localization\\en-US_Mods.Everware.hjson",
               "RelativeDocumentMoniker": "Localization\\en-US_Mods.Everware.hjson",
@@ -262,12 +301,11 @@
               "RelativeToolTip": "Localization\\en-US_Mods.Everware.hjson",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-01-29T18:03:28.315Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-29T18:03:28.315Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 18,
               "Title": "EverTile.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Tiles\\EverTile.cs",
               "RelativeDocumentMoniker": "Content\\Base\\Tiles\\EverTile.cs",
@@ -275,12 +313,11 @@
               "RelativeToolTip": "Content\\Base\\Tiles\\EverTile.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwA4AAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T16:56:20.528Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-29T16:56:20.528Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 16,
               "Title": "EverPlaceableItem.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Items\\EverPlaceableItem.cs",
               "RelativeDocumentMoniker": "Content\\Base\\Items\\EverPlaceableItem.cs",
@@ -288,24 +325,11 @@
               "RelativeToolTip": "Content\\Base\\Items\\EverPlaceableItem.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAcAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T16:57:07.961Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-29T16:57:07.961Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "EverDust.cs",
-              "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Dusts\\EverDust.cs",
-              "RelativeDocumentMoniker": "Content\\Base\\Dusts\\EverDust.cs",
-              "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\Dusts\\EverDust.cs",
-              "RelativeToolTip": "Content\\Base\\Dusts\\EverDust.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T17:14:45.974Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 19,
               "Title": "EasingCurves.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Utils\\EasingCurves.cs",
               "RelativeDocumentMoniker": "Utils\\EasingCurves.cs",
@@ -317,7 +341,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "Everware.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Everware.cs",
               "RelativeDocumentMoniker": "Everware.cs",

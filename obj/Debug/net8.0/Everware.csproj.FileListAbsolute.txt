@@ -10,3 +10,4 @@ C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Deb
 C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\refint\Everware.dll
 C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.pdb
 C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\ref\Everware.dll
+C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.sourcelink.json

@@ -23,6 +23,8 @@ public abstract class PowderDust : EverDust
 
     public override bool Update(Dust dust)
     {
+        base.Update(dust);
+
         dust.scale = MathHelper.Lerp(dust.scale, 1f, 0.1f);
 
         dust.fadeIn++;
@@ -41,8 +43,6 @@ public abstract class PowderDust : EverDust
 
         if (dust.alpha >= 255)
             dust.active = false;
-
-        dust.position += dust.velocity;
 
         return false;
     }

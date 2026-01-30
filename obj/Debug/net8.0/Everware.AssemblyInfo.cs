@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Everware")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5737eacb87dcc3c637413feb6fca5eb5e40ec615")]
 [assembly: System.Reflection.AssemblyProductAttribute("Everware")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Everware")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
