@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Import tModLoader mod properties -->
+	<Import Project="..\tModLoader.targets" />
+
+	<!-- General -->
+	<PropertyGroup>
+		
+	</PropertyGroup>
+	<ItemGroup>
+	  <None Include="Content\PreHardmode\Kilnstone\KilnBrick.cs" />
+	  <None Include="Content\PreHardmode\Kilnstone\KilnBrickBlock.cs" />
+	</ItemGroup>
+
+	<!-- References -->
+
+</Project>

@@ -1,0 +1,26 @@
+Items: {
+	Kilnstone: {
+		DisplayName: Kilnstone
+		Tooltip: ""
+	}
+
+	KilnBrick: {
+		DisplayName: Kiln Brick
+		Tooltip: ""
+	}
+
+	KilnstoneBrickplate: {
+		DisplayName: Kilnstone Brickplate
+		Tooltip: ""
+	}
+
+	KilnstoneChausses: {
+		DisplayName: Kilnstone Chausses
+		Tooltip: ""
+	}
+
+	KilnstoneHelmet: {
+		DisplayName: Kilnstone Helmet
+		Tooltip: ""
+	}
+}
