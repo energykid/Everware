@@ -23,4 +23,9 @@ Items: {
 		DisplayName: Kilnstone Helmet
 		Tooltip: ""
 	}
+
+	KilnBrickWall: {
+		DisplayName: Kiln Brick Wall
+		Tooltip: ""
+	}
 }

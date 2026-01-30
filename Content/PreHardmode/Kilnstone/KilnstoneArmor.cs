@@ -149,10 +149,11 @@ public class KilnstoneSetBonus : ModPlayer
     }
 
     float UseSpeedMult => Easing.KeyFloat(kilnstoneSetActive, 0f, 100f, 0f, 0.5f, Easing.Linear);
+    bool PickaxeHeld => Player.HeldItem.pick != 0;
 
     public override float UseTimeMultiplier(Item item)
     {
-        return base.UseSpeedMultiplier(item) * (Player.HeldItem.pick != 0 ? (1 - (UseSpeedMult * 0.25f)) : 1f);
+        return base.UseSpeedMultiplier(item) * (PickaxeHeld ? (1 - (UseSpeedMult * 0.25f)) : 1f);
     }
     public override float UseAnimationMultiplier(Item item)
     {
@@ -169,7 +170,7 @@ public class KilnstoneSetBonus : ModPlayer
         {
             int type = tileTarget.TileType;
             if (TileID.Sets.Dirt[type] || TileID.Sets.Stone[type] || TileID.Sets.Grass[type] || type == TileID.ClayBlock || type == TileID.Mud || type == TileID.Sand)
-                self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += 5;
+                self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += 3 + ((100f / (float)pickPower));
         }
         return orig(self, x, y, pickPower, hitBufferIndex, tileTarget);
     }
