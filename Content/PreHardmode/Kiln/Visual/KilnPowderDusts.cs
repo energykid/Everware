@@ -3,7 +3,7 @@ using Everware.Utils;
 using Microsoft.Xna.Framework;
 using Terraria;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Visual;
 
 public abstract class PowderDust : EverDust
 {
@@ -25,7 +25,6 @@ public abstract class PowderDust : EverDust
     {
         base.Update(dust);
 
-        dust.scale = MathHelper.Lerp(dust.scale, 1f, 0.1f);
 
         dust.fadeIn++;
 
@@ -36,7 +35,15 @@ public abstract class PowderDust : EverDust
         dust.rotation += rot;
 
         if (dust.fadeIn > 30)
+        {
             dust.velocity.Y += 0.1f;
+            if (dust.fadeIn < 75)
+                dust.scale = MathHelper.Lerp(dust.scale, 1f, -0.075f);
+        }
+        else
+        {
+            dust.scale = MathHelper.Lerp(dust.scale, 1f, 0.1f);
+        }
 
         if (dust.fadeIn > 40)
             dust.alpha += 10;

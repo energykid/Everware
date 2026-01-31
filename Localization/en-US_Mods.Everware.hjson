@@ -28,4 +28,34 @@ Items: {
 		DisplayName: Kiln Brick Wall
 		Tooltip: ""
 	}
+
+	TestItem: {
+		DisplayName: Test Item
+		Tooltip: ""
+	}
+
+	ForgingKilnItem: {
+		DisplayName: Forging Kiln
+		Tooltip: ""
+	}
+
+	KilnBrickPlatform: {
+		DisplayName: Kiln Brick Platform
+		Tooltip: ""
+	}
+
+	MakeshiftBed: {
+		DisplayName: Makeshift Bed
+		Tooltip: ""
+	}
+
+	MakeshiftWorkbench: {
+		DisplayName: Makeshift Workbench
+		Tooltip: ""
+	}
+
+	RoughWood: {
+		DisplayName: Rough Wood
+		Tooltip: ""
+	}
 }

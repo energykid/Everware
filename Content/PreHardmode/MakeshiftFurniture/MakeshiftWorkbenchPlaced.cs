@@ -1,11 +1,9 @@
 ﻿using Everware.Content.Base.Tiles;
-using Terraria.ModLoader;
-using Terraria.Audio;
-using Microsoft.Xna.Framework;
+using Everware.Content.PreHardmode.Kiln.Visual;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.MakeshiftFurniture;
 
-public class KilnBrickBlock : EverTile 
+public class MakeshiftWorkbenchPlaced : WorkbenchTemplate
 {
     public override void SetStaticDefaults()
     {
@@ -13,7 +11,7 @@ public class KilnBrickBlock : EverTile
         DustType = ModContent.DustType<KilnPowderDust>();
         SoundStyle style = new SoundStyle("Everware/Sounds/Tile/KilnstoneHit");
         AddMapEntry(new Color(181, 62, 59));
-        style.PitchRange = (0.2f, 0.4f);
+        style.PitchRange = (0f, 0.2f);
         HitSound = style;
     }
 }

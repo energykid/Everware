@@ -1,10 +1,11 @@
 ﻿using Terraria.Audio;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using Everware.Content.PreHardmode.Kiln.Visual;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
-public class KilnBrickWallBlock : ModWall
+public class KilnBrickWallPlaced : ModWall
 {
     public override void SetStaticDefaults()
     {

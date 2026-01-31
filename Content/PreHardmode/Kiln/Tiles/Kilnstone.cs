@@ -8,18 +8,18 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
 public class Kilnstone : EverPlaceableItem
 {
-    public override int PlacementID => ModContent.TileType<KilnstoneBlock>();
+    public override int PlacementID => ModContent.TileType<KilnstonePlaced>();
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe(20);
         recipe.AddIngredient(ItemID.ClayBlock, 15);
         recipe.AddIngredient(ItemID.StoneBlock, 5);
-        recipe.AddTile(TileID.Furnaces);
+        recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
     }
 }

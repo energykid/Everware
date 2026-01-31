@@ -31,6 +31,15 @@ public class Easing
         else return pointB;
     }
 
+    public static float? KeyFloatPersistent(float time, float start, float end, float pointA, float pointB, AnimationCurve curve)
+    {
+        if (time >= start && time <= end)
+        {
+            return MathHelper.Lerp(pointA, pointB, curve((time - start) / (end - start)));
+        }
+        return null;
+    }
+
     /// <summary>
     /// Sets a float based on five parameters. Essentially, a more complex version of lerp, using a reference variable.
     /// </summary>

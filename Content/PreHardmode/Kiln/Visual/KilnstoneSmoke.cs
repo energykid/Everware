@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Visual;
 
 public class KilnstoneSmoke : EverAnimatedDust
 {

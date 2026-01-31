@@ -1,18 +1,17 @@
-﻿using Everware.Content.Base.Tiles;
+﻿using Terraria.Audio;
 using Terraria.ModLoader;
-using Terraria.Audio;
 using Microsoft.Xna.Framework;
+using Everware.Content.PreHardmode.Kiln.Visual;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
-public class KilnstoneBlock : EverTile 
+public class KilnstoneWallPlaced : ModWall
 {
     public override void SetStaticDefaults()
     {
-        base.SetStaticDefaults();
         DustType = ModContent.DustType<RawKilnPowderDust>();
         SoundStyle style = new SoundStyle("Everware/Sounds/Tile/KilnstoneHit");
-        AddMapEntry(new Color(151, 62, 59));
+        AddMapEntry(new Color(181, 62, 59));
         style.PitchRange = (-0.1f, 0.1f);
         HitSound = style;
     }

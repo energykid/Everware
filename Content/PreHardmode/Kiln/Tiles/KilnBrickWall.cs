@@ -8,13 +8,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
 public class KilnBrickWall : EverPlaceableItem
 {
     public override void SetDefaults()
     {
-        Item.DefaultToPlaceableWall(ModContent.WallType<KilnBrickWallBlock>());
+        Item.DefaultToPlaceableWall(ModContent.WallType<KilnBrickWallPlaced>());
     }
 
     public override void AddRecipes()

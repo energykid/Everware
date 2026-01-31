@@ -1,14 +1,16 @@
 ﻿using Everware.Content.Base.Items;
+using Everware.Content.PreHardmode.Kiln.Tiles;
+using Everware.Content.PreHardmode.Kiln.Visual;
 using Everware.Utils;
+using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.Audio;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
-using Terraria.Graphics.Shaders;
-using Terraria.Audio;
 
-namespace Everware.Content.PreHardmode.Kilnstone;
+namespace Everware.Content.PreHardmode.Kiln.Gear;
 
 #region Armor Pieces
 [AutoloadEquip(EquipType.Head)]
@@ -26,7 +28,7 @@ public class KilnstoneHelmet : EverItem
     {
         Recipe recipe = CreateRecipe(1);
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 25);
-        recipe.AddTile(TileID.Furnaces);
+        recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
     }
 
@@ -58,7 +60,7 @@ public class KilnstoneBrickplate : EverItem
         Recipe recipe = CreateRecipe(1);
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 20);
         recipe.AddIngredient(ItemID.StoneBlock, 15);
-        recipe.AddTile(TileID.Furnaces);
+        recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
     }
 }
@@ -77,7 +79,7 @@ public class KilnstoneChausses : EverItem
         Recipe recipe = CreateRecipe(1);
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 10);
         recipe.AddIngredient(ItemID.StoneBlock, 10);
-        recipe.AddTile(TileID.Furnaces);
+        recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
     }
 
@@ -123,12 +125,13 @@ public class KilnstoneSetBonus : ModPlayer
         if (!kilnstoneSetBonus)
         {
             soundIsPlaying = false;
+            kilnstoneSetActive = 0;
         }
         kilnstoneSetActive -= 0.2f;
         kilnstoneSetActive = Math.Clamp(kilnstoneSetActive, 0, 100);
         kilnstoneTimer++;
 
-        if (kilnstoneSetActive > 10)
+        if (kilnstoneSetActive > 10 && kilnstoneSetBonus)
         {
             int dustAlpha = 255 - (int)(UseSpeedMult * 255f * 2f);
 
