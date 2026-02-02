@@ -94,8 +94,8 @@ public static class KilnGenerator
         #endregion
 
         Point ForgeLocationPoint = new Point(BasePoint.X + ForgeLocationX, BasePoint.Y);
-        int RoomExtrusionLeft = Main.rand.Next(4, 8);
-        int RoomExtrusionRight = Main.rand.Next(4, 8);
+        int RoomExtrusionLeft = Main.rand.Next(5, 8);
+        int RoomExtrusionRight = Main.rand.Next(5, 8);
         int RoomHeight = Main.rand.Next(4, 6);
         Point RoomBasePoint = new Point(ForgeLocationPoint.X + 1, BasePoint.Y + RoomHeight + 1);
 
@@ -143,7 +143,6 @@ public static class KilnGenerator
         WorldGen.PlaceObject(CookingPotX, RoomBasePoint.Y, TileID.CookingPots, direction: BedLeft ? 1 : -1);
 
         // Place hanging brazier
-        Main.tile[BrazierX, BasePoint.Y].ResetToType(TileID.AdamantiteBeam);
         WorldGen.PlaceObject(BrazierX, BasePoint.Y + 2, TileID.BrazierSuspended);
 
         // Place the Forging Kiln itself

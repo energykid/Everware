@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base;
+using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Base.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
 using Everware.Utils;
@@ -38,12 +39,26 @@ public class ForgingKiln : EverMultitile
         if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0)
         {
             Main.instance.TilesRenderer.AddSpecialPoint(i, j, TileDrawing.TileCounterType.CustomNonSolid);
+
+            bool b = true;
+            foreach (ForgingKilnSmokePillar p in ParticleSystem.AllParticles)
+            {
+                if (p.position.Distance(new Vector2((float)i * 16f, (float)j * 16f)) < 10)
+                {
+                    b = false;
+                }
+            }
+
+            if (b)
+            {
+                new ForgingKilnSmokePillar(new Vector2(i * 16, j * 16)).Spawn();
+            }
         }
     }
 
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
-        Lighting.AddLight(i, j, 0.7f, 0.5f, 0.2f);
+        Lighting.AddLight(i, j, 1.4f, 0.65f, 0.15f);
 
         float ReferenceValue = GlobalTimer.Value * 0.05f;
 
@@ -62,7 +77,6 @@ public class ForgingKiln : EverMultitile
 
     public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
     {
-        Lighting.AddLight(i, j, 2, 2, 1);
     }
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
@@ -73,7 +87,7 @@ public class ForgingKiln : EverMultitile
 
     public override void PlaceInWorld(int i, int j, Item item)
     {
-        new ForgingKilnSmokePillar(new Vector2(i * 16, j * 16)).Spawn();
+
     }
 
     public override IEnumerable<Item> GetItemDrops(int i, int j)

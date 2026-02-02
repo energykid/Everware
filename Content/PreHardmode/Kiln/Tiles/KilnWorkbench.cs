@@ -12,7 +12,6 @@ public class KilnWorkbench : EverPlaceableItem
         Recipe recipe = CreateRecipe(20);
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 10);
         recipe.AddIngredient(ItemID.Leather, 1);
-        recipe.AddTile(TileID.WorkBenches);
         recipe.Register();
     }
 }
