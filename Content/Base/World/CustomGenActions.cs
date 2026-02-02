@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using Terraria;
+﻿using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 
@@ -8,6 +6,38 @@ namespace Everware.Content.Base.World;
 
 public class CustomGenActions
 {
+    public class GrowGrass : GenAction
+    {
+        public GrowGrass() { }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            ushort type = TileID.Dirt;
+
+            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType])
+            {
+                type = Main.tile[x, y].TileType;
+
+                if (type == TileID.Dirt)
+                {
+                    if (!Main.tile[x + 1, y].HasTile ||
+                        !Main.tile[x - 1, y].HasTile ||
+                        !Main.tile[x, y + 1].HasTile ||
+                        !Main.tile[x, y - 1].HasTile ||
+                        !Main.tile[x + 1, y + 1].HasTile ||
+                        !Main.tile[x - 1, y + 1].HasTile ||
+                        !Main.tile[x - 1, y - 1].HasTile ||
+                        !Main.tile[x + 1, y - 1].HasTile)
+                    {
+                        Main.tile[x, y].ResetToType(TileID.Grass);
+                        WorldUtils.TileFrame(x, y, true);
+                    }
+                }
+            }
+
+            return UnitApply(origin, x, y, args);
+        }
+    }
     public class SetSilt : GenAction
     {
         public SetSilt() { }
@@ -55,6 +85,27 @@ public class CustomGenActions
         }
     }
 
+    public class SetTileFromOther : GenAction
+    {
+        private ushort id;
+        public SetTileFromOther(ushort ID)
+        {
+            id = ID;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType])
+            {
+                WorldGen.KillTile(x, y, false, false, true);
+                WorldGen.PlaceTile(x, y, id, true);
+            }
+
+            WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
     public class ClearTileForRoom : GenAction
     {
         private ushort id;
@@ -67,8 +118,8 @@ public class CustomGenActions
 
         public override bool Apply(Point origin, int x, int y, params object[] args)
         {
-            List<Point> ps = new List<Point>()
-            {
+            List<Point> ps =
+            [
                 new Point(-1, 0),
                 new Point(-1, -1),
                 new Point(1, 0),
@@ -77,7 +128,7 @@ public class CustomGenActions
                 new Point(0, -1),
                 new Point(1, 1),
                 new Point(-1, 1),
-            };
+            ];
 
             foreach (Point p in ps)
             {

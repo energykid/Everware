@@ -2,13 +2,8 @@
 using Everware.Content.PreHardmode.Kiln.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
 using Everware.Utils;
-using Microsoft.Xna.Framework;
 using System;
-using Terraria;
-using Terraria.Audio;
-using Terraria.Graphics.Shaders;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Everware.Content.PreHardmode.Kiln.Gear;
 
@@ -59,7 +54,6 @@ public class KilnstoneBrickplate : EverItem
     {
         Recipe recipe = CreateRecipe(1);
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 20);
-        recipe.AddIngredient(ItemID.StoneBlock, 15);
         recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
     }
@@ -78,7 +72,6 @@ public class KilnstoneChausses : EverItem
     {
         Recipe recipe = CreateRecipe(1);
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 10);
-        recipe.AddIngredient(ItemID.StoneBlock, 10);
         recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
     }
@@ -110,9 +103,12 @@ public class KilnstoneSetBonus : ModPlayer
     {
         if (!soundIsPlaying && kilnstoneSetBonus)
         {
-            SoundStyle snd = new SoundStyle("Everware/Sounds/Gear/Armor/KilnstoneSmoke");
-            snd.IsLooped = true;
-            SoundEngine.PlaySound(snd, Player.Center, Sound => {
+            SoundStyle snd = new SoundStyle("Everware/Sounds/Gear/Armor/KilnstoneSmoke")
+            {
+                IsLooped = true
+            };
+            SoundEngine.PlaySound(snd, Player.Center, Sound =>
+            {
                 Sound.Position = Player.Center;
                 Sound.Pitch = UseSpeedMult * 4f;
                 Sound.Volume = UseSpeedMult * 0.5f;

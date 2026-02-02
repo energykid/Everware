@@ -58,4 +58,31 @@ Items: {
 		DisplayName: Rough Wood
 		Tooltip: ""
 	}
+
+	KilnWorkbench: {
+		DisplayName: Kiln Workbench
+		Tooltip: ""
+	}
+
+	WornFence: {
+		DisplayName: Worn Fence
+		Tooltip: ""
+	}
+
+	WornWood: {
+		DisplayName: Worn Wood
+		Tooltip: ""
+	}
+
+	RebarRod: {
+		DisplayName: Rebar Rod
+		Tooltip: ""
+	}
+}
+
+Biomes: {
+	KilnMusic: {
+		DisplayName: Kiln Music
+		TownNPCDialogueName: the Kiln Music
+	}
 }

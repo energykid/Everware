@@ -1,9 +1,9 @@
 ﻿using Everware.Content.Base.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
 
-namespace Everware.Content.PreHardmode.MakeshiftFurniture;
+namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
-public class MakeshiftWorkbenchPlaced : WorkbenchTemplate
+public class KilnWorkbenchPlaced : WorkbenchTemplate
 {
     public override void SetStaticDefaults()
     {

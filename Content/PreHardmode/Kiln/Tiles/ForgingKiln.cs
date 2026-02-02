@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base.Tiles;
+﻿using Everware.Content.Base;
+using Everware.Content.Base.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,6 +13,8 @@ namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
 public class ForgingKiln : EverMultitile
 {
+    public static readonly string POIName = "Forging Kiln";
+
     public override int Width => 5;
     public override int Height => 5;
     public override void SetStaticDefaults()
@@ -24,7 +27,7 @@ public class ForgingKiln : EverMultitile
         AddMapEntry(new Color(151, 62, 59));
         style.PitchRange = (-0.3f, -0.1f);
         HitSound = style;
-        MinPick = 100;
+        Main.tileNoAttach[Type] = true;
         Main.tileFrameImportant[Type] = true;
     }
 
@@ -38,22 +41,11 @@ public class ForgingKiln : EverMultitile
         }
     }
 
-    public override void EmitParticles(int i, int j, Tile tile, short tileFrameX, short tileFrameY, Color tileLight, bool visible)
-    {
-        if (tileFrameX > 16 && tileFrameX < 32 && visible && tileFrameY == 0)
-        {
-            int y = 1;
-            Dust.NewDustPerfect(new Vector2((i * 16) + 16, (j - y) * 16) + new Vector2(Main.rand.Next(16), 22), ModContent.DustType<KilnstoneSmoke>(), new Vector2(0, -1f));
-        }
-    }
-
-    float ReferenceValue = 0f;
-
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
         Lighting.AddLight(i, j, 0.7f, 0.5f, 0.2f);
 
-        ReferenceValue += 0.05f;
+        float ReferenceValue = GlobalTimer.Value * 0.05f;
 
         float alph1 = 1f;
         alph1 = Easing.KeyFloatPersistent(ReferenceValue % 2, 0f, 1f, 0f, 1f, Easing.Linear).GetValueOrDefault(alph1);
@@ -77,6 +69,11 @@ public class ForgingKiln : EverMultitile
     {
         SoundEngine.PlaySound(new SoundStyle("Everware/Sounds/Tile/ForgingKilnDestroy").WithPitchOffset(0.2f), new Vector2((i * 16) + 32, (j * 16) + 32));
         base.KillMultiTile(i, j, frameX, frameY);
+    }
+
+    public override void PlaceInWorld(int i, int j, Item item)
+    {
+        new ForgingKilnSmokePillar(new Vector2(i * 16, j * 16)).Spawn();
     }
 
     public override IEnumerable<Item> GetItemDrops(int i, int j)

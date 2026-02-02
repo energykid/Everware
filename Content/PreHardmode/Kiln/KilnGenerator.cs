@@ -1,24 +1,23 @@
 ﻿using Everware.Content.Base.World;
 using Everware.Content.PreHardmode.Kiln.Tiles;
-using Everware.Content.PreHardmode.MakeshiftFurniture;
 using System;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 
 namespace Everware.Content.PreHardmode.Kiln;
 
-public class KilnGenerator
+public static class KilnGenerator
 {
     public static void GenerateKiln(Point p)
     {
-        Point BasePoint = p;
+        Point BasePoint = new Point(p.X, p.Y);
         int ForgeLocationX = 0;
 
-        ushort WoodFloorType = (ushort)ModContent.TileType<RoughWoodPlaced>();
+        ushort WoodFloorType = (ushort)ModContent.TileType<WornWoodPlaced>();
 
         #region Pass 1 (Base platform)
         // Replace ground with silt in the area
-        new Shapes.Slime(18, 1f, 0.4f).Perform(BasePoint, Actions.Chain(new CustomGenActions.SetSilt(), new Actions.Smooth(true)));
+        new Shapes.Slime(18, 1f, 1f).Perform(BasePoint, Actions.Chain(new CustomGenActions.SetSilt(), new Actions.Smooth(true)));
 
         // Create base platform
         new Shapes.Rectangle(new Rectangle(-10, 0, 20, 2)).Perform(
@@ -42,6 +41,28 @@ public class KilnGenerator
         new Shapes.Rectangle(new Rectangle(-3, -3, 7, 4)).Perform(new Point(BasePoint.X + ForgeLocationX, BasePoint.Y), Actions.Chain(
             new Actions.PlaceWall((ushort)ModContent.WallType<KilnBrickWallPlaced>()),
             new CustomGenActions.ClearTileExcept((ushort)ModContent.TileType<KilnBrickPlaced>())));
+
+        // Place fences outside range of the bricks
+        int FencesLeftTillPillar = 1;
+        for (int i = -9; i < 9; i++)
+        {
+            int height = 1;
+            if (FencesLeftTillPillar < 1)
+            {
+                height = Main.rand.Next(2, 6);
+                FencesLeftTillPillar = Main.rand.Next(1, 3);
+            }
+            for (int j = 0; j <= height; j++)
+            {
+                ushort wallType = (ushort)ModContent.WallType<KilnBrickWallPlaced>();
+                ushort fenceType = (ushort)ModContent.WallType<WornFencePlaced>();
+                if (Main.tile[BasePoint.X + i, BasePoint.Y - j].WallType == wallType) break;
+                if (Main.tile[BasePoint.X + i + 1, BasePoint.Y - j].WallType == wallType) break;
+                if (Main.tile[BasePoint.X + i - 1, BasePoint.Y - j].WallType == wallType) break;
+                WorldGen.PlaceWall(BasePoint.X + i, BasePoint.Y - j, fenceType);
+            }
+            FencesLeftTillPillar--;
+        }
 
         Point FloorPoint = new Point(BasePoint.X + ForgeLocationX, BasePoint.Y);
 
@@ -72,11 +93,11 @@ public class KilnGenerator
         }
         #endregion
 
-        Point ForgeLocationPoint = new Point(p.X + ForgeLocationX, p.Y);
+        Point ForgeLocationPoint = new Point(BasePoint.X + ForgeLocationX, BasePoint.Y);
         int RoomExtrusionLeft = Main.rand.Next(4, 8);
         int RoomExtrusionRight = Main.rand.Next(4, 8);
         int RoomHeight = Main.rand.Next(4, 6);
-        Point RoomBasePoint = new Point(ForgeLocationPoint.X + 1, p.Y + RoomHeight + 1);
+        Point RoomBasePoint = new Point(ForgeLocationPoint.X + 1, BasePoint.Y + RoomHeight + 1);
 
         #region Pass 2 (Base room & kiln itself)
 
@@ -104,7 +125,7 @@ public class KilnGenerator
         new Shapes.Rectangle(new Rectangle(-1, 0, 3, 1)).Perform(ForgeLocationPoint, Actions.Chain(
                     new Actions.RemoveWall(), new Actions.PlaceWall(WallID.GrayBrick)));
 
-        new Shapes.Rectangle(new Rectangle(-1 - RoomExtrusionLeft, 1, 3 + RoomExtrusionLeft + RoomExtrusionRight, 3)).Perform(ForgeLocationPoint, Actions.Chain(
+        new Shapes.Rectangle(new Rectangle(-1 - RoomExtrusionLeft, 1, 3 + RoomExtrusionLeft + RoomExtrusionRight, 2)).Perform(ForgeLocationPoint, Actions.Chain(
                     new Actions.RemoveWall(), new Actions.PlaceWall(WallID.GrayBrick)));
 
         bool BedLeft = Main.rand.NextBool();
@@ -112,7 +133,8 @@ public class KilnGenerator
         if (ForgeLocationX < 0) BedLeft = true;
 
         int BedX = RoomBasePoint.X + (BedLeft ? -RoomExtrusionLeft : RoomExtrusionRight - 1) + -1;
-        int CookingPotX = RoomBasePoint.X + (BedLeft ? RoomExtrusionRight - 2 : -RoomExtrusionLeft + 2) + (BedLeft ? 0 : -1);
+        int CookingPotX = RoomBasePoint.X + (BedLeft ? RoomExtrusionRight - 1 : -RoomExtrusionLeft) + (BedLeft ? 0 : -1);
+        int BrazierX = ForgeLocationPoint.X + (BedLeft ? 3 : -4);
 
         // Place bed
         WorldGen.PlaceObject(BedX, RoomBasePoint.Y, TileID.Beds, direction: BedLeft ? 1 : -1);
@@ -120,11 +142,19 @@ public class KilnGenerator
         // Place cooking pot
         WorldGen.PlaceObject(CookingPotX, RoomBasePoint.Y, TileID.CookingPots, direction: BedLeft ? 1 : -1);
 
+        // Place hanging brazier
+        Main.tile[BrazierX, BasePoint.Y].ResetToType(TileID.AdamantiteBeam);
+        WorldGen.PlaceObject(BrazierX, BasePoint.Y + 2, TileID.BrazierSuspended);
+
         // Place the Forging Kiln itself
-        WorldGen.PlaceObject(BasePoint.X + ForgeLocationX - 2, BasePoint.Y - 4, ModContent.TileType<ForgingKiln>());
+        Point KilnPoint = new Point(BasePoint.X + ForgeLocationX - 2, BasePoint.Y - 4);
+        WorldGen.PlaceObject(KilnPoint.X, KilnPoint.Y, ModContent.TileType<ForgingKiln>());
 
         // Place the workbench next to the Forging Kiln
-        WorldGen.PlaceObject(BasePoint.X + ForgeLocationX + (ForgeLocationX < 0 ? -4 : 4), BasePoint.Y - 1, ModContent.TileType<MakeshiftWorkbenchPlaced>());
+        int WorkbenchLocation = (ForgeLocationX < 0 ? 3 : -4);
+        if (ForgeLocationX == 0)
+            WorkbenchLocation = (Main.rand.NextBool() ? 3 : -4);
+        WorldGen.PlaceObject(BasePoint.X + ForgeLocationX + WorkbenchLocation, BasePoint.Y - 1, ModContent.TileType<KilnWorkbenchPlaced>());
 
         #endregion
 

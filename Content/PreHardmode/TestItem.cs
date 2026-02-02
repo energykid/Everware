@@ -1,7 +1,5 @@
 ﻿using Everware.Content.Base.Items;
 using Everware.Content.PreHardmode.Kiln;
-using Microsoft.Xna.Framework;
-using Terraria;
 
 namespace Everware.Content.PreHardmode;
 
@@ -18,7 +16,7 @@ public class TestItem : EverItem
         if (player.itemAnimation == player.itemAnimationMax - 2)
         {
             Point p = (Main.MouseWorld / 16f).ToPoint();
-            for (int i = 0; i < 20; i++) if (!Main.tileSolid[Main.tile[p].TileType] || !Main.tile[p].HasTile) p.Y++;
+            for (int i = 0; i < 60; i++) if ((Main.tile[p].HasTile && !Main.tileSolid[Main.tile[p].TileType]) || !Main.tile[p].HasTile) p.Y++;
             KilnGenerator.GenerateKiln(p);
         }
         return base.UseItem(player);

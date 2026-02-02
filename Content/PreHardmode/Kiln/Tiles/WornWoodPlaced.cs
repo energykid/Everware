@@ -1,9 +1,9 @@
 ﻿using Everware.Content.Base.Tiles;
 using Terraria.ID;
 
-namespace Everware.Content.PreHardmode.MakeshiftFurniture;
+namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
-public class RoughWoodPlaced : EverTile
+public class WornWoodPlaced : EverTile
 {
     public override void SetStaticDefaults()
     {
