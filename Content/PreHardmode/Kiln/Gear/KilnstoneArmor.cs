@@ -11,6 +11,7 @@ namespace Everware.Content.PreHardmode.Kiln.Gear;
 [AutoloadEquip(EquipType.Head)]
 public class KilnstoneHelmet : EverItem
 {
+    public override int DuplicationAmount => 1;
     public override int Rarity => ItemRarityID.Green;
 
     public override void SetDefaults()
@@ -42,6 +43,7 @@ public class KilnstoneHelmet : EverItem
 [AutoloadEquip(EquipType.Body)]
 public class KilnstoneBrickplate : EverItem
 {
+    public override int DuplicationAmount => 1;
     public override int Rarity => ItemRarityID.Green;
 
     public override void SetDefaults()
@@ -61,6 +63,7 @@ public class KilnstoneBrickplate : EverItem
 [AutoloadEquip(EquipType.Legs)]
 public class KilnstoneChausses : EverItem
 {
+    public override int DuplicationAmount => 1;
     public override int Rarity => ItemRarityID.Green;
     public override void SetDefaults()
     {
