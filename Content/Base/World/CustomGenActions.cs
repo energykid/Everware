@@ -38,6 +38,7 @@ public class CustomGenActions
             return UnitApply(origin, x, y, args);
         }
     }
+
     public class SetSilt : GenAction
     {
         public SetSilt() { }
@@ -147,6 +148,48 @@ public class CustomGenActions
             WorldGen.KillTile(x, y, false, false, true);
 
             WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
+    public class SetWall : GenAction
+    {
+        private ushort wallid;
+        public SetWall(ushort wallID)
+        {
+            wallid = wallID;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            WorldUtils.ClearWall(x, y);
+            Main.tile[x, y].ClearWallPaintAndCoating();
+            WorldGen.PlaceWall(x, y, wallid);
+
+            WorldUtils.TileFrame(x, y, true);
+
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
+    public class SetTileBetweenTwo : GenAction
+    {
+        private ushort id1;
+        private ushort id2;
+        public SetTileBetweenTwo(ushort ID1, ushort ID2)
+        {
+            id1 = ID1;
+            id2 = ID2;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            WorldUtils.ClearTile(x, y);
+
+            Main.tile[x, y].ResetToType(Main.rand.NextBool() ? id1 : id2);
+
+            WorldUtils.TileFrame(x, y, true);
+
             return UnitApply(origin, x, y, args);
         }
     }

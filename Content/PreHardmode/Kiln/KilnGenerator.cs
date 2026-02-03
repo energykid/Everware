@@ -134,7 +134,7 @@ public static class KilnGenerator
 
         int BedX = RoomBasePoint.X + (BedLeft ? -RoomExtrusionLeft : RoomExtrusionRight - 1) + -1;
         int CookingPotX = RoomBasePoint.X + (BedLeft ? RoomExtrusionRight - 1 : -RoomExtrusionLeft) + (BedLeft ? 0 : -1);
-        int BrazierX = ForgeLocationPoint.X + (BedLeft ? 3 : -4);
+        int BrazierX = ForgeLocationPoint.X + (BedLeft ? 3 : -3);
 
         // Place bed
         WorldGen.PlaceObject(BedX, RoomBasePoint.Y, TileID.Beds, direction: BedLeft ? 1 : -1);
