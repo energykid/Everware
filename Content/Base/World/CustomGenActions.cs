@@ -65,6 +65,16 @@ public class CustomGenActions
             return UnitApply(origin, x, y, args);
         }
     }
+    public class PoundTile : GenAction
+    {
+        public PoundTile() { }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            WorldGen.PoundTile(x, y);
+            return UnitApply(origin, x, y, args);
+        }
+    }
 
     public class ClearTileExcept : GenAction
     {
@@ -165,6 +175,28 @@ public class CustomGenActions
             WorldUtils.ClearWall(x, y);
             Main.tile[x, y].ClearWallPaintAndCoating();
             WorldGen.PlaceWall(x, y, wallid);
+
+            WorldUtils.TileFrame(x, y, true);
+
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
+    public class SetWallBetweenTwo : GenAction
+    {
+        private ushort wallid;
+        private ushort wallid2;
+        public SetWallBetweenTwo(ushort wallID, ushort wallID2)
+        {
+            wallid = wallID;
+            wallid2 = wallID2;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            WorldUtils.ClearWall(x, y);
+            Main.tile[x, y].ClearWallPaintAndCoating();
+            WorldGen.PlaceWall(x, y, Main.rand.NextBool() ? wallid : wallid2);
 
             WorldUtils.TileFrame(x, y, true);
 

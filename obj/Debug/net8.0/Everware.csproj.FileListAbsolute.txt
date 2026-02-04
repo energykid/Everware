@@ -11,3 +11,16 @@ C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Deb
 C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.pdb
 C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\ref\Everware.dll
 C:\Users\Mint\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.sourcelink.json
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\bin\Debug\net8.0\Everware.deps.json
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\bin\Debug\net8.0\Everware.dll
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\bin\Debug\net8.0\Everware.pdb
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.csproj.AssemblyReference.cache
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.AssemblyInfoInputs.cache
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.AssemblyInfo.cs
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.csproj.CoreCompileInputs.cache
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.sourcelink.json
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.dll
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\refint\Everware.dll
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\Everware.pdb
+C:\Users\Casey\OneDrive\Documents\My Games\Terraria\tModLoader\ModSources\Everware\obj\Debug\net8.0\ref\Everware.dll

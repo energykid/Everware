@@ -78,11 +78,16 @@ Items: {
 		DisplayName: Rebar Rod
 		Tooltip: ""
 	}
+
+	SturdyBricks: {
+		DisplayName: Sturdy Brick
+		Tooltip: ""
+	}
 }
 
 Biomes: {
 	KilnMusic: {
-		DisplayName: Kiln Music
-		TownNPCDialogueName: the Kiln Music
+		DisplayName: Kiln
+		TownNPCDialogueName: the Kiln
 	}
 }
