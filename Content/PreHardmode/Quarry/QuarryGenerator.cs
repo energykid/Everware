@@ -71,6 +71,37 @@ public static class QuarryGenerator
 
         #region Pass 2 (Building on the side)
 
+        #region Clear out area for the house
+        for (int i = 0; i < 20; i++)
+        {
+            int numTiles = 0;
+            for (int j = -i; j < 0; j++)
+            {
+                Point pointA = new Point(HousePoint.X - 6 - (j * 2), HousePoint.Y - i);
+                if (WorldGen.SolidOrSlopedTile(Main.tile[pointA]))
+                {
+                    numTiles++;
+                    new Actions.ClearTile(true).Apply(pointA, pointA.X, pointA.Y);
+                }
+            }
+            if (numTiles == 0) break;
+        }
+        for (int i = 0; i < 20; i++)
+        {
+            int numTiles = 0;
+            for (int j = -i; j < 0; j++)
+            {
+                Point pointA = new Point(HousePoint.X + 7 + (j * 2), HousePoint.Y - i);
+                if (WorldGen.SolidOrSlopedTile(Main.tile[pointA]))
+                {
+                    numTiles++;
+                    new Actions.ClearTile(true).Apply(pointA, pointA.X, pointA.Y);
+                }
+            }
+            if (numTiles == 0) break;
+        }
+        #endregion
+
         // Place foundation
         new Shapes.Rectangle(new Rectangle(-7, 2, 14, 10)).Perform(HousePoint,
             new CustomGenActions.SetTileBetweenTwo(TileID.GrayBrick, TileID.Stone)
@@ -108,18 +139,20 @@ public static class QuarryGenerator
         int SkipDoor = 0;
         // If <0, don't place the left door; if >0, don't place the right door
         // If 0, place both
+        // If 2, place neither
+        // Ideally, SkipDoor should NEVER be 2, but just in case something is completely catastrophic...
 
-        if (HousePoint.X < BasePoint.X && GetBlocksPastDoor(new Point(HousePoint.X - 8, HousePoint.Y - 2)) > 0) SkipDoor = -1;
-        if (HousePoint.X > BasePoint.X && GetBlocksPastDoor(new Point(HousePoint.X + 7, HousePoint.Y - 2)) > 0) SkipDoor = 1;
+        if (GetBlocksPastDoor(new Point(HousePoint.X - 8, HousePoint.Y - 3)) > 0 || GetBlocksPastDoor(new Point(HousePoint.X - 9, HousePoint.Y - 3)) > 0) SkipDoor = -1;
+        if (GetBlocksPastDoor(new Point(HousePoint.X + 7, HousePoint.Y - 3)) > 0 || GetBlocksPastDoor(new Point(HousePoint.X + 8, HousePoint.Y - 3)) > 0) SkipDoor = SkipDoor == -1 ? 2 : 1;
 
-        if (SkipDoor != -1)
+        if (SkipDoor != -1 && SkipDoor != 2)
         {
             new Shapes.Rectangle(new Rectangle(-7, -3, 1, 3)).Perform(HousePoint,
                 new Actions.ClearTile(true)
                 );
             WorldGen.PlaceDoor(HousePoint.X - 7, HousePoint.Y - 2, TileID.ClosedDoor);
         }
-        if (SkipDoor != 1)
+        if (SkipDoor != 1 && SkipDoor != 2)
         {
             new Shapes.Rectangle(new Rectangle(6, -3, 1, 3)).Perform(HousePoint,
                 new Actions.ClearTile(true)
@@ -134,8 +167,15 @@ public static class QuarryGenerator
         new Shapes.Rectangle(new Rectangle(-7, -8, 7, 1)).Perform(HousePoint,
             Actions.Chain(new Actions.SetTile(BrickType, true), new CustomGenActions.PoundTile())
             );
-        if (SkipDoor != 1)
+        if (!WorldGen.SolidOrSlopedTile(Main.tile[HousePoint.X + 7, HousePoint.Y - 8]))
             WorldGen.PoundTile(HousePoint.X + 7, HousePoint.Y - 7);
+
+        // Place platform in ceiling if there is no door facing the quarry itself
+        if (SkipDoor == 2 || SkipDoor == -Math.Sign(HousePositionX))
+        {
+            new Shapes.Rectangle(new Rectangle(-2, -8, 4, 3)).Perform(HousePoint, new Actions.ClearTile(true));
+            new Shapes.Rectangle(new Rectangle(-2, -6, 4, 1)).Perform(HousePoint, new Actions.PlaceTile(TileID.Platforms));
+        }
 
         // Place rebar-cross windows
         new Shapes.Rectangle(new Rectangle(-5, -3, 10, 2)).Perform(HousePoint,
@@ -145,6 +185,32 @@ public static class QuarryGenerator
         // Place lanterns
         WorldGen.PlaceObject(HousePoint.X - 5, HousePoint.Y - 5, TileID.HangingLanterns);
         WorldGen.PlaceObject(HousePoint.X + 4, HousePoint.Y - 5, TileID.HangingLanterns);
+
+        // Place staircases up to the room
+        for (int i = 0; i < 16; i++)
+        {
+            Point CurrentStairPos = new Point(HousePoint.X - 8 - i, HousePoint.Y + i);
+            if (WorldGen.SolidOrSlopedTile(Main.tile[CurrentStairPos]))
+            {
+                WorldGen.SlopeTile(CurrentStairPos.X, CurrentStairPos.Y, (int)SlopeType.Solid);
+                break;
+            }
+            WorldGen.KillTile(CurrentStairPos.X, CurrentStairPos.Y, noItem: true);
+            WorldGen.PlaceTile(CurrentStairPos.X, CurrentStairPos.Y, TileID.Platforms);
+            if (i != 15) WorldGen.SlopeTile(CurrentStairPos.X, CurrentStairPos.Y, (int)SlopeType.SlopeDownRight);
+        }
+        for (int i = 0; i < 16; i++)
+        {
+            Point CurrentStairPos = new Point(HousePoint.X + 7 + i, HousePoint.Y + i);
+            if (WorldGen.SolidOrSlopedTile(Main.tile[CurrentStairPos]))
+            {
+                WorldGen.SlopeTile(CurrentStairPos.X, CurrentStairPos.Y, (int)SlopeType.Solid);
+                break;
+            }
+            WorldGen.KillTile(CurrentStairPos.X, CurrentStairPos.Y, noItem: true);
+            WorldGen.PlaceTile(CurrentStairPos.X, CurrentStairPos.Y, TileID.Platforms);
+            if (i != 15) WorldGen.SlopeTile(CurrentStairPos.X, CurrentStairPos.Y, (int)SlopeType.SlopeDownLeft);
+        }
 
         #endregion
     }
