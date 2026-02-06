@@ -16,7 +16,10 @@ public class KilnOrQuarryGeneration : ModSystem
             Point spawn = new(Main.spawnTileX, Main.spawnTileY);
             if (!Main.drunkWorld)
             {
-                KilnGenerator.GenerateKiln(GetPointFrom(spawn));
+                if (Main.rand.NextBool())
+                    KilnGenerator.GenerateKiln(GetPointFrom(spawn));
+                else
+                    QuarryGenerator.GenerateQuarry(GetPointFrom(spawn));
             }
             else
             {

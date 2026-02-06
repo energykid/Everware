@@ -102,7 +102,6 @@ public static class QuarryGenerator
         }
         #endregion
 
-
         // Replace ground with silt in the area
         new Shapes.Circle(22).Perform(HousePoint, Actions.Chain(new CustomGenActions.SetSiltForQuarry(), new Actions.Smooth(true)));
 
@@ -189,6 +188,9 @@ public static class QuarryGenerator
         // Place lanterns
         WorldGen.PlaceObject(HousePoint.X - 5, HousePoint.Y - 5, TileID.HangingLanterns);
         WorldGen.PlaceObject(HousePoint.X + 4, HousePoint.Y - 5, TileID.HangingLanterns);
+
+        // Place Welding Station
+        WorldGen.PlaceObject(HousePoint.X, HousePoint.Y - 1, ModContent.TileType<WeldingStation>());
 
         // Place staircases up to the room
         for (int i = 0; i < 16; i++)

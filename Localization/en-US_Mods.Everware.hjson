@@ -30,7 +30,7 @@ Items: {
 	}
 
 	TestItem: {
-		DisplayName: Test Item
+		DisplayName: Dev Item
 		Tooltip: ""
 	}
 
@@ -85,7 +85,7 @@ Items: {
 	}
 
 	WeldingStationItem: {
-		DisplayName: Welding Station Item
+		DisplayName: Welding Station
 		Tooltip: ""
 	}
 }

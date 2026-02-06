@@ -29,7 +29,7 @@ public class ParticleSystem : ModSystem
 
 public abstract class Particle : Entity
 {
-    public string Sprite = "";
+    public static string Sprite => "";
     public Vector2 FrameCount = Vector2.One;
     public Vector2 FrameNum = Vector2.Zero;
     public Color Color = Color.White;
@@ -37,6 +37,7 @@ public abstract class Particle : Entity
     public Vector2 Scale = Vector2.One;
     public SpriteEffects Effects = SpriteEffects.None;
     public bool DrawBelowEntities = false;
+    public bool AffectedByLight = true;
 
     public delegate void ParticleFunction(Particle p);
 
@@ -53,15 +54,16 @@ public abstract class Particle : Entity
         ParticleSystem.AllParticles.Remove(this);
     }
 
-    public Particle(string sprite, Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null)
+    public Particle(Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null)
     {
-        Sprite = sprite;
         position = pos;
         velocity = vel;
         Scale = scale;
         UpdateFunction = upd;
         DrawFunction = drw;
     }
+
+    public static readonly Asset<Texture2D> Texture = ModContent.Request<Texture2D>(Sprite);
 
     public virtual void Update()
     {
@@ -75,9 +77,9 @@ public abstract class Particle : Entity
             DrawFunction(this);
         if (Sprite != "")
         {
-            Asset<Texture2D> tex = ModContent.Request<Texture2D>(Sprite);
-            Rectangle frame = tex.Frame((int)FrameCount.X, (int)FrameCount.Y, (int)FrameNum.X, (int)FrameNum.Y);
-            Main.EntitySpriteDraw(tex.Value, position - Main.screenPosition, frame, Color, Rotation, frame.Size() / 2f, Scale, Effects);
+            Color c = !AffectedByLight ? Color : Color.MultiplyRGBA(Lighting.GetColor((position / 16f).ToPoint()));
+            Rectangle frame = Texture.Frame((int)FrameCount.X, (int)FrameCount.Y, (int)FrameNum.X, (int)FrameNum.Y);
+            Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, Color, Rotation, frame.Size() / 2f, Scale, Effects);
         }
     }
 }

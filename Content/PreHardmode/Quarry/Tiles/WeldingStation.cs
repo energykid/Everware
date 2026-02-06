@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
+using Terraria.ID;
 using Terraria.ObjectData;
 
 namespace Everware.Content.PreHardmode.Quarry.Tiles;
@@ -61,6 +62,17 @@ public class WeldingStation : EverMultitile
         Vector2 LaserX2 = new Vector2(10 - (X * 10), 0f);
 
         Vector2 BaseVector = new Vector2(i * 16, j * 16) + new Vector2(68, 6);
+
+        Vector2 SparkBaseVector = new Vector2(i * 16, j * 16) + new Vector2(22, 20);
+
+        Dust d1 = Dust.NewDustPerfect(SparkBaseVector + new Vector2(-16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), DustID.MinecartSpark, new Vector2(-2f, -1f).RotatedByRandom(0.5f));
+        Dust d2 = Dust.NewDustPerfect(SparkBaseVector + new Vector2(16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), DustID.MinecartSpark, new Vector2(2f, -1f).RotatedByRandom(0.5f));
+
+        d1.noGravity = false;
+        d2.noGravity = false;
+
+        d1.fadeIn = 1f;
+        d2.fadeIn = 1f;
 
         Vector2 X1 = BaseVector + LaserX1;
 

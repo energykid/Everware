@@ -8,16 +8,15 @@ namespace Everware.Content.PreHardmode.Kiln.Visual;
 
 public class ForgingKilnSmokePillar : Particle
 {
-    public ForgingKilnSmokePillar(string sprite, Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null) : base(sprite, pos, vel, scale, upd, drw)
+    public ForgingKilnSmokePillar(string sprite, Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null) : base(pos, vel, scale, upd, drw)
     {
-        Sprite = sprite;
         position = pos;
         velocity = vel;
         Scale = scale;
         UpdateFunction = upd;
         DrawFunction = drw;
     }
-    public ForgingKilnSmokePillar(Vector2 pos) : base("", pos, Vector2.Zero, Vector2.One, null, null) { }
+    public ForgingKilnSmokePillar(Vector2 pos) : base(pos, Vector2.Zero, Vector2.One, null, null) { }
 
     float PillarPosition = 0f;
     float Timer = 0f;
