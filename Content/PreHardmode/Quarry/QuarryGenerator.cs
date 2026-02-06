@@ -102,6 +102,10 @@ public static class QuarryGenerator
         }
         #endregion
 
+
+        // Replace ground with silt in the area
+        new Shapes.Circle(22).Perform(HousePoint, Actions.Chain(new CustomGenActions.SetSiltForQuarry(), new Actions.Smooth(true)));
+
         // Place foundation
         new Shapes.Rectangle(new Rectangle(-7, 2, 14, 10)).Perform(HousePoint,
             new CustomGenActions.SetTileBetweenTwo(TileID.GrayBrick, TileID.Stone)
@@ -213,6 +217,12 @@ public static class QuarryGenerator
         }
 
         #endregion
+
+        // Get rid of item drops (from trees and whatnot)
+        for (int i = 0; i < Main.item.Length; i++)
+        {
+            Main.item[i].active = false;
+        }
     }
 
     public static Point GroundPoint(Point p)

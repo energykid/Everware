@@ -17,7 +17,7 @@ public static class KilnGenerator
 
         #region Pass 1 (Base platform)
         // Replace ground with silt in the area
-        new Shapes.Slime(18, 1f, 1f).Perform(BasePoint, Actions.Chain(new CustomGenActions.SetSilt(), new Actions.Smooth(true)));
+        new Shapes.Slime(22, 1f, 1f).Perform(BasePoint, Actions.Chain(new CustomGenActions.SetSilt(), new Actions.Smooth(true)));
 
         // Create base platform
         new Shapes.Rectangle(new Rectangle(-10, 0, 20, 2)).Perform(

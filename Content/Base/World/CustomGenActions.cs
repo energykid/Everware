@@ -65,6 +65,30 @@ public class CustomGenActions
             return UnitApply(origin, x, y, args);
         }
     }
+
+    public class SetSiltForQuarry : GenAction
+    {
+        public SetSiltForQuarry() { }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            ushort type = TileID.Stone;
+
+            if (WorldGen.SolidOrSlopedTile(Main.tile[x, y]) && Main.tile[x, y].TileType != type)
+            {
+                Main.tile[x, y].ResetToType(TileID.Silt);
+            }
+
+            if (!Main.tile[x, y + 1].HasTile && Main.tile[x, y].TileType == TileID.Silt)
+            {
+                Main.tile[x, y + 1].ResetToType(TileID.Stone);
+                Main.tile[x, y + 2].ResetToType(TileID.Stone);
+            }
+
+            WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
     public class PoundTile : GenAction
     {
         public PoundTile() { }
