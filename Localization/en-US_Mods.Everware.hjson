@@ -83,6 +83,11 @@ Items: {
 		DisplayName: Sturdy Brick
 		Tooltip: ""
 	}
+
+	WeldingStationItem: {
+		DisplayName: Welding Station Item
+		Tooltip: ""
+	}
 }
 
 Biomes: {
