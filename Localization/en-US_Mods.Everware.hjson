@@ -88,6 +88,11 @@ Items: {
 		DisplayName: Welding Station
 		Tooltip: ""
 	}
+
+	Kilnpost: {
+		DisplayName: Kilnpost
+		Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -95,4 +100,11 @@ Biomes: {
 		DisplayName: Kiln
 		TownNPCDialogueName: the Kiln
 	}
+
+	QuarryMusic: {
+		DisplayName: Quarry Music
+		TownNPCDialogueName: the Quarry Music
+	}
 }
+
+Projectiles.KilnpostHoldout.DisplayName: Kilnpost Holdout

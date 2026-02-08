@@ -1,10 +1,14 @@
 ﻿using Everware.Content.Base.Items;
-using Everware.Content.PreHardmode.Quarry;
+using Everware.Content.PreHardmode.Kiln;
 
 namespace Everware.Content.PreHardmode;
 
 public class TestItem : EverItem
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return false;
+    }
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -17,7 +21,7 @@ public class TestItem : EverItem
         {
             Point p = (Main.MouseWorld / 16f).ToPoint();
             for (int i = 0; i < 60; i++) if ((Main.tile[p].HasTile && !Main.tileSolid[Main.tile[p].TileType]) || !Main.tile[p].HasTile) p.Y++;
-            QuarryGenerator.GenerateQuarry(p);
+            KilnGenerator.GenerateKiln(p);
         }
         return base.UseItem(player);
     }

@@ -1,1 +1,5 @@
-Modify this file with a description of your mod.
+Everware v0.1 - humble beginnings
+
+added the Kiln and Quarry structures, interchangeably generating. generating a drunk world spawns both.
+added Kilnstone armor, the Claymore, and the Kilnpost, craftable only at the Kiln
+added Rebar armor, the Rebuker, and the Unearther, craftable only at the Quarry

@@ -1,11 +1,11 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.Tiles;
+using Everware.Content.PreHardmode.Quarry.Visual;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
-using Terraria.ID;
 using Terraria.ObjectData;
 
 namespace Everware.Content.PreHardmode.Quarry.Tiles;
@@ -63,16 +63,16 @@ public class WeldingStation : EverMultitile
 
         Vector2 BaseVector = new Vector2(i * 16, j * 16) + new Vector2(68, 6);
 
-        Vector2 SparkBaseVector = new Vector2(i * 16, j * 16) + new Vector2(22, 20);
+        Vector2 SparkBaseVector = new Vector2(i * 16, j * 16) + new Vector2(20, 20);
 
-        Dust d1 = Dust.NewDustPerfect(SparkBaseVector + new Vector2(-16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), DustID.MinecartSpark, new Vector2(-2f, -1f).RotatedByRandom(0.5f));
-        Dust d2 = Dust.NewDustPerfect(SparkBaseVector + new Vector2(16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), DustID.MinecartSpark, new Vector2(2f, -1f).RotatedByRandom(0.5f));
+        if (!Main.gameInactive)
+        {
+            if (Main.rand.NextBool(3))
+                new WeldingSpark(SparkBaseVector + new Vector2(-16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), new Vector2(-1f, -2f).RotatedByRandom(1f)).Spawn();
 
-        d1.noGravity = false;
-        d2.noGravity = false;
-
-        d1.fadeIn = 1f;
-        d2.fadeIn = 1f;
+            if (Main.rand.NextBool(3))
+                new WeldingSpark(SparkBaseVector + new Vector2(16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), new Vector2(1f, -2f).RotatedByRandom(1f)).Spawn();
+        }
 
         Vector2 X1 = BaseVector + LaserX1;
 
@@ -85,6 +85,7 @@ public class WeldingStation : EverMultitile
         }
         else
         {
+            Lighting.AddLight(BaseVector, 0.6f, 0f, 0f);
             spriteBatch.Draw(LaserTexture2.Value, BaseVector + LaserX1 - Main.screenPosition, LightColor);
             spriteBatch.Draw(LaserTexture2.Value, BaseVector + LaserX2 - Main.screenPosition, LightColor);
             spriteBatch.Draw(LaserTexture2Glow.Value, BaseVector + LaserX1 - Main.screenPosition, Color.White);

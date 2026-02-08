@@ -29,7 +29,6 @@ public class ParticleSystem : ModSystem
 
 public abstract class Particle : Entity
 {
-    public static string Sprite => "";
     public Vector2 FrameCount = Vector2.One;
     public Vector2 FrameNum = Vector2.Zero;
     public Color Color = Color.White;
@@ -38,6 +37,9 @@ public abstract class Particle : Entity
     public SpriteEffects Effects = SpriteEffects.None;
     public bool DrawBelowEntities = false;
     public bool AffectedByLight = true;
+    public float Opacity = 1f;
+
+    public virtual Asset<Texture2D> Texture => null;
 
     public delegate void ParticleFunction(Particle p);
 
@@ -63,8 +65,6 @@ public abstract class Particle : Entity
         DrawFunction = drw;
     }
 
-    public static readonly Asset<Texture2D> Texture = ModContent.Request<Texture2D>(Sprite);
-
     public virtual void Update()
     {
         if (UpdateFunction != null)
@@ -75,11 +75,11 @@ public abstract class Particle : Entity
     {
         if (DrawFunction != null)
             DrawFunction(this);
-        if (Sprite != "")
+        if (Texture != null)
         {
             Color c = !AffectedByLight ? Color : Color.MultiplyRGBA(Lighting.GetColor((position / 16f).ToPoint()));
             Rectangle frame = Texture.Frame((int)FrameCount.X, (int)FrameCount.Y, (int)FrameNum.X, (int)FrameNum.Y);
-            Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, Color, Rotation, frame.Size() / 2f, Scale, Effects);
+            Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, Color.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, frame.Size() / 2f, Scale, Effects);
         }
     }
 }

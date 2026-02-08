@@ -41,11 +41,14 @@ public class ForgingKiln : EverMultitile
             Main.instance.TilesRenderer.AddSpecialPoint(i, j, TileDrawing.TileCounterType.CustomNonSolid);
 
             bool b = true;
-            foreach (ForgingKilnSmokePillar p in ParticleSystem.AllParticles)
+            foreach (Particle p in ParticleSystem.AllParticles)
             {
-                if (p.position.Distance(new Vector2((float)i * 16f, (float)j * 16f)) < 10)
+                if (p is ForgingKilnSmokePillar)
                 {
-                    b = false;
+                    if (p.position.Distance(new Vector2((float)i * 16f, (float)j * 16f)) < 10)
+                    {
+                        b = false;
+                    }
                 }
             }
 

@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ModLoader;
+using System.IO;
 
 namespace Everware;
 
 public class Everware : Mod
 {
-
+    public Everware Instance => this;
+    public override void HandlePacket(BinaryReader reader, int whoAmI)
+    {
+        base.HandlePacket(reader, whoAmI);
+        EverwarePacketHandler.HandleAllPackets(Instance, reader, whoAmI);
+    }
 }
