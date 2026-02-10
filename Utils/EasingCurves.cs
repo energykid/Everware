@@ -1,9 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Everware.Utils;
 
@@ -29,6 +24,14 @@ public class Easing
         if (time < start)
             return pointA;
         else return pointB;
+    }
+    public static float KeyFloat(float time, float start, float end, float pointA, float pointB, AnimationCurve curve, float def)
+    {
+        if (time >= start && time <= end)
+        {
+            return MathHelper.Lerp(pointA, pointB, curve((time - start) / (end - start)));
+        }
+        return def;
     }
 
     public static float? KeyFloatPersistent(float time, float start, float end, float pointA, float pointB, AnimationCurve curve)

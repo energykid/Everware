@@ -13,7 +13,7 @@ public static class EverItemExtensions
     {
         item.useTime = useTime;
         item.useAnimation = useTime;
-        item.useStyle = ItemUseStyleID.Swing;
+        item.useStyle = ItemUseStyleID.HiddenAnimation;
         item.damage = damage;
         item.DamageType = clss;
         item.noMelee = true;
