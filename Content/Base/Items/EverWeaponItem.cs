@@ -31,7 +31,7 @@ public abstract class EverWeaponItem : EverItem
     }
     public override bool? UseItem(Player player)
     {
-        if (HoldoutType != null && player.ownedProjectileCounts[(int)HoldoutType] < 1)
+        if (HoldoutType != null && player.ownedProjectileCounts[(int)HoldoutType] < 1 && player.heldProj == -1)
         {
             var proj = Projectile.NewProjectileDirect(new EntitySource_Misc("Held Projectile"), player.Center, Vector2.Zero, (int)HoldoutType, Item.damage, Item.knockBack, player.whoAmI);
 
@@ -89,5 +89,9 @@ public abstract class EverWeaponItem : EverItem
                 Shoot(player, es, position, player.DirectionTo(player.GetModPlayer<NetworkPlayer>().MousePosition) * Item.shootSpeed, Item.shoot, Item.damage, Item.knockBack);
             }
         }
+    }
+    public override bool CanUseItem(Player player)
+    {
+        return player.heldProj == -1 && base.CanUseItem(player) && player.ownedProjectileCounts[(int)HoldoutType] < 1;
     }
 }

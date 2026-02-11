@@ -91,7 +91,9 @@ Items: {
 
 	Kilnpost: {
 		DisplayName: Kilnpost
-		Tooltip: ""
+		Tooltip:'''
+		Stop attacking to break the weapon off into an enemy
+		'''
 	}
 }
 
@@ -107,4 +109,7 @@ Biomes: {
 	}
 }
 
-Projectiles.KilnpostHoldout.DisplayName: Kilnpost Holdout
+Projectiles: {
+	KilnpostHoldout.DisplayName: Kilnpost Holdout
+	KilnpostBreakaway.DisplayName: Kilnpost Breakaway
+}

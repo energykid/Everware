@@ -21,6 +21,11 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public Vector2 Origin = Vector2.Zero;
     public Vector2 Scale = Vector2.One;
     public SpriteEffects Effects = SpriteEffects.None;
+    public bool Persist = false;
+    public bool AutoDirection = true;
+    public int HitFrames = 0;
+    public bool HasMouseBeenReleased = false;
+    public bool Started = false;
     public virtual Asset<Texture2D> Asset { get => ModContent.Request<Texture2D>(Texture); }
     public override void SetDefaults()
     {
@@ -29,15 +34,24 @@ public abstract class EverHoldoutProjectile : EverProjectile
         Projectile.friendly = true;
         Projectile.tileCollide = false;
         Projectile.usesLocalNPCImmunity = true;
-        Projectile.localNPCHitCooldown = 1;
+        Projectile.localNPCHitCooldown = 2;
     }
     public override void NetOnSpawn()
     {
         if (Asset != null)
             Frame = Asset.Frame();
     }
+    public override bool? CanDamage()
+    {
+        return (base.CanDamage() == true || base.CanDamage() == null) && HitFrames > 0;
+    }
     public override void AI()
     {
+        if (!NetworkOwner.MouseDown && Started == true) HasMouseBeenReleased = true;
+        Started = true;
+
+        HitFrames--;
+
         Projectile.timeLeft = 10;
 
         if (Owner.ItemAnimationActive)
@@ -57,7 +71,8 @@ public abstract class EverHoldoutProjectile : EverProjectile
         Projectile.Center = Owner.Center + Offset;
         Projectile.rotation = Rotation + RotationOffset;
 
-        Owner.direction = Math.Sign(new Vector2(1, 0).RotatedBy(Rotation).X);
+        if (AutoDirection)
+            Owner.direction = Math.Sign(new Vector2(1, 0).RotatedBy(Rotation).X);
 
         Owner.SetCompositeArmBack(false, Player.CompositeArmStretchAmount.None, 0f);
         Owner.SetCompositeArmFront(false, Player.CompositeArmStretchAmount.None, 0f);
@@ -83,7 +98,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
     }
     public virtual bool ShouldKill()
     {
-        return Projectile.ai[0] < -2;
+        return Projectile.ai[0] < -2 && !Persist;
     }
     public static Player.CompositeArmStretchAmount StretchAmountFromExtension(float ext)
     {
