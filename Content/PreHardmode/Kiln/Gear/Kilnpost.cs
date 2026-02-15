@@ -21,8 +21,8 @@ public class Kilnpost : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(10, 40, DamageClass.Melee);
-        Item.knockBack = 2f;
+        Item.DefaultToBasicWeapon(8, 40, DamageClass.Melee);
+        Item.knockBack = 1f;
     }
 }
 public class KilnpostHoldout : EverHoldoutProjectile
@@ -58,7 +58,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
             Projectile.ai[2] = 70f;
             Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
             BaseRot = Rotation;
-            Dir = Owner.direction;
+            Dir = Math.Sign(NetworkOwner.MousePosition.X - Owner.Center.X);
             State = (State == "Spin") ? "Thrust" : "Spin";
             if (State == "Thrust")
             {
@@ -110,6 +110,8 @@ public class KilnpostHoldout : EverHoldoutProjectile
         }
 
         NPC npc = Main.npc[npcWhoAmI];
+
+        npc.velocity += new Vector2(12, -12).RotatedBy(Projectile.rotation) * npc.knockBackResist;
 
         ScreenEffects.AddScreenShake(npc.Center, 3f, 0.5f);
 
@@ -176,7 +178,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
 
         if (Projectile.ai[2] < 32)
         {
-            Projectile.damage = 10;
+            Projectile.damage = 8;
         }
 
         RotationOffset = MathHelper.ToRadians(45f);
@@ -189,7 +191,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public void SpinMotion()
     {
-        Projectile.damage = 3;
+        Projectile.damage = 2;
 
         Projectile.ai[1]++;
 
@@ -230,18 +232,20 @@ public class KilnpostBreakaway : EverProjectile
 {
     public Vector2 Pos = Vector2.Zero;
     float Shake = 3f;
+    float Out = 3f;
+
 
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
-        behindNPCs.Add(index);
     }
 
     public override void AI()
     {
+        Projectile.tileCollide = false;
+        Out *= 0.7f;
         Shake *= 0.7f;
-        Projectile.hide = true;
         if (Projectile.ai[0] != 0)
-            Projectile.Center = Main.npc[(int)Projectile.ai[0]].Center + Pos + new Vector2(Shake, 0).RotatedByRandom(MathHelper.TwoPi) + new Vector2(3 - (Shake * 3), 0).RotatedBy(Projectile.rotation + MathHelper.ToRadians(135f));
+            Projectile.Center = Main.npc[(int)Projectile.ai[0]].Center + Pos + new Vector2(Shake, 0).RotatedByRandom(MathHelper.TwoPi) + new Vector2(3 - (Out * 3), 0).RotatedBy(Projectile.rotation + MathHelper.ToRadians(135f));
         else Projectile.Kill();
 
         if (!Main.npc[(int)Projectile.ai[0]].active)
@@ -256,9 +260,10 @@ public class KilnpostBreakaway : EverProjectile
             if (Projectile.alpha > 255) Projectile.Kill();
         }
 
-        if (Projectile.ai[1] % 4 == 0 && Projectile.ai[1] < 12)
+        if (Projectile.ai[1] % 15 == 14 && Projectile.ai[1] < 90)
         {
-            Main.npc[(int)Projectile.ai[0]].SimpleStrikeNPC(4, 0);
+            Shake = 3f;
+            Main.npc[(int)Projectile.ai[0]].SimpleStrikeNPC(1, 0);
         }
     }
 

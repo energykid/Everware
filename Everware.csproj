@@ -16,9 +16,6 @@
 	<ItemGroup>
 	  <None Include="Content\Base\Tiles\EverMultitile.cs" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Content\PreHardmode\Quarry\Gear\" />
-	</ItemGroup>
 
 	<!-- References -->
 

@@ -1,7 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-
-namespace Everware.Content.Base.Dusts;
+﻿namespace Everware.Content.Base.Dusts;
 
 public abstract class EverAnimatedDust : EverDust
 {

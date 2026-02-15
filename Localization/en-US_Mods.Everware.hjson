@@ -91,9 +91,27 @@ Items: {
 
 	Kilnpost: {
 		DisplayName: Kilnpost
-		Tooltip:'''
-		Stop attacking to break the weapon off into an enemy
-		'''
+		Tooltip: Can break off into enemies when releasing LMB
+	}
+
+	RebarCrest: {
+		DisplayName: Rebar Crest
+		Tooltip: ""
+	}
+
+	RebarGridmail: {
+		DisplayName: Rebar Gridmail
+		Tooltip: ""
+	}
+
+	RebarLeggings: {
+		DisplayName: Rebar Leggings
+		Tooltip: ""
+	}
+
+	RebarSandals: {
+		DisplayName: Rebar Sandals
+		Tooltip: ""
 	}
 }
 
@@ -104,12 +122,12 @@ Biomes: {
 	}
 
 	QuarryMusic: {
-		DisplayName: Quarry Music
-		TownNPCDialogueName: the Quarry Music
+		DisplayName: Quarry
+		TownNPCDialogueName: the Quarry
 	}
 }
 
 Projectiles: {
-	KilnpostHoldout.DisplayName: Kilnpost Holdout
-	KilnpostBreakaway.DisplayName: Kilnpost Breakaway
+	KilnpostHoldout.DisplayName: Kilnpost
+	KilnpostBreakaway.DisplayName: Kiln Shard
 }

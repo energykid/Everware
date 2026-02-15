@@ -4,3 +4,8 @@
 /obj/Debug/net8.0
 *.editorconfig
 *.cache
+/obj
+/obj/Debug/net8.0
+/obj/Debug
+/obj
+/.vs

@@ -114,4 +114,9 @@ public abstract class EverHoldoutProjectile : EverProjectile
                 return Player.CompositeArmStretchAmount.None;
         }
     }
+    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+    {
+        base.ModifyHitNPC(target, ref modifiers);
+        modifiers.HitDirectionOverride = Math.Sign(target.Center.X - Owner.Center.X);
+    }
 }
