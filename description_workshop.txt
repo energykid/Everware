@@ -1,9 +1,17 @@
 [h1] Everware [/h1]
 
+-+=+-
+
 this mod adds content, no restrictions. no set theme - any addition or change is fair game so long as i want to create it!
 
 i try my best to make sure attention is given to details and take care to make content feel at home in Terraria while giving it my own spin.
 
-current content in Everware is short and simple, including two interchangeable world structures which you get one of per world: the Kiln and the Quarry. each has its own exclusive set of crafted gear, a custom theme, and carefully-tuned extra visual details.
+current content in Everware is short and simple, including two interchangeable world structures of which you get one per world: the Kiln and the Quarry. each has its own small set of crafted gear, a custom theme, and carefully-tuned extra visual details.
 
 once downloaded, check the mod's in-game description for more details!
+
+-+=+-
+
+credits:
+ENNWAY - director, lead programmer, artist, sound designer and musician
+Jaqbix - artist

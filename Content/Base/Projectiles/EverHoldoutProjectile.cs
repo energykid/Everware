@@ -89,7 +89,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         return false;
     }
-    public virtual void UseItem(Item item, Player owner)
+    public virtual void UseAmmo(Item item, Player owner)
     {
         if (AmmoType != AmmoID.None)
         {

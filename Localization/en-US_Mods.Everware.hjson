@@ -89,11 +89,6 @@ Items: {
 		Tooltip: ""
 	}
 
-	Kilnpost: {
-		DisplayName: Kilnpost
-		Tooltip: Can break off into enemies when releasing LMB
-	}
-
 	RebarCrest: {
 		DisplayName: Rebar Crest
 		Tooltip: ""
@@ -113,6 +108,16 @@ Items: {
 		DisplayName: Rebar Sandals
 		Tooltip: ""
 	}
+
+	Kilnpost: {
+		DisplayName: Kilnpost
+		Tooltip: Can break off into enemies when releasing LMB
+	}
+
+	Rebuker: {
+		DisplayName: Rebuker
+		Tooltip: Fires a piercing metal rod that deals more damage on early hits
+	}
 }
 
 Biomes: {
@@ -130,4 +135,6 @@ Biomes: {
 Projectiles: {
 	KilnpostHoldout.DisplayName: Kilnpost
 	KilnpostBreakaway.DisplayName: Kiln Shard
+	RebukerBolt.DisplayName: Rebuker
+	RebukerHoldout.DisplayName: Rebuker
 }

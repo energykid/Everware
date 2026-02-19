@@ -9,7 +9,7 @@ public class KilnWorkbench : EverPlaceableItem
 
     public override void AddRecipes()
     {
-        Recipe recipe = CreateRecipe(20);
+        Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 10);
         recipe.AddIngredient(ItemID.Leather, 1);
         recipe.Register();

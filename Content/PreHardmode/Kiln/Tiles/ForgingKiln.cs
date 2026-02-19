@@ -2,9 +2,9 @@
 using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Base.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
+using Everware.Core;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
@@ -31,8 +31,6 @@ public class ForgingKiln : EverMultitile
         Main.tileNoAttach[Type] = true;
         Main.tileFrameImportant[Type] = true;
     }
-
-    public static readonly Asset<Texture2D> FireGlow = ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Kiln/Tiles/ForgingKilnGlow");
 
     public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
     {
@@ -61,6 +59,8 @@ public class ForgingKiln : EverMultitile
 
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        var FireGlow = AssetReferences.Content.PreHardmode.Kiln.Tiles.ForgingKilnGlow.Asset;
+
         Lighting.AddLight(i, j, 1.4f, 0.65f, 0.15f);
 
         float ReferenceValue = GlobalTimer.Value * 0.05f;
