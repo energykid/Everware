@@ -11,10 +11,9 @@
 using System;
 using System.Reflection;
 
+[assembly: System.Runtime.CompilerServices.IgnoresAccessChecksToAttribute("tModLoader")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Everware")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6fb92be7d785aa3592da951adbddeaac01e7f9cc")]
 [assembly: System.Reflection.AssemblyProductAttribute("Everware")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Everware")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
