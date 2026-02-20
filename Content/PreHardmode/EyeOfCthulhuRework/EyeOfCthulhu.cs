@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base;
+﻿using Everware.Common.Systems;
+using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using Everware.Core;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,6 +11,13 @@ namespace Everware.Content.PreHardmode.EyeOfCthulhuRework;
 
 public class EyeOfCthulhu : GlobalNPC
 {
+    // Tendril 0: front left
+    // Tendril 1: front right
+    // Tendril 2: back left
+    // Tendril 3: back right
+    public Vector2[] TendrilPositions = new Vector2[4];
+    public Vector2[] TendrilJointPositions = new Vector2[4];
+    public Vector2[] TendrilClawPositions = new Vector2[4];
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
@@ -34,6 +42,13 @@ public class EyeOfCthulhu : GlobalNPC
     {
         base.SetDefaults(npc);
         npc.aiStyle = -1;
+
+        for (int i = 0; i < 4; i++)
+        {
+            TendrilPositions[i] = TendrilJointPositions[i] = TendrilClawPositions[i] = npc.Center;
+        }
+
+        PupilPaletteNum = Main.rand.Next(3);
     }
     public override void FindFrame(NPC npc, int frameHeight)
     {
@@ -43,25 +58,42 @@ public class EyeOfCthulhu : GlobalNPC
     public int EyeDilationReset = 0;
     public override void AI(NPC npc)
     {
-        npc.TargetClosest();
+        if (npc.ai[0] == 0)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                TendrilPositions[i] = TendrilJointPositions[i] = TendrilClawPositions[i] = npc.Center;
+            }
+        }
+        else
+        {
+            MoveTendrilsIdle(npc);
+        }
 
         EyeDilationReset--;
         if (EyeDilationReset <= 0)
             EyeDilation = MathHelper.Lerp(EyeDilation, 0.3f + (float)(Math.Sin(GlobalTimer.Value / 10f) * 0.05f), 0.2f);
         else
         {
-            EyeDilation = MathHelper.Lerp(EyeDilation, 0f, 0.6f);
+            EyeDilation = MathHelper.Lerp(EyeDilation, -0.2f, 0.6f);
         }
 
         AttackTimer++;
 
-        if (AttackTimer > 60)
+        if (AttackTimer > 100)
         {
-            if (CurrentPupilWidth == PupilWidth.Normal) CurrentPupilWidth = PupilWidth.Narrow;
-            else if (CurrentPupilWidth == PupilWidth.Narrow) CurrentPupilWidth = PupilWidth.Wide;
-            else if (CurrentPupilWidth == PupilWidth.Wide) CurrentPupilWidth = PupilWidth.Normal;
-            AttackTimer = 0;
+            if (npc.ai[0] <= 3)
+            {
+                EyeDilation = MathHelper.Lerp(EyeDilation, 1.5f, 0.5f);
+                npc.velocity *= 0.85f;
+                if (AttackTimer % 14 == 0)
+                {
+                    UnleashTendril(npc);
+                }
+            }
         }
+
+        npc.TargetClosest();
 
         Player Target = Main.player[npc.target];
 
@@ -75,25 +107,49 @@ public class EyeOfCthulhu : GlobalNPC
     public float EyeDilation = 0f;
 
     float FrameNum = 0;
+    float PupilPaletteNum = 1;
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (npc.IsABestiaryIconDummy)
         {
+            MoveTendrilsIdle(npc);
             drawColor = Color.White;
+            EyeDilation = MathHelper.Lerp(EyeDilation, 0.3f + (float)(Math.Sin(GlobalTimer.Value / 10f) * 0.05f), 0.2f);
         }
 
         FrameNum += 0.2f;
         FrameNum = FrameNum % 5;
 
         Asset<Texture2D> EyeDraw = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhu.Asset;
+        Asset<Texture2D> TendrilDraw = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhuTendril.Asset;
+        Vector2 TendrilOrigin = new Vector2(6, 2);
+        Asset<Texture2D> ClawDraw = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhuClaw.Asset;
+        Vector2 ClawOrigin = new Vector2(12, 2);
         Asset<Texture2D> EyePupilDraw = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhu_PupilMask.Asset;
+
+        if (npc.ai[0] > 0)
+        {
+            for (int i = 0; i < npc.ai[0]; i++)
+            {
+                SpriteEffects eff = SpriteEffects.None;
+                if (i == 0 || i == 2)
+                    eff = SpriteEffects.FlipHorizontally;
+
+                spriteBatch.Draw(TendrilDraw.Value, TendrilPositions[i] - screenPos, TendrilDraw.Frame(), drawColor, TendrilPositions[i].AngleTo(TendrilJointPositions[i]) - MathHelper.PiOver2, TendrilOrigin, 1f, eff, 0f);
+                spriteBatch.Draw(TendrilDraw.Value, TendrilJointPositions[i] - screenPos, TendrilDraw.Frame(), drawColor, TendrilJointPositions[i].AngleTo(TendrilClawPositions[i]) - MathHelper.PiOver2, TendrilOrigin, 1f, eff, 0f);
+                spriteBatch.Draw(ClawDraw.Value, TendrilClawPositions[i] - screenPos, ClawDraw.Frame(), drawColor, npc.rotation, ClawOrigin, 1f, eff, 0f);
+            }
+        }
 
         spriteBatch.Draw(EyeDraw.Value, npc.Center - screenPos, EyeDraw.Frame(5, 1, (int)Math.Floor(FrameNum), 0), drawColor, npc.rotation, (npc.frame.Size() / 2) + new Vector2(0, 22), 1f, SpriteEffects.None, 0f);
 
         var PupilEffect = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhuPupil.CreatePupilEffect();
         PupilEffect.Parameters.IrisThreshold = 0.33f + (EyeDilation * 0.22f);
         PupilEffect.Parameters.PupilThreshold = 0.66f + (EyeDilation * 0.22f);
-        PupilEffect.Parameters.PupilGradient = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.PupilPalette1.Asset.Value;
+        var PupilPalette = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.PupilPalette1.Asset.Value;
+        if (PupilPaletteNum == 1) PupilPalette = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.PupilPalette2.Asset.Value;
+        if (PupilPaletteNum == 2) PupilPalette = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.PupilPalette3.Asset.Value;
+        PupilEffect.Parameters.PupilGradient = PupilPalette;
         PupilEffect.Parameters.LightingColor = drawColor.ToVector4();
         PupilEffect.Apply();
 
@@ -122,5 +178,45 @@ public class EyeOfCthulhu : GlobalNPC
     {
         OnHit(npc, damageDone);
         base.OnHitByItem(npc, player, item, hit, damageDone);
+    }
+    public void MoveTendrilsIdle(NPC npc)
+    {
+        if (npc.ai[0] > 0)
+            MoveTendril(npc, 0, npc.Center + new Vector2(-110, 20).RotatedBy(npc.rotation));
+        if (npc.ai[0] > 1)
+            MoveTendril(npc, 1, npc.Center + new Vector2(110, 20).RotatedBy(npc.rotation));
+        if (npc.ai[0] > 2)
+            MoveTendril(npc, 2, npc.Center + new Vector2(-100, -80).RotatedBy(npc.rotation));
+        if (npc.ai[0] > 3)
+            MoveTendril(npc, 3, npc.Center + new Vector2(100, -80).RotatedBy(npc.rotation));
+    }
+    // IK lookalike to move the tendrils
+    public void MoveTendril(NPC npc, int i, Vector2 position)
+    {
+        TendrilPositions[i] = npc.Center + new Vector2(0, -20).RotatedBy(npc.rotation) + (npc.DirectionTo(position) * 20);
+
+        TendrilClawPositions[i] = Vector2.Lerp(TendrilClawPositions[i], position, 0.35f);
+        TendrilJointPositions[i] = Vector2.Lerp(TendrilJointPositions[i], Vector2.Lerp(TendrilPositions[i], TendrilClawPositions[i], 0.45f) + new Vector2(0, -40f).RotatedBy(npc.rotation), 0.25f);
+
+        TendrilJointPositions[i] = TendrilPositions[i] + (TendrilPositions[i].DirectionTo(TendrilJointPositions[i]) * 74);
+        TendrilClawPositions[i] = TendrilJointPositions[i] + (TendrilJointPositions[i].DirectionTo(TendrilClawPositions[i]) * 74);
+    }
+    public void UnleashTendril(NPC npc)
+    {
+        int i = (int)npc.ai[0];
+        TendrilPositions[i] = TendrilJointPositions[i] = TendrilClawPositions[i] =
+            npc.Center + new Vector2(i == 0 || i == 2 ? -50 : 50, i > 1 ? -10 : 10).RotatedBy(npc.rotation);
+
+        ScreenEffects.AddScreenShake(npc.Center, 10f, 0.6f);
+
+        for (int j = 0; j < 75; j++)
+        {
+            Vector2 v = npc.Center + new Vector2(Main.rand.Next(80), 0).RotatedByRandom(MathHelper.TwoPi);
+            Dust.NewDustDirect(v, 5, 5, DustID.Blood, v.DirectionFrom(npc.Center).X, v.DirectionFrom(npc.Center).Y, Scale: 1.3f);
+        }
+
+        SoundEngine.PlaySound(Sounds.NPC.EoCTendrilEmerge.Asset with { MaxInstances = 4 }, TendrilPositions[i]);
+        npc.velocity += npc.DirectionFrom(TendrilPositions[i]) * 6f;
+        npc.ai[0]++;
     }
 }

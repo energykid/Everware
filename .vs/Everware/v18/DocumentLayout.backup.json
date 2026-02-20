@@ -7,16 +7,16 @@
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\eyeofcthulhurework\\eyeofcthulhu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\npcs\\evernpcextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\npcs\\evernpcextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\eyeofcthulhurework\\eyeofcthulhupupil.fx||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\eyeofcthulhurework\\eyeofcthulhupupil.fx||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\prehardmode\\quarry\\gear\\rebuker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\prehardmode\\quarry\\gear\\rebuker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\content\\base\\npcs\\evernpcextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|solutionrelative:content\\base\\npcs\\evernpcextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{349A9A44-0A20-F5F9-CC5A-F555388B7621}|Everware.csproj|c:\\users\\mint\\documents\\my games\\terraria\\tmodloader\\modsources\\everware\\utils\\easingcurves.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -205,7 +205,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "EyeOfCthulhuPupil.fx",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\EyeOfCthulhuRework\\EyeOfCthulhuPupil.fx",
               "RelativeDocumentMoniker": "Content\\PreHardmode\\EyeOfCthulhuRework\\EyeOfCthulhuPupil.fx",
@@ -218,7 +218,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Rebuker.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\Quarry\\Gear\\Rebuker.cs",
               "RelativeDocumentMoniker": "Content\\PreHardmode\\Quarry\\Gear\\Rebuker.cs",
@@ -267,13 +267,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "EverNPCExtensions.cs",
               "DocumentMoniker": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\NPCs\\EverNPCExtensions.cs",
               "RelativeDocumentMoniker": "Content\\Base\\NPCs\\EverNPCExtensions.cs",
               "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\Base\\NPCs\\EverNPCExtensions.cs",
               "RelativeToolTip": "Content\\Base\\NPCs\\EverNPCExtensions.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABcAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAB6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-20T01:08:42.964Z",
               "EditorCaption": ""
@@ -286,7 +286,7 @@
               "RelativeDocumentMoniker": "Content\\PreHardmode\\EyeOfCthulhuRework\\EyeOfCthulhu.cs",
               "ToolTip": "C:\\Users\\Mint\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\Everware\\Content\\PreHardmode\\EyeOfCthulhuRework\\EyeOfCthulhu.cs",
               "RelativeToolTip": "Content\\PreHardmode\\EyeOfCthulhuRework\\EyeOfCthulhu.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAUwFwAAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAGEAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-20T01:05:39.454Z",
               "EditorCaption": ""
