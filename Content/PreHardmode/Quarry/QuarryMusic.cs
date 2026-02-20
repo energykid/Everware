@@ -8,7 +8,6 @@ namespace Everware.Content.PreHardmode.Quarry;
 
 public class QuarryMusic : ModBiome
 {
-    public override int Music => MusicLoader.GetMusicSlot("Everware/Sounds/Music/Quarry");
     public override bool IsBiomeActive(Player player)
     {
         return player.GetModPlayer<KilnQuarryMusicStats>().quarryTiles > 20 && player.GetModPlayer<KilnQuarryMusicStats>().siltTiles > 10;

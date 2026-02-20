@@ -1,4 +1,5 @@
-﻿using Terraria.ID;
+﻿using Everware.Core.Projectiles;
+using Terraria.ID;
 
 namespace Everware.Common.Players;
 
@@ -61,5 +62,14 @@ public sealed class NetworkPlayer : ModPlayer
                 AnimationTime = Player.itemAnimationMax;
             }
         }
+    }
+    public override bool CanUseItem(Item item)
+    {
+        foreach (Projectile projectile in Main.projectile)
+        {
+            if (projectile.ModProjectile is EverHoldoutProjectile && projectile.owner == Player.whoAmI && projectile.active) return false;
+        }
+
+        return base.CanUseItem(item);
     }
 }

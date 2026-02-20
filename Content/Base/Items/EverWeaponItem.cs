@@ -92,6 +92,11 @@ public abstract class EverWeaponItem : EverItem
     }
     public override bool CanUseItem(Player player)
     {
-        return player.heldProj == -1 && base.CanUseItem(player) && player.ownedProjectileCounts[(int)HoldoutType] < 1;
+        foreach (Projectile projectile in Main.projectile)
+        {
+            if (projectile.ModProjectile is EverHoldoutProjectile && projectile.owner == player.whoAmI && projectile.active) return false;
+        }
+
+        return base.CanUseItem(player) && player.ownedProjectileCounts[(int)HoldoutType] < 1;
     }
 }

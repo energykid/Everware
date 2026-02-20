@@ -53,7 +53,7 @@ public class RebukerHoldout : EverHoldoutProjectile
 
         Projectile.ai[1]++;
 
-        int ShootTime = 35;
+        int ShootTime = Owner.itemAnimationMax / 2;
         int LoadTime = 1;
 
         if (Projectile.ai[1] == ShootTime)
