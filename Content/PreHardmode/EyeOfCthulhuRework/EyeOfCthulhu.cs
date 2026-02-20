@@ -18,6 +18,7 @@ public class EyeOfCthulhu : GlobalNPC
     public Vector2[] TendrilPositions = new Vector2[4];
     public Vector2[] TendrilJointPositions = new Vector2[4];
     public Vector2[] TendrilClawPositions = new Vector2[4];
+    public int TendrilsOut = 0;
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
@@ -58,7 +59,7 @@ public class EyeOfCthulhu : GlobalNPC
     public int EyeDilationReset = 0;
     public override void AI(NPC npc)
     {
-        if (npc.ai[0] == 0)
+        if (TendrilsOut == 0)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -82,7 +83,7 @@ public class EyeOfCthulhu : GlobalNPC
 
         if (AttackTimer > 100)
         {
-            if (npc.ai[0] <= 3)
+            if (TendrilsOut <= 3)
             {
                 EyeDilation = MathHelper.Lerp(EyeDilation, 1.5f, 0.5f);
                 npc.velocity *= 0.85f;
@@ -127,9 +128,9 @@ public class EyeOfCthulhu : GlobalNPC
         Vector2 ClawOrigin = new Vector2(12, 2);
         Asset<Texture2D> EyePupilDraw = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhu_PupilMask.Asset;
 
-        if (npc.ai[0] > 0)
+        if (TendrilsOut > 0)
         {
-            for (int i = 0; i < npc.ai[0]; i++)
+            for (int i = 0; i < TendrilsOut; i++)
             {
                 SpriteEffects eff = SpriteEffects.None;
                 if (i == 0 || i == 2)
@@ -181,13 +182,13 @@ public class EyeOfCthulhu : GlobalNPC
     }
     public void MoveTendrilsIdle(NPC npc)
     {
-        if (npc.ai[0] > 0)
+        if (TendrilsOut > 0)
             MoveTendril(npc, 0, npc.Center + new Vector2(-110, 20).RotatedBy(npc.rotation));
-        if (npc.ai[0] > 1)
+        if (TendrilsOut > 1)
             MoveTendril(npc, 1, npc.Center + new Vector2(110, 20).RotatedBy(npc.rotation));
-        if (npc.ai[0] > 2)
+        if (TendrilsOut > 2)
             MoveTendril(npc, 2, npc.Center + new Vector2(-100, -80).RotatedBy(npc.rotation));
-        if (npc.ai[0] > 3)
+        if (TendrilsOut > 3)
             MoveTendril(npc, 3, npc.Center + new Vector2(100, -80).RotatedBy(npc.rotation));
     }
     // IK lookalike to move the tendrils
@@ -203,7 +204,7 @@ public class EyeOfCthulhu : GlobalNPC
     }
     public void UnleashTendril(NPC npc)
     {
-        int i = (int)npc.ai[0];
+        int i = (int)TendrilsOut;
         TendrilPositions[i] = TendrilJointPositions[i] = TendrilClawPositions[i] =
             npc.Center + new Vector2(i == 0 || i == 2 ? -50 : 50, i > 1 ? -10 : 10).RotatedBy(npc.rotation);
 
@@ -217,6 +218,6 @@ public class EyeOfCthulhu : GlobalNPC
 
         SoundEngine.PlaySound(Sounds.NPC.EoCTendrilEmerge.Asset with { MaxInstances = 4 }, TendrilPositions[i]);
         npc.velocity += npc.DirectionFrom(TendrilPositions[i]) * 6f;
-        npc.ai[0]++;
+        TendrilsOut++;
     }
 }
