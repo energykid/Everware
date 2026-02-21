@@ -1,5 +1,6 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.Items;
+using Everware.Content.PreHardmode.Quarry.Tiles;
 using Everware.Core.Projectiles;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -19,6 +20,15 @@ public class Rebuker : EverWeaponItem
         base.SetDefaults();
         Item.DefaultToBasicWeapon(9, 65, DamageClass.Ranged);
         Item.knockBack = 1f;
+    }
+
+    public override void AddRecipes()
+    {
+        Recipe recipe = Recipe.Create(Type);
+        recipe.AddIngredient(ModContent.ItemType<RebarRod>(), 20);
+        recipe.AddRecipeGroup(RecipeGroupID.IronBar, 5);
+        recipe.AddTile(ModContent.TileType<WeldingStation>());
+        recipe.Register();
     }
 }
 

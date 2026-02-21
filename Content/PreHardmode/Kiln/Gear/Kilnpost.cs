@@ -1,6 +1,7 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.Items;
+using Everware.Content.PreHardmode.Kiln.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
 using Everware.Core.Projectiles;
 using Everware.Utils;
@@ -23,6 +24,14 @@ public class Kilnpost : EverWeaponItem
         base.SetDefaults();
         Item.DefaultToBasicWeapon(8, 40, DamageClass.Melee);
         Item.knockBack = 1f;
+    }
+    public override void AddRecipes()
+    {
+        Recipe recipe = Recipe.Create(Type);
+        recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 20);
+        recipe.AddIngredient(ModContent.ItemType<Kilnstone>(), 5);
+        recipe.AddTile(ModContent.TileType<ForgingKiln>());
+        recipe.Register();
     }
 }
 public class KilnpostHoldout : EverHoldoutProjectile

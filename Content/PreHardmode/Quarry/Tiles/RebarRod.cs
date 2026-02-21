@@ -13,7 +13,7 @@ public class RebarRod : EverPlaceableItem
     public override void AddRecipes()
     {
         Recipe recipe1 = CreateRecipe(8);
-        recipe1.AddIngredient(RecipeGroupID.IronBar, 1);
+        recipe1.AddRecipeGroup(RecipeGroupID.IronBar, 1);
         recipe1.AddTile(ModContent.TileType<WeldingStation>()); // replace with Welding Station ASAP
         recipe1.Register();
     }

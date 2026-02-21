@@ -105,7 +105,7 @@ public class EyeOfCthulhu : GlobalNPC
                 break;
             case AttackState.TendrilsOut:
                 AttackTimer++;
-                if (AttackTimer > 100)
+                if (AttackTimer > 200)
                 {
                     if (TendrilsOut <= 3)
                     {
@@ -144,6 +144,9 @@ public class EyeOfCthulhu : GlobalNPC
                     }
                     else
                     {
+                        if (npc.Distance(Target.Center) > 800)
+                            ChangeState(npc, AttackState.None);
+
                         EyeDilation = MathHelper.Lerp(EyeDilation, -0.5f, 0.2f);
                         if (npc.ai[1] < 0.5f)
                         {
