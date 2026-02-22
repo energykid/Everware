@@ -14,7 +14,6 @@ public class CthulhuBloodProjectile : EverProjectile
         Projectile.friendly = false;
         Projectile.hostile = true;
         Projectile.knockBack = 3f;
-        Projectile.damage = 10;
     }
     public override void AI()
     {

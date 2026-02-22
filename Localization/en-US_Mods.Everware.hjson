@@ -138,4 +138,5 @@ Projectiles: {
 	RebukerBolt.DisplayName: Rebuker
 	RebukerHoldout.DisplayName: Rebuker
 	CthulhuBloodProjectile.DisplayName: Cthulhu Blood Projectile
+	EyeOfCthulhuTendrilHitbox.DisplayName: Eye Of Cthulhu Tendril Hitbox
 }
