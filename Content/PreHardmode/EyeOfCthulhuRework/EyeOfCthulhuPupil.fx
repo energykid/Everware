@@ -40,7 +40,7 @@ float4 PupilEffect(float2 coords : TEXCOORD0) : COLOR0
         
         return extraCol * float4(LightingColor.r, LightingColor.g, LightingColor.b, LightingColor.a);
     }
-    return col;
+    return float4(0.0, 0.0, 0.0, 0.0);
 }
 
 technique PupilShader

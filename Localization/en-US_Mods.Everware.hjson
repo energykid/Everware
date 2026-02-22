@@ -137,4 +137,5 @@ Projectiles: {
 	KilnpostBreakaway.DisplayName: Kiln Shard
 	RebukerBolt.DisplayName: Rebuker
 	RebukerHoldout.DisplayName: Rebuker
+	CthulhuBloodProjectile.DisplayName: Cthulhu Blood Projectile
 }

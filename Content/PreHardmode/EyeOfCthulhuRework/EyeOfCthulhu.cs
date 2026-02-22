@@ -6,12 +6,15 @@ using Everware.Core;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.PreHardmode.EyeOfCthulhuRework;
 
 public class EyeOfCthulhu : GlobalNPC
 {
+    public static readonly int BloodProjectileDamage = 15;
+
     // Tendril 0: front left
     // Tendril 1: front right
     // Tendril 2: back left
@@ -21,6 +24,7 @@ public class EyeOfCthulhu : GlobalNPC
     public Vector2[] TendrilClawPositions = new Vector2[4];
     public Vector2 VelocityTarget = Vector2.Zero;
     public int TendrilsOut = 0;
+    public float Shake = 0f;
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
@@ -98,9 +102,9 @@ public class EyeOfCthulhu : GlobalNPC
                 npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
                 npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -200 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.03f, 0.03f);
 
-                if (AttackTimer > 50)
+                if (AttackTimer > 80)
                 {
-                    ChangeState(npc, AttackState.Bash);
+                    ChangeState(npc, Main.rand.NextBool() ? AttackState.Bash : AttackState.Bleed);
                 }
                 break;
             case AttackState.TendrilsOut:
@@ -168,7 +172,51 @@ public class EyeOfCthulhu : GlobalNPC
                     ChangeState(npc, AttackState.None);
                 }
                 break;
+            case AttackState.Bleed:
+                npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
+                AttackTimer++;
+                if (AttackTimer > 50)
+                {
+                    npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -200 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.03f, 0.03f, 10);
+
+                    npc.velocity *= 0.95f;
+                    if (AttackTimer % 25 == 18)
+                    {
+                        BleedInDirection(npc, npc.Center + new Vector2(200, 0).RotatedBy(npc.rotation + MathHelper.ToRadians(90f)));
+                        npc.velocity += new Vector2(-5, 0).RotatedBy(npc.rotation + MathHelper.ToRadians(90f));
+
+                        SoundEngine.PlaySound(Sounds.NPC.EoCTendrilEmerge.Asset, npc.Center);
+                        ScreenEffects.AddScreenShake(npc.Center, 10, 0.6f);
+
+                        Projectile.NewProjectileDirect(new EntitySource_Parent(npc, "EoC blood projectile"), PupilPosition(npc), npc.DirectionTo(PupilPosition(npc) + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10))) * 25, ModContent.ProjectileType<CthulhuBloodProjectile>(), BloodProjectileDamage, 2f);
+                    }
+                    if (AttackTimer % 25 >= 18)
+                    {
+                        EyeDilation = MathHelper.Lerp(EyeDilation, 3, 0.4f);
+                    }
+                    if (AttackTimer > 150)
+                    {
+                        ChangeState(npc, AttackState.None);
+                    }
+                }
+                else
+                {
+                    Shake += 0.2f;
+                    if (AttackTimer >= 20)
+                    {
+                        EyeDilation = MathHelper.Lerp(EyeDilation, 1f + ((float)AttackTimer / 50f) * 2f, 0.4f);
+                        if (AttackTimer == 20)
+                            SoundEngine.PlaySound(Sounds.NPC.EoCMuffledRoar.Asset, npc.Center);
+                    }
+                    npc.velocity *= 0.95f;
+                }
+                break;
         }
+        Shake *= 0.9f;
+    }
+    public Vector2 PupilPosition(NPC npc)
+    {
+        return npc.Center + new Vector2(60, 0).RotatedBy(npc.rotation + MathHelper.PiOver2);
     }
     public void ChangeState(NPC npc, AttackState state)
     {
@@ -181,6 +229,8 @@ public class EyeOfCthulhu : GlobalNPC
     float PupilPaletteNum = 1;
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
+        Vector2 offset = new Vector2(Main.rand.NextFloat(-Shake, Shake), 0).RotatedByRandom(MathHelper.TwoPi);
+
         if (npc.IsABestiaryIconDummy)
         {
             MoveTendrilsIdle(npc);
@@ -206,13 +256,13 @@ public class EyeOfCthulhu : GlobalNPC
                 if (i == 0 || i == 2)
                     eff = SpriteEffects.FlipHorizontally;
 
-                spriteBatch.Draw(TendrilDraw.Value, TendrilPositions[i] - screenPos, TendrilDraw.Frame(), drawColor, TendrilPositions[i].AngleTo(TendrilJointPositions[i]) - MathHelper.PiOver2, TendrilOrigin, 1f, eff, 0f);
-                spriteBatch.Draw(TendrilDraw.Value, TendrilJointPositions[i] - screenPos, TendrilDraw.Frame(), drawColor, TendrilJointPositions[i].AngleTo(TendrilClawPositions[i]) - MathHelper.PiOver2, TendrilOrigin, 1f, eff, 0f);
-                spriteBatch.Draw(ClawDraw.Value, TendrilClawPositions[i] - screenPos, ClawDraw.Frame(), drawColor, npc.rotation, ClawOrigin, 1f, eff, 0f);
+                spriteBatch.Draw(TendrilDraw.Value, TendrilPositions[i] - screenPos + offset, TendrilDraw.Frame(), drawColor, TendrilPositions[i].AngleTo(TendrilJointPositions[i]) - MathHelper.PiOver2, TendrilOrigin, 1f, eff, 0f);
+                spriteBatch.Draw(TendrilDraw.Value, TendrilJointPositions[i] - screenPos + offset, TendrilDraw.Frame(), drawColor, TendrilJointPositions[i].AngleTo(TendrilClawPositions[i]) - MathHelper.PiOver2, TendrilOrigin, 1f, eff, 0f);
+                spriteBatch.Draw(ClawDraw.Value, TendrilClawPositions[i] - screenPos + offset, ClawDraw.Frame(), drawColor, npc.rotation, ClawOrigin, 1f, eff, 0f);
             }
         }
 
-        spriteBatch.Draw(EyeDraw.Value, npc.Center - screenPos, EyeDraw.Frame(5, 1, (int)Math.Floor(FrameNum), 0), drawColor, npc.rotation, (npc.frame.Size() / 2) + new Vector2(0, 22), 1f, SpriteEffects.None, 0f);
+        spriteBatch.Draw(EyeDraw.Value, npc.Center - screenPos + offset, EyeDraw.Frame(5, 1, (int)Math.Floor(FrameNum), 0), drawColor, npc.rotation, (npc.frame.Size() / 2) + new Vector2(0, 22), 1f, SpriteEffects.None, 0f);
 
         var PupilEffect = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.EyeOfCthulhuPupil.CreatePupilEffect();
         PupilEffect.Parameters.IrisThreshold = 0.33f + (EyeDilation * 0.22f);
@@ -227,7 +277,7 @@ public class EyeOfCthulhu : GlobalNPC
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, PupilEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
-        spriteBatch.Draw(EyePupilDraw.Value, npc.Center - screenPos, EyePupilDraw.Frame(), Color.White, npc.rotation, (npc.frame.Size() / 2) + new Vector2(0, 22), 1f, SpriteEffects.None, 0f);
+        spriteBatch.Draw(EyePupilDraw.Value, npc.Center - screenPos + offset, EyePupilDraw.Frame(), Color.White, npc.rotation, (npc.frame.Size() / 2) + new Vector2(0, 22), 1f, SpriteEffects.None, 0f);
 
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
@@ -272,11 +322,33 @@ public class EyeOfCthulhu : GlobalNPC
         TendrilJointPositions[i] = TendrilPositions[i] + (TendrilPositions[i].DirectionTo(TendrilJointPositions[i]) * 74);
         TendrilClawPositions[i] = TendrilJointPositions[i] + (TendrilJointPositions[i].DirectionTo(TendrilClawPositions[i]) * 74);
     }
+    public void BleedInDirection(NPC npc, Vector2 targetPos)
+    {
+
+        for (float j = -6f; j <= 6f; j += 2)
+        {
+            CthulhuBloodParticle part = new CthulhuBloodParticle(npc.Center + new Vector2(55, 0).RotatedBy(npc.AngleTo(targetPos)), new Vector2(2, 0).RotatedBy(npc.AngleTo(targetPos) + MathHelper.ToRadians(j * Main.rand.NextFloat(15f, 20f))))
+            {
+                Scale = new Vector2(MathHelper.Lerp(0.7f, 0.2f, Math.Abs(j) / 5f), MathHelper.Lerp(2f, 1f, Math.Abs(j) / 5f))
+            };
+            part.Spawn();
+
+        }
+
+        CthulhuBloodRingParticle part2 = new CthulhuBloodRingParticle(npc.Center + new Vector2(55, 0).RotatedBy(npc.AngleTo(targetPos)), new Vector2(2, 0).RotatedBy(npc.AngleTo(targetPos) + MathHelper.Pi))
+        {
+            Scale = new Vector2(1.4f, 1.2f)
+        };
+        part2.Spawn();
+    }
+
     public void UnleashTendril(NPC npc)
     {
         int i = (int)TendrilsOut;
         TendrilPositions[i] = TendrilJointPositions[i] = TendrilClawPositions[i] =
-            npc.Center + new Vector2(i == 0 || i == 2 ? -50 : 50, i > 1 ? -10 : 10).RotatedBy(npc.rotation);
+            npc.Center + new Vector2(i == 0 || i == 2 ? -50 : 50, i > 1 ? -30 : 10).RotatedBy(npc.rotation);
+
+        BleedInDirection(npc, TendrilPositions[i]);
 
         BleedAllOver(npc);
 
