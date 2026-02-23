@@ -1,6 +1,4 @@
-﻿using Terraria.ID;
-
-namespace Everware.Common.Systems;
+﻿namespace Everware.Common.Systems;
 
 public class EverMusicSystem : ModSystem
 {
@@ -15,10 +13,12 @@ public class EverMusicSystem : ModSystem
 
         if (!Main.gameMenu)
         {
+            /*
             if (NPC.CountNPCS(NPCID.EyeofCthulhu) > 0)
             {
                 Main.newMusic = Sounds.Music.EyeOfCthulhu.Slot;
             }
+            */
         }
     }
 }
