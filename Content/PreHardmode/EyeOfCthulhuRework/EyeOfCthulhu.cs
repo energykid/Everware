@@ -14,11 +14,11 @@ namespace Everware.Content.PreHardmode.EyeOfCthulhuRework;
 
 public class EyeOfCthulhu : GlobalNPC
 {
-    public static int BloodProjectileDamage => 8;
-    public static int BashDamage => 11;
-    public static int Phase2BashDamage => 17;
-    public static int TendrilDamage => 9;
-    public static int Phase2TendrilDamage => 11;
+    public static int BloodProjectileDamage => Main.expertMode ? 9 : 15;
+    public static int BashDamage => Main.expertMode ? 28 : 18;
+    public static int Phase2BashDamage => Main.expertMode ? 42 : 32;
+    public static int TendrilDamage => Main.expertMode ? 30 : 20;
+    public static int Phase2TendrilDamage => Main.expertMode ? 40 : 30;
     public static int DesperationThreshold => Main.expertMode ? 400 : 250;
     public int Phase2Threshold = 0;
     public int Phase = 0;
@@ -182,11 +182,22 @@ public class EyeOfCthulhu : GlobalNPC
                 AttackTimer++;
                 if (AttackTimer > 200)
                 {
+                    ScreenEffects.ZoomScreen(0.3f);
+                    ScreenEffects.PanTo(npc.Center);
+
+                    int Time = 14;
+
+                    if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                    {
+                        calFables.Call("vfx.displayBossIntroCard", "Eye of Cthulhu", "Night Stalker", 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, "ENNWAY", "");
+                        Time = 20;
+                    }
+
                     if (TendrilsOut <= 3)
                     {
                         EyeDilation = MathHelper.Lerp(EyeDilation, 1.5f, 0.5f);
                         npc.velocity *= 0.85f;
-                        if (AttackTimer % 14 == 0)
+                        if (AttackTimer % Time == 1)
                         {
                             UnleashTendril(npc);
                         }
@@ -248,7 +259,16 @@ public class EyeOfCthulhu : GlobalNPC
                         npc.velocity += (npc.rotation + MathHelper.PiOver2).ToRotationVector2() * Easing.OutBounce(npc.ai[1]) * 1.75f;
                     }
                 }
-                if (WorldGen.SolidOrSlopedTile(Main.tile[((npc.Center + npc.velocity) / 16).ToPoint()]) && npc.ai[2] > 0.8f)
+                bool b = false;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (SolidTileOrPlatform(Main.tile[((npc.Center + new Vector2(0, i * 16).RotatedBy(npc.rotation)) / 16).ToPoint()]))
+                    {
+                        b = true;
+                        break;
+                    }
+                }
+                if (b && npc.ai[2] > 0.8f)
                 {
                     ThrowTileReplicants(npc, (npc.Center / 16).ToPoint());
                     BleedAllOver(npc);
@@ -277,11 +297,17 @@ public class EyeOfCthulhu : GlobalNPC
                         else
                         {
                             if (AttackTimer > Easing.KeyFloat(npc.life, DesperationThreshold, npc.lifeMax, 4, 1, Easing.Linear))
-                                ChangeState(npc, Main.rand.NextBool() ? AttackState.Bleed : AttackState.Multiply);
+                            {
+                                Shake = 7;
+                                npc.velocity *= 0.4f;
+                                ChangeState(npc, AttackState.BashCooldown);
+                                AttackTimer = -30;
+                            }
                         }
                     }
                     else
                     {
+                        npc.velocity *= 0.6f;
                         ChangeState(npc, AttackState.BashCooldown);
                         Shake = 8;
                         AttackTimer = -40;
@@ -289,10 +315,28 @@ public class EyeOfCthulhu : GlobalNPC
                 }
                 break;
             case AttackState.BashCooldown:
-                npc.velocity = Vector2.Zero;
+                ContactDamage = false;
                 AttackTimer++;
-                if (AttackTimer > 0)
-                    ChangeState(npc, Main.rand.NextBool() ? AttackState.Bleed : AttackState.Multiply);
+                if (AttackTimer == 0)
+                {
+                    Shake = (MathHelper.Lerp(1f, 0f, (float)-AttackTimer * 0.2f));
+                    SoundEngine.PlaySound(Sounds.NPC.EoCBash.Asset with { Pitch = 1f }, npc.Center);
+                    npc.velocity.Y -= 13f;
+                }
+                if (AttackTimer >= 0)
+                {
+                    npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
+
+                    npc.velocity *= 0.88f;
+                    npc.velocity.Y += 0.05f;
+                    if (AttackTimer > 30)
+                        ChangeState(npc, Main.rand.NextBool() ? AttackState.Bleed : AttackState.Multiply);
+                }
+                else
+                {
+                    npc.velocity *= 0.9f;
+                    npc.velocity.Y = Math.Abs(npc.velocity.Y);
+                }
                 break;
             case AttackState.Bleed:
                 npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -250 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.1f, 0.05f);
@@ -435,7 +479,10 @@ public class EyeOfCthulhu : GlobalNPC
             case AttackState.Stab:
                 if (AttackTimer == 0)
                 {
-                    VectorTarget = new Vector2(Main.rand.NextBool() ? -220 : 220, Main.rand.NextFloat(-90, -20));
+                    int dir = Main.rand.NextBool() ? -1 : 1;
+                    if (Target.velocity.X > 0) dir = 1;
+                    if (Target.velocity.X < 0) dir = -1;
+                    VectorTarget = new Vector2(dir * 220, Main.rand.NextFloat(-90, -20));
 
                     if (Phase == 0)
                         SoundEngine.PlaySound(Sounds.NPC.EoCMuffledRoar.Asset, npc.Center);
@@ -613,6 +660,11 @@ public class EyeOfCthulhu : GlobalNPC
     {
         OnHit(npc, damageDone);
         base.OnHitByItem(npc, player, item, hit, damageDone);
+    }
+
+    public bool SolidTileOrPlatform(Tile tile)
+    {
+        return WorldGen.SolidOrSlopedTile(tile) || Main.tileSolidTop[tile.type];
     }
     public void MoveTendrilsIdle(NPC npc)
     {

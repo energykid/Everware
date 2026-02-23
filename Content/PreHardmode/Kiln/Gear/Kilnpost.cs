@@ -67,12 +67,12 @@ public class KilnpostHoldout : EverHoldoutProjectile
             Projectile.ai[2] = 70f;
             Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
             BaseRot = Rotation;
-            Dir = Math.Sign(NetworkOwner.MousePosition.X - Owner.Center.X);
+            Dir = Math.Sign(NetworkOwner.MousePosition.X - Owner.MountedCenter.X);
             State = (State == "Spin") ? "Thrust" : "Spin";
             if (State == "Thrust")
             {
                 FrontArmExtension = 1f;
-                SoundEngine.PlaySound(Kilnpost.ThrustSound, Owner.Center);
+                SoundEngine.PlaySound(Kilnpost.ThrustSound, Owner.MountedCenter);
                 HitFrames = 2;
                 Projectile.damage = 10;
             }
@@ -230,9 +230,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         if (RecoveryAmount < 1f)
-            Main.EntitySpriteDraw(BrokenAsset.Value, Owner.Center + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(BrokenAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
         else
-            Main.EntitySpriteDraw(Asset.Value, Owner.Center + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(Asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
 
         return false;
     }

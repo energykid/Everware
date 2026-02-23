@@ -13,9 +13,12 @@ public class EverMusicSystem : ModSystem
     {
         orig(self);
 
-        if (NPC.CountNPCS(NPCID.EyeofCthulhu) > 0)
+        if (!Main.gameMenu)
         {
-            Main.newMusic = Sounds.Music.EyeOfCthulhu.Slot;
+            if (NPC.CountNPCS(NPCID.EyeofCthulhu) > 0)
+            {
+                Main.newMusic = Sounds.Music.EyeOfCthulhu.Slot;
+            }
         }
     }
 }

@@ -17,6 +17,8 @@ public class CthulhuBloodProjectile : EverProjectile
     }
     public override void AI()
     {
+        Projectile.ai[2] += Projectile.velocity.Length() / 10f;
+
         Projectile.ai[0]++;
         if (Projectile.ai[0] < 20)
         {
@@ -54,7 +56,7 @@ public class CthulhuBloodProjectile : EverProjectile
         var BloodEffect = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.CthulhuBloodProjectileEffect.CreateBloodEffect();
         BloodEffect.Parameters.BloodGradient = AssetReferences.Content.PreHardmode.EyeOfCthulhuRework.BloodProjectilePalette.Asset.Value;
         BloodEffect.Parameters.LightingColor = Lighting.GetColor((Projectile.Center / 16f).ToPoint()).ToVector4();
-        BloodEffect.Parameters.Timer = Projectile.ai[0] / -10f;
+        BloodEffect.Parameters.Timer = Projectile.ai[2] / -10f;
         BloodEffect.Parameters.NoiseTexture = Textures.PerlinNoise.Asset.Value;
         BloodEffect.Parameters.Threshold = Clip;
         BloodEffect.Apply();

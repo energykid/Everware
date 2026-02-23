@@ -118,6 +118,16 @@ Items: {
 		DisplayName: Rebuker
 		Tooltip: Fires a piercing metal rod that deals more damage on early hits
 	}
+
+	KilnMusicBox: {
+		DisplayName: Music Box (Kiln)
+		Tooltip: ""
+	}
+
+	QuarryMusicBox: {
+		DisplayName: Music Box (Quarry)
+		Tooltip: ""
+	}
 }
 
 Biomes: {
