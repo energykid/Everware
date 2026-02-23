@@ -68,7 +68,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         Owner.heldProj = Projectile.whoAmI;
 
-        Projectile.Center = Owner.Center + Offset;
+        Projectile.Center = Owner.MountedCenter + Offset;
         Projectile.rotation = Rotation + RotationOffset;
 
         if (AutoDirection)
