@@ -18,7 +18,7 @@ public class Rebuker : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(9, 65, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(26, 35, DamageClass.Ranged);
         Item.knockBack = 1f;
     }
 
@@ -133,7 +133,7 @@ public class RebukerHoldout : EverHoldoutProjectile
     {
         SoundEngine.PlaySound(Rebuker.FireSound, Projectile.Center);
         Vector2 SpawnLocation = Owner.MountedCenter + new Vector2(40, 0).RotatedBy(Projectile.rotation);
-        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), 12, 3f, Projectile.owner);
+        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), Projectile.damage, 3f, Projectile.owner);
     }
     public void LoadRebarBolt()
     {
@@ -165,7 +165,7 @@ public class RebukerBolt : EverProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         base.OnHitNPC(target, hit, damageDone);
-        if (Projectile.damage > 4) Projectile.damage -= 3;
+        if (Projectile.damage > 4) Projectile.damage -= 5;
     }
     public override bool? CanDamage()
     {

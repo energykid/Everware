@@ -262,7 +262,7 @@ public class EyeOfCthulhu : GlobalNPC
                 bool b = false;
                 for (int i = 0; i < 4; i++)
                 {
-                    if (SolidTileOrPlatform(Main.tile[((npc.Center + new Vector2(0, i * 16).RotatedBy(npc.rotation)) / 16).ToPoint()]))
+                    if (SolidTileOrPlatformBeneath(npc, Main.tile[((npc.Center + new Vector2(0, i * 16).RotatedBy(npc.rotation)) / 16).ToPoint()]))
                     {
                         b = true;
                         break;
@@ -662,9 +662,10 @@ public class EyeOfCthulhu : GlobalNPC
         base.OnHitByItem(npc, player, item, hit, damageDone);
     }
 
-    public bool SolidTileOrPlatform(Tile tile)
+    public bool SolidTileOrPlatformBeneath(NPC npc, Tile tile)
     {
-        return WorldGen.SolidOrSlopedTile(tile) || Main.tileSolidTop[tile.type];
+        bool b1 = WorldGen.SolidOrSlopedTile(tile) || Main.tileSolidTop[tile.type];
+        return b1 && npc.Bottom.Y > Main.player[npc.target].Top.Y;
     }
     public void MoveTendrilsIdle(NPC npc)
     {
