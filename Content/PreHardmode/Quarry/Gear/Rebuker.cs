@@ -152,6 +152,7 @@ public class RebukerBolt : EverProjectile
         Projectile.penetrate = -1;
         Projectile.timeLeft = 1000;
         Projectile.friendly = true;
+        Projectile.DamageType = DamageClass.Ranged;
     }
     public override void NetOnSpawn()
     {

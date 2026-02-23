@@ -47,6 +47,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Projectile.DamageType = DamageClass.Melee;
         Projectile.width = 90;
         Projectile.height = 90;
     }
