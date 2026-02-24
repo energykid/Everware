@@ -1,5 +1,6 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.Items;
+using Everware.Content.PreHardmode.Quarry.Tiles;
 using Everware.Core.Projectiles;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -17,8 +18,17 @@ public class Rebuker : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(9, 65, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(26, 35, DamageClass.Ranged);
         Item.knockBack = 1f;
+    }
+
+    public override void AddRecipes()
+    {
+        Recipe recipe = Recipe.Create(Type);
+        recipe.AddIngredient(ModContent.ItemType<RebarRod>(), 20);
+        recipe.AddRecipeGroup(RecipeGroupID.IronBar, 5);
+        recipe.AddTile(ModContent.TileType<WeldingStation>());
+        recipe.Register();
     }
 }
 
@@ -53,7 +63,7 @@ public class RebukerHoldout : EverHoldoutProjectile
 
         Projectile.ai[1]++;
 
-        int ShootTime = 35;
+        int ShootTime = Owner.itemAnimationMax / 2;
         int LoadTime = 1;
 
         if (Projectile.ai[1] == ShootTime)
@@ -123,7 +133,7 @@ public class RebukerHoldout : EverHoldoutProjectile
     {
         SoundEngine.PlaySound(Rebuker.FireSound, Projectile.Center);
         Vector2 SpawnLocation = Owner.MountedCenter + new Vector2(40, 0).RotatedBy(Projectile.rotation);
-        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), 12, 3f, Projectile.owner);
+        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), Projectile.damage, 3f, Projectile.owner);
     }
     public void LoadRebarBolt()
     {
@@ -142,6 +152,7 @@ public class RebukerBolt : EverProjectile
         Projectile.penetrate = -1;
         Projectile.timeLeft = 1000;
         Projectile.friendly = true;
+        Projectile.DamageType = DamageClass.Ranged;
     }
     public override void NetOnSpawn()
     {
@@ -154,7 +165,7 @@ public class RebukerBolt : EverProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         base.OnHitNPC(target, hit, damageDone);
-        if (Projectile.damage > 4) Projectile.damage -= 3;
+        if (Projectile.damage > 4) Projectile.damage -= 5;
     }
     public override bool? CanDamage()
     {

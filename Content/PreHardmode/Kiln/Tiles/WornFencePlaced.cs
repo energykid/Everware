@@ -8,5 +8,6 @@ public class WornFencePlaced : ModWall
     {
         DustType = DustID.WoodFurniture;
         AddMapEntry(new Color(66, 52, 40));
+        Main.wallHouse[Type] = true;
     }
 }

@@ -118,6 +118,16 @@ Items: {
 		DisplayName: Rebuker
 		Tooltip: Fires a piercing metal rod that deals more damage on early hits
 	}
+
+	KilnMusicBox: {
+		DisplayName: Music Box (Kiln)
+		Tooltip: ""
+	}
+
+	QuarryMusicBox: {
+		DisplayName: Music Box (Quarry)
+		Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -137,4 +147,6 @@ Projectiles: {
 	KilnpostBreakaway.DisplayName: Kiln Shard
 	RebukerBolt.DisplayName: Rebuker
 	RebukerHoldout.DisplayName: Rebuker
+	CthulhuBloodProjectile.DisplayName: Cthulhu Blood Projectile
+	EyeOfCthulhuTendrilHitbox.DisplayName: Eye Of Cthulhu Tendril Hitbox
 }

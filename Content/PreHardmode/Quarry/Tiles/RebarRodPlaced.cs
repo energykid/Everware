@@ -9,5 +9,6 @@ public class RebarRodPlaced : ModWall
         DustType = DustID.Lead;
         Main.wallLight[Type] = true;
         AddMapEntry(new Color(23, 23, 23));
+        Main.wallHouse[Type] = true;
     }
 }

@@ -1,7 +1,4 @@
-﻿using Terraria.Audio;
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
-using Everware.Content.PreHardmode.Kiln.Visual;
+﻿using Everware.Content.PreHardmode.Kiln.Visual;
 
 namespace Everware.Content.PreHardmode.Kiln.Tiles;
 
@@ -14,5 +11,6 @@ public class KilnstoneWallPlaced : ModWall
         AddMapEntry(new Color(181, 62, 59));
         style.PitchRange = (-0.1f, 0.1f);
         HitSound = style;
+        Main.wallHouse[Type] = true;
     }
 }

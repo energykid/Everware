@@ -2,7 +2,6 @@
 using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Base.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
-using Everware.Core;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -59,7 +58,7 @@ public class ForgingKiln : EverMultitile
 
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
-        var FireGlow = AssetReferences.Content.PreHardmode.Kiln.Tiles.ForgingKilnGlow.Asset;
+        var FireGlow = ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Kiln/Tiles/ForgingKilnGlow");
 
         Lighting.AddLight(i, j, 1.4f, 0.65f, 0.15f);
 

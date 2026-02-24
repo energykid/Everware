@@ -68,9 +68,6 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         Owner.heldProj = Projectile.whoAmI;
 
-        Projectile.Center = Owner.MountedCenter + Offset;
-        Projectile.rotation = Rotation + RotationOffset;
-
         if (AutoDirection)
             Owner.direction = Math.Sign(new Vector2(1, 0).RotatedBy(Rotation).X);
 
@@ -81,11 +78,14 @@ public abstract class EverHoldoutProjectile : EverProjectile
             Owner.SetCompositeArmBack(true, StretchAmountFromExtension(BackArmExtension), Rotation + BackArmRotationOffset - MathHelper.ToRadians(90f));
         if (TwoHanded || FrontHanded)
             Owner.SetCompositeArmFront(true, StretchAmountFromExtension(FrontArmExtension), Rotation + FrontArmRotationOffset - MathHelper.ToRadians(90f));
+
+        Projectile.Center = Owner.MountedCenter + Offset + new Vector2(Owner.MountXOffset, 0);
+        Projectile.rotation = Rotation + RotationOffset;
     }
     public override bool PreDraw(ref Color lightColor)
     {
         if (Asset != null)
-            Main.EntitySpriteDraw(Asset.Value, Owner.Center + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(Asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
 
         return false;
     }

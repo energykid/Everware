@@ -7,7 +7,7 @@ namespace Everware.Content.PreHardmode.Kiln;
 
 public class KilnMusic : ModBiome
 {
-    public override int Music => MusicLoader.GetMusicSlot("Everware/Sounds/Music/Kiln");
+    public override int Music => Sounds.Music.Kiln.Slot;
     public override bool IsBiomeActive(Player player)
     {
         return player.GetModPlayer<KilnQuarryMusicStats>().kilnTiles > 20 && player.GetModPlayer<KilnQuarryMusicStats>().siltTiles > 10;

@@ -1,6 +1,7 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.Items;
+using Everware.Content.PreHardmode.Kiln.Tiles;
 using Everware.Content.PreHardmode.Kiln.Visual;
 using Everware.Core.Projectiles;
 using Everware.Utils;
@@ -24,6 +25,14 @@ public class Kilnpost : EverWeaponItem
         Item.DefaultToBasicWeapon(8, 40, DamageClass.Melee);
         Item.knockBack = 1f;
     }
+    public override void AddRecipes()
+    {
+        Recipe recipe = Recipe.Create(Type);
+        recipe.AddIngredient(ModContent.ItemType<KilnBrick>(), 20);
+        recipe.AddIngredient(ModContent.ItemType<Kilnstone>(), 5);
+        recipe.AddTile(ModContent.TileType<ForgingKiln>());
+        recipe.Register();
+    }
 }
 public class KilnpostHoldout : EverHoldoutProjectile
 {
@@ -38,6 +47,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Projectile.DamageType = DamageClass.Melee;
         Projectile.width = 90;
         Projectile.height = 90;
     }
@@ -58,12 +68,12 @@ public class KilnpostHoldout : EverHoldoutProjectile
             Projectile.ai[2] = 70f;
             Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
             BaseRot = Rotation;
-            Dir = Math.Sign(NetworkOwner.MousePosition.X - Owner.Center.X);
+            Dir = Math.Sign(NetworkOwner.MousePosition.X - Owner.MountedCenter.X);
             State = (State == "Spin") ? "Thrust" : "Spin";
             if (State == "Thrust")
             {
                 FrontArmExtension = 1f;
-                SoundEngine.PlaySound(Kilnpost.ThrustSound, Owner.Center);
+                SoundEngine.PlaySound(Kilnpost.ThrustSound, Owner.MountedCenter);
                 HitFrames = 2;
                 Projectile.damage = 10;
             }
@@ -221,9 +231,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         if (RecoveryAmount < 1f)
-            Main.EntitySpriteDraw(BrokenAsset.Value, Owner.Center + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(BrokenAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
         else
-            Main.EntitySpriteDraw(Asset.Value, Owner.Center + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(Asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
 
         return false;
     }
