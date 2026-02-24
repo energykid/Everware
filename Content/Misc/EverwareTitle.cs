@@ -23,9 +23,8 @@ public class EverwareTitle : ModMenu
 
         var Background = AssetReferences.Content.Misc.MenuArtBackground.Asset;
         var Foreground = AssetReferences.Content.Misc.MenuArtForeground.Asset;
-        var Mist1 = AssetReferences.Content.Misc.MenuLayer1.Asset;
-        var Mist2 = AssetReferences.Content.Misc.MenuLayer2.Asset;
-        var PartialVignette = AssetReferences.Content.Misc.MenuLayer4.Asset;
+        var Mist = AssetReferences.Content.Misc.MenuLayer1.Asset;
+        var PartialVignette = AssetReferences.Content.Misc.MenuLayer2.Asset;
         var Outline = AssetReferences.Content.Misc.MenuLayer3.Asset;
 
         Color MistColorForeground = Color.DarkSlateBlue;
@@ -40,7 +39,7 @@ public class EverwareTitle : ModMenu
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.UIScaleMatrix);
 
-        Main.spriteBatch.Draw(Background.Value, Vector2.Zero + (Parallax * 0.3f), Background.Frame(), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(Background.Value, new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f) + (Parallax * 0.3f), Background.Frame(), Color.White, 0f, Background.Frame().Size() / 2f, 1f, SpriteEffects.None, 0f);
 
         var OutlineEffect = AssetReferences.Content.Misc.PureColorEffect.CreateColorEffect();
 
@@ -77,7 +76,7 @@ public class EverwareTitle : ModMenu
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, Effect2.Shader, Main.UIScaleMatrix);
 
         for (int i = 0; i < 5; i++)
-            Main.spriteBatch.Draw(Mist1.Value, Vector2.Zero, Mist1.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(Mist.Value, Vector2.Zero, Mist.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
         spriteBatch.End();
 
@@ -94,7 +93,7 @@ public class EverwareTitle : ModMenu
 
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, Effect.Shader, Main.UIScaleMatrix);
 
-        Main.spriteBatch.Draw(Mist1.Value, Vector2.Zero, Mist1.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(Mist.Value, Vector2.Zero, Mist.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.UIScaleMatrix);
