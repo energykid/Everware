@@ -28,13 +28,6 @@ public class HellPod : EverMultitile
     {
         Main.tile[i, j].Get<HellPodData>().Rotation = MathHelper.ToRadians(Main.rand.NextFloat(-20, 20));
     }
-    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
-    {
-        if (Main.tile[i, j].TileFrameX < 8 && Main.tile[i, j].TileFrameY % (18 * 3) < 8)
-        {
-
-        }
-    }
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
     {
         if (Main.tile[i, j].Get<HellPodData>().Enabled != true)
@@ -155,19 +148,62 @@ public class HellPod : EverMultitile
         spriteBatch.Draw(Placed.Value, p - Main.screenPosition + new Vector2(24), frame, Lighting.GetColor((p / 16).ToPoint()), rot, origin, 1f, SpriteEffects.None, 0);
         spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, Color.White, rot, origin, 1f, SpriteEffects.None, 0);
 
-        if (Main.tile[i, j].TileFrameX < 8 && Main.tile[i, j].TileFrameY % (18 * 3) < 8)
+        if (Main.tile[i, j].TileFrameX % (18 * 3) < 8 && Main.tile[i, j].TileFrameY % (18 * 3) < 8)
         {
             var Asset = AssetReferences.Content.PreHardmode.Hell.HellPodStalk.Asset;
+            int topDistance = 0;
+            int bottomDistance = 0;
+
+            int referenceTopDistance = 0;
+            int referenceBottomDistance = 0;
+
+            // if the distance has been calculated last frame, get the distances to compare to this frame
+            if (Main.tile[i, j].Get<HellPodData>().DistanceYetCalculated)
+            {
+                referenceTopDistance = Main.tile[i, j].Get<HellPodData>().DistanceTop;
+                referenceBottomDistance = Main.tile[i, j].Get<HellPodData>().DistanceBottom;
+            }
+
+            // combination draw function & distance calculator (since i'm forced to run this stuff through a draw method anyways...)
             DoThingALot(i, j, (ii, jj) =>
             {
                 int frameX = 0;
                 int frameY = 0;
                 Rectangle frame = Asset.Frame(2, 2, frameX, frameY);
                 spriteBatch.Draw(Asset.Value, new Vector2(ii, jj) - Main.screenPosition, frame, Lighting.GetColor((new Vector2(ii + 8, jj + 8) / 16).ToPoint()), rot, new Vector2(8f), 1f, SpriteEffects.None, 0);
+
+                if (jj < p2.Y) topDistance = (int)Math.Abs(jj - p2.Y);
+                else bottomDistance = (int)Math.Abs(jj - p2.Y);
             });
+
+            // save the distance between the center and either end
+            // this is so that we can check if it's changed
+            // if it HAS changed, then we kill the pod early because that means the player has broken one of the tiles holding it up
+            Main.tile[i, j].Get<HellPodData>().DistanceTop = topDistance;
+            Main.tile[i, j].Get<HellPodData>().DistanceBottom = bottomDistance;
+
+            // if the distance was calculated last frame, these values will both be more than 0, therefore we do the actual comparison and act accordingly
+            if (referenceTopDistance != 0 && referenceBottomDistance != 0)
+            {
+                // if either distance is different, just damage the pod 3 times so it breaks and runs all related behavior
+                if (referenceTopDistance != topDistance || referenceBottomDistance != bottomDistance)
+                {
+                    for (int x = 0; x < 3; x++)
+                        DamagePod(i, j);
+                }
+            }
+
+            Main.tile[i, j].Get<HellPodData>().DistanceYetCalculated = true;
         }
     }
     delegate void ThingToDo(int i, int j);
+
+    /// <summary>
+    /// This performs an action in a rotated column protruding outwards from this hell pod
+    /// </summary>
+    /// <param name="i">Center X, in tile coordinates</param>
+    /// <param name="j">Center Y, in tile coordinates</param>
+    /// <param name="action">The thing to do at each set of world coordinates (NOT tile coordinates because this needs more precision)</param>
     static void DoThingALot(int i, int j, ThingToDo action)
     {
         float rot = Main.tile[i, j].Get<HellPodData>().Rotation;
@@ -246,14 +282,15 @@ public class HellPodDataSaverLoader : ModSystem
 
             Main.tile[pos].Get<HellPodData>().Enabled = true;
             Main.tile[pos].Get<HellPodData>().Rotation = tag.GetFloat("EverwareHellPod" + i.ToString() + "Rotation");
-
-            Main.NewText(pos.ToString());
         }
     }
 }
 
 public struct HellPodData : ITileData
 {
+    public int DistanceTop;
+    public int DistanceBottom;
+    public bool DistanceYetCalculated;
     public bool Enabled;
     public float Rotation;
     public int Variant;
