@@ -1,10 +1,10 @@
 ﻿using Everware.Content.Base.Items;
+using Everware.Content.Base.Tiles.TileData;
 using Everware.Content.PreHardmode.Quarry.Tiles;
 using Everware.Content.PreHardmode.Quarry.Visual;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.ID;
 
@@ -114,103 +114,53 @@ public class RebarSetBonus : ModPlayer
 {
     public static readonly SoundStyle ScavengeSound = new SoundStyle("Everware/Sounds/Gear/Armor/RebarScavengeOre") with { PitchRange = (-0.2f, 0.3f) };
 
-    public static List<int> RebarOreList = [];
-
     public bool rebarSetBonus = false;
-
-    public override void Load()
-    {
-        base.Load();
-
-        On_Tile.ClearTile += On_Tile_ClearTile;
-    }
-
-    private void On_Tile_ClearTile(On_Tile.orig_ClearTile orig, ref Tile self)
-    {
-        orig(ref self);
-    }
 
     public override void ResetEffects()
     {
         rebarSetBonus = false;
     }
-    public override void PostUpdate()
-    {
-
-    }
 }
 
 public class RebarGlobalTile : GlobalTile
 {
-    public override void Unload()
-    {
-        base.Unload();
-    }
-
-    public override void Drop(int i, int j, int type)
-    {
-        if (Main.LocalPlayer.GetModPlayer<RebarSetBonus>().rebarSetBonus && TileID.Sets.Ore[type])
-        {
-            if (Main.rand.NextBool(3))
-            {
-                Vector2 position = new Vector2((i * 16) + 8, (j * 16) + 8);
-
-                SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
-
-                int t = Main.tile[i, j].TileType;
-
-                for (int k = 0; k < 2; k++)
-                {
-                    int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)));
-                    Main.item[ii].GetGlobalItem<RebarGlobalItem>().StackabilityTimer = 1f;
-                    Main.item[ii].GetGlobalItem<RebarGlobalItem>().CanStack = false;
-                }
-
-                for (int k = 0; k < 5; k++)
-                {
-                    Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
-                }
-            }
-            else
-            {
-                int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)));
-            }
-        }
-    }
-
     public void DropStuff(int i, int j, int type)
     {
-        if (Main.LocalPlayer.GetModPlayer<RebarSetBonus>().rebarSetBonus && TileID.Sets.Ore[type])
+        if (Main.tile[i, j].Get<LastPlayerMinedData>().WhichPlayerAmI != -1)
         {
-            if (Main.rand.NextBool(3))
+            if (Main.player[Main.tile[i, j].Get<LastPlayerMinedData>().WhichPlayerAmI].GetModPlayer<RebarSetBonus>().rebarSetBonus && TileID.Sets.Ore[type])
             {
-                Vector2 position = new Vector2((i * 16) + 8, (j * 16) + 8);
+                if (Main.rand.NextBool(3))
+                {
+                    Vector2 position = new Vector2((i * 16) + 8, (j * 16) + 8);
 
-                SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
+                    SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
 
-                int t = Main.tile[i, j].TileType;
+                    int t = Main.tile[i, j].TileType;
 
-                for (int k = 0; k < 2; k++)
+                    for (int k = 0; k < 2; k++)
+                    {
+                        int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)));
+                        Main.item[ii].GetGlobalItem<RebarGlobalItem>().StackabilityTimer = 1f;
+                        Main.item[ii].GetGlobalItem<RebarGlobalItem>().CanStack = false;
+                    }
+
+                    for (int k = 0; k < 5; k++)
+                    {
+                        Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
+                    }
+                }
+                else
                 {
                     int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)));
-                    Main.item[ii].GetGlobalItem<RebarGlobalItem>().StackabilityTimer = 1f;
-                    Main.item[ii].GetGlobalItem<RebarGlobalItem>().CanStack = false;
                 }
-
-                for (int k = 0; k < 5; k++)
-                {
-                    Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
-                }
-            }
-            else
-            {
-                int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)));
             }
         }
     }
 
     public override bool CanDrop(int i, int j, int type)
     {
+
         if (Main.LocalPlayer.GetModPlayer<RebarSetBonus>().rebarSetBonus && TileID.Sets.Ore[type])
         {
             DropStuff(i, j, type);
