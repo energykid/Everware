@@ -14,7 +14,7 @@ public class EverMusicSystem : ModSystem
     {
         orig(self);
 
-        if (!Main.gameMenu)
+        if (!Main.gameMenu && EyeOfCthulhu.ReworkEnabled)
         {
             if (NPC.CountNPCS(NPCID.EyeofCthulhu) > 0)
             {

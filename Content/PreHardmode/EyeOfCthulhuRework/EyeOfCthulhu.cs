@@ -38,10 +38,11 @@ public class EyeOfCthulhu : GlobalNPC
     public bool ContactDamage = false;
     public bool TendrilDamageEnabled = false;
     public bool MusicEnabled = false;
+    public static bool ReworkEnabled = false;
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        return entity.type == NPCID.EyeofCthulhu;
+        return ReworkEnabled && entity.type == NPCID.EyeofCthulhu;
     }
     public override bool CanHitPlayer(NPC npc, Player target, ref int cooldownSlot)
     {
