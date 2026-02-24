@@ -14,7 +14,7 @@ namespace Everware.Content.PreHardmode.EyeOfCthulhuRework;
 
 public class EyeOfCthulhu : GlobalNPC
 {
-    public static int BloodProjectileDamage => Main.expertMode ? 28 : 22;
+    public static int BloodProjectileDamage => Main.expertMode ? 9 : 16;
     public static int BashDamage => Main.expertMode ? 38 : 28;
     public static int Phase2BashDamage => Main.expertMode ? 48 : 38;
     public static int TendrilDamage => Main.expertMode ? 32 : 25;
@@ -37,10 +37,11 @@ public class EyeOfCthulhu : GlobalNPC
     float Roar = 0f;
     public bool ContactDamage = false;
     public bool TendrilDamageEnabled = false;
+    public bool MusicEnabled = false;
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        return false;
+        return entity.type == NPCID.EyeofCthulhu;
     }
     public override bool CanHitPlayer(NPC npc, Player target, ref int cooldownSlot)
     {
@@ -199,6 +200,8 @@ public class EyeOfCthulhu : GlobalNPC
                         npc.velocity *= 0.85f;
                         if (AttackTimer % Time == 1)
                         {
+                            MusicEnabled = true;
+
                             UnleashTendril(npc);
                         }
                     }
