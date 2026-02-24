@@ -1,5 +1,5 @@
 ﻿using Everware.Content.Base.Items;
-using Everware.Content.PreHardmode.Kiln;
+using Terraria.ID;
 
 namespace Everware.Content.PreHardmode;
 
@@ -12,17 +12,17 @@ public class TestItem : EverItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToPlaceableTile(0);
-        Item.createTile = -1;
+        Item.useStyle = ItemUseStyleID.HoldUp;
+        Item.useTime = Item.useAnimation = 20;
     }
     public override bool? UseItem(Player player)
     {
-        if (player.itemAnimation == player.itemAnimationMax - 2)
+        if (player.ItemAnimationJustStarted)
         {
-            Point p = (Main.MouseWorld / 16f).ToPoint();
-            for (int i = 0; i < 60; i++) if ((Main.tile[p].HasTile && !Main.tileSolid[Main.tile[p].TileType]) || !Main.tile[p].HasTile) p.Y++;
-            KilnGenerator.GenerateKiln(p);
+
+            SoundEngine.PlaySound(SoundID.Grass);
         }
+
         return base.UseItem(player);
     }
 }

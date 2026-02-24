@@ -3,8 +3,10 @@ using Everware.Content.Base.Tiles;
 using Everware.Core;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Everware.Content.PreHardmode.Hell;
 
@@ -22,14 +24,26 @@ public class HellPod : EverMultitile
         HitSound = null;
         Main.tileNoAttach[Type] = true;
     }
+    public override void PlaceInWorld(int i, int j, Item item)
+    {
+        Main.tile[i, j].Get<HellPodData>().Rotation = MathHelper.ToRadians(Main.rand.NextFloat(-20, 20));
+    }
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
         if (Main.tile[i, j].TileFrameX < 8 && Main.tile[i, j].TileFrameY % (18 * 3) < 8)
         {
+
         }
     }
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        if (Main.tile[i, j].Get<HellPodData>().Enabled != true)
+        {
+            HellPodDataSaverLoader.HellPodPositions.Add(new Point(i, j));
+            Main.tile[i, j].Get<HellPodData>().Rotation = MathHelper.ToRadians(Main.rand.NextFloat(-20, 20));
+            Main.tile[i, j].Get<HellPodData>().Enabled = true;
+        }
+
         return true;
     }
     public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
@@ -55,11 +69,6 @@ public class HellPod : EverMultitile
             jj--;
         }
 
-        for (int k = 0; k < 10; k++)
-        {
-            Dust.NewDust(new Vector2(ii * 16, jj * 16), 16, 16, DustID.ScourgeOfTheCorruptor);
-        }
-
         Main.tile[ii, jj].TileFrameY += 18 * 3;
         if (ii != i || jj != j)
             Main.tile[i, j].TileFrameY += 18 * 3;
@@ -79,6 +88,9 @@ public class HellPod : EverMultitile
             {
                 for (int y = 0; y < 3; y++)
                 {
+                    if (HellPodDataSaverLoader.HellPodPositions.Contains(new Point(ii + x, jj + y)))
+                        HellPodDataSaverLoader.HellPodPositions.Remove(new Point(ii + x, jj + y));
+
                     WorldGen.KillTile(ii + x, jj + y);
                 }
             }
@@ -120,6 +132,8 @@ public class HellPod : EverMultitile
     }
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        float rot = Main.tile[i, j].Get<HellPodData>().Rotation;
+
         var Placed = AssetReferences.Content.PreHardmode.Hell.HellPodPlaced.Asset;
         var Glow = AssetReferences.Content.PreHardmode.Hell.HellPodGlow.Asset;
         var Light = AssetReferences.Content.PreHardmode.Hell.HellPodLight.Asset;
@@ -128,13 +142,18 @@ public class HellPod : EverMultitile
 
         Vector2 fr = new Vector2((float)Math.Floor(tile.TileFrameX / 54f), (float)Math.Floor(tile.TileFrameY / 54f));
 
-        Vector2 p = new Vector2(i * 16, j * 16) + new Vector2(0, -fr.Y);
+        Vector2 p = new Vector2(i * 16, j * 16) + new Vector2(0, -fr.Y).RotatedBy(rot) + new Vector2(0, 2);
+        Vector2 p2 = new Vector2(i * 16, j * 16) + new Vector2(0, 2);
 
-        spriteBatch.Draw(Light.Value, p - Main.screenPosition + new Vector2(48f / 2f), Light.Frame(), Color.Black.MultiplyRGBA(new(1f, 1f, 1f, 0.3f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.4f, SpriteEffects.None, 0);
-        spriteBatch.Draw(Light.Value, p - Main.screenPosition + new Vector2(48f / 2f), Light.Frame(), Color.OrangeRed.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.2f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.2f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(48f / 2f), Light.Frame(), Color.Black.MultiplyRGBA(new(1f, 1f, 1f, 0.1f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.3f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(48f / 2f), Light.Frame(), Color.OrangeRed.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.2f, SpriteEffects.None, 0);
 
-        spriteBatch.Draw(Placed.Value, p - Main.screenPosition, Placed.Frame(2, 3, (int)fr.X, (int)fr.Y), Lighting.GetColor((p / 16).ToPoint()));
-        spriteBatch.Draw(Glow.Value, p - Main.screenPosition, Glow.Frame(2, 3, (int)fr.X, (int)fr.Y), Color.White);
+        Rectangle frame = Placed.Frame(2, 3, (int)fr.X, (int)fr.Y);
+
+        Vector2 origin = new Vector2(24f, 24f).RotatedBy(-rot);
+
+        spriteBatch.Draw(Placed.Value, p - Main.screenPosition + new Vector2(24), frame, Lighting.GetColor((p / 16).ToPoint()), rot, origin, 1f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, Color.White, rot, origin, 1f, SpriteEffects.None, 0);
 
         if (Main.tile[i, j].TileFrameX < 8 && Main.tile[i, j].TileFrameY % (18 * 3) < 8)
         {
@@ -143,41 +162,44 @@ public class HellPod : EverMultitile
             {
                 int frameX = 0;
                 int frameY = 0;
-                spriteBatch.Draw(Asset.Value, new Vector2(ii, jj) - Main.screenPosition, Asset.Frame(2, 2, frameX, frameY), Lighting.GetColor((new Vector2(ii + 8, jj + 8) / 16).ToPoint()));
+                Rectangle frame = Asset.Frame(2, 2, frameX, frameY);
+                spriteBatch.Draw(Asset.Value, new Vector2(ii, jj) - Main.screenPosition, frame, Lighting.GetColor((new Vector2(ii + 8, jj + 8) / 16).ToPoint()), rot, new Vector2(8f), 1f, SpriteEffects.None, 0);
             });
         }
     }
     delegate void ThingToDo(int i, int j);
     static void DoThingALot(int i, int j, ThingToDo action)
     {
+        float rot = Main.tile[i, j].Get<HellPodData>().Rotation;
+
         Vector2 position = new Vector2(i * 16, j * 16);
 
         int xx = 16;
         int ii = 2;
         int jj = 32;
         int iterations = 0;
-        while (!WorldGen.SolidOrSlopedTile(Main.tile[new Point(i + 1, j + (ii / 16) - 1)]))
+
+        Vector2 p1 = (new Vector2(i * 16, j * 16) + new Vector2(8f)) + new Vector2(16, 3).RotatedBy(rot);
+        Vector2 p2 = (new Vector2(i * 16, j * 16) + new Vector2(8f)) + new Vector2(16, 32).RotatedBy(rot);
+
+        while (!WorldGen.SolidOrSlopedTile(Main.tile[(p1 / 16).ToPoint()]))
         {
             iterations++;
             if (iterations > 70) break;
 
-            ii -= 16;
+            p1 += new Vector2(0, -16).RotatedBy(rot);
 
-            Vector2 pos = position + new Vector2(xx, ii);
-
-            action((int)pos.X, (int)pos.Y);
+            action((int)p1.X, (int)p1.Y);
         }
         iterations = 0;
-        while (!WorldGen.SolidOrSlopedTile(Main.tile[new Point(i + 1, j + (jj / 16))]))
+        while (!WorldGen.SolidOrSlopedTile(Main.tile[(p2 / 16).ToPoint()]))
         {
             iterations++;
             if (iterations > 70) break;
 
-            jj += 16;
+            p2 += new Vector2(0, 16).RotatedBy(rot);
 
-            Vector2 pos = position + new Vector2(xx, jj);
-
-            action((int)pos.X, (int)pos.Y);
+            action((int)p2.X, (int)p2.Y);
         }
     }
 }
@@ -188,7 +210,7 @@ public class HellPodGlobalProjectile : GlobalProjectile
     public bool HasHitPod = false;
     public override void PostAI(Projectile projectile)
     {
-        if (projectile.friendly)
+        if (projectile.friendly && projectile.damage > 0 && !HasHitPod)
         {
             if (Main.tile[(projectile.Center / 16).ToPoint()].TileType == ModContent.TileType<HellPod>() && Main.tile[(projectile.Center / 16).ToPoint()].HasTile)
             {
@@ -199,4 +221,40 @@ public class HellPodGlobalProjectile : GlobalProjectile
             }
         }
     }
+}
+
+public class HellPodDataSaverLoader : ModSystem
+{
+    public static List<Point> HellPodPositions = [];
+    public override void SaveWorldData(TagCompound tag)
+    {
+        tag.Set("EverwareHellPodCount", HellPodPositions.Count);
+        for (int i = 0; i < HellPodPositions.Count; i++)
+        {
+            tag.Set("EverwareHellPod" + i.ToString() + "Position", HellPodPositions[i]);
+            tag.Set("EverwareHellPod" + i.ToString() + "Rotation", Main.tile[HellPodPositions[i]].Get<HellPodData>().Rotation);
+        }
+    }
+    public override void LoadWorldData(TagCompound tag)
+    {
+        for (int i = 0; i < tag.GetInt("EverwareHellPodCount"); i++)
+        {
+            Point pos = tag.Get<Point>("EverwareHellPod" + i.ToString() + "Position");
+
+            if (!HellPodPositions.Contains(pos))
+                HellPodPositions.Add(pos);
+
+            Main.tile[pos].Get<HellPodData>().Enabled = true;
+            Main.tile[pos].Get<HellPodData>().Rotation = tag.GetFloat("EverwareHellPod" + i.ToString() + "Rotation");
+
+            Main.NewText(pos.ToString());
+        }
+    }
+}
+
+public struct HellPodData : ITileData
+{
+    public bool Enabled;
+    public float Rotation;
+    public int Variant;
 }
