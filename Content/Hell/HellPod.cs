@@ -16,7 +16,7 @@ public class HellPodTileEntity : ModTileEntity
     public bool Placed = false;
     public override void OnKill()
     {
-        SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodBreak.Asset with { PitchVariance = 0.1f }, new Vector2((Position.X + 1) * 16, (Position.Y + 1) * 16));
+        SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, new Vector2((Position.X + 1) * 16, (Position.Y + 1) * 16));
     }
     public override bool IsTileValidForEntity(int x, int y)
     {
@@ -36,8 +36,11 @@ public class HellPodTileEntity : ModTileEntity
     }
     public override void LoadData(TagCompound tag)
     {
-        Main.tile[Position].Get<HellPodData>().Rotation = tag.Get<float>("Rotation");
-        Placed = true;
+        if (tag.Get<float>("Rotation") != 0f)
+        {
+            Main.tile[Position].Get<HellPodData>().Rotation = tag.Get<float>("Rotation");
+            Placed = true;
+        }
     }
     public override void Update()
     {
@@ -141,7 +144,7 @@ public class HellPod : EverMultitile
     public static void DamagePod(int i, int j)
     {
         float frame = (float)Math.Floor((float)Main.tile[i, j].TileFrameY / (18 * 3));
-        SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodCrack.Asset with { PitchVariance = 0.2f, Pitch = frame * 0.4f }, new Vector2(i * 16, j * 16));
+        SoundEngine.PlaySound(frame == 0 ? Assets.Sounds.Tile.HellPodCrack.Asset : Assets.Sounds.Tile.HellPodHeavyCrack.Asset, new Vector2(i * 16, j * 16));
 
         int ii = i;
         int jj = j;

@@ -6,7 +6,7 @@ namespace Everware.Content.Quarry.Visual;
 
 public class WeldingSpark : Particle
 {
-    public override Asset<Texture2D> Texture => ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Quarry/Visual/WeldingSpark");
+    public override Asset<Texture2D> Texture => Assets.Textures.Quarry.WeldingSpark.Asset;
     public WeldingSpark(Vector2 pos, Vector2 vel) : base(pos, vel, Vector2.One, null, null)
     {
         position = pos;

@@ -23,7 +23,7 @@ public class ForgingKiln : EverMultitile
 
         AdjTiles = [TileID.Furnaces];
 
-        SoundStyle style = new SoundStyle("Everware/Sounds/Tile/KilnstoneHit");
+        SoundStyle style = new SoundStyle("Everware/Assets/Sounds/Tile/KilnstoneHit");
         AddMapEntry(new Color(151, 62, 59));
         style.PitchRange = (-0.3f, -0.1f);
         HitSound = style;
@@ -58,7 +58,7 @@ public class ForgingKiln : EverMultitile
 
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
-        var FireGlow = ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Kiln/Tiles/ForgingKilnGlow");
+        var FireGlow = Assets.Textures.Kiln.ForgingKilnGlow.Asset;
 
         Lighting.AddLight(i, j, 1.4f, 0.65f, 0.15f);
 
@@ -83,7 +83,7 @@ public class ForgingKiln : EverMultitile
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
     {
-        SoundEngine.PlaySound(new SoundStyle("Everware/Sounds/Tile/ForgingKilnDestroy").WithPitchOffset(0.2f), new Vector2((i * 16) + 32, (j * 16) + 32));
+        SoundEngine.PlaySound(new SoundStyle("Everware/Assets/Sounds/Tile/ForgingKilnDestroy").WithPitchOffset(0.2f), new Vector2((i * 16) + 32, (j * 16) + 32));
         base.KillMultiTile(i, j, frameX, frameY);
     }
 

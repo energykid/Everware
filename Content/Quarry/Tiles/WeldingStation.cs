@@ -48,9 +48,9 @@ public class WeldingStation : EverMultitile
         }
     }
 
-    public static readonly Asset<Texture2D> LaserTexture1 = ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Quarry/Tiles/WeldingStation_LaserGrid");
-    public static readonly Asset<Texture2D> LaserTexture2 = ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Quarry/Tiles/WeldingStation_LaserGrid2");
-    public static readonly Asset<Texture2D> LaserTexture2Glow = ModContent.Request<Texture2D>("Everware/Content/PreHardmode/Quarry/Tiles/WeldingStation_LaserGrid2_Glow");
+    public static readonly Asset<Texture2D> LaserTexture1 = Assets.Textures.Quarry.WeldingStation_LaserGrid.Asset;
+    public static readonly Asset<Texture2D> LaserTexture2 = Assets.Textures.Quarry.WeldingStation_LaserGrid2.Asset;
+    public static readonly Asset<Texture2D> LaserTexture2Glow = Assets.Textures.Quarry.WeldingStation_LaserGrid2_Glow.Asset;
 
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
