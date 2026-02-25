@@ -8,12 +8,6 @@
 		
 	</PropertyGroup>
 	<ItemGroup>
-	  <AdditionalFiles Remove="Content\PreHardmode\Kilnstone\**" />
-	  <Compile Remove="Content\PreHardmode\Kilnstone\**" />
-	  <EmbeddedResource Remove="Content\PreHardmode\Kilnstone\**" />
-	  <None Remove="Content\PreHardmode\Kilnstone\**" />
-	</ItemGroup>
-	<ItemGroup>
 	  <None Include="Content\Base\Tiles\EverMultitile.cs" />
 	</ItemGroup>
 

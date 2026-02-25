@@ -1,4 +1,4 @@
-﻿using Everware.Content.PreHardmode.EyeOfCthulhuRework;
+﻿using Everware.Content.EyeOfCthulhuRework;
 using Terraria.ID;
 
 namespace Everware.Common.Systems;
@@ -20,12 +20,12 @@ public class EverMusicSystem : ModSystem
             {
                 if (Main.npc[NPC.FindFirstNPC(NPCID.EyeofCthulhu)].GetGlobalNPC<EyeOfCthulhu>().MusicEnabled)
                 {
-                    Main.newMusic = Sounds.Music.EyeOfCthulhu.Slot;
+                    Main.newMusic = Assets.Sounds.Music.EyeOfCthulhu.Slot;
                     Main.musicFade[Main.newMusic] = 1;
                 }
                 else
                 {
-                    Main.newMusic = Sounds.Music.Silence.Slot;
+                    Main.newMusic = Assets.Sounds.Music.Silence.Slot;
                 }
             }
         }

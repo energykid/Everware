@@ -1,17 +1,66 @@
 ﻿using Everware.Common.Players;
 using Everware.Core.Projectiles;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terraria.ID;
 
 namespace Everware;
 
-public static class EverwarePacketHandler
+public abstract class EverPacket : ILoadable
 {
-    public static void HandleAllPackets(Mod mod, BinaryReader reader, int whoAmI)
+    public EverPacket Instance => this;
+    public virtual string Name => "";
+    /// <summary>
+    /// Read and set data from the BinaryReader here. Only run on the server.
+    /// </summary>
+    /// <param name="mod">The mod instance.</param>
+    /// <param name="reader">The BinaryReader to read from.</param>
+    public virtual void ReceiveOnServer(Mod mod, BinaryReader reader)
     {
 
+    }
+    /// <summary>
+    /// Read and set data from the BinaryReader here. Only run on the client.
+    /// </summary>
+    /// <param name="mod">The mod instance.</param>
+    /// <param name="reader">The BinaryReader to read from.</param>
+    public virtual void ReceiveOnClient(Mod mod, BinaryReader reader)
+    {
+
+    }
+
+    public void Load(Mod mod)
+    {
+        EverwarePacketHandler.CustomPackets.Add(Instance);
+    }
+
+    public void Unload() { }
+}
+
+public static class EverwarePacketHandler
+{
+    public static List<EverPacket> CustomPackets = [];
+    public static void HandleAllPackets(Mod mod, BinaryReader reader, int whoAmI)
+    {
         string str = reader.ReadString();
+
+        for (int i = 0; i < CustomPackets.Count; i++)
+        {
+            EverPacket packet = CustomPackets[i];
+
+            if (str == packet.Name)
+            {
+                if (Main.netMode == NetmodeID.Server)
+                {
+                    packet.ReceiveOnServer(mod, reader);
+                }
+                else
+                {
+                    packet.ReceiveOnClient(mod, reader);
+                }
+            }
+        }
 
         switch (str)
         {
