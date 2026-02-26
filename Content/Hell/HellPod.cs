@@ -16,6 +16,21 @@ public class HellPodTileEntity : ModTileEntity
     public bool Placed = false;
     public override void OnKill()
     {
+        HellPod.DoThingALot(Position.X, Position.Y, (ii, jj, num) =>
+        {
+            new HellPodStalkDebris(new Vector2(ii, jj), Main.tile[Position].Get<HellPodData>().Rotation)
+            {
+                FrameNum = HellPod.StalkFrame(num).TopLeft() / 18f,
+                FrameDelay = Math.Abs(num / 2)
+            }
+            .Spawn();
+        });
+
+        for (int i = 0; i < 5; i++)
+        {
+            new HellPodDebris((Position.ToVector2() * 16) + new Vector2(24, 24), i, Main.tile[Position].Get<HellPodData>().Rotation).Spawn();
+        }
+
         SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, new Vector2((Position.X + 1) * 16, (Position.Y + 1) * 16));
     }
     public override bool IsTileValidForEntity(int x, int y)
@@ -74,7 +89,7 @@ public class HellPodTileEntity : ModTileEntity
         }
 
         // distance calculator
-        HellPod.DoThingALot(i, j, (ii, jj) =>
+        HellPod.DoThingALot(i, j, (ii, jj, num) =>
         {
             if (jj < p2.Y) topDistance = (int)Math.Abs(jj - p2.Y);
             else bottomDistance = (int)Math.Abs(jj - p2.Y);
@@ -121,10 +136,9 @@ public class HellPod : EverMultitile
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
-        DustType = DustID.InfernoFork;
         AddMapEntry(new Color(250, 106, 10));
         MineResist = 100;
-
+        DustType = -1;
         HitSound = null;
         Main.tileNoAttach[Type] = true;
 
@@ -139,6 +153,17 @@ public class HellPod : EverMultitile
     {
         return true;
     }
+    public static Rectangle StalkFrame(int determinor)
+    {
+        float rnd1 = (float)(Math.Sin((float)(determinor * 13.12436f)) * 10);
+        float rnd2 = (float)(Math.Sin((float)(determinor * 11.24846f)) * 10);
+
+        rnd1 = (float)Math.Floor(rnd1);
+        rnd2 = (float)Math.Floor(rnd2);
+
+        return Assets.Textures.Hell.HellPodStalk.Asset.Frame(2, 2, (int)Math.Abs(rnd1 % 2), (int)Math.Abs(rnd2 % 2));
+    }
+    public static Color BacklightColor => Color.OrangeRed.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0f));
     public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
     {
         Lighting.AddLight(i, j, TorchID.Torch, 0.2f);
@@ -167,18 +192,6 @@ public class HellPod : EverMultitile
         if (ii != i || jj != j)
             Main.tile[i, j].TileFrameY += 18 * 3;
 
-        if (Main.tile[ii, jj].TileFrameY >= (18 * 3 * 3))
-        {
-            SoundEngine.PlaySound(SoundID.Dig, new Vector2(i * 16, j * 16));
-            DoThingALot(i, j, (i, j) =>
-            {
-                for (int k = 0; k < 5; k++)
-                {
-                    Dust.NewDust(new Vector2(ii + 4, jj), 8, 16, DustID.Obsidian);
-                }
-            });
-        }
-
         Main.tile[ii, jj].Get<HellPodData>().HurtIntensity = 1f;
     }
     public override bool CanKillTile(int i, int j, ref bool blockDamaged)
@@ -201,6 +214,7 @@ public class HellPod : EverMultitile
 
         var Placed = Assets.Textures.Hell.HellPodPlaced.Asset;
         var Glow = Assets.Textures.Hell.HellPodGlow.Asset;
+        var BrightGlow = Assets.Textures.Hell.HellPodBrightGlow.Asset;
         var Light = Assets.Textures.Hell.HellPodLight.Asset;
 
         Tile tile = Main.tile[i, j];
@@ -210,8 +224,8 @@ public class HellPod : EverMultitile
         Vector2 p = new Vector2(i * 16, j * 16) + new Vector2(0, -fr.Y).RotatedBy(rot) + new Vector2(0, 2);
         Vector2 p2 = new Vector2(i * 16, j * 16) + new Vector2(0, 2);
 
-        spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(24), Light.Frame(), Color.Black.MultiplyRGBA(new(1f, 1f, 1f, 0.1f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.3f, SpriteEffects.None, 0);
-        spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(24), Light.Frame(), Color.OrangeRed.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.2f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(24), Light.Frame(), Color.Black.MultiplyRGBA(new(1f, 1f, 1f, 0.5f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.4f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(24), Light.Frame(), BacklightColor, GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.2f, SpriteEffects.None, 0);
 
         Rectangle frame = Placed.Frame(2, 3, variant % 2, (int)fr.Y);
 
@@ -227,11 +241,9 @@ public class HellPod : EverMultitile
             var Asset = Assets.Textures.Hell.HellPodStalk.Asset;
 
             // draw function
-            DoThingALot(i, j, (ii, jj) =>
+            DoThingALot(i, j, (ii, jj, num) =>
             {
-                int frameX = 0;
-                int frameY = 0;
-                Rectangle frame = Asset.Frame(2, 2, frameX, frameY);
+                Rectangle frame = StalkFrame(num);
                 spriteBatch.Draw(Asset.Value, new Vector2(ii, jj) - Main.screenPosition, frame, Lighting.GetColor((new Vector2(ii + 8, jj + 8) / 16).ToPoint()), rot, new Vector2(8f), 1f, SpriteEffects.None, 0);
 
                 if (jj < p2.Y) topPosition = new(ii, jj);
@@ -250,8 +262,10 @@ public class HellPod : EverMultitile
         spriteBatch.Draw(Placed.Value, p - Main.screenPosition + new Vector2(24), frame, Lighting.GetColor((p / 16).ToPoint()), rot, origin, 1f, SpriteEffects.None, 0);
         spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, Color.White, rot, origin, 1f, SpriteEffects.None, 0);
         spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, new Color(intens, intens, intens, 0f), rot, origin, 1f, SpriteEffects.None, 0);
+        if (intens > 0.3f)
+            spriteBatch.Draw(BrightGlow.Value, p - Main.screenPosition + new Vector2(24), frame, Color.White, rot, origin, 1f, SpriteEffects.None, 0);
     }
-    public delegate void ThingToDo(int i, int j);
+    public delegate void ThingToDo(int i, int j, int num);
 
     /// <summary>
     /// This performs an action in a rotated column protruding outwards from this hell pod
@@ -275,12 +289,12 @@ public class HellPod : EverMultitile
 
         while (!WorldGen.SolidOrSlopedTile(Main.tile[(p1 / 16).ToPoint()]))
         {
-            iterations++;
-            if (iterations > 70) break;
+            iterations--;
+            if (iterations < -70) break;
 
             p1 += new Vector2(0, -16).RotatedBy(rot);
 
-            action((int)p1.X, (int)p1.Y);
+            action((int)p1.X, (int)p1.Y, iterations);
         }
         iterations = 0;
         while (!WorldGen.SolidOrSlopedTile(Main.tile[(p2 / 16).ToPoint()]))
@@ -290,7 +304,7 @@ public class HellPod : EverMultitile
 
             p2 += new Vector2(0, 16).RotatedBy(rot);
 
-            action((int)p2.X, (int)p2.Y);
+            action((int)p2.X, (int)p2.Y, iterations);
         }
     }
 }
