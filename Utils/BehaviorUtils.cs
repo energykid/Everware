@@ -25,4 +25,10 @@ public static class BehaviorUtils
     {
         return WorldGen.SolidOrSlopedTile(tile) || Main.tileSolidTop[tile.type];
     }
+
+    public static bool SolidTilePlatformOrLiquid(int i, int j)
+    {
+        Tile tile = Main.tile[i, j];
+        return WorldGen.SolidOrSlopedTile(tile) || Main.tileSolidTop[tile.type] || Main.tile[i, j].LiquidAmount > 0;
+    }
 }

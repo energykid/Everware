@@ -53,11 +53,6 @@ public class HellPodDebris : Particle
     }
     public override void Draw()
     {
-        var glow = Assets.Textures.Hell.HellPodLight.Asset;
-        float x = 1f;
-
-        Main.EntitySpriteDraw(glow.Value, position - Main.screenPosition, glow.Frame(), HellPod.BacklightColor, 0f, glow.Size() / 2f, 1f, SpriteEffects.None);
-
         base.Draw();
 
         if (GlowOpacity > 0.6f)
@@ -129,5 +124,48 @@ public class HellPodStalkDebris : Particle
 
             if (WorldGen.SolidTile(Main.tile[(position / 16).ToPoint()])) Particle.Kill();
         };
+    }
+}
+
+public class HellPodPopShockwave : Particle
+{
+    float T = 0f;
+    public HellPodPopShockwave(Vector2 pos) : base(pos, Vector2.Zero, Vector2.One, null, null)
+    {
+        T = 0f;
+    }
+    public override void Update()
+    {
+        base.Update();
+        T = MathHelper.Lerp(T, 1.1f, 0.18f);
+        if (T > 1f) Kill();
+    }
+    public override void Draw()
+    {
+        var A = Assets.Textures.Hell.HellPodPopShockwave.Asset;
+        var A2 = Assets.Textures.Hell.HellPodBubble.Asset;
+
+        var HellPodEffect = Assets.Effects.Misc.GradientClip.CreateEffect();
+        HellPodEffect.Parameters.ColorClip = 0 - T;
+        HellPodEffect.Parameters.ColorClipUpper = 1 - T;
+        HellPodEffect.Parameters.Gradient = Assets.Textures.Hell.HellPodPaletteGradient.Asset.Value;
+        HellPodEffect.Parameters.LightingColor = Color.White.ToVector4();
+        HellPodEffect.Apply();
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, HellPodEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+
+        for (int i = 0; i < 4; i++)
+        {
+            Main.spriteBatch.Draw(A.Value, position + new Vector2(2, 0).RotatedBy(i * MathHelper.PiOver2) - Main.screenPosition, A.Frame(), Color.White, 0f, A.Size() / 2f, 1f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(A2.Value, position + new Vector2(2, 0).RotatedBy(i * MathHelper.PiOver2) - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, 1f, SpriteEffects.None, 0);
+        }
+
+        Main.spriteBatch.Draw(A.Value, position - Main.screenPosition, A.Frame(), Color.White, 0f, A.Size() / 2f, 1f, SpriteEffects.None, 0);
+
+        Main.spriteBatch.Draw(A2.Value, position - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, 1f, SpriteEffects.None, 0);
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
     }
 }
