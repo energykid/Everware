@@ -12,7 +12,7 @@ namespace Everware.Content.Hell;
 
 public class HellPodTileEntity : ModTileEntity
 {
-    public float Rotation = 0f;
+    public float HurtIntensity = 0f;
     public bool Placed = false;
     public override void OnKill()
     {
@@ -36,16 +36,21 @@ public class HellPodTileEntity : ModTileEntity
     }
     public override void LoadData(TagCompound tag)
     {
-        if (tag.Get<float>("Rotation") != 0f)
+        float rot = tag.Get<float>("Rotation");
+        if (rot != 0f)
         {
-            Main.tile[Position].Get<HellPodData>().Rotation = tag.Get<float>("Rotation");
+            Main.tile[Position].Get<HellPodData>().Rotation = rot;
             Placed = true;
         }
+        Main.tile[Position].Get<HellPodData>().Variant = Main.rand.Next(3);
     }
     public override void Update()
     {
+        Main.tile[Position].Get<HellPodData>().HurtIntensity *= 0.75f;
+
         if (!Placed)
         {
+            Main.tile[Position].Get<HellPodData>().Variant = Main.rand.Next(3);
             Main.tile[Position].Get<HellPodData>().Rotation = MathHelper.ToRadians(Main.rand.NextFloat(-20, 20));
             Placed = true;
         }
@@ -173,6 +178,8 @@ public class HellPod : EverMultitile
                 }
             });
         }
+
+        Main.tile[ii, jj].Get<HellPodData>().HurtIntensity = 1f;
     }
     public override bool CanKillTile(int i, int j, ref bool blockDamaged)
     {
@@ -188,6 +195,8 @@ public class HellPod : EverMultitile
     }
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        int variant = Main.tile[i, j].Get<HellPodData>().Variant;
+
         float rot = Main.tile[i, j].Get<HellPodData>().Rotation;
 
         var Placed = Assets.Textures.Hell.HellPodPlaced.Asset;
@@ -204,12 +213,14 @@ public class HellPod : EverMultitile
         spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(24), Light.Frame(), Color.Black.MultiplyRGBA(new(1f, 1f, 1f, 0.1f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.3f, SpriteEffects.None, 0);
         spriteBatch.Draw(Light.Value, p2 - Main.screenPosition + new Vector2(24), Light.Frame(), Color.OrangeRed.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0f)), GlobalTimer.Value / 300f, Light.Frame().Size() / 2f, 0.2f, SpriteEffects.None, 0);
 
-        Rectangle frame = Placed.Frame(2, 3, (int)fr.X, (int)fr.Y);
+        Rectangle frame = Placed.Frame(2, 3, variant % 2, (int)fr.Y);
 
         Vector2 origin = new Vector2(24f, 24f).RotatedBy(-rot);
 
-        spriteBatch.Draw(Placed.Value, p - Main.screenPosition + new Vector2(24), frame, Lighting.GetColor((p / 16).ToPoint()), rot, origin, 1f, SpriteEffects.None, 0);
-        spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, Color.White, rot, origin, 1f, SpriteEffects.None, 0);
+        float intens = Main.tile[i, j].Get<HellPodData>().HurtIntensity;
+
+        Vector2 bottomPosition = Vector2.Zero;
+        Vector2 topPosition = Vector2.Zero;
 
         if (Main.tile[i, j].TileFrameX % (18 * 3) < 8 && Main.tile[i, j].TileFrameY % (18 * 3) < 8)
         {
@@ -222,8 +233,23 @@ public class HellPod : EverMultitile
                 int frameY = 0;
                 Rectangle frame = Asset.Frame(2, 2, frameX, frameY);
                 spriteBatch.Draw(Asset.Value, new Vector2(ii, jj) - Main.screenPosition, frame, Lighting.GetColor((new Vector2(ii + 8, jj + 8) / 16).ToPoint()), rot, new Vector2(8f), 1f, SpriteEffects.None, 0);
+
+                if (jj < p2.Y) topPosition = new(ii, jj);
+                else bottomPosition = new(ii, jj);
             });
         }
+
+        var BaseAsset = Assets.Textures.Hell.HellPodBase.Asset;
+
+        var baseFrame = BaseAsset.Frame(3, 1, variant);
+        var baseFrame2 = BaseAsset.Frame(3, 1, (variant + 1) % 3);
+
+        spriteBatch.Draw(BaseAsset.Value, topPosition - Main.screenPosition, baseFrame, Lighting.GetColor((topPosition / 16).ToPoint()), rot + MathHelper.Pi, new Vector2(baseFrame.Size().X / 2, baseFrame.Size().Y - 8), 1f, SpriteEffects.None, 0);
+        spriteBatch.Draw(BaseAsset.Value, bottomPosition - Main.screenPosition, baseFrame2, Lighting.GetColor((bottomPosition / 16).ToPoint()), rot, new Vector2(baseFrame.Size().X / 2, baseFrame.Size().Y - 8), 1f, SpriteEffects.None, 0);
+
+        spriteBatch.Draw(Placed.Value, p - Main.screenPosition + new Vector2(24), frame, Lighting.GetColor((p / 16).ToPoint()), rot, origin, 1f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, Color.White, rot, origin, 1f, SpriteEffects.None, 0);
+        spriteBatch.Draw(Glow.Value, p - Main.screenPosition + new Vector2(24), frame, new Color(intens, intens, intens, 0f), rot, origin, 1f, SpriteEffects.None, 0);
     }
     public delegate void ThingToDo(int i, int j);
 
@@ -289,6 +315,7 @@ public class HellPodGlobalProjectile : GlobalProjectile
 }
 public struct HellPodData : ITileData
 {
+    public float HurtIntensity;
     public int DistanceTop;
     public int DistanceBottom;
     public bool DistanceYetCalculated;
