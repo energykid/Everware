@@ -1,8 +1,6 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.Tiles;
-using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,102 +11,59 @@ using Terraria.ObjectData;
 
 namespace Everware.Content.Hell;
 
-public class HellPodGlobalItem : GlobalItem
-{
-    public override bool InstancePerEntity => true;
-    public bool ShouldHover = false;
-    public float SizeTimer = 0;
-    public bool Rare = false;
-    float maxFall = 0f;
-    float grav = 0f;
-    bool start = false;
-
-    public static Vector2 GroundedOrLavad(Vector2 baseVec)
-    {
-        if (BehaviorUtils.SolidTilePlatformOrLiquid((int)baseVec.X / 16, (int)baseVec.Y / 16))
-        {
-            for (int i = 0; i < 250; i++)
-            {
-                baseVec.Y -= 2;
-                if (!BehaviorUtils.SolidTilePlatformOrLiquid((int)baseVec.X / 16, (int)baseVec.Y / 16)) break;
-            }
-            return baseVec;
-        }
-        for (int i = 0; i < 250; i++)
-        {
-            baseVec.Y += 2;
-            if (BehaviorUtils.SolidTilePlatformOrLiquid((int)baseVec.X / 16, (int)baseVec.Y / 16)) break;
-        }
-        return baseVec;
-    }
-    public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
-    {
-        if (ShouldHover)
-        {
-            SizeTimer -= 0.1f;
-            SizeTimer *= 0.9f;
-        }
-
-        if (ShouldHover && SizeTimer > 0)
-        {
-            gravity = 0f;
-            maxFallSpeed = 0f;
-        }
-        else if (ShouldHover && GroundedOrLavad(item.position).Y < (item.position + new Vector2(0, 120)).Y)
-        {
-            if (!start)
-            {
-                grav = gravity;
-                maxFall = maxFallSpeed;
-                start = true;
-            }
-            else
-            {
-                grav *= 0.6f;
-                maxFall *= 0.6f;
-                maxFall = Math.Min(maxFall, 5);
-            }
-
-            gravity = grav;
-            maxFallSpeed = maxFall;
-
-            item.position.Y += (float)Math.Sin((GlobalTimer.Value + (item.whoAmI * 7)) / 20f) * 0.1f;
-        }
-
-        base.Update(item, ref gravity, ref maxFallSpeed);
-    }
-
-    public override bool PreDrawInWorld(Item item, SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
-    {
-        Asset<Texture2D> fr = TextureAssets.Item[item.type];
-
-        if (ShouldHover)
-        {
-            if (SizeTimer > 0)
-                rotation = (float)Math.Sin(SizeTimer / 3f) * (SizeTimer / 60f);
-
-            scale = Easing.KeyFloat(SizeTimer, 0, 30, 1f, 2f, Easing.InCubic, 1f);
-            scale = Easing.KeyFloat(SizeTimer, 30, 60, 2f, 0f, Easing.OutCubic, scale);
-
-            for (int i = 0; i < 4; i++)
-            {
-                Main.EntitySpriteDraw(fr.Value,
-                    item.Center + new Vector2(Rare ? 4 : 2, 0).RotatedBy(i * MathHelper.PiOver2) + new Vector2(0, -1) - Main.screenPosition,
-                    fr.Frame(), Color.White.MultiplyRGBA(new Color(1f, 0.75f, 0.2f, 0f)), rotation, fr.Size() / 2f, scale, SpriteEffects.None);
-            }
-        }
-
-        if (Rare)
-        {
-            lightColor = Color.White;
-        }
-
-        return base.PreDrawInWorld(item, spriteBatch, lightColor, alphaColor, ref rotation, ref scale, whoAmI);
-    }
-}
-
 public class HellPodTileEntity : ModTileEntity
 {
+    public override void Load()
+    {
+        EverwarePacketHandler.AddPacket(
+            (mod, reader, whoAmI, identifier) =>
+            {
+                if (identifier == "TestText")
+                {
+                    Main.NewText("Test Successful!");
+                }
+                if (identifier == "DamageHellPod")
+                {
+                    int x = reader.ReadInt32();
+                    int y = reader.ReadInt32();
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        ModPacket p = Everware.Instance.GetPacket();
+                        p.Write("DamageHellPod");
+                        p.Write(x);
+                        p.Write(y);
+                        p.Send();
+                    }
+                    else
+                        HellPod.DamagePod(x, y);
+                }
+                // "HellPodItem", X (int), Y (int), Type (int), StackNum (int), Rare (bool)
+                if (identifier == "HellPodItem" && Main.netMode != NetmodeID.Server)
+                {
+                    int x = reader.ReadInt32();
+                    int y = reader.ReadInt32();
+                    int type = reader.ReadInt32();
+                    int stackNum = reader.ReadInt32();
+                    bool rare = reader.ReadBoolean();
+
+                    int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)x, (int)y, 1, 1), new Item(
+                    type, stackNum));
+                    Main.item[item].velocity = Vector2.Zero;
+                    Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = rare;
+                    Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+                    Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = rare ? 60 : 0;
+
+                    Main.NewText("X: " + x.ToString());
+                    Main.NewText("Y: " + y.ToString());
+                    Main.NewText("Type: " + type.ToString());
+                    Main.NewText("Stack Number: " + stackNum.ToString());
+                    Main.NewText("Rare: " + (rare ? "Yes!" : "No."));
+                }
+            }
+        );
+    }
+
     public struct HellPodLootInstance(int ID, int min, int max)
     {
         public int ItemID = ID;
@@ -135,36 +90,48 @@ public class HellPodTileEntity : ModTileEntity
 
     public static void DropLoot(Vector2 position)
     {
-        for (int i = 0; i < Main.rand.Next(3, 5); i++)
+        if (Main.netMode == NetmodeID.SinglePlayer)
         {
-            int randomSelection = Main.rand.Next(PossibleLesserItems.Count);
-            // god i'm gonna have to send a packet from here to sync in multiplayer FUCKKKKK
-            int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
-               PossibleLesserItems[randomSelection].ItemID, Main.rand.Next(PossibleLesserItems[randomSelection].MinStack, PossibleLesserItems[randomSelection].MaxStack)));
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+            for (int i = 0; i < Main.rand.Next(3, 5); i++)
+            {
+                int randomSelection = Main.rand.Next(PossibleLesserItems.Count);
+                int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
+                   PossibleLesserItems[randomSelection].ItemID, Main.rand.Next(PossibleLesserItems[randomSelection].MinStack, PossibleLesserItems[randomSelection].MaxStack)));
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+            }
+            if (Main.rand.Next(100) > 60)
+            {
+                int randomSelection = Main.rand.Next(PossibleGreaterItems.Count);
+                int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
+                   PossibleGreaterItems[randomSelection], 1));
+                Main.item[item].velocity = Vector2.Zero;
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = true;
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = 60;
+            }
         }
-        if (Main.rand.Next(100) > 60)
+        else
         {
-            int randomSelection = Main.rand.Next(PossibleGreaterItems.Count);
-            // god i'm gonna have to send a packet from here to sync in multiplayer FUCKKKKK
-            int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
-               PossibleGreaterItems[randomSelection], 1));
-            Main.item[item].velocity = Vector2.Zero;
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = true;
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = 60;
+            Main.NewText("Client in multiplayer, no items spawned yet");
         }
     }
 
-    public override void OnKill()
+    public static void DestroyAt(int x, int y)
     {
-        Vector2 CenterPosition = (Position.ToVector2() * 16) + new Vector2(24, 24);
+        float rot = 0f;
+
+        if (TileEntity.TryGet(x, y, out HellPodTileEntity entity))
+        {
+            rot = entity.Rotation;
+        }
+
+        Vector2 CenterPosition = (new Vector2(x, y) * 16) + new Vector2(24, 24);
 
         DropLoot(CenterPosition);
 
-        HellPod.DoThingALot(Position.X, Position.Y, (ii, jj, num) =>
+        HellPod.DoThingALot(x, y, (ii, jj, num) =>
         {
-            new HellPodStalkDebris(new Vector2(ii, jj), Main.tile[Position].Get<HellPodData>().Rotation)
+            new HellPodStalkDebris(new Vector2(ii, jj), rot)
             {
                 FrameNum = HellPod.StalkFrame(num).TopLeft() / 18f,
                 FrameDelay = Math.Abs(num / 2)
@@ -176,37 +143,51 @@ public class HellPodTileEntity : ModTileEntity
 
         for (int i = 0; i < 5; i++)
         {
-            new HellPodDebris(CenterPosition, i, Main.tile[Position].Get<HellPodData>().Rotation).Spawn();
+            new HellPodDebris(CenterPosition, i, rot).Spawn();
         }
 
         SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, CenterPosition);
+
+        for (int xx = 0; xx < 3; xx++)
+        {
+            for (int yy = 0; yy < 3; yy++)
+            {
+                WorldGen.KillTile(x + xx, y + yy);
+            }
+        }
     }
+
     public override bool IsTileValidForEntity(int x, int y)
     {
         return Main.tile[Position].TileType == ModContent.TileType<HellPod>();
     }
     public override void NetSend(BinaryWriter writer)
     {
-        writer.Write(Main.tile[Position].Get<HellPodData>().Rotation);
+        writer.Write(Rotation);
+        writer.Write(Main.tile[Position].Get<HellPodData>().HurtIntensity);
     }
     public override void NetReceive(BinaryReader reader)
     {
-        Main.tile[Position].Get<HellPodData>().Rotation = reader.ReadSingle();
+        Rotation = reader.ReadSingle();
+        Main.tile[Position].Get<HellPodData>().HurtIntensity = reader.ReadSingle();
     }
+    public float Rotation;
     public override void SaveData(TagCompound tag)
     {
-        tag.Set("Rotation", Main.tile[Position].Get<HellPodData>().Rotation);
+        tag.Set("Rotation", Rotation);
+        base.SaveData(tag);
     }
     public override void LoadData(TagCompound tag)
     {
+        base.LoadData(tag);
         float rot = tag.Get<float>("Rotation");
         if (rot != 0f)
         {
-            Main.tile[Position].Get<HellPodData>().Rotation = rot;
+            Rotation = rot;
             Placed = true;
         }
-        Main.tile[Position].Get<HellPodData>().Variant = Main.rand.Next(3);
     }
+    int NetTimer = 0;
     public override void Update()
     {
         Main.tile[Position].Get<HellPodData>().HurtIntensity *= 0.75f;
@@ -214,7 +195,7 @@ public class HellPodTileEntity : ModTileEntity
         if (!Placed)
         {
             Main.tile[Position].Get<HellPodData>().Variant = Main.rand.Next(3);
-            Main.tile[Position].Get<HellPodData>().Rotation = MathHelper.ToRadians(Main.rand.NextFloat(-20, 20));
+            Rotation = MathHelper.ToRadians(Main.rand.NextFloat(-20, 20));
             Placed = true;
         }
 
@@ -256,23 +237,13 @@ public class HellPodTileEntity : ModTileEntity
             if (referenceTopDistance != topDistance || referenceBottomDistance != bottomDistance)
             {
                 for (int x = 0; x < 3; x++)
+                {
                     HellPod.DamagePod(i, j);
+                }
             }
         }
 
         Main.tile[i, j].Get<HellPodData>().DistanceYetCalculated = true;
-
-        if (Main.tile[Position].TileFrameY > 18 * 3 * 2)
-        {
-            Kill(Position.X, Position.Y);
-            for (int x = 0; x < 3; x++)
-            {
-                for (int y = 0; y < 3; y++)
-                {
-                    WorldGen.KillTile(Position.X + x, Position.Y + y);
-                }
-            }
-        }
     }
 }
 
@@ -341,11 +312,14 @@ public class HellPod : EverMultitile
             Main.tile[i, j].TileFrameY += 18 * 3;
 
         Main.tile[ii, jj].Get<HellPodData>().HurtIntensity = 1f;
+
+        if (Main.tile[ii, jj].TileFrameY > 18 * 3 * 2)
+        {
+            HellPodTileEntity.DestroyAt(ii, jj);
+        }
     }
     public override bool CanKillTile(int i, int j, ref bool blockDamaged)
     {
-        DamagePod(i, j);
-
         return false;
     }
     public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
@@ -356,9 +330,16 @@ public class HellPod : EverMultitile
     }
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        Main.tile[i, j].Get<HellPodData>().HurtIntensity *= 0.9f;
+
         int variant = Main.tile[i, j].Get<HellPodData>().Variant;
 
-        float rot = Main.tile[i, j].Get<HellPodData>().Rotation;
+        float rot = 0f;
+
+        if (TileEntity.TryGet(i, j, out HellPodTileEntity entity))
+        {
+            rot = entity.Rotation;
+        }
 
         var Placed = Assets.Textures.Hell.HellPodPlaced.Asset;
         var Glow = Assets.Textures.Hell.HellPodGlow.Asset;
@@ -423,36 +404,39 @@ public class HellPod : EverMultitile
     /// <param name="action">The thing to do at each set of world coordinates (NOT tile coordinates because this needs more precision)</param>
     public static void DoThingALot(int i, int j, ThingToDo action)
     {
-        float rot = Main.tile[i, j].Get<HellPodData>().Rotation;
-
-        Vector2 position = new Vector2(i * 16, j * 16);
-
-        int xx = 16;
-        int ii = 2;
-        int jj = 32;
-        int iterations = 0;
-
-        Vector2 p1 = (new Vector2(i * 16, j * 16) + new Vector2(8f)) + new Vector2(16, 3).RotatedBy(rot);
-        Vector2 p2 = (new Vector2(i * 16, j * 16) + new Vector2(8f)) + new Vector2(16, 32).RotatedBy(rot);
-
-        while (!WorldGen.SolidOrSlopedTile(Main.tile[(p1 / 16).ToPoint()]))
+        if (TileEntity.TryGet(i, j, out HellPodTileEntity entity))
         {
-            iterations--;
-            if (iterations < -70) break;
+            float rot = entity.Rotation;
 
-            p1 += new Vector2(0, -16).RotatedBy(rot);
+            Vector2 position = new Vector2(i * 16, j * 16);
 
-            action((int)p1.X, (int)p1.Y, iterations);
-        }
-        iterations = 0;
-        while (!WorldGen.SolidOrSlopedTile(Main.tile[(p2 / 16).ToPoint()]))
-        {
-            iterations++;
-            if (iterations > 70) break;
+            int xx = 16;
+            int ii = 2;
+            int jj = 32;
+            int iterations = 0;
 
-            p2 += new Vector2(0, 16).RotatedBy(rot);
+            Vector2 p1 = (new Vector2(i * 16, j * 16) + new Vector2(8f)) + new Vector2(16, 3).RotatedBy(rot);
+            Vector2 p2 = (new Vector2(i * 16, j * 16) + new Vector2(8f)) + new Vector2(16, 32).RotatedBy(rot);
 
-            action((int)p2.X, (int)p2.Y, iterations);
+            while (!WorldGen.SolidOrSlopedTile(Main.tile[(p1 / 16).ToPoint()]))
+            {
+                iterations--;
+                if (iterations < -70) break;
+
+                p1 += new Vector2(0, -16).RotatedBy(rot);
+
+                action((int)p1.X, (int)p1.Y, iterations);
+            }
+            iterations = 0;
+            while (!WorldGen.SolidOrSlopedTile(Main.tile[(p2 / 16).ToPoint()]))
+            {
+                iterations++;
+                if (iterations > 70) break;
+
+                p2 += new Vector2(0, 16).RotatedBy(rot);
+
+                action((int)p2.X, (int)p2.Y, iterations);
+            }
         }
     }
 }
@@ -470,7 +454,19 @@ public class HellPodGlobalProjectile : GlobalProjectile
                 HasHitPod = true;
                 projectile.penetrate--;
                 Point p = (projectile.Center / 16).ToPoint();
-                HellPod.DamagePod(p.X, p.Y);
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    HellPod.DamagePod(p.X, p.Y);
+                }
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    ModPacket Packet = Everware.Instance.GetPacket();
+                    Packet.Write("DamageHellPod");
+                    Packet.Write(p.X);
+                    Packet.Write(p.Y);
+                    Packet.Send();
+                }
+                projectile.netUpdate = true;
             }
         }
     }
@@ -481,7 +477,5 @@ public struct HellPodData : ITileData
     public int DistanceTop;
     public int DistanceBottom;
     public bool DistanceYetCalculated;
-    public bool Enabled;
-    public float Rotation;
     public int Variant;
 }

@@ -66,7 +66,7 @@ public class WeldingStation : EverMultitile
 
         Vector2 SparkBaseVector = new Vector2(i * 16, j * 16) + new Vector2(20, 20);
 
-        if (!Main.gameInactive)
+        if (!Main.gameInactive && !Main.gamePaused)
         {
             if (Main.rand.NextBool(3))
                 new WeldingSpark(SparkBaseVector + new Vector2(-16, 0) + new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)), new Vector2(-1f, -2f).RotatedByRandom(1f)).Spawn();
