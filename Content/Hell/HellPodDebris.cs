@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base.ParticleSystem;
+﻿/* REMOVED TEMPORARILY
+using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -169,3 +170,4 @@ public class HellPodPopShockwave : Particle
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
     }
 }
+REMOVED TEMPORARILY */

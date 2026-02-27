@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿/* REMOVED TEMPORARILY
+
+using System.Collections.Generic;
 using Terraria.GameContent.Generation;
 using Terraria.IO;
 using Terraria.WorldBuilding;
@@ -51,3 +53,5 @@ public class HellPodGenerator : ModSystem
         }));
     }
 }
+
+REMOVED TEMPORARILY */

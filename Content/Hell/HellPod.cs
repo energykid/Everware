@@ -1,4 +1,6 @@
-﻿using Everware.Content.Base;
+﻿/* REMOVED TEMPORARILY
+
+using Everware.Content.Base;
 using Everware.Content.Base.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -487,3 +489,5 @@ public class HellPodGlobalProjectile : GlobalProjectile
         }
     }
 }
+
+REMOVED TEMPORARILY */
