@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Core.Projectiles;
 
 public abstract class EverHoldoutProjectile : EverProjectile
 {
+    public Vector2 MousePosition = Vector2.Zero;
     public int AmmoType = AmmoID.None;
     public Vector2 Offset = Vector2.Zero;
     public float RotationOffset = 0f;
@@ -36,6 +38,16 @@ public abstract class EverHoldoutProjectile : EverProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 2;
     }
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(Rotation);
+        writer.Write(RotationOffset);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Rotation = reader.ReadSingle();
+        RotationOffset = reader.ReadSingle();
+    }
     public override void NetOnSpawn()
     {
         if (Asset != null)
@@ -47,8 +59,13 @@ public abstract class EverHoldoutProjectile : EverProjectile
     }
     public override void AI()
     {
-        if (!NetworkOwner.MouseDown && Started == true) HasMouseBeenReleased = true;
+        if (!NetworkOwner.MouseDown && Started == false) HasMouseBeenReleased = true;
         Started = true;
+
+        if (Main.LocalPlayer.whoAmI == Projectile.owner)
+        {
+            MousePosition = Main.MouseWorld;
+        }
 
         HitFrames--;
 
@@ -58,6 +75,8 @@ public abstract class EverHoldoutProjectile : EverProjectile
             Projectile.ai[0] = Owner.itemTime;
         else
         {
+            Projectile.netUpdate = true;
+
             Projectile.ai[0]--;
 
             if (ShouldKill())

@@ -21,7 +21,7 @@ public class EverwareTitle : ModMenu
         LogoEffect.Parameters.FillTexture = Assets.Textures.Menu.LogoFill.Asset.Value;
         LogoEffect.Apply();
 
-        Parallax = Vector2.Lerp(Parallax, Main.MouseScreen * 0.03f, 0.05f);
+        Parallax = Vector2.Lerp(Parallax, Main.MouseScreen / Main.ScreenSize.ToVector2(), 0.05f);
 
         Main.time = Main.dayLength / 2;
 
@@ -47,7 +47,7 @@ public class EverwareTitle : ModMenu
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.UIScaleMatrix);
 
-        Main.spriteBatch.Draw(Background.Value, new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f) + (Parallax * 0.3f), Background.Frame(), Color.White, 0f, Background.Frame().Size() / 2f, 1f, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(Background.Value, new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f) + (Parallax * 10f), Background.Frame(), Color.White, 0f, Background.Frame().Size() / 2f, 1f, SpriteEffects.None, 0f);
 
         var OutlineEffect = Assets.Effects.Misc.PureColorEffect.CreateColorEffect();
 
@@ -88,7 +88,7 @@ public class EverwareTitle : ModMenu
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, Effect2.Shader, Main.UIScaleMatrix);
 
         for (int i = 0; i < 5; i++)
-            Main.spriteBatch.Draw(Mist.Value, Vector2.Zero, Mist.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(Mist.Value, Vector2.Zero - new Vector2(20, 20) + (Parallax * 20), Mist.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
         spriteBatch.End();
 
@@ -105,7 +105,7 @@ public class EverwareTitle : ModMenu
 
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, Effect.Shader, Main.UIScaleMatrix);
 
-        Main.spriteBatch.Draw(Mist.Value, Vector2.Zero, Mist.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(Mist.Value, Vector2.Zero - new Vector2(20, 20) + (Parallax * 20), Mist.Frame(), MistColorForeground, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.UIScaleMatrix);

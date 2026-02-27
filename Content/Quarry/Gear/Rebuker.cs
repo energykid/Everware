@@ -135,7 +135,8 @@ public class RebukerHoldout : EverHoldoutProjectile
     {
         SoundEngine.PlaySound(Rebuker.FireSound, Projectile.Center);
         Vector2 SpawnLocation = Owner.MountedCenter + new Vector2(40, 0).RotatedBy(Projectile.rotation);
-        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), Projectile.damage, 3f, Projectile.owner);
+        if (!Main.dedServ)
+            Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), Projectile.damage, 3f, Projectile.owner);
     }
     public void LoadRebarBolt()
     {
