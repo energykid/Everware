@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
+using Terraria.ID;
 
 namespace Everware.Content.Base.ParticleSystem;
 
@@ -49,12 +50,14 @@ public abstract class Particle : Entity
 
     public void Spawn()
     {
-        ParticleSystem.AllParticles.Add(this);
+        if (Main.netMode != NetmodeID.Server)
+            ParticleSystem.AllParticles.Add(this);
     }
 
     public void Kill()
     {
-        ParticleSystem.AllParticles.Remove(this);
+        if (Main.netMode != NetmodeID.Server)
+            ParticleSystem.AllParticles.Remove(this);
     }
 
     public Particle(Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null)

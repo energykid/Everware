@@ -65,13 +65,14 @@ public class RebukerHoldout : EverHoldoutProjectile
 
         Projectile.ai[1]++;
 
-        int ShootTime = Owner.itemAnimationMax / 2;
+        int ShootTime = NetworkOwner.AnimationTime / 2;
         int LoadTime = 1;
 
         if (Projectile.ai[1] == ShootTime)
         {
             ShootRebarBolt();
             RotLerpFactor = 0f;
+            Projectile.netUpdate = true;
         }
         if (Projectile.ai[1] == LoadTime)
         {

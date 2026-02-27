@@ -1,4 +1,4 @@
-﻿using Everware.Common.Players;
+﻿using Terraria.ID;
 
 namespace Everware.Content.Base.Tiles.TileData;
 
@@ -9,24 +9,63 @@ public struct LastPlayerMinedData : ITileData
 
 public class LastPlayerMinedItem : GlobalItem
 {
-    public override bool? UseItem(Item item, Player player)
+    public override void Load()
     {
-        if (base.UseItem(item, player).Equals(true))
-        {
-            Tile? tile = Main.tile[(player.GetModPlayer<NetworkPlayer>().MousePosition / 16).ToPoint()];
-
-            if (tile.HasValue)
+        EverwarePacketHandler.AddPacket(
+            (mod, reader, whoAmI, identifier) =>
             {
-                if (tile.Value.HasTile)
+                if (identifier == "SetLastPlayerMined")
                 {
-                    if (item.pick > 0)
+                    int x = reader.ReadInt32();
+                    int y = reader.ReadInt32();
+                    int playerName = reader.ReadInt32();
+
+                    Main.tile[x, y].Get<LastPlayerMinedData>().WhichPlayerAmI = playerName;
+
+                    if (Main.netMode == NetmodeID.Server)
                     {
-                        tile.Value.Get<LastPlayerMinedData>().WhichPlayerAmI = player.whoAmI;
-                        return base.UseItem(item, player);
+                        ModPacket packet = Everware.Instance.GetPacket();
+                        packet.Write("SetLastPlayerMined");
+                        packet.Write(x);
+                        packet.Write(y);
+                        packet.Write(playerName);
+                        packet.Send();
+                    }
+                }
+            }
+        );
+
+        On_Player.GetPickaxeDamage += OnDamageTile;
+    }
+
+    public override void Unload()
+    {
+        On_Player.GetPickaxeDamage -= OnDamageTile;
+    }
+
+    private int OnDamageTile(On_Player.orig_GetPickaxeDamage orig, Player self, int x, int y, int pickPower, int hitBufferIndex, Tile tileTarget)
+    {
+        if (pickPower > 0 && tileTarget.HasTile)
+        {
+            if (self.whoAmI == Main.LocalPlayer.whoAmI)
+            {
+                if (tileTarget.HasTile)
+                {
+                    if (self.HeldItem.pick > 0)
+                    {
+                        tileTarget.Get<LastPlayerMinedData>().WhichPlayerAmI = self.whoAmI;
+
+                        ModPacket packet = Everware.Instance.GetPacket();
+                        packet.Write("SetLastPlayerMined");
+                        packet.Write(x);
+                        packet.Write(y);
+                        packet.Write(self.whoAmI);
+                        packet.Send();
                     }
                 }
             }
         }
-        return base.UseItem(item, player);
+
+        return orig(self, x, y, pickPower, hitBufferIndex, tileTarget);
     }
 }

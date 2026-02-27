@@ -1,5 +1,4 @@
 ﻿using Everware.Common.Players;
-using Everware.Core.Projectiles;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -137,8 +136,6 @@ public static class EverwarePacketHandler
                     animPacket.Send();
 
                     Projectile pr = Main.projectile.FirstOrDefault(x => x.identity == proj);
-
-                    (pr.ModProjectile as EverProjectile).NetOnHitEnemy(Main.npc[npc]);
                 }
                 else
                 {
@@ -146,8 +143,6 @@ public static class EverwarePacketHandler
                     int npc = reader.ReadInt32();
 
                     Projectile pr = Main.projectile.FirstOrDefault(x => x.identity == proj);
-
-                    (pr.ModProjectile as EverProjectile).NetOnHitEnemy(Main.npc[npc]);
                 }
 
                 shouldRunNewPacketBehavior = false;

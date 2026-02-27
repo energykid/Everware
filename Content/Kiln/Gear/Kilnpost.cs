@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
 
@@ -45,6 +46,16 @@ public class KilnpostHoldout : EverHoldoutProjectile
     float RecoveryTransparency = 1f;
     int Dir = 0;
     int LastHitNPC = -1;
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        base.SendExtraAI(writer);
+        writer.Write(LastHitNPC);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        base.ReceiveExtraAI(reader);
+        LastHitNPC = reader.ReadInt32();
+    }
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -52,12 +63,13 @@ public class KilnpostHoldout : EverHoldoutProjectile
         Projectile.width = 90;
         Projectile.height = 90;
     }
-    public override void NetOnHitEnemy(NPC npc)
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        base.NetOnHitEnemy(npc);
+        base.OnHitNPC(target, hit, damageDone);
         if (State == "Thrust")
         {
-            LastHitNPC = npc.whoAmI;
+            LastHitNPC = target.whoAmI;
+            Projectile.netUpdate = true;
         }
     }
     public override void AI()
@@ -152,6 +164,10 @@ public class KilnpostHoldout : EverHoldoutProjectile
                     return;
                 }
             }
+            else
+            {
+                Projectile.Kill();
+            }
         }
     }
     public void BreakawayMotion()
@@ -164,18 +180,11 @@ public class KilnpostHoldout : EverHoldoutProjectile
         Rotation = Rotation.AngleLerp(BaseRot - MathHelper.ToRadians(120f * Dir), 0.5f);
         RotationOffset = RotationOffset.AngleLerp(MathHelper.ToRadians(45f + (130f * Dir)), 0.5f);
 
-        Projectile.ai[2] = MathHelper.Lerp(Projectile.ai[2], 25f, 0.4f);
-        Projectile.ai[1] = MathHelper.Lerp(Projectile.ai[1], 10f, 0.4f);
+        Projectile.ai[2] = MathHelper.Lerp(Projectile.ai[2], 25f, 0.1f);
 
-        if (Projectile.ai[2] < 26f)
+        if (Projectile.ai[2] < 25.4f)
         {
-            RecoveryAmount = MathHelper.Lerp(RecoveryAmount, 1f, 0.3f);
-            if (RecoveryAmount > 0.85f)
-            {
-                RecoveryTransparency = MathHelper.Lerp(RecoveryTransparency, 1f, 0.2f);
-                if (RecoveryTransparency > 0.9f)
-                    Projectile.Kill();
-            }
+            Projectile.Kill();
         }
 
         FrontArmExtension = MathHelper.Lerp(FrontArmExtension, 0f, 0.4f);

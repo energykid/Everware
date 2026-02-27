@@ -144,14 +144,6 @@ public class KilnstoneSetBonus : ModPlayer
             }
         }
     }
-    public override void Load()
-    {
-        On_Player.GetPickaxeDamage += On_Player_GetPickaxeDamage;
-    }
-    public override void Unload()
-    {
-        On_Player.GetPickaxeDamage -= On_Player_GetPickaxeDamage;
-    }
 
     float UseSpeedMult => Easing.KeyFloat(kilnstoneSetActive, 0f, 100f, 0f, 0.5f, Easing.Linear);
     bool PickaxeHeld => Player.HeldItem.pick != 0;
@@ -168,14 +160,57 @@ public class KilnstoneSetBonus : ModPlayer
     {
         return base.UseSpeedMultiplier(item) + UseSpeedMult * 0.5f;
     }
+    public override void Load()
+    {
+        EverwarePacketHandler.AddPacket(
+            (mod, reader, whoAmI, identifier) =>
+            {
+                if (identifier == "IncreaseKilnstoneSetBonus")
+                {
+                    int plr = reader.ReadInt32();
+                    float amt = reader.ReadSingle();
+
+                    Main.player[plr].GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += amt;
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        ModPacket packet = Everware.Instance.GetPacket();
+                        packet.Write("IncreaseKilnstoneSetBonus");
+                        packet.Write(plr);
+                        packet.Write(amt);
+                        packet.Send(ignoreClient: plr);
+                    }
+                }
+            }
+        );
+
+        On_Player.GetPickaxeDamage += On_Player_GetPickaxeDamage;
+    }
+    public override void Unload()
+    {
+        On_Player.GetPickaxeDamage -= On_Player_GetPickaxeDamage;
+    }
 
     private int On_Player_GetPickaxeDamage(On_Player.orig_GetPickaxeDamage orig, Player self, int x, int y, int pickPower, int hitBufferIndex, Tile tileTarget)
     {
         if (self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetBonus)
         {
+            float power = 3 + ((100f / (float)pickPower));
+
             int type = tileTarget.TileType;
             if (TileID.Sets.Dirt[type] || TileID.Sets.Stone[type] || TileID.Sets.Grass[type] || type == TileID.ClayBlock || type == TileID.Mud || type == TileID.Sand)
-                self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += 3 + ((100f / (float)pickPower));
+            {
+                self.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += power;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    ModPacket packet = Everware.Instance.GetPacket();
+                    packet.Write("IncreaseKilnstoneSetBonus");
+                    packet.Write(self.whoAmI);
+                    packet.Write((float)power);
+                    packet.Send();
+                }
+            }
         }
         return orig(self, x, y, pickPower, hitBufferIndex, tileTarget);
     }

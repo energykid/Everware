@@ -5,6 +5,7 @@ using Everware.Content.Quarry.Visual;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
 
@@ -127,6 +128,25 @@ public class RebarSetBonus : ModPlayer
 
 public class RebarGlobalTile : GlobalTile
 {
+    public override void Load()
+    {
+        EverwarePacketHandler.AddPacket(
+            (mod, reader, whoAmI, identifier) =>
+            {
+                if (identifier == "SendRebarParticles")
+                {
+                    int x = reader.ReadInt32();
+                    int y = reader.ReadInt32();
+
+                    Vector2 position = new Vector2(x, y);
+
+                    SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
+                    for (int k = 0; k < 5; k++)
+                        Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
+                }
+            }
+        );
+    }
     public void DropStuff(int i, int j, int type)
     {
         if (Main.tile[i, j].Get<LastPlayerMinedData>().WhichPlayerAmI != -1)
@@ -137,20 +157,34 @@ public class RebarGlobalTile : GlobalTile
                 {
                     Vector2 position = new Vector2((i * 16) + 8, (j * 16) + 8);
 
-                    SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
-
                     int t = Main.tile[i, j].TileType;
 
-                    for (int k = 0; k < 2; k++)
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)));
-                        Main.item[ii].GetGlobalItem<RebarGlobalItem>().StackabilityTimer = 1f;
-                        Main.item[ii].GetGlobalItem<RebarGlobalItem>().CanStack = false;
+                        for (int k = 0; k < 2; k++)
+                        {
+                            int ii = Item.NewItem(new EntitySource_TileBreak(i, j), new Rectangle(i * 16, j * 16, 16, 16), new Item(TileLoader.GetItemDropFromTypeAndStyle(type)), true);
+                            Main.item[ii].GetGlobalItem<RebarGlobalItem>().StackabilityTimer = 1f;
+                            Main.item[ii].GetGlobalItem<RebarGlobalItem>().CanBeStacked = false;
+
+                            if (Main.netMode == NetmodeID.Server)
+                            {
+                                NetMessage.SendData(MessageID.SyncItem, number: ii);
+
+                                ModPacket p = Everware.Instance.GetPacket();
+                                p.Write("SendRebarParticles");
+                                p.Write((int)position.X);
+                                p.Write((int)position.Y);
+                                p.Send();
+                            }
+                        }
                     }
 
-                    for (int k = 0; k < 5; k++)
+                    if (Main.netMode == NetmodeID.SinglePlayer)
                     {
-                        Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
+                        SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
+                        for (int k = 0; k < 5; k++)
+                            Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
                     }
                 }
                 else
@@ -163,8 +197,7 @@ public class RebarGlobalTile : GlobalTile
 
     public override bool CanDrop(int i, int j, int type)
     {
-
-        if (Main.LocalPlayer.GetModPlayer<RebarSetBonus>().rebarSetBonus && TileID.Sets.Ore[type])
+        if (Main.player[Main.tile[i, j].Get<LastPlayerMinedData>().WhichPlayerAmI].GetModPlayer<RebarSetBonus>().rebarSetBonus && TileID.Sets.Ore[type])
         {
             DropStuff(i, j, type);
             return false;
@@ -177,10 +210,20 @@ public class RebarGlobalItem : GlobalItem
 {
     public override bool InstancePerEntity => true;
     public float StackabilityTimer = 0;
-    public bool CanStack = true;
+    public bool CanBeStacked = true;
+    public override void NetSend(Item item, BinaryWriter writer)
+    {
+        writer.Write(CanBeStacked);
+        writer.Write(StackabilityTimer);
+    }
+    public override void NetReceive(Item item, BinaryReader reader)
+    {
+        CanBeStacked = reader.ReadBoolean();
+        StackabilityTimer = reader.ReadSingle();
+    }
     public override bool CanStackInWorld(Item destination, Item source)
     {
-        if (!CanStack) return false;
+        if (!CanBeStacked) return false;
         return base.CanStackInWorld(destination, source) && StackabilityTimer == 0f;
     }
     public override bool CanPickup(Item item, Player player)

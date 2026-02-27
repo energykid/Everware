@@ -4,10 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Terraria.Chat;
 using Terraria.DataStructures;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
@@ -75,11 +73,6 @@ public class HellPodTileEntity : ModTileEntity
                 {
                     NetMessage.SendData(MessageID.SyncItem, number: item);
                 }
-            }
-
-            if (Main.netMode == NetmodeID.Server)
-            {
-                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("A"), Color.White);
             }
         }
     }
