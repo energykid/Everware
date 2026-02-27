@@ -104,22 +104,6 @@ public class HellPodTileEntity : ModTileEntity
 
             SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, CenterPosition);
         }
-        else
-        {
-            ModPacket packet = Everware.Instance.GetPacket();
-            packet.Write("DestroyHellPod");
-            packet.Write(x);
-            packet.Write(y);
-            packet.Send();
-        }
-
-        for (int xx = 0; xx < 3; xx++)
-        {
-            for (int yy = 0; yy < 3; yy++)
-            {
-                WorldGen.KillTile(x + xx, y + yy);
-            }
-        }
     }
 
     public override bool IsTileValidForEntity(int x, int y)
@@ -284,6 +268,11 @@ public class HellPod : EverMultitile
         if (Main.tile[ii, jj].TileFrameY > 18 * 3 * 2)
         {
             HellPodTileEntity.DestroyAt(ii, jj);
+
+            if (Main.netMode != NetmodeID.Server)
+                for (int xx = 0; xx < 3; xx++)
+                    for (int yy = 0; yy < 3; yy++)
+                        Main.tile[ii + xx, jj + yy].ClearTile();
         }
     }
     public override bool CanKillTile(int i, int j, ref bool blockDamaged)
@@ -465,13 +454,18 @@ public class HellPodGlobalProjectile : GlobalProjectile
                     Point p = (projectile.Center / 16).ToPoint();
                     HellPod.DamagePod(p.X, p.Y);
 
-                    if (Main.LocalPlayer.whoAmI == projectile.owner)
+                    int closestPlayer = (int)Player.FindClosest(projectile.Center, 2000, 2000);
+
+                    if (closestPlayer >= 0)
                     {
-                        ModPacket packet = Everware.Instance.GetPacket();
-                        packet.Write("DamageHellPodFromServer");
-                        packet.Write((int)p.X);
-                        packet.Write((int)p.Y);
-                        packet.Send();
+                        if (Main.LocalPlayer.whoAmI == closestPlayer)
+                        {
+                            ModPacket packet = Everware.Instance.GetPacket();
+                            packet.Write("DamageHellPodFromServer");
+                            packet.Write((int)p.X);
+                            packet.Write((int)p.Y);
+                            packet.Send();
+                        }
                     }
                 }
             }
