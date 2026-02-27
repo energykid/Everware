@@ -1,5 +1,6 @@
 ﻿using Everware.Common.Players;
 using Everware.Core.Projectiles;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terraria.ID;
@@ -8,10 +9,17 @@ namespace Everware;
 
 public static class EverwarePacketHandler
 {
+    public delegate void PacketBehavior(Mod mod, BinaryReader reader, int whoAmI, string identifier);
+    public static List<PacketBehavior> CustomPackets = [];
+    public static void AddPacket(PacketBehavior behavior)
+    {
+        CustomPackets.Add(behavior);
+    }
     public static void HandleAllPackets(Mod mod, BinaryReader reader, int whoAmI)
     {
-
         string str = reader.ReadString();
+
+        bool shouldRunNewPacketBehavior = true;
 
         switch (str)
         {
@@ -38,6 +46,8 @@ public static class EverwarePacketHandler
 
                     Main.player[playerID2].GetModPlayer<NetworkPlayer>().MousePosition = post2;
                 }
+
+                shouldRunNewPacketBehavior = false;
                 break;
             case "ItemAnimationMax": // Item animation time sending/recieving
                 if (Main.netMode == NetmodeID.Server)
@@ -60,6 +70,8 @@ public static class EverwarePacketHandler
 
                     Main.player[playerID].GetModPlayer<NetworkPlayer>().AnimationTime = time;
                 }
+
+                shouldRunNewPacketBehavior = false;
                 break;
 
             case "ControlUseItem": // Player mouse down sending/recieving
@@ -83,6 +95,8 @@ public static class EverwarePacketHandler
 
                     Main.player[playerID].GetModPlayer<NetworkPlayer>().MouseDown = down;
                 }
+
+                shouldRunNewPacketBehavior = false;
                 break;
 
             case "AltFunctionUse": // Player alt use down sending/recieving
@@ -106,6 +120,8 @@ public static class EverwarePacketHandler
 
                     Main.player[playerID].GetModPlayer<NetworkPlayer>().AltFunction = altFunc;
                 }
+
+                shouldRunNewPacketBehavior = false;
                 break;
 
             case "NetOnHitEnemy": // NetOnHitNPC
@@ -133,9 +149,19 @@ public static class EverwarePacketHandler
 
                     (pr.ModProjectile as EverProjectile).NetOnHitEnemy(Main.npc[npc]);
                 }
+
+                shouldRunNewPacketBehavior = false;
                 break;
 
             default: break;
+        }
+
+        if (shouldRunNewPacketBehavior)
+        {
+            foreach (PacketBehavior behavior in CustomPackets)
+            {
+                behavior(mod, reader, whoAmI, str);
+            }
         }
     }
 }

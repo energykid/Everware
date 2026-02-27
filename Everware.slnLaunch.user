@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Singleplayer",
+    "Projects": [
+      {
+        "Path": "Everware.csproj",
+        "Action": "Start",
+        "DebugTarget": "Terraria"
+      }
+    ]
+  },
+  {
+    "Name": "Multiplayer",
+    "Projects": [
+      {
+        "Path": "Everware.csproj",
+        "Action": "Start",
+        "DebugTarget": "TerrariaServer"
+      }
+    ]
+  },
+  {
+    "Name": "Singleplayer 2",
+    "Projects": [
+      {
+        "Path": "Everware.csproj",
+        "Action": "Start",
+        "DebugTarget": "Terraria"
+      }
+    ]
+  }
+]

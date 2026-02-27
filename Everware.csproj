@@ -1,4 +1,4 @@
-﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.9">
+<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.9">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -7,12 +7,6 @@
 	<PropertyGroup>
 		
 	</PropertyGroup>
-	<ItemGroup>
-	  <AdditionalFiles Remove="Content\PreHardmode\Kilnstone\**" />
-	  <Compile Remove="Content\PreHardmode\Kilnstone\**" />
-	  <EmbeddedResource Remove="Content\PreHardmode\Kilnstone\**" />
-	  <None Remove="Content\PreHardmode\Kilnstone\**" />
-	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Content\Base\Tiles\EverMultitile.cs" />
 	</ItemGroup>
