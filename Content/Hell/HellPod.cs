@@ -4,8 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Terraria.Chat;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
@@ -36,33 +38,48 @@ public class HellPodTileEntity : ModTileEntity
     ItemID.ObsidianRose,
     ItemID.LavaCharm];
 
+    public static int MPSyncWorkaround = 0;
+
     public static void DropLoot(Vector2 position)
     {
-        for (int i = 0; i < Main.rand.Next(3, 5); i++)
+        // for some reason this method is being called precisely four times on the server every time my packet gets sent
+        // it's weird and idk why it's happening, but it's consistently four times, so unless this bugs out for someone,
+        // or i find a better fix, this is what we get right now
+        // thanks obama
+        MPSyncWorkaround++;
+        if (MPSyncWorkaround % 4 == 0)
         {
-            int randomSelection = Main.rand.Next(PossibleLesserItems.Count);
-            int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
-               PossibleLesserItems[randomSelection].ItemID, Main.rand.Next(PossibleLesserItems[randomSelection].MinStack, PossibleLesserItems[randomSelection].MaxStack)), true);
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
-
-            if (Main.netMode == NetmodeID.Server)
+            for (int i = 0; i < Main.rand.Next(3, 5); i++)
             {
-                NetMessage.SendData(MessageID.SyncItem, number: item);
+                int randomSelection = Main.rand.Next(PossibleLesserItems.Count);
+                int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
+                   PossibleLesserItems[randomSelection].ItemID, Main.rand.Next(PossibleLesserItems[randomSelection].MinStack, PossibleLesserItems[randomSelection].MaxStack)), true);
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+
+                if (Main.netMode == NetmodeID.Server)
+                {
+                    NetMessage.SendData(MessageID.SyncItem, number: item);
+                }
             }
-        }
-        if (Main.rand.Next(100) >= 50)
-        {
-            int randomSelection = Main.rand.Next(PossibleGreaterItems.Count);
-            int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
-               PossibleGreaterItems[randomSelection], 1), true);
-            Main.item[item].velocity = Vector2.Zero;
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = true;
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
-            Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = 60;
+            if (Main.rand.Next(100) >= 50)
+            {
+                int randomSelection = Main.rand.Next(PossibleGreaterItems.Count);
+                int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
+                   PossibleGreaterItems[randomSelection], 1), true);
+                Main.item[item].velocity = Vector2.Zero;
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = true;
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+                Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = 60;
+
+                if (Main.netMode == NetmodeID.Server)
+                {
+                    NetMessage.SendData(MessageID.SyncItem, number: item);
+                }
+            }
 
             if (Main.netMode == NetmodeID.Server)
             {
-                NetMessage.SendData(MessageID.SyncItem, number: item);
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("A"), Color.White);
             }
         }
     }
@@ -78,7 +95,7 @@ public class HellPodTileEntity : ModTileEntity
 
         Vector2 CenterPosition = (new Vector2(x, y) * 16) + new Vector2(24, 24);
 
-        if (Main.netMode != NetmodeID.MultiplayerClient)
+        if (Main.netMode == NetmodeID.SinglePlayer || Main.netMode == NetmodeID.Server)
         {
             DropLoot(CenterPosition);
         }
@@ -103,6 +120,14 @@ public class HellPodTileEntity : ModTileEntity
             }
 
             SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, CenterPosition);
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                Main.tile[x + i, y + j].ClearTile();
+            }
         }
     }
 
@@ -268,16 +293,11 @@ public class HellPod : EverMultitile
         if (Main.tile[ii, jj].TileFrameY > 18 * 3 * 2)
         {
             HellPodTileEntity.DestroyAt(ii, jj);
-
-            if (Main.netMode != NetmodeID.Server)
-                for (int xx = 0; xx < 3; xx++)
-                    for (int yy = 0; yy < 3; yy++)
-                        Main.tile[ii + xx, jj + yy].ClearTile();
         }
     }
     public override bool CanKillTile(int i, int j, ref bool blockDamaged)
     {
-        return false;
+        return true;
     }
     public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
     {
@@ -414,19 +434,22 @@ public class HellPodGlobalProjectile : GlobalProjectile
                     if (Main.netMode == NetmodeID.Server)
                     {
                         HellPod.DamagePod(x, y);
+
+                        ModPacket p = Everware.Instance.GetPacket();
+                        p.Write("DamageHellPod");
+                        p.Write(x);
+                        p.Write(y);
+                        p.Send();
                     }
                 }
-                if (identifier == "DestroyHellPod")
+                if (identifier == "DamageHellPod")
                 {
-                    int x = reader.ReadInt32();
-                    int y = reader.ReadInt32();
-
-                    for (int i = 0; i < 3; i++)
+                    if (Main.netMode != NetmodeID.Server)
                     {
-                        for (int j = 0; j < 3; i++)
-                        {
-                            Main.tile[x + i, y + j].ClearTile();
-                        }
+                        int x = reader.ReadInt32();
+                        int y = reader.ReadInt32();
+
+                        HellPod.DamagePod(x, y);
                     }
                 }
             }
@@ -449,17 +472,16 @@ public class HellPodGlobalProjectile : GlobalProjectile
                 }
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
-                    HasHitPod = true;
-                    projectile.penetrate--;
-                    Point p = (projectile.Center / 16).ToPoint();
-                    HellPod.DamagePod(p.X, p.Y);
-
                     int closestPlayer = (int)Player.FindClosest(projectile.Center, 2000, 2000);
 
                     if (closestPlayer >= 0)
                     {
                         if (Main.LocalPlayer.whoAmI == closestPlayer)
                         {
+                            HasHitPod = true;
+                            projectile.penetrate--;
+                            Point p = (projectile.Center / 16).ToPoint();
+
                             ModPacket packet = Everware.Instance.GetPacket();
                             packet.Write("DamageHellPodFromServer");
                             packet.Write((int)p.X);
