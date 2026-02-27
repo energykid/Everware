@@ -3,6 +3,7 @@ using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.IO;
 
 namespace Everware.Content.Hell;
 
@@ -15,6 +16,19 @@ public class HellPodGlobalItem : GlobalItem
     float maxFall = 0f;
     float grav = 0f;
     bool start = false;
+
+    public override void NetSend(Item item, BinaryWriter writer)
+    {
+        writer.Write(ShouldHover);
+        writer.Write(SizeTimer);
+        writer.Write(Rare);
+    }
+    public override void NetReceive(Item item, BinaryReader reader)
+    {
+        ShouldHover = reader.ReadBoolean();
+        SizeTimer = reader.ReadSingle();
+        Rare = reader.ReadBoolean();
+    }
 
     public static Vector2 GroundedOrLavad(Vector2 baseVec)
     {

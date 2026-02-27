@@ -112,12 +112,12 @@ public class EverwareTitle : ModMenu
 
         Main.spriteBatch.Draw(Outline.Value, Vector2.Zero, Outline.Frame(), MistColorForeground, 0f, Vector2.Zero, new Vector2(1f / Outline.Width() * Main.screenWidth, 1f / Outline.Height() * Main.screenHeight), SpriteEffects.None, 0f);
 
-        Main.spriteBatch.Draw(Logo.Value, new Vector2(Main.screenWidth / 2f, 110), Logo.Frame(), Color.White, 0f, Logo.Size() / 2f, new Vector2(1f), SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(Logo.Value, new Vector2(Main.screenWidth / 2f, 110), Logo.Frame(), Color.White, logoRotation, Logo.Size() / 2f, new Vector2(logoScale), SpriteEffects.None, 0f);
 
         spriteBatch.End();
-        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, LogoEffect.Shader, Main.UIScaleMatrix);
+        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, Main.Rasterizer, LogoEffect.Shader, Main.UIScaleMatrix);
 
-        Main.spriteBatch.Draw(LogoMask.Value, new Vector2(Main.screenWidth / 2f, 110), Logo.Frame(), Color.White, 0f, Logo.Size() / 2f, new Vector2(1f), SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(LogoMask.Value, new Vector2(Main.screenWidth / 2f, 110), Logo.Frame(), Color.White, logoRotation, Logo.Size() / 2f, new Vector2(logoScale), SpriteEffects.None, 0f);
 
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.UIScaleMatrix);
