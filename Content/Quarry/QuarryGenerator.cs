@@ -11,11 +11,10 @@ public static class QuarryGenerator
 {
     public static void GenerateQuarry(Point p)
     {
-        ushort RebarWallType = (ushort)ModContent.WallType<RebarRodPlaced>();
+        ushort RebarWallType = (ushort)ModContent.WallType<RebarRodPlacedUnfriendly>();
         ushort BrickType = (ushort)ModContent.TileType<SturdyBricksPlaced>();
         ushort BrickWallType = WallID.GrayBrick;
         ushort WoodType = (ushort)ModContent.TileType<WornWoodPlaced>();
-        ushort WoodWallType = TileID.WoodBlock;
 
         Point BasePoint = p;
         #region Pass 1 (Hole and rebar walls)

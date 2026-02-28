@@ -43,18 +43,28 @@ public class KilnpostHoldout : EverHoldoutProjectile
     float Spin = 0f;
     float BaseRot = 0f;
     float RecoveryAmount = 1f;
-    float RecoveryTransparency = 1f;
     int Dir = 0;
     int LastHitNPC = -1;
+    int Timer = 0;
     public override void SendExtraAI(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
         writer.Write(LastHitNPC);
+        writer.Write(Spin);
+        writer.Write(BaseRot);
+        writer.Write(RecoveryAmount);
+        writer.Write(Dir);
+        writer.Write(State);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
         LastHitNPC = reader.ReadInt32();
+        Spin = reader.ReadSingle();
+        BaseRot = reader.ReadSingle();
+        RecoveryAmount = reader.ReadSingle();
+        Dir = reader.ReadInt32();
+        State = reader.ReadString();
     }
     public override void SetDefaults()
     {
@@ -62,6 +72,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
         Projectile.DamageType = DamageClass.Melee;
         Projectile.width = 90;
         Projectile.height = 90;
+        State = "Thrust";
+        if (Main.myPlayer != Projectile.owner) State = "Spin";
+        Projectile.netUpdate = true;
     }
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
@@ -74,8 +87,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public override void AI()
     {
+        Timer++;
         TwoHanded = false;
-        if (Owner.itemAnimation == Owner.itemAnimationMax / 3 || Owner.ItemAnimationJustStarted)
+        if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1)
         {
             Projectile.ai[1] = 0f;
             Projectile.ai[2] = 70f;
@@ -95,9 +109,10 @@ public class KilnpostHoldout : EverHoldoutProjectile
                 Projectile.damage = 3;
                 BackArmExtension = 0.8f;
             }
+            Projectile.netUpdate = true;
         }
 
-        if (Owner.ItemAnimationEndingOrEnded && HasMouseBeenReleased && State != "Breakaway")
+        if ((Timer == NetworkOwner.AnimationTime) && HasMouseBeenReleased && State != "Breakaway")
         {
             BreakOffSpear();
         }
@@ -124,7 +139,6 @@ public class KilnpostHoldout : EverHoldoutProjectile
     {
         SoundEngine.PlaySound(Kilnpost.BreakawaySound, Projectile.Center);
         RecoveryAmount = 0f;
-        RecoveryTransparency = 0f;
         State = "Breakaway";
 
         for (int i = 0; i < 10; i++)
@@ -134,7 +148,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
 
         NPC npc = Main.npc[npcWhoAmI];
 
-        npc.velocity += new Vector2(12, -12).RotatedBy(Projectile.rotation) * npc.knockBackResist;
+        float r = npc.AngleFrom(Owner.Center);
+
+        npc.velocity += new Vector2(12, 0).RotatedBy(r) * npc.knockBackResist;
 
         ScreenEffects.AddScreenShake(npc.Center, 3f, 0.5f);
 

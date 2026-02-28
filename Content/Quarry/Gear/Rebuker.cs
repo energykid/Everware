@@ -42,6 +42,7 @@ public class RebukerHoldout : EverHoldoutProjectile
     {
         base.SetDefaults();
         Origin = new Vector2(8, 18);
+        Projectile.netUpdate = true;
     }
     public override void NetOnSpawn()
     {
@@ -136,7 +137,7 @@ public class RebukerHoldout : EverHoldoutProjectile
     {
         SoundEngine.PlaySound(Rebuker.FireSound, Projectile.Center);
         Vector2 SpawnLocation = Owner.MountedCenter + new Vector2(40, 0).RotatedBy(Projectile.rotation);
-        if (!Main.dedServ)
+        if (!Main.dedServ && Main.myPlayer == Projectile.owner)
             Projectile.NewProjectileDirect(new EntitySource_ItemUse(Owner, Owner.HeldItem), SpawnLocation, new Vector2(3, 0).RotatedBy(Projectile.rotation), ModContent.ProjectileType<RebukerBolt>(), Projectile.damage, 3f, Projectile.owner);
     }
     public void LoadRebarBolt()

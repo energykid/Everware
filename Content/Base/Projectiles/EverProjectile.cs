@@ -14,7 +14,7 @@ public abstract class EverProjectile : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
 
     /// <summary>
-    ///     Shorthand variable that allows to quickly grab the VariaPlayer instance of this projectile's owner
+    ///     Shorthand variable that allows to quickly grab the NetworkPlayer instance of this projectile's owner
     /// </summary>
     public NetworkPlayer NetworkOwner => Owner.GetModPlayer<NetworkPlayer>();
 

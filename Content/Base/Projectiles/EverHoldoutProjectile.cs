@@ -32,21 +32,41 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Projectile.netImportant = true;
         Projectile.penetrate = -1;
         Projectile.friendly = true;
         Projectile.tileCollide = false;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 2;
+        Projectile.timeLeft = 9999;
+    }
+    public override void PostAI()
+    {
+        base.PostAI();
+
+        if (!Started)
+        {
+            Projectile.netUpdate = true;
+        }
+        Started = true;
     }
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write(Rotation);
         writer.Write(RotationOffset);
+        writer.Write(Persist);
+        writer.Write(HitFrames);
+        writer.Write(HasMouseBeenReleased);
+        writer.Write(Started);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Rotation = reader.ReadSingle();
         RotationOffset = reader.ReadSingle();
+        Persist = reader.ReadBoolean();
+        HitFrames = reader.ReadInt32();
+        HasMouseBeenReleased = reader.ReadBoolean();
+        Started = reader.ReadBoolean();
     }
     public override void NetOnSpawn()
     {
@@ -60,7 +80,6 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public override void AI()
     {
         if (!NetworkOwner.MouseDown && Started == false) HasMouseBeenReleased = true;
-        Started = true;
 
         if (Main.LocalPlayer.whoAmI == Projectile.owner)
         {
@@ -69,14 +88,12 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         HitFrames--;
 
-        Projectile.timeLeft = 10;
-
         if (Owner.ItemAnimationActive)
+        {
             Projectile.ai[0] = Owner.itemTime;
+        }
         else
         {
-            Projectile.netUpdate = true;
-
             Projectile.ai[0]--;
 
             if (ShouldKill())
@@ -135,7 +152,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
     }
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        base.ModifyHitNPC(target, ref modifiers);
         modifiers.HitDirectionOverride = Math.Sign(target.Center.X - Owner.Center.X);
+        base.ModifyHitNPC(target, ref modifiers);
     }
 }
