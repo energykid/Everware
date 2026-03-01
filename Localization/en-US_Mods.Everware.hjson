@@ -141,7 +141,11 @@ Items: {
 
 	BloodRubyCharm: {
 		DisplayName: Devil's Ruby
-		Tooltip: Double tap a direction to dash forward with a damaging explosive blast
+		Tooltip:
+			'''
+			Double tap a direction to dash forward with a damaging explosive blast
+			Dashing also briefly stops you from falling
+			'''
 	}
 }
 
@@ -162,7 +166,7 @@ Projectiles: {
 	KilnpostBreakaway.DisplayName: Kiln Shard
 	RebukerBolt.DisplayName: Rebuker
 	RebukerHoldout.DisplayName: Rebuker
-	CthulhuBloodProjectile.DisplayName: Cthulhu Blood Projectile
-	EyeOfCthulhuTendrilHitbox.DisplayName: Eye Of Cthulhu Tendril Hitbox
-	BloodRubyExplosion.DisplayName: Blood Ruby Explosion
+	CthulhuBloodProjectile.DisplayName: Blood
+	EyeOfCthulhuTendrilHitbox.DisplayName: Cthulhu Tendril
+	BloodRubyExplosion.DisplayName: Explosion
 }

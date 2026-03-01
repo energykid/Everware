@@ -1,13 +1,14 @@
 ﻿using Everware.Common.Systems;
-using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Everware.Content.EyeOfCthulhuRework;
 
@@ -39,6 +40,31 @@ public class EyeOfCthulhu : GlobalNPC
     public bool MusicEnabled = false;
     public static float MusicPitch = 1f;
     public static bool ReworkEnabled = true;
+    float AI3 = 0f;
+    public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
+    {
+        binaryWriter.Write((float)VectorTarget.X);
+        binaryWriter.Write((float)VectorTarget.Y);
+
+        binaryWriter.Write(ContactDamage);
+        binaryWriter.Write(TendrilDamageEnabled);
+
+        binaryWriter.Write(Phase);
+
+        binaryWriter.Write(AI3);
+    }
+    public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
+    {
+        VectorTarget.X = binaryReader.ReadSingle();
+        VectorTarget.Y = binaryReader.ReadSingle();
+
+        ContactDamage = binaryReader.ReadBoolean();
+        TendrilDamageEnabled = binaryReader.ReadBoolean();
+
+        Phase = binaryReader.ReadInt32();
+
+        AI3 = binaryReader.ReadSingle();
+    }
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
@@ -50,9 +76,9 @@ public class EyeOfCthulhu : GlobalNPC
     }
     public enum AttackState
     {
-        Flee,
-
         TendrilsOut,
+
+        Flee,
         Phase2Transition,
         None,
         Bash,
@@ -78,6 +104,8 @@ public class EyeOfCthulhu : GlobalNPC
         npc.behindTiles = true;
         npc.aiStyle = -1;
 
+        npc.ai[2] = (int)AttackState.TendrilsOut;
+
         for (int i = 0; i < 4; i++)
         {
             TendrilPositions[i] = TendrilJointPositions[i] = TendrilClawPositions[i] = npc.Center;
@@ -87,30 +115,26 @@ public class EyeOfCthulhu : GlobalNPC
 
         Phase2Threshold = (int)(npc.lifeMax * 0.6f);
         if (Main.expertMode) Phase2Threshold = (int)(npc.lifeMax * 0.75f);
-
-        for (int i = 0; i < 4; i++)
-        {
-            Projectile.NewProjectile(new EntitySource_Parent(npc, "Bleh"), npc.Center, Vector2.Zero, ModContent.ProjectileType<EyeOfCthulhuTendrilHitbox>(), TendrilDamage, 3f, ai0: npc.whoAmI, ai1: i);
-        }
     }
-    public override void FindFrame(NPC npc, int frameHeight)
-    {
-
-    }
-    public int AttackTimer = 0;
     public int EyeDilationReset = 0;
     int TargetedPlayer = 0;
+    public float Timer = 0f;
     public override void AI(NPC npc)
     {
-        if (npc.life < DesperationThreshold)
+        Timer++;
+
+        if (Main.netMode != NetmodeID.Server)
         {
-            MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold), 0.1f);
+            if (npc.life < DesperationThreshold)
+            {
+                MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold), 0.1f);
+            }
+            else
+            {
+                MusicPitch = 0f;
+            }
+            MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", MusicPitch);
         }
-        else
-        {
-            MusicPitch = 0f;
-        }
-        MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", MusicPitch);
 
         ContactDamage = false;
 
@@ -126,9 +150,10 @@ public class EyeOfCthulhu : GlobalNPC
         }
 
         if (Plr != -1)
-            TargetedPlayer = Plr;
-        Player Target = Main.player[TargetedPlayer];
-        bool ShouldFlee = Main.dayTime || !Target.active;
+            npc.target = Plr;
+
+        Player Target = Main.player[npc.target];
+        bool ShouldFlee = Main.dayTime || Target.dead;
 
         if (TendrilsOut == 0)
         {
@@ -146,14 +171,14 @@ public class EyeOfCthulhu : GlobalNPC
 
         EyeDilationReset--;
         if (EyeDilationReset <= 0)
-            EyeDilation = MathHelper.Lerp(EyeDilation, 0.3f + (float)(Math.Sin(GlobalTimer.Value / 10f) * 0.05f), 0.2f);
+            EyeDilation = MathHelper.Lerp(EyeDilation, 0.3f + (float)(Math.Sin(Timer / 10f) * 0.05f), 0.2f);
         else
         {
             EyeDilation = MathHelper.Lerp(EyeDilation, -0.2f, 0.6f);
         }
 
 
-        switch (CurrentAttack)
+        switch ((AttackState)npc.ai[2])
         {
             case AttackState.Flee:
                 npc.velocity.Y -= 0.5f;
@@ -170,9 +195,9 @@ public class EyeOfCthulhu : GlobalNPC
                 }
                 break;
             case AttackState.None:
-                AttackTimer++;
+                npc.ai[0]++;
                 npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
-                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -200 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.03f, 0.03f);
+                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -200 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.03f, 0.03f);
 
                 if (ShouldFlee)
                 {
@@ -184,15 +209,15 @@ public class EyeOfCthulhu : GlobalNPC
                     ChangeState(npc, AttackState.Phase2Transition);
                 }
 
-                if (AttackTimer > 80)
+                if (npc.ai[0] > 80)
                 {
                     AttackState[] states = { AttackState.Bash, AttackState.Stab };
                     ChangeState(npc, states[Main.rand.Next(states.Length)]);
                 }
                 break;
             case AttackState.TendrilsOut:
-                AttackTimer++;
-                if (AttackTimer > 200)
+                npc.ai[0]++;
+                if (npc.ai[0] > 200)
                 {
                     ScreenEffects.ZoomScreen(0.3f);
                     ScreenEffects.PanTo(npc.Center);
@@ -209,7 +234,7 @@ public class EyeOfCthulhu : GlobalNPC
                     {
                         EyeDilation = MathHelper.Lerp(EyeDilation, 1.5f, 0.5f);
                         npc.velocity *= 0.85f;
-                        if (AttackTimer % Time == 1)
+                        if (npc.ai[0] % Time == 1)
                         {
                             MusicEnabled = true;
 
@@ -222,28 +247,28 @@ public class EyeOfCthulhu : GlobalNPC
                     }
                 }
                 npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
-                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -200 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.03f, 0.03f, 15);
+                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -200 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.03f, 0.03f, 15);
                 break;
             case AttackState.Bash:
                 npc.damage = BashDamage;
                 if (Phase > 0)
                     npc.damage = Phase2BashDamage;
-                if (AttackTimer == 0)
+                if (npc.ai[0] == 0)
                 {
-                    npc.ai[2] = 0f;
+                    AI3 = 0f;
                     npc.velocity.Y -= 4f;
-                    AttackTimer++;
+                    npc.ai[0]++;
                 }
                 else
                 {
-                    npc.ai[2] = MathHelper.Lerp(npc.ai[2], 1f, 0.075f);
-                    if (npc.ai[2] < 0.8f)
+                    AI3 = MathHelper.Lerp(AI3, 1f, 0.075f);
+                    if (AI3 < 0.8f)
                     {
                         npc.velocity *= 0.9f;
                         EyeDilation = MathHelper.Lerp(EyeDilation, 1f, 0.2f);
                         npc.ai[1] = 0f;
                         npc.LerpAngleTowardsPosition(Target.Center, 0.04f, MathHelper.ToRadians(-90f));
-                        npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -700 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.02f, 0.2f);
+                        npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(AI3 / 20f) * 50f, -700 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.02f, 0.2f);
                     }
                     else
                     {
@@ -282,40 +307,40 @@ public class EyeOfCthulhu : GlobalNPC
                         break;
                     }
                 }
-                if (b && npc.ai[2] > 0.8f)
+                if (b && AI3 > 0.8f)
                 {
                     ThrowTileReplicants(npc, (npc.Center / 16).ToPoint());
                     BleedAllOver(npc);
-                    npc.ai[2] = 0f;
+                    AI3 = 0f;
                     SoundEngine.PlaySound(Assets.Sounds.NPC.EoCBash.Asset, npc.Center);
                     ScreenEffects.AddScreenShake(npc.Center, 20f, 0.6f);
                     npc.velocity = Vector2.Zero;
                     npc.velocity.Y = -3f;
-                    npc.ai[2] = -2f;
-                    AttackTimer++;
+                    AI3 = -2f;
+                    npc.ai[0]++;
                     if (Phase > 0)
                     {
                         if (npc.life < DesperationThreshold)
                         {
                             ChangeState(npc, AttackState.Bash);
-                            AttackTimer = -40;
+                            npc.ai[0] = -40;
                             if (npc.life < DesperationThreshold / 2)
                             {
-                                AttackTimer = -20;
+                                npc.ai[0] = -20;
                             }
                             if (npc.life < DesperationThreshold / 3)
                             {
-                                AttackTimer = -10;
+                                npc.ai[0] = -10;
                             }
                         }
                         else
                         {
-                            if (AttackTimer > Easing.KeyFloat(npc.life, DesperationThreshold, npc.lifeMax, 4, 1, Easing.Linear))
+                            if (npc.ai[0] > Easing.KeyFloat(npc.life, DesperationThreshold, npc.lifeMax, 4, 1, Easing.Linear))
                             {
                                 Shake = 7;
                                 npc.velocity *= 0.4f;
                                 ChangeState(npc, AttackState.BashCooldown);
-                                AttackTimer = -30;
+                                npc.ai[0] = -30;
                             }
                         }
                     }
@@ -324,26 +349,26 @@ public class EyeOfCthulhu : GlobalNPC
                         npc.velocity *= 0.6f;
                         ChangeState(npc, AttackState.BashCooldown);
                         Shake = 8;
-                        AttackTimer = -40;
+                        npc.ai[0] = -40;
                     }
                 }
                 break;
             case AttackState.BashCooldown:
                 ContactDamage = false;
-                AttackTimer++;
-                if (AttackTimer == 0)
+                npc.ai[0]++;
+                if (npc.ai[0] == 0)
                 {
-                    Shake = (MathHelper.Lerp(1f, 0f, (float)-AttackTimer * 0.2f));
+                    Shake = (MathHelper.Lerp(1f, 0f, (float)-npc.ai[0] * 0.2f));
                     SoundEngine.PlaySound(Assets.Sounds.NPC.EoCBash.Asset with { Pitch = 1f }, npc.Center);
                     npc.velocity.Y -= 13f;
                 }
-                if (AttackTimer >= 0)
+                if (npc.ai[0] >= 0)
                 {
                     npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
 
                     npc.velocity *= 0.88f;
                     npc.velocity.Y += 0.05f;
-                    if (AttackTimer > 30)
+                    if (npc.ai[0] > 30)
                         ChangeState(npc, Main.rand.NextBool() ? AttackState.Bleed : AttackState.Multiply);
                 }
                 else
@@ -353,15 +378,15 @@ public class EyeOfCthulhu : GlobalNPC
                 }
                 break;
             case AttackState.Bleed:
-                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -250 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.1f, 0.05f);
+                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -250 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.1f, 0.05f);
                 npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
-                AttackTimer++;
-                if (AttackTimer > 50)
+                npc.ai[0]++;
+                if (npc.ai[0] > 50)
                 {
-                    npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -200 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.03f, 0.03f, 10);
+                    npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -200 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.03f, 0.03f, 10);
 
                     npc.velocity *= 0.95f;
-                    if (AttackTimer % 25 == 18)
+                    if (npc.ai[0] % 25 == 18)
                     {
                         for (int i = 0; i < ((Phase > 0) ? 2 : 1); i++)
                         {
@@ -371,14 +396,15 @@ public class EyeOfCthulhu : GlobalNPC
                             SoundEngine.PlaySound(Assets.Sounds.NPC.EoCTendrilEmerge.Asset, npc.Center);
                             ScreenEffects.AddScreenShake(npc.Center, 10, 0.6f);
 
-                            Projectile.NewProjectileDirect(new EntitySource_Parent(npc, "EoC blood projectile"), PupilPosition(npc), npc.DirectionTo(PupilPosition(npc) + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10))) * 25, ModContent.ProjectileType<CthulhuBloodProjectile>(), BloodProjectileDamage, 2f);
+                            if (Main.netMode != NetmodeID.MultiplayerClient)
+                                Projectile.NewProjectileDirect(new EntitySource_Parent(npc, "EoC blood projectile"), PupilPosition(npc), npc.DirectionTo(PupilPosition(npc) + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10))) * 25, ModContent.ProjectileType<CthulhuBloodProjectile>(), BloodProjectileDamage, 2f);
                         }
                     }
-                    if (AttackTimer % 25 >= 18)
+                    if (npc.ai[0] % 25 >= 18)
                     {
                         EyeDilation = MathHelper.Lerp(EyeDilation, 3, 0.4f);
                     }
-                    if (AttackTimer > 150)
+                    if (npc.ai[0] > 150)
                     {
                         ChangeState(npc, AttackState.None);
                     }
@@ -386,25 +412,25 @@ public class EyeOfCthulhu : GlobalNPC
                 else
                 {
                     Shake += 0.2f;
-                    if (AttackTimer >= 20)
+                    if (npc.ai[0] >= 20)
                     {
-                        EyeDilation = MathHelper.Lerp(EyeDilation, 1f + ((float)AttackTimer / 50f) * 2f, 0.4f);
-                        if (AttackTimer == 20)
+                        EyeDilation = MathHelper.Lerp(EyeDilation, 1f + ((float)npc.ai[0] / 50f) * 2f, 0.4f);
+                        if (npc.ai[0] == 20)
                             SoundEngine.PlaySound(Assets.Sounds.NPC.EoCMuffledRoar.Asset, npc.Center);
                     }
                     npc.velocity *= 0.95f;
                 }
                 break;
             case AttackState.Multiply:
-                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -300 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.02f, 0.2f);
+                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -300 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.02f, 0.2f);
                 npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
-                AttackTimer++;
-                if (AttackTimer > 50)
+                npc.ai[0]++;
+                if (npc.ai[0] > 50)
                 {
-                    npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -200 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)), 0.03f, 0.03f, 10);
+                    npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -200 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.03f, 0.03f, 10);
 
                     npc.velocity *= 0.95f;
-                    if (AttackTimer % 10 == 5)
+                    if (npc.ai[0] % 10 == 5)
                     {
                         BleedInDirection(npc, npc.Center + new Vector2(200, 0).RotatedBy(npc.rotation + MathHelper.ToRadians(90f)));
                         npc.velocity += new Vector2(-5, 0).RotatedBy(npc.rotation + MathHelper.ToRadians(90f));
@@ -415,11 +441,11 @@ public class EyeOfCthulhu : GlobalNPC
                         int newNpc = NPC.NewNPC(new EntitySource_Parent(npc, "EoC minion"), (int)PupilPosition(npc).X, (int)PupilPosition(npc).Y, NPCID.ServantofCthulhu);
                         Main.npc[newNpc].velocity = npc.DirectionTo(PupilPosition(npc)) * 3f;
                     }
-                    if (AttackTimer % 10 >= 5)
+                    if (npc.ai[0] % 10 >= 5)
                     {
                         EyeDilation = MathHelper.Lerp(EyeDilation, 3, 0.4f);
                     }
-                    if (AttackTimer > 80)
+                    if (npc.ai[0] > 80)
                     {
                         ChangeState(npc, AttackState.None);
                     }
@@ -427,10 +453,10 @@ public class EyeOfCthulhu : GlobalNPC
                 else
                 {
                     Shake += 0.2f;
-                    if (AttackTimer >= 20)
+                    if (npc.ai[0] >= 20)
                     {
-                        EyeDilation = MathHelper.Lerp(EyeDilation, 1f + ((float)AttackTimer / 50f) * 2f, 0.4f);
-                        if (AttackTimer == 20)
+                        EyeDilation = MathHelper.Lerp(EyeDilation, 1f + ((float)npc.ai[0] / 50f) * 2f, 0.4f);
+                        if (npc.ai[0] == 20)
                             SoundEngine.PlaySound(Assets.Sounds.NPC.EoCMuffledRoar.Asset, npc.Center);
                     }
                     npc.velocity *= 0.95f;
@@ -438,19 +464,19 @@ public class EyeOfCthulhu : GlobalNPC
                 break;
             case AttackState.Phase2Transition:
                 npc.velocity *= 0.9f;
-                if (AttackTimer == 0)
+                if (npc.ai[0] == 0)
                 {
                     VectorTarget = npc.Center;
                     SoundEngine.PlaySound(Assets.Sounds.NPC.EoCMuffledRoar.Asset with { Pitch = -0.5f }, npc.Center);
                 }
                 npc.VelocityMoveTowardsPosition(VectorTarget, 0.2f, 0.1f, 8);
-                AttackTimer++;
-                if (AttackTimer < 180)
+                npc.ai[0]++;
+                if (npc.ai[0] < 180)
                 {
-                    if (AttackTimer < 160 && AttackTimer > 15 && AttackTimer % 15 == 5)
+                    if (npc.ai[0] < 160 && npc.ai[0] > 15 && npc.ai[0] % 15 == 5)
                     {
                         TendrilSplay += 0.4f;
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.EoCTendrilEmerge.Asset with { Pitch = Easing.KeyFloat(AttackTimer, 0, 100, 0.2f, 0.6f, Easing.Linear) }, npc.Center);
+                        SoundEngine.PlaySound(Assets.Sounds.NPC.EoCTendrilEmerge.Asset with { Pitch = Easing.KeyFloat(npc.ai[0], 0, 100, 0.2f, 0.6f, Easing.Linear) }, npc.Center);
                         Vector2 rand = new Vector2(Main.rand.NextFloat(2f, 5f), 0f).RotatedByRandom(MathHelper.TwoPi);
                         BleedAllOver(npc);
                         BleedInDirection(npc, npc.Center + rand);
@@ -462,17 +488,17 @@ public class EyeOfCthulhu : GlobalNPC
                 }
                 else
                 {
-                    if (AttackTimer >= 180 && AttackTimer < 230)
+                    if (npc.ai[0] >= 180 && npc.ai[0] < 230)
                     {
                         ScreenEffects.PanTo(npc.Center);
                         ScreenEffects.ZoomScreen(0.5f);
                         ScreenEffects.AddScreenShake(npc.Center, 2f);
                     }
-                    if (AttackTimer > 260)
+                    if (npc.ai[0] > 260)
                     {
                         ChangeState(npc, AttackState.None);
                     }
-                    if (AttackTimer == 180)
+                    if (npc.ai[0] == 180)
                     {
                         SoundEngine.PlaySound(Assets.Sounds.NPC.EoCTendrilEmerge.Asset with { Pitch = -0.2f }, npc.Center);
 
@@ -486,51 +512,55 @@ public class EyeOfCthulhu : GlobalNPC
                         }
 
                         Phase = 1;
+
+                        npc.netUpdate = true;
                     }
                     npc.LerpAngleTowardsPosition(Target.Center, 0.4f, -MathHelper.PiOver2);
                 }
                 break;
             case AttackState.Stab:
-                if (AttackTimer == 0)
+                if (npc.ai[0] == 0)
                 {
                     int dir = Main.rand.NextBool() ? -1 : 1;
                     if (Target.velocity.X > 0) dir = 1;
                     if (Target.velocity.X < 0) dir = -1;
                     VectorTarget = new Vector2(dir * 220, Main.rand.NextFloat(-90, -20));
 
+                    npc.netUpdate = true;
+
                     if (Phase == 0)
                         SoundEngine.PlaySound(Assets.Sounds.NPC.EoCMuffledRoar.Asset, npc.Center);
                 }
-                AttackTimer++;
+                npc.ai[0]++;
 
                 npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
 
                 int Delay = 64;
-                if (AttackTimer < Delay)
+                if (npc.ai[0] < Delay)
                 {
-                    npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(GlobalTimer.Value / 20f) * 50f, -50 + ((float)Math.Sin(GlobalTimer.Value / 17f) * 30f)) + VectorTarget, 0.1f, 0.1f);
+                    npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -50 + ((float)Math.Sin(Timer / 17f) * 30f)) + VectorTarget, 0.1f, 0.1f);
                 }
                 else
                 {
-                    if (AttackTimer == Delay && Phase > 0)
+                    if (npc.ai[0] == Delay && Phase > 0)
                     {
                         EmitRoar(npc);
                     }
-                    if (AttackTimer < Delay + 32)
+                    if (npc.ai[0] < Delay + 32)
                     {
                         TendrilDamageEnabled = true;
-                        if (AttackTimer % 8 >= 2 && AttackTimer % 15 < 9)
+                        if (npc.ai[0] % 8 >= 2 && npc.ai[0] % 15 < 9)
                         {
                             int i = 0;
-                            if (AttackTimer >= Delay + 8) i = 1;
-                            if (AttackTimer >= Delay + 16) i = 2;
-                            if (AttackTimer >= Delay + 24) i = 3;
+                            if (npc.ai[0] >= Delay + 8) i = 1;
+                            if (npc.ai[0] >= Delay + 16) i = 2;
+                            if (npc.ai[0] >= Delay + 24) i = 3;
 
                             MoveTendril(npc, i, Target.Center + new Vector2(Main.rand.NextFloat(-5, 5), Main.rand.NextFloat(-5, 5)), 1f);
 
                             float DashSpeed = Phase > 0 ? 13 : 9;
 
-                            if (AttackTimer % 8 == 2)
+                            if (npc.ai[0] % 8 == 2)
                             {
                                 SoundEngine.PlaySound(Assets.Sounds.NPC.EoCStab.Asset, TendrilClawPositions[i]);
                                 npc.velocity += (npc.DirectionTo(Target.Center) * DashSpeed).RotatedBy(Main.rand.NextFloat(MathHelper.ToRadians(-10), MathHelper.ToRadians(10)));
@@ -543,7 +573,7 @@ public class EyeOfCthulhu : GlobalNPC
                         TendrilDamageEnabled = false;
                         npc.velocity *= 0.94f;
                     }
-                    if (AttackTimer >= Delay + 48)
+                    if (npc.ai[0] >= Delay + 48)
                     {
                         ChangeState(npc, Main.rand.NextBool() ? AttackState.Bleed : AttackState.Multiply);
                     }
@@ -575,8 +605,11 @@ public class EyeOfCthulhu : GlobalNPC
     }
     public void ChangeState(NPC npc, AttackState state)
     {
-        AttackTimer = 0;
-        npc.GetGlobalNPC<EyeOfCthulhu>().CurrentAttack = state;
+        npc.ai[0] = 0;
+        npc.ai[2] = (int)state;
+        if (npc.life < DesperationThreshold)
+            npc.ai[2] = (int)AttackState.Bash;
+        npc.netUpdate = true;
     }
     public float EyeDilation = 0f;
 
@@ -590,7 +623,7 @@ public class EyeOfCthulhu : GlobalNPC
         {
             MoveTendrilsIdle(npc);
             drawColor = Color.White;
-            EyeDilation = MathHelper.Lerp(EyeDilation, 0.3f + (float)(Math.Sin(GlobalTimer.Value / 10f) * 0.05f), 0.2f);
+            EyeDilation = MathHelper.Lerp(EyeDilation, 0.3f + (float)(Math.Sin(Timer / 10f) * 0.05f), 0.2f);
         }
         else
             drawColor = Lighting.GetColor((npc.Top / 16).ToPoint());

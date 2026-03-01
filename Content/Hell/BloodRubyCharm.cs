@@ -1,4 +1,6 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Common.Systems;
+using Everware.Content.Base.Items;
+using Everware.Content.Misc;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,7 +91,7 @@ public class BloodRubyDashPlayer : ModPlayer
     {
         BloodRubyEffect = false;
 
-        if (DashTimer <= 0)
+        if (DashTimer <= 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
         {
             if (Player.controlRight && Player.releaseRight && Player.doubleTapCardinalTimer[2] < 15 && Player.doubleTapCardinalTimer[3] == 0)
             {
@@ -142,10 +144,11 @@ public class BloodRubyDashPlayer : ModPlayer
             if (DashTimer > DashDuration - 5)
             {
                 Player.velocity.Y = MathHelper.Min(Player.velocity.Y, 0.5f);
+                Player.fallStart = (int)Player.Center.Y;
             }
             if (DashTimer > DashDuration - 20)
             {
-
+                new SmallSmoke(Player.Center + new Vector2(Main.rand.NextFloat(10), 0).RotatedByRandom(MathHelper.TwoPi), new Vector2(Main.rand.NextFloat(1), 0).RotatedByRandom(MathHelper.TwoPi), new Color(0f, 0f, 0f, 0.5f)).Spawn();
             }
             Player.eocDash = DashTimer;
             Player.armorEffectDrawShadowEOCShield = true;
@@ -167,6 +170,8 @@ public class BloodRubyDashPlayer : ModPlayer
     public void Explosion()
     {
         SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.BloodRubyDash.Asset, Player.Center);
+
+        ScreenEffects.AddScreenShake(Player.Center, 3f, 0.6f);
 
         if (Main.myPlayer == Player.whoAmI)
         {

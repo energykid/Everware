@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Everware.Common.Systems;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria.ID;
@@ -37,6 +38,7 @@ public abstract class Particle : Entity
     public Vector2 Scale = Vector2.One;
     public Vector2 Origin = -Vector2.One;
     public SpriteEffects Effects = SpriteEffects.None;
+    public bool Pixelated = false;
     public bool DrawBelowEntities = false;
     public bool AffectedByLight = true;
     public float Opacity = 1f;
@@ -83,7 +85,11 @@ public abstract class Particle : Entity
         {
             Color c = !AffectedByLight ? Color : Color.MultiplyRGBA(Lighting.GetColor((position / 16f).ToPoint()));
             Rectangle frame = Texture.Frame((int)FrameCount.X, (int)FrameCount.Y, (int)FrameNum.X, (int)FrameNum.Y);
-            Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, Color.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
+
+            if (Pixelated)
+                PixelRendering.DrawPixelatedSprite(Texture.Value, position - Main.screenPosition, frame, Color.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
+            else
+                Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, Color.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
         }
     }
 }
