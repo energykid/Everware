@@ -18,7 +18,7 @@ public class EyeOfCthulhu : GlobalNPC
     public static int Phase2BashDamage => Main.expertMode ? 48 : 38;
     public static int TendrilDamage => Main.expertMode ? 32 : 25;
     public static int Phase2TendrilDamage => Main.expertMode ? 43 : 32;
-    public static int DesperationThreshold => Main.expertMode ? 400 : 250;
+    public static int DesperationThreshold => Main.expertMode ? Main.masterMode ? 700 : 400 : 250;
     public int Phase2Threshold = 0;
     public int Phase = 0;
 
@@ -37,7 +37,8 @@ public class EyeOfCthulhu : GlobalNPC
     public bool ContactDamage = false;
     public bool TendrilDamageEnabled = false;
     public bool MusicEnabled = false;
-    public static bool ReworkEnabled = false;
+    public static float MusicPitch = 1f;
+    public static bool ReworkEnabled = true;
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
@@ -101,6 +102,16 @@ public class EyeOfCthulhu : GlobalNPC
     int TargetedPlayer = 0;
     public override void AI(NPC npc)
     {
+        if (npc.life < DesperationThreshold)
+        {
+            MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold), 0.1f);
+        }
+        else
+        {
+            MusicPitch = 0f;
+        }
+        MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", MusicPitch);
+
         ContactDamage = false;
 
         int Plr = -1;

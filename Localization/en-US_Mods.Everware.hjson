@@ -133,6 +133,11 @@ Items: {
 		DisplayName: Music Box (Somewhere Else)
 		Tooltip: ""
 	}
+
+	EyeMusicBox: {
+		DisplayName: Eye Music Box
+		Tooltip: ""
+	}
 }
 
 Biomes: {
