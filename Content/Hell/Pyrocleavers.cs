@@ -18,6 +18,7 @@ public class Pyrocleavers : EverWeaponItem
         Item.DefaultToBasicWeapon(20, 25, DamageClass.Melee);
         Item.shoot = ModContent.ProjectileType<PyrocleaverProjectile>();
         Item.shootSpeed = 8f;
+        Item.width = Item.height = 32;
         Item.autoReuse = true;
         Item.UseSound = Assets.Sounds.Gear.Weapon.PyrocleaversThrow.Asset with { PitchVariance = 0.4f };
     }

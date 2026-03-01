@@ -35,7 +35,8 @@ public class HellPodTileEntity : ModTileEntity
     public static List<int> PossibleGreaterItems => [
     ItemID.ObsidianRose,
     ItemID.LavaCharm,
-    ModContent.ItemType<BloodRubyCharm>()];
+    ModContent.ItemType<BloodRubyCharm>(),
+    ModContent.ItemType<Pyrocleavers>()];
 
     public static int MPSyncWorkaround = 0;
 
