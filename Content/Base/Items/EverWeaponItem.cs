@@ -1,5 +1,6 @@
 ﻿using Everware.Common.Players;
 using Everware.Core.Projectiles;
+using Everware.Utils;
 using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -97,6 +98,15 @@ public abstract class EverWeaponItem : EverItem
             if (projectile.ModProjectile is EverHoldoutProjectile && projectile.owner == player.whoAmI && projectile.active) return false;
         }
 
-        return base.CanUseItem(player) && player.ownedProjectileCounts[(int)HoldoutType] < 1;
+        return base.CanUseItem(player) && (HoldoutType == null || player.ownedProjectileCounts[(int)HoldoutType] < 1);
+    }
+
+    public void BaseThrowingUseAnimation(Player player)
+    {
+        float time = ItemTime(player);
+
+        float rot = MathHelper.ToRadians(-90 + Easing.KeyFloat(time, 0f, player.itemAnimationMax, -50, 170, Easing.InBack)) * player.direction;
+
+        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, rot);
     }
 }

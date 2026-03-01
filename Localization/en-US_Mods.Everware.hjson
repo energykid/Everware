@@ -147,6 +147,11 @@ Items: {
 			Dashing also briefly stops you from falling
 			'''
 	}
+
+	Pyrocleavers: {
+		DisplayName: Pyrocleavers
+		Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -169,4 +174,6 @@ Projectiles: {
 	CthulhuBloodProjectile.DisplayName: Blood
 	EyeOfCthulhuTendrilHitbox.DisplayName: Cthulhu Tendril
 	BloodRubyExplosion.DisplayName: Explosion
+	FloorIsLava.DisplayName: Floor Is Lava
+	PyrocleaverProjectile.DisplayName: Pyrocleaver Projectile
 }
