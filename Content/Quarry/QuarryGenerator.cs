@@ -11,7 +11,8 @@ public static class QuarryGenerator
 {
     public static void GenerateQuarry(Point p)
     {
-        ushort RebarWallType = (ushort)ModContent.WallType<RebarRodPlacedUnfriendly>();
+        ushort RebarWallType = (ushort)ModContent.WallType<RebarRodPlaced>();
+        ushort RebarWallType2 = (ushort)ModContent.WallType<RebarRodPlacedUnfriendly>();
         ushort BrickType = (ushort)ModContent.TileType<SturdyBricksPlaced>();
         ushort BrickWallType = WallID.GrayBrick;
         ushort WoodType = (ushort)ModContent.TileType<WornWoodPlaced>();
@@ -29,7 +30,7 @@ public static class QuarryGenerator
                     if (new Vector2(BasePoint.X + i, BasePoint.Y + (j / 1.4f)).Distance(BasePoint.ToVector2()) < 10)
                     {
                         WorldGen.KillWall(BasePoint.X + i, BasePoint.Y + j);
-                        WorldGen.PlaceWall(BasePoint.X + i, BasePoint.Y + j, RebarWallType, true);
+                        WorldGen.PlaceWall(BasePoint.X + i, BasePoint.Y + j, Main.rand.NextBool(3) ? RebarWallType : RebarWallType2, true);
                     }
                 }
             }

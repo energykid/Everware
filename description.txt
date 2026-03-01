@@ -1,5 +1,12 @@
 Everware v0.1 - humble beginnings
 
-added the Kiln and Quarry structures, interchangeably generating. generating a drunk world spawns both.
+added the Kiln and Quarry structures, interchangeably generating. generating a drunk world spawns both
 added Kilnstone armor and the Kilnpost, craftable only at the Kiln
 added Rebar armor and the Rebuker, craftable only at the Quarry
+
+Everware v0.1.4 - polishing things up before 0.2
+
+added a new menu, "Somewhere Else," with a custom OST and logo
+added music boxes for all existing content with associated music
+you can craft the music box for the new menu theme using all other music boxes in the mod
+various small balancing and gameplay changes

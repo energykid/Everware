@@ -19,7 +19,7 @@ public class Rebuker : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(26, 35, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(20, 45, DamageClass.Ranged);
         Item.knockBack = 1f;
     }
 
