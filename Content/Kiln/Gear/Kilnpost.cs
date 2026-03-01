@@ -49,6 +49,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override void SendExtraAI(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
+        writer.Write(Timer);
         writer.Write(LastHitNPC);
         writer.Write(Spin);
         writer.Write(BaseRot);
@@ -59,6 +60,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
+        Timer = reader.ReadInt32();
         LastHitNPC = reader.ReadInt32();
         Spin = reader.ReadSingle();
         BaseRot = reader.ReadSingle();
@@ -88,7 +90,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     {
         Timer++;
         TwoHanded = false;
-        if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1)
+        if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1 && Main.myPlayer == Projectile.owner)
         {
             Projectile.ai[1] = 0f;
             Projectile.ai[2] = 70f;
@@ -114,6 +116,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
         if (Owner.ItemAnimationEndingOrEnded && HasMouseBeenReleased && State != "Breakaway")
         {
             BreakOffSpear();
+            Projectile.netUpdate = true;
         }
 
         if (State == "Spin")
