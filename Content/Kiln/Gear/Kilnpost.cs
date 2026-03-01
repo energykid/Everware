@@ -111,7 +111,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
             Projectile.netUpdate = true;
         }
 
-        if ((Timer == NetworkOwner.AnimationTime) && HasMouseBeenReleased && State != "Breakaway")
+        if (Owner.ItemAnimationEndingOrEnded && HasMouseBeenReleased && State != "Breakaway")
         {
             BreakOffSpear();
         }

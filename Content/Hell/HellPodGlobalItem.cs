@@ -1,4 +1,4 @@
-﻿/* REMOVED TEMPORARILY
+﻿
 
 using Everware.Content.Base;
 using Everware.Utils;
@@ -116,4 +116,3 @@ public class HellPodGlobalItem : GlobalItem
     }
 }
 
-REMOVED TEMPORARILY */

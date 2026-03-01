@@ -135,8 +135,13 @@ Items: {
 	}
 
 	EyeMusicBox: {
-		DisplayName: Eye Music Box
+		DisplayName: Music Box (Eye of Cthulhu)
 		Tooltip: ""
+	}
+
+	BloodRubyCharm: {
+		DisplayName: Devil's Ruby
+		Tooltip: Double tap a direction to dash forward with a damaging explosive blast
 	}
 }
 
@@ -159,4 +164,5 @@ Projectiles: {
 	RebukerHoldout.DisplayName: Rebuker
 	CthulhuBloodProjectile.DisplayName: Cthulhu Blood Projectile
 	EyeOfCthulhuTendrilHitbox.DisplayName: Eye Of Cthulhu Tendril Hitbox
+	BloodRubyExplosion.DisplayName: Blood Ruby Explosion
 }

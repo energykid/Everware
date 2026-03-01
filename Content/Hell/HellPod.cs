@@ -1,6 +1,4 @@
-﻿/* REMOVED TEMPORARILY
-
-using Everware.Content.Base;
+﻿using Everware.Content.Base;
 using Everware.Content.Base.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -36,7 +34,8 @@ public class HellPodTileEntity : ModTileEntity
         ];
     public static List<int> PossibleGreaterItems => [
     ItemID.ObsidianRose,
-    ItemID.LavaCharm];
+    ItemID.LavaCharm,
+    ModContent.ItemType<BloodRubyCharm>()];
 
     public static int MPSyncWorkaround = 0;
 
@@ -489,5 +488,3 @@ public class HellPodGlobalProjectile : GlobalProjectile
         }
     }
 }
-
-REMOVED TEMPORARILY */
