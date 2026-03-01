@@ -73,7 +73,6 @@ public class KilnpostHoldout : EverHoldoutProjectile
         Projectile.width = 90;
         Projectile.height = 90;
         State = "Thrust";
-        if (Main.myPlayer != Projectile.owner && Main.netMode != NetmodeID.SinglePlayer) State = "Spin";
         Projectile.netUpdate = true;
     }
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
