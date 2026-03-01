@@ -55,12 +55,15 @@ public class LastPlayerMinedItem : GlobalItem
                     {
                         tileTarget.Get<LastPlayerMinedData>().WhichPlayerAmI = self.whoAmI;
 
-                        ModPacket packet = Everware.Instance.GetPacket();
-                        packet.Write("SetLastPlayerMined");
-                        packet.Write(x);
-                        packet.Write(y);
-                        packet.Write(self.whoAmI);
-                        packet.Send();
+                        if (Main.netMode != NetmodeID.SinglePlayer)
+                        {
+                            ModPacket packet = Everware.Instance.GetPacket();
+                            packet.Write("SetLastPlayerMined");
+                            packet.Write(x);
+                            packet.Write(y);
+                            packet.Write(self.whoAmI);
+                            packet.Send();
+                        }
                     }
                 }
             }

@@ -15,5 +15,11 @@ public class Kilnstone : EverPlaceableItem
         recipe.AddIngredient(ItemID.StoneBlock, 1);
         recipe.AddTile(ModContent.TileType<ForgingKiln>());
         recipe.Register();
+
+        Recipe recipe2 = CreateRecipe(1);
+        recipe2.AddIngredient(ItemID.DirtBlock, 1);
+        recipe2.AddIngredient(ItemID.StoneBlock, 1);
+        recipe2.AddTile(ModContent.TileType<ForgingKiln>());
+        recipe2.Register();
     }
 }

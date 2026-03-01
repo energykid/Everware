@@ -1,4 +1,6 @@
-﻿using Everware.Content.Base;
+﻿/* REMOVED TEMPORARILY
+
+using Everware.Content.Base;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -113,3 +115,5 @@ public class HellPodGlobalItem : GlobalItem
         return base.PreDrawInWorld(item, spriteBatch, lightColor, alphaColor, ref rotation, ref scale, whoAmI);
     }
 }
+
+REMOVED TEMPORARILY */
