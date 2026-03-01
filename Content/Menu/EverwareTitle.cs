@@ -15,7 +15,7 @@ public class EverwareTitle : ModMenu
     public override bool PreDrawLogo(SpriteBatch spriteBatch, ref Vector2 logoDrawCenter, ref float logoRotation, ref float logoScale, ref Color drawColor)
     {
         var LogoEffect = Assets.Effects.Menu.EverwareLogoEffect.CreateLogoEffect();
-        LogoEffect.Parameters.Timer = -UpdateTimer / 1000f;
+        LogoEffect.Parameters.Timer = UpdateTimer / 2000f;
         LogoEffect.Parameters.TextResolution = Assets.Textures.Menu.Logo.Asset.Size();
         LogoEffect.Parameters.FillResolution = Assets.Textures.Menu.LogoFill.Asset.Size();
         LogoEffect.Parameters.FillTexture = Assets.Textures.Menu.LogoFill.Asset.Value;

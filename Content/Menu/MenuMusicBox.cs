@@ -1,5 +1,10 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Content.Base;
+using Everware.Content.Base.Items;
+using Everware.Content.Kiln.Tiles;
+using Everware.Content.Quarry.Tiles;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria.DataStructures;
+using Terraria.GameContent.Drawing;
 using Terraria.GameContent.ObjectInteractions;
 using Terraria.ID;
 using Terraria.Localization;
@@ -26,6 +31,15 @@ public class MenuMusicBox : EverItem
     public override void SetDefaults()
     {
         Item.DefaultToMusicBox(ModContent.TileType<MenuMusicBoxPlaced>(), 0);
+    }
+
+    public override void AddRecipes()
+    {
+        Recipe recipe = Recipe.Create(Type);
+        recipe.AddIngredient<KilnMusicBox>();
+        recipe.AddIngredient<QuarryMusicBox>();
+        recipe.AddTile(TileID.TinkerersWorkbench);
+        recipe.Register();
     }
 }
 
@@ -62,6 +76,8 @@ public class MenuMusicBoxPlaced : ModTile
         return true;
     }
 
+    public static int Timer = 0;
+
     public override void EmitParticles(int i, int j, Tile tileCache, short tileFrameX, short tileFrameY, Color tileLight, bool visible)
     {
         // This code spawns the music notes when the music box is open.
@@ -88,5 +104,33 @@ public class MenuMusicBoxPlaced : ModTile
         }
 
         Gore.NewGore(new EntitySource_TileUpdate(i, j), SpawnPosition, NoteMovement, MusicNote, 0.8f);
+    }
+    public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+    {
+        Tile t = Main.tile[i, j];
+        if (t.TileFrameX == 0 || t.TileFrameX == 36)
+        {
+            if (t.TileFrameY == 0)
+            {
+                Main.instance.TilesRenderer.AddSpecialPoint(i, j, TileDrawing.TileCounterType.CustomNonSolid);
+            }
+        }
+    }
+    public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        return true;
+    }
+    public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        Color lightColor = Lighting.GetColor(i + 1, j + 1);
+
+        Tile t = Main.tile[i, j];
+
+        int v = (int)(GlobalTimer.Value / 5);
+
+        Rectangle frame = Assets.Textures.Menu.MenuMusicBoxPlaced_Animated.Asset.Frame(8);
+        if (t.TileFrameX == 36) frame = Assets.Textures.Menu.MenuMusicBoxPlaced_Animated.Asset.Frame(8, 1, 1 + (v % 6));
+
+        spriteBatch.Draw(Assets.Textures.Menu.MenuMusicBoxPlaced_Animated.Asset.Value, new Vector2((float)i * 16f, (float)j * 16f) - Main.screenPosition + new Vector2(36 / 2, 36 / 2) + new Vector2(-3, 0), frame, lightColor, 0f, frame.Size() / 2, 1f, SpriteEffects.None, 0f);
     }
 }
