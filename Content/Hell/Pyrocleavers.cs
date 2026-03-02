@@ -92,7 +92,7 @@ public class PyrocleaverProjectile : EverProjectile
             if (Projectile.ai[0] > 20)
             {
                 if (Projectile.velocity.Y > 2 && Projectile.ai[0] > 40)
-                    SlashOpacity = MathHelper.Lerp(SlashOpacity, 1f, 0.1f);
+                    SlashOpacity = MathHelper.Lerp(SlashOpacity, 1f, 0.05f);
                 Projectile.extraUpdates = 1;
                 Projectile.velocity.X *= 0.99f;
                 Projectile.velocity.Y += 0.01f * (Projectile.ai[0] - 20);
