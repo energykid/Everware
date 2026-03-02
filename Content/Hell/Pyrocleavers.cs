@@ -54,10 +54,13 @@ public class PyrocleaverProjectile : EverProjectile
 
             Projectile.velocity = Vector2.Zero;
             Projectile.ai[1] = 1;
+
+            Projectile.Center = Projectile.Center.Grounded();
         }
         Projectile.hide = true;
         if (Projectile.ai[1] == 1)
         {
+            SlashOpacity *= 0.2f;
             Projectile.extraUpdates = 0;
             if (Projectile.ai[2] % 5 == 2)
             {
@@ -88,11 +91,13 @@ public class PyrocleaverProjectile : EverProjectile
             Projectile.ai[0]++;
             if (Projectile.ai[0] > 20)
             {
+                if (Projectile.velocity.Y > 2 && Projectile.ai[0] > 40)
+                    SlashOpacity = MathHelper.Lerp(SlashOpacity, 1f, 0.1f);
                 Projectile.extraUpdates = 1;
                 Projectile.velocity.X *= 0.99f;
                 Projectile.velocity.Y += 0.01f * (Projectile.ai[0] - 20);
             }
-            Projectile.rotation += MathHelper.ToRadians(Projectile.velocity.X * 3f);
+            Projectile.rotation += (Math.Abs(MathHelper.ToRadians(Projectile.velocity.X * 1.2f)) + Math.Abs(MathHelper.ToRadians(Projectile.velocity.Y * 1.2f))) * Math.Sign(Projectile.velocity.X);
         }
     }
     public SpriteEffects effects = SpriteEffects.None;
@@ -104,15 +109,29 @@ public class PyrocleaverProjectile : EverProjectile
     {
         behindNPCsAndTiles.Add(index);
     }
+    float SlashOpacity = 0f;
     public override bool PreDraw(ref Color lightColor)
     {
         var asset = Assets.Textures.Hell.Pyrocleavers.Asset;
         var asset2 = Assets.Textures.Hell.Pyrocleavers_Glow.Asset;
 
+        var asset3 = Assets.Textures.Misc.Slash.Asset;
+        var asset4 = Assets.Textures.Misc.LensFlash.Asset;
+
         var frame = asset.Frame();
+
+        var slashOrigin = new Vector2(effects == SpriteEffects.None ? -20 : asset3.Size().X + 20, asset3.Size().Y / 2f);
+
+        DrawingUtils.DrawTrailBehind(Projectile, Color.Orange.MultiplyRGBA(new(1f, 1f, 1f, 0.5f)), Color.Maroon.MultiplyRGBA(new(0.1f, 0.1f, 0.1f, 0f)), Vector2.Zero, customTexture: Assets.Textures.Hell.Pyrocleavers_Glow.Asset);
 
         Main.EntitySpriteDraw(asset.Value, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, frame.Size() / 2f, 1f, effects);
         Main.EntitySpriteDraw(asset2.Value, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, frame.Size() / 2f, 1f, effects);
+
+        Main.EntitySpriteDraw(asset3.Value, Projectile.Center - Main.screenPosition, asset3.Frame(), Color.Maroon.MultiplyRGBA(new(SlashOpacity, SlashOpacity, SlashOpacity, 0.2f * SlashOpacity)), Projectile.rotation, slashOrigin, 0.35f, effects);
+        Main.EntitySpriteDraw(asset3.Value, Projectile.Center - Main.screenPosition, asset3.Frame(), Color.OrangeRed.MultiplyRGBA(new(SlashOpacity, SlashOpacity, SlashOpacity, 0.2f * SlashOpacity)), Projectile.rotation, slashOrigin, 0.425f, effects);
+        Main.EntitySpriteDraw(asset3.Value, Projectile.Center - Main.screenPosition, asset3.Frame(), Color.Orange.MultiplyRGBA(new(SlashOpacity, SlashOpacity, SlashOpacity, 0.2f * SlashOpacity)), Projectile.rotation, slashOrigin, 0.5f, effects);
+
+        Main.EntitySpriteDraw(asset4.Value, Projectile.Center - Main.screenPosition + new Vector2(effects == SpriteEffects.None ? 30 : -30, 0).RotatedBy(Projectile.rotation), asset4.Frame(), Color.Orange.MultiplyRGBA(new(SlashOpacity, SlashOpacity, SlashOpacity, 0.2f * SlashOpacity)), 0f, asset4.Size() / 2f, 0.3f, SpriteEffects.None);
 
         return false;
     }
@@ -134,15 +153,24 @@ public class FloorIsLava : EverProjectile
     }
     public override void AI()
     {
-        Lighting.AddLight(Projectile.Center, new Vector3(0.5f, 0.3f, 0f) * (Projectile.ai[0] / 5));
+        Lighting.AddLight(Projectile.Center, new Vector3(0.5f, 0.3f, 0f) * MathHelper.Clamp((Projectile.ai[0] / 5), 0f, 1f));
 
         Projectile.position = Projectile.position.Grounded() + new Vector2(0, -16);
-        Projectile.position.Y = (float)Math.Round(Projectile.position.Y / 16) * 16;
+        if (Main.tile[((Projectile.position / 16) + new Vector2(0, 1)).ToPoint()].IsHalfBlock)
+        {
+            Projectile.position.Y += 8;
+        }
+        Projectile.position.Y = (float)Math.Round(Projectile.position.Y / 8) * 8;
         base.AI();
         Projectile.ai[1]++;
         if (Projectile.ai[1] < 200)
         {
-            Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 4f, 0.15f);
+            Projectile.ai[0] += 0.45f;
+            if (Projectile.ai[0] > 3) Projectile.ai[0] -= 0.25f;
+            if (Projectile.ai[0] > 7)
+            {
+                Projectile.ai[0] -= 4;
+            }
         }
         else
         {
@@ -161,7 +189,7 @@ public class FloorIsLava : EverProjectile
         int tileFrameX = 0;
 
         int i = (int)Projectile.position.X / 16;
-        int j = (int)Projectile.position.Y / 16;
+        int j = (int)Projectile.position.Y / 8;
 
         if (IsFloorLavaAt(i - 1, j))
         {
@@ -179,9 +207,12 @@ public class FloorIsLava : EverProjectile
             }
         }
 
-        var frame = asset.Frame(4, 5, tileFrameX, (int)MathHelper.Max((float)Math.Floor(Projectile.ai[0]), 0));
+        var frame = asset.Frame(4, 8, tileFrameX, (int)MathHelper.Max((float)Math.Floor(Projectile.ai[0]), 0));
 
-        Main.EntitySpriteDraw(asset.Value, Projectile.Center - Main.screenPosition + new Vector2(0, Main.tile[i, j + 1].IsHalfBlock ? 24 : 16), frame, Color.White, 0f, frame.Size() / 2f, 1f, SpriteEffects.None);
+        SpriteEffects eff = SpriteEffects.None;
+        if (i % 2 == 0 && tileFrameX == 2) eff = SpriteEffects.FlipHorizontally;
+
+        Main.EntitySpriteDraw(asset.Value, Projectile.Center - Main.screenPosition + new Vector2(0, 16) + new Vector2(0, 3), frame, Color.White, 0f, frame.Size() / 2f, 1f, eff);
 
         return false;
     }
@@ -189,7 +220,7 @@ public class FloorIsLava : EverProjectile
     {
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
-            if (projectile.Distance(new Vector2((i * 16) + 8, (j * 16) + 8)) < 2)
+            if (projectile.Distance(new Vector2((i * 16) + 8, (j * 8) + 8)) < 2 && projectile.ai[0] > 3)
             {
                 return true;
             }

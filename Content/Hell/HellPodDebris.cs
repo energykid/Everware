@@ -158,13 +158,13 @@ public class HellPodPopShockwave : Particle
 
         for (int i = 0; i < 4; i++)
         {
-            Main.spriteBatch.Draw(A.Value, position + new Vector2(2, 0).RotatedBy(i * MathHelper.PiOver2) - Main.screenPosition, A.Frame(), Color.White, 0f, A.Size() / 2f, 1f, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(A2.Value, position + new Vector2(2, 0).RotatedBy(i * MathHelper.PiOver2) - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, 1f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(A.Value, position + new Vector2(2, 0).RotatedBy(i * MathHelper.PiOver2) - Main.screenPosition, A.Frame(), Color.White, 0f, A.Size() / 2f, Scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(A2.Value, position + new Vector2(2, 0).RotatedBy(i * MathHelper.PiOver2) - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, Scale, SpriteEffects.None, 0);
         }
 
-        Main.spriteBatch.Draw(A.Value, position - Main.screenPosition, A.Frame(), Color.White, 0f, A.Size() / 2f, 1f, SpriteEffects.None, 0);
+        Main.spriteBatch.Draw(A.Value, position - Main.screenPosition, A.Frame(), Color.White, 0f, A.Size() / 2f, Scale, SpriteEffects.None, 0);
 
-        Main.spriteBatch.Draw(A2.Value, position - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, 1f, SpriteEffects.None, 0);
+        Main.spriteBatch.Draw(A2.Value, position - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, Scale, SpriteEffects.None, 0);
 
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
