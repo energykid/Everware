@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria.DataStructures;
+using Terraria.ID;
 
 namespace Everware.Content.Hell;
 
@@ -20,7 +21,7 @@ public class Pyrocleavers : EverWeaponItem
         Item.shootSpeed = 8f;
         Item.width = Item.height = 32;
         Item.autoReuse = true;
-        Item.UseSound = Assets.Sounds.Gear.Weapon.PyrocleaversThrow.Asset with { PitchVariance = 0.4f };
+        Item.UseSound = Assets.Sounds.Gear.Weapon.PyrocleaverThrow.Asset with { PitchRange = (0f, 0.4f), MaxInstances = 5 };
     }
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {
@@ -40,12 +41,21 @@ public class PyrocleaverProjectile : EverProjectile
         Projectile.DamageType = DamageClass.Melee;
         Projectile.penetrate = -1;
         Projectile.extraUpdates = 4;
+        SlashOpacity = 1f;
+    }
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        target.AddBuff(BuffID.OnFire, 120);
     }
     public override void AI()
     {
         Lighting.AddLight(Projectile.Center, new Vector3(0.5f, 0.3f, 0f));
-        if (Projectile.ai[1] == 0 && WorldGen.SolidOrSlopedTile(Main.tile[(Projectile.Center / 16f).ToPoint()]))
+        Point p = (Projectile.Center / 16f).ToPoint();
+        if (Projectile.ai[1] == 0 && WorldGen.SolidOrSlopedTile(Main.tile[p]))
         {
+            SoundEngine.PlaySound(SoundID.Dig, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Tink with { Pitch = -1 }, Projectile.Center);
+
             SoundStyle style = Assets.Sounds.Gear.Weapon.PyrocleaversLavaBubble.Asset;
             style.PitchRange = (-0.5f, 0f);
             style.MaxInstances = 20;
@@ -56,6 +66,8 @@ public class PyrocleaverProjectile : EverProjectile
             Projectile.ai[1] = 1;
 
             Projectile.Center = Projectile.Center.Grounded();
+
+
         }
         Projectile.hide = true;
         if (Projectile.ai[1] == 1)
@@ -93,10 +105,14 @@ public class PyrocleaverProjectile : EverProjectile
             {
                 if (Projectile.velocity.Y > 2 && Projectile.ai[0] > 40)
                     SlashOpacity = MathHelper.Lerp(SlashOpacity, 1f, 0.05f);
+                else
+                    SlashOpacity = MathHelper.Lerp(SlashOpacity, 0f, 0.05f);
                 Projectile.extraUpdates = 1;
                 Projectile.velocity.X *= 0.99f;
                 Projectile.velocity.Y += 0.01f * (Projectile.ai[0] - 20);
             }
+            else
+                SlashOpacity = MathHelper.Lerp(SlashOpacity, 0f, 0.1f);
             Projectile.rotation += (Math.Abs(MathHelper.ToRadians(Projectile.velocity.X * 1.2f)) + Math.Abs(MathHelper.ToRadians(Projectile.velocity.Y * 1.2f))) * Math.Sign(Projectile.velocity.X);
         }
     }
@@ -139,6 +155,10 @@ public class PyrocleaverProjectile : EverProjectile
 
 public class FloorIsLava : EverProjectile
 {
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        target.AddBuff(BuffID.OnFire, 30);
+    }
     public override string Texture => "Everware/Assets/Textures/Hell/FloorIsLava";
     public override void SetDefaults()
     {
