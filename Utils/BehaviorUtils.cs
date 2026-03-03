@@ -31,4 +31,40 @@ public static class BehaviorUtils
         Tile tile = Main.tile[i, j];
         return WorldGen.SolidOrSlopedTile(tile) || Main.tileSolidTop[tile.type] || Main.tile[i, j].LiquidAmount > 0;
     }
+
+    public static bool ClosestNPC(ref NPC target, float maxDistance, Vector2 position, bool ignoreTiles = false, int overrideTarget = -1, int forcedNPCType = -1, bool hostilesOnly = false)
+    {
+        bool foundTarget = false;
+        if (overrideTarget != -1)
+        {
+            if ((Main.npc[overrideTarget].Center - position).Length() < maxDistance)
+            {
+                target = Main.npc[overrideTarget];
+                return true;
+            }
+
+        }
+        for (int k = 0; k < 200; k++)
+        {
+            NPC possibleTarget = Main.npc[k];
+            float distance = (possibleTarget.Center - position).Length();
+            bool found = distance < maxDistance && possibleTarget.active && (Collision.CanHit(position, 0, 0, possibleTarget.Center, 0, 0) || ignoreTiles);
+            if (hostilesOnly)
+            {
+                if (possibleTarget.friendly || possibleTarget.townNPC || possibleTarget.dontTakeDamage || possibleTarget.CountsAsACritter)
+                    found = false;
+            }
+            if (found)
+            {
+                if (forcedNPCType == -1 || forcedNPCType == Main.npc[k].type)
+                {
+                    target = Main.npc[k];
+                    foundTarget = true;
+
+                    maxDistance = (target.Center - position).Length();
+                }
+            }
+        }
+        return foundTarget;
+    }
 }

@@ -10,6 +10,9 @@
 	<ItemGroup>
 	  <None Include="Content\Base\Tiles\EverMultitile.cs" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Assets\Effects\Hell\" />
+	</ItemGroup>
 
 	<!-- References -->
 

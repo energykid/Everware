@@ -109,4 +109,20 @@ public abstract class EverWeaponItem : EverItem
 
         player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, rot);
     }
+    public void DefaultToSummonWeapon(int damage, float knockBack, int useTime, int manaUse, int minionID, int buffID, float shootSpeed = 15)
+    {
+        Item.damage = damage;
+        Item.knockBack = knockBack;
+        Item.useTime = useTime;
+        Item.useAnimation = useTime;
+        Item.shootSpeed = shootSpeed;
+        Item.mana = manaUse;
+        Item.noMelee = true;
+        Item.useStyle = ItemUseStyleID.Swing;
+        Item.DamageType = DamageClass.Summon;
+        Item.UseSound = SoundID.Item77;
+        Item.buffType = buffID;
+        Item.buffTime = 1;
+        Item.shoot = minionID;
+    }
 }

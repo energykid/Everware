@@ -143,14 +143,27 @@ Items: {
 		DisplayName: Devil's Ruby
 		Tooltip:
 			'''
-			Double tap a direction to dash forward with a damaging explosive blast
+			Double tap a direction to dash, creating a damaging explosion behind you
 			Dashing also briefly stops you from falling
 			'''
 	}
 
 	Pyrocleavers: {
 		DisplayName: Pyrocleavers
-		Tooltip: ""
+		Tooltip:
+			'''
+			Throws molten cleavers that melt into the floor, leaving lingering lava
+			If hitting a wall, the cleavers will bounce off of it
+			'''
+	}
+
+	SkullStaff: {
+		DisplayName: Obsidian Skull Staff
+		Tooltip: 
+			'''
+			Summons a terrifying, laughing, screaming obsidian skull that explodes on contact
+			Regenerates shortly after hitting an enemy
+			'''
 	}
 }
 
@@ -173,7 +186,16 @@ Projectiles: {
 	RebukerHoldout.DisplayName: Rebuker
 	CthulhuBloodProjectile.DisplayName: Blood
 	EyeOfCthulhuTendrilHitbox.DisplayName: Cthulhu Tendril
-	BloodRubyExplosion.DisplayName: Explosion
-	FloorIsLava.DisplayName: Floor Is Lava
-	PyrocleaverProjectile.DisplayName: Pyrocleaver Projectile
+	BloodRubyExplosion.DisplayName: Explosive Boost
+	FloorIsLava.DisplayName: Molten Lava
+	PyrocleaverProjectile.DisplayName: Pyrocleaver
+	SkullMinion.DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
+	SkullMinionExplosion.DisplayName: Skeletal Explosion
+}
+
+Buffs: {
+	SkullMinionBuff: {
+		DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
+		Description: The terrifying, laughing, screaming obsidian skull will fight for you
+	}
 }
