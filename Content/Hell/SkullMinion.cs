@@ -16,10 +16,10 @@ class SkullMinion : EverMinion
 {
     public override string Texture => "Everware/Assets/Textures/Hell/SkullMinion";
     public override int BuffType => ModContent.BuffType<SkullMinionBuff>();
-
-    public override void NetOnSpawn()
+    public override void SetDefaults()
     {
-        base.NetOnSpawn();
+        Projectile.friendly = true;
+        Projectile.penetrate = -1;
         Projectile.velocity = new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
         Projectile.tileCollide = false;
         Projectile.Opacity = 0f;

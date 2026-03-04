@@ -62,6 +62,14 @@ public class Easing
             return pointA;
         else return pointB;
     }
+    public static Vector2 KeyVector2(float time, float start, float end, Vector2 pointA, Vector2 pointB, AnimationCurve curve, Vector2 def)
+    {
+        if (time >= start && time <= end)
+        {
+            return Vector2.Lerp(pointA, pointB, curve((time - start) / (end - start)));
+        }
+        return def;
+    }
 
     #region Easing Curves
 

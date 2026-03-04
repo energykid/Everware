@@ -159,11 +159,16 @@ Items: {
 
 	SkullStaff: {
 		DisplayName: Obsidian Skull Staff
-		Tooltip: 
+		Tooltip:
 			'''
 			Summons a terrifying, laughing, screaming obsidian skull that explodes on contact
 			Regenerates shortly after hitting an enemy
 			'''
+	}
+
+	HotShot: {
+		DisplayName: Hot Shot
+		Tooltip: ""
 	}
 }
 
@@ -191,6 +196,9 @@ Projectiles: {
 	PyrocleaverProjectile.DisplayName: Pyrocleaver
 	SkullMinion.DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
 	SkullMinionExplosion.DisplayName: Skeletal Explosion
+	HotShotHoldout.DisplayName: Hot Shot Holdout
+	HotShotLargeProjectile.DisplayName: Hot Shot Large Projectile
+	HotShotSlag.DisplayName: Hot Shot Slag
 }
 
 Buffs: {
