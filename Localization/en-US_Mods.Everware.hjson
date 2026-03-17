@@ -168,7 +168,11 @@ Items: {
 
 	HotShot: {
 		DisplayName: Hot Shot
-		Tooltip: ""
+		Tooltip:
+			'''
+			Right click to pump, increasing bullet count and speed while reducing spread
+			Three consecutive pumps before firing maxes your charge and causes heavy recoil when attacking
+			'''
 	}
 }
 

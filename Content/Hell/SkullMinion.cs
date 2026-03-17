@@ -1,4 +1,5 @@
 ﻿using Everware.Common.Systems;
+using Everware.Content.Base;
 using Everware.Content.Base.Buffs;
 using Everware.Content.Base.Projectiles;
 using Everware.Core.Projectiles;
@@ -16,6 +17,11 @@ class SkullMinion : EverMinion
 {
     public override string Texture => "Everware/Assets/Textures/Hell/SkullMinion";
     public override int BuffType => ModContent.BuffType<SkullMinionBuff>();
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+        Main.projPet[Type] = true;
+    }
     public override void SetDefaults()
     {
         Projectile.friendly = true;
@@ -122,7 +128,25 @@ class SkullMinion : EverMinion
     public static readonly Asset<Texture2D> MainTexture = Assets.Textures.Hell.SkullMinion.Asset;
     public static readonly Asset<Texture2D> GlowmaskTexture = Assets.Textures.Hell.SkullMinion_Glow.Asset;
     public override void PostDraw(Color lightColor)
-    { }
+    {
+        SpriteEffects eff = Projectile.velocity.X < 0 ? SpriteEffects.FlipVertically : SpriteEffects.None;
+
+        Rectangle frame = MainTexture.Frame(1, 7, 0, (int)(Math.Floor(GlobalTimer.Value / 5)) % 7);
+        Vector2 orig = frame.Size() / 2f;
+        SpriteEffectRendering.DrawSprite(
+            MainTexture.Value,
+            Projectile.Center - Main.screenPosition,
+            frame,
+            Color.Orange.MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, 0f)),
+            Projectile.rotation,
+            orig,
+            new Vector2(Projectile.scale + 0.2f + MathHelper.Lerp(1f, 0f, Projectile.Opacity)),
+            eff
+        );
+
+        SpriteEffectRendering.DrawSprite(MainTexture.Value, Projectile.Center - Main.screenPosition, frame, Color.Lerp(lightColor, Color.White, 0.2f).MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, Projectile.Opacity)), Projectile.rotation, orig, new(Projectile.scale), eff);
+        SpriteEffectRendering.DrawSprite(GlowmaskTexture.Value, Projectile.Center - Main.screenPosition, frame, Color.White.MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, Projectile.Opacity)), Projectile.rotation, orig, new(Projectile.scale), eff);
+    }
     public override bool PreDraw(ref Color lightColor)
     {
         List<Vector2> vec2s = [];
@@ -155,25 +179,6 @@ class SkullMinion : EverMinion
 
         float s = Projectile.velocity.Length() / TrailTexture.Height();
         PixelRendering.DrawPixelatedSprite(TrailTexture.Value, Projectile.Center - Main.screenPosition, TrailTexture.Frame(3), Color.White, Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f), new Vector2(TrailTexture.Width() / 6, 0), new(0.25f, s * 5f), effect: Effect.Shader);
-
-        SpriteEffects eff = Projectile.velocity.X < 0 ? SpriteEffects.FlipVertically : SpriteEffects.None;
-
-        Projectile.frameCounter++;
-        if (Projectile.frameCounter > 5)
-        {
-            Projectile.frame++;
-            if (Projectile.frame >= 7) Projectile.frame = 0;
-            Projectile.frameCounter = 0;
-        }
-
-        Rectangle frame = MainTexture.Frame(1, 7, 0, Projectile.frame);
-        Vector2 orig = frame.Size() / 2f;
-        if (Projectile.scale > 0.7f)
-        {
-            DrawingUtils.DrawGlowBehind(Projectile, Color.Orange.MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, 0f)), new Vector2(-2, -5).RotatedBy(Projectile.rotation), eff, 2 + MathHelper.Lerp(50, 0, Projectile.Opacity), frame);
-        }
-        SpriteEffectRendering.DrawSprite(MainTexture.Value, Projectile.Center - Main.screenPosition, frame, Color.Lerp(lightColor, Color.White, 0.2f).MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, Projectile.Opacity)), Projectile.rotation, orig, new(Projectile.scale), eff);
-        SpriteEffectRendering.DrawSprite(GlowmaskTexture.Value, Projectile.Center - Main.screenPosition, frame, Color.White.MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, Projectile.Opacity)), Projectile.rotation, orig, new(Projectile.scale), eff);
 
         return false;
     }

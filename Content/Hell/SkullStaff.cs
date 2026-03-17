@@ -12,6 +12,7 @@ class SkullStaff : EverWeaponItem
         base.SetDefaults();
         DefaultToSummonWeapon(50, 2f, 20, 10, ModContent.ProjectileType<SkullMinion>(), ModContent.BuffType<SkullMinionBuff>(), 50);
         Item.noMelee = true;
+        Item.summon = true;
         Item.rare = ItemRarityID.LightRed;
     }
     public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)

@@ -36,7 +36,9 @@ public class HellPodTileEntity : ModTileEntity
     ItemID.ObsidianRose,
     ItemID.LavaCharm,
     ModContent.ItemType<BloodRubyCharm>(),
-    ModContent.ItemType<Pyrocleavers>()];
+    ModContent.ItemType<Pyrocleavers>(),
+    ModContent.ItemType<SkullStaff>(),
+    ModContent.ItemType<HotShot>()];
 
     public static int MPSyncWorkaround = 0;
 

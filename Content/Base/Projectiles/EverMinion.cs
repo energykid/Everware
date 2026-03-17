@@ -18,6 +18,8 @@ public abstract class EverMinion : EverProjectile
     }
     public override void AI()
     {
+        base.AI();
+
         if (!Owner.HasBuff(BuffType))
         {
             Projectile.Kill();

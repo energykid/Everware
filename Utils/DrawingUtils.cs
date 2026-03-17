@@ -135,7 +135,7 @@ public static class DrawingUtils
         }
     }
 
-    public static void DrawGlowBehind(Projectile projectile, Color color, Vector2 offset, SpriteEffects eff, float width = 2, Rectangle? frame = null)
+    public static void DrawGlowBehind(Projectile projectile, Color color, Vector2 offset, SpriteEffects eff, float width = 2, Rectangle? frame = null, Asset<Texture2D> overrideTex = null)
     {
         Asset<Texture2D> tex;
 
@@ -147,6 +147,9 @@ public static class DrawingUtils
         {
             tex = TextureAssets.Projectile[projectile.type];
         }
+
+        if (overrideTex != null)
+            tex = overrideTex;
 
         for (var i = 0; i < 360; i += 90)
         {
