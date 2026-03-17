@@ -21,9 +21,22 @@ class SkullMinion : EverMinion
     {
         base.SetStaticDefaults();
         Main.projPet[Type] = true;
+
+        ProjectileID.Sets.MinionTargettingFeature[Type] = true;
+
+        ProjectileID.Sets.MinionSacrificable[Type] = true;
+        ProjectileID.Sets.CultistIsResistantTo[Type] = true;
     }
+
+    public override bool MinionContactDamage()
+    {
+        return true;
+    }
+
     public override void SetDefaults()
     {
+        base.SetDefaults();
+        Projectile.minion = true;
         Projectile.friendly = true;
         Projectile.penetrate = -1;
         Projectile.velocity = new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
@@ -63,8 +76,9 @@ class SkullMinion : EverMinion
         }
         if (Projectile.ai[0] > 60)
         {
-            if (BehaviorUtils.ClosestNPC(ref targetNPC, 650, Owner.Center, hostilesOnly: true, ignoreTiles: true))
+            if (BehaviorUtils.ClosestNPC(ref targetNPC, 650, Owner.Center, hostilesOnly: true, ignoreTiles: true) || (Projectile.OwnerMinionAttackTargetNPC != null))
             {
+                if (Projectile.OwnerMinionAttackTargetNPC != null) targetNPC = Projectile.OwnerMinionAttackTargetNPC;
                 if (Projectile.ai[0] > 90)
                 {
                     if (Projectile.ai[0] == 91)

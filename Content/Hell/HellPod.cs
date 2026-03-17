@@ -492,3 +492,29 @@ public class HellPodGlobalProjectile : GlobalProjectile
         }
     }
 }
+
+public class HellPodGlobalPlayer : ModPlayer
+{
+    public override void PostUpdate()
+    {
+        Tile t = Main.tile[Player.tileTargetX, Player.tileTargetY];
+        if (Player.itemTime == Player.itemTimeMax - 1 && Player.HeldItem.pick > 0 && t.HasTile && t.TileType == (ushort)ModContent.TileType<HellPod>())
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                HellPod.DamagePod(Player.tileTargetX, Player.tileTargetY);
+            }
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                if (Main.LocalPlayer.whoAmI == Player.whoAmI)
+                {
+                    ModPacket packet = Everware.Instance.GetPacket();
+                    packet.Write("DamageHellPodFromServer");
+                    packet.Write((int)Player.tileTargetX);
+                    packet.Write((int)Player.tileTargetY);
+                    packet.Send();
+                }
+            }
+        }
+    }
+}

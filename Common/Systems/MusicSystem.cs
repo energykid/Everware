@@ -28,6 +28,10 @@ public class EverMusicSystem : ModSystem
                     Main.newMusic = Assets.Sounds.Music.Silence.Slot;
                 }
             }
+            else
+            {
+                MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", 0f);
+            }
         }
     }
 }

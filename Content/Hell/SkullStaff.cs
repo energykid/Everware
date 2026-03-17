@@ -15,6 +15,13 @@ class SkullStaff : EverWeaponItem
         Item.summon = true;
         Item.rare = ItemRarityID.LightRed;
     }
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+
+        ItemID.Sets.GamepadWholeScreenUseRange[Type] = true;
+        ItemID.Sets.LockOnIgnoresCollision[Type] = true;
+    }
     public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
     {
         base.ModifyShootStats(player, ref position, ref velocity, ref type, ref damage, ref knockback);
