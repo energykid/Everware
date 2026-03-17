@@ -77,6 +77,14 @@ public abstract class EverHoldoutProjectile : EverProjectile
     {
         return (base.CanDamage() == true || base.CanDamage() == null) && HitFrames > 0;
     }
+
+    public override bool PreAI()
+    {
+        if (AutoDirection)
+            Owner.direction = Math.Sign(new Vector2(1, 0).RotatedBy(Rotation).X);
+
+        return true;
+    }
     public override void AI()
     {
         if (!NetworkOwner.MouseDown && Started == false) HasMouseBeenReleased = true;
@@ -125,12 +133,20 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         return false;
     }
-    public virtual void UseAmmo(Item item, Player owner)
+    public virtual Item? UseAmmo(Item item, Player owner)
     {
         if (AmmoType != AmmoID.None)
         {
-            if (owner.HasAmmo(item)) owner.ChooseAmmo(item).stack--;
+            Item? ammo = null;
+            if (owner.HasAmmo(item))
+            {
+                ammo = owner.ChooseAmmo(item);
+                if (ammo.consumable)
+                    ammo.stack--;
+                return ammo;
+            }
         }
+        return null;
     }
     public virtual bool ShouldKill()
     {

@@ -1,8 +1,9 @@
-﻿using Everware.Common.Systems;
-using Everware.Content.Base.Items;
+﻿using Everware.Content.Base.Items;
+using Everware.Content.Misc;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -13,139 +14,280 @@ public class HotShot : EverWeaponItem
 {
     public override string Texture => "Everware/Assets/Textures/Hell/HotShot";
     public override int? HoldoutType => ModContent.ProjectileType<HotShotHoldout>();
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+        ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
+    }
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(24, 30, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(24, 60, DamageClass.Ranged);
+        Item.autoReuse = true;
+        Item.useAmmo = AmmoID.Bullet;
+    }
+    public int ChargeLevel = 0;
+    public override bool AltFunctionUse(Player player)
+    {
+        return true;
+    }
+    public override bool? UseItem(Player player)
+    {
+        if (player.altFunctionUse == 2 && player.ItemAnimationJustStarted)
+        {
+            ChargeLevel += 1;
+            ChargeLevel = Math.Clamp(ChargeLevel, 0, 3);
+        }
+        return base.UseItem(player);
+    }
+    public override bool CanUseItem(Player player)
+    {
+        Item.useTime = 45;
+        Item.useAnimation = 45;
+        if (player.altFunctionUse == 2)
+        {
+            Item.useTime = 18;
+            Item.useAnimation = 18;
+        }
+        return base.CanUseItem(player);
     }
 }
 
 public class HotShotHoldout : EverHoldoutProjectile
 {
     public override string Texture => "Everware/Assets/Textures/Hell/HotShot";
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
     }
+    public float GetChargeAmount()
+    {
+        if (Owner.HeldItem.ModItem is HotShot shot)
+        {
+            return (float)(shot.ChargeLevel);
+        }
+        return 0f;
+    }
 
     float RotLerpFactor = 1f;
+    float PumpFrame = 0f;
+    float ChargeFrame = 0f;
     public override void AI()
     {
+        Projectile.velocity = Vector2.Zero;
+
+        AmmoType = AmmoID.Bullet;
+
+        TwoHanded = true;
+
+        FrontArmExtension = 1f;
+
         Effects = Owner.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
-        Origin = Owner.direction == -1 ? new Vector2(8, 10) : new Vector2(8, 18);
+        Origin = Owner.direction == -1 ? new Vector2(7, 22 - 16) : new Vector2(7, 16);
 
         RotLerpFactor = MathHelper.Lerp(RotLerpFactor, 0.5f, 0.05f);
 
         Projectile.ai[1]++;
 
-        if (Projectile.ai[1] == 1)
+        ChargeFrame = 0;
+        if (Owner.HeldItem.ModItem is HotShot shot)
         {
-            Fire();
+            ChargeFrame = shot.ChargeLevel;
         }
 
-        Scale = Easing.KeyVector2(Projectile.ai[1], 0, 2, Vector2.One, new Vector2(0.75f, 1.25f), Easing.OutCirc, Scale);
-
-        Scale = Easing.KeyVector2(Projectile.ai[1], 2, 10, new Vector2(0.75f, 1.25f), Vector2.One, Easing.InCirc, Scale);
-
-        if (Projectile.ai[1] <= 3)
+        if (Owner.altFunctionUse == 2)
         {
-            RotationOffset -= MathHelper.ToRadians(Easing.KeyFloat(Projectile.ai[1], 0, 6, 10, 0, Easing.Linear)) * Owner.direction;
-        }
-        else if (Projectile.ai[1] <= 7)
-        {
-            RotationOffset += MathHelper.ToRadians(Easing.KeyFloat(Projectile.ai[1], 6, 15, 0, 22, Easing.Linear)) * Owner.direction;
+            if (GetChargeAmount() > 0)
+            {
+                Lighting.AddLight(Projectile.Center, 0.4f, 0.2f, 0.025f);
+            }
 
+            if (Projectile.ai[1] == 1)
+            {
+                Pump();
+            }
+            float ItemAnim = Owner.itemAnimationMax;
+
+            PumpFrame = Projectile.ai[1] / ItemAnim * 6;
+
+            Rotation = Rotation.AngleLerp(Owner.AngleTo(NetworkOwner.MousePosition), RotLerpFactor);
+
+            RotationOffset = MathHelper.Lerp(RotationOffset, MathHelper.ToRadians(10 * Owner.direction), 0.2f);
+
+            Offset = new Vector2(-10, 0).RotatedBy(Rotation);
+
+            FrontArmExtension = Easing.KeyFloat(Projectile.ai[1], 0f, ItemAnim, 0.7f, 1f, Easing.InCirc);
+
+            FrontArmRotationOffset = RotationOffset;
+            BackArmRotationOffset = RotationOffset;
         }
         else
         {
-            RotationOffset *= 0.6f;
-        }
-        Rotation = Rotation.AngleLerp(Owner.AngleTo(NetworkOwner.MousePosition), RotLerpFactor);
+            if (Projectile.ai[1] == 1)
+            {
+                Fire();
+            }
+            float ItemAnim = Owner.itemAnimationMax;
 
+            if (Projectile.ai[1] == 3)
+            {
+                if (Owner.HeldItem.ModItem is HotShot sh)
+                {
+                    sh.ChargeLevel = 0;
+                }
+            }
+
+            if (GetChargeAmount() > 0)
+            {
+                Lighting.AddLight(Projectile.Center, 0.4f, 0.2f, 0.025f);
+            }
+
+            float rotOffset = 0f;
+            rotOffset = Easing.KeyFloat(Projectile.ai[1], 0f, ItemAnim / 8f, 0f, 30f, Easing.OutCirc, rotOffset);
+            rotOffset = Easing.KeyFloat(Projectile.ai[1], ItemAnim / 8f, ItemAnim / 8f * 2, 30f, 20f, Easing.Linear, rotOffset);
+            rotOffset = Easing.KeyFloat(Projectile.ai[1], ItemAnim / 8f * 2, ItemAnim / 5f * 2f, 20f, 0f, Easing.OutCirc, rotOffset);
+
+            Rotation = Rotation.AngleLerp(Owner.AngleTo(NetworkOwner.MousePosition), RotLerpFactor);
+
+            RotationOffset = MathHelper.ToRadians(rotOffset) * (float)-Owner.direction;
+
+            Offset = Easing.KeyVector2(Projectile.ai[1], 0f, ItemAnim / 3f, Vector2.Zero, new Vector2(-5, 0).RotatedBy(Rotation), Easing.OutCirc, Offset);
+            Offset = Easing.KeyVector2(Projectile.ai[1], ItemAnim / 3f, ItemAnim / 3f * 2f, new Vector2(-5, 0).RotatedBy(Rotation), new Vector2(-2, 0).RotatedBy(Rotation) + new Vector2(0, 3), Easing.OutCirc, Offset);
+            Offset = Easing.KeyVector2(Projectile.ai[1], ItemAnim / 3f * 2f, ItemAnim, new Vector2(-2, 0).RotatedBy(Rotation) + new Vector2(0, 3), Vector2.Zero, Easing.InCirc, Offset);
+
+            FrontArmExtension = Easing.KeyFloat(Projectile.ai[1], 0f, ItemAnim, 0.7f, 1f, Easing.InCirc);
+
+            FrontArmRotationOffset = RotationOffset;
+            BackArmRotationOffset = RotationOffset;
+        }
         base.AI();
+    }
+
+    public void Pump()
+    {
+        SoundStyle st = Assets.Sounds.Gear.Weapon.HotShotPump3.Asset;
+        if (GetChargeAmount() == 1) st = Assets.Sounds.Gear.Weapon.HotShotPump1.Asset;
+        if (GetChargeAmount() == 2) st = Assets.Sounds.Gear.Weapon.HotShotPump2.Asset;
+
+        SoundEngine.PlaySound(st.WithVolumeScale(0.75f), Owner.Center);
     }
 
     public void Fire()
     {
         SoundEngine.PlaySound(SoundID.Item70.WithPitchOffset(0.5f), Projectile.Center);
 
-        for (int i = 0; i < 6; i++)
-        {
-            Vector2 vel = Projectile.DirectionTo(NetworkOwner.MousePosition).RotatedByRandom(MathHelper.PiOver4 / 3f) * 40;
-            Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot"), Projectile.Center + vel * 1.5f, vel, ModContent.ProjectileType<HotShotSlag>(), Projectile.damage, 5f, Projectile.owner, ai1: Math.Sign(NetworkOwner.MousePosition.X - Owner.Center.X));
-        }
-    }
-}
+        SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.HotShotFire.Asset.WithPitchVariance(0.2f), Owner.Center);
 
-public class HotShotSlag : EverProjectile
-{
-    public override string Texture => "Everware/Assets/Textures/Hell/HotShotSlag";
-    public override void SetDefaults()
-    {
-        base.SetDefaults();
-        Projectile.friendly = true;
-        Projectile.knockBack = 2;
-        Projectile.tileCollide = true;
-        Projectile.DamageType = DamageClass.Ranged;
-    }
-    public override bool OnTileCollide(Vector2 oldVelocity)
-    {
-        Projectile.velocity = oldVelocity * 0.7f;
-        if (ShouldKill == -1)
-            ShouldKill = 10;
-        return false;
+        Item? it = UseAmmo(Owner.HeldItem, Owner);
+
+        if (it != null)
+        {
+            if (GetChargeAmount() < 4)
+            {
+                Vector2 blastlocation = new Vector2(40, 0).RotatedBy(Rotation);
+                float spread = MathHelper.Lerp(20, 4, GetChargeAmount() / 3f);
+                float amt = MathHelper.Lerp(3, 9, GetChargeAmount() / 3f);
+                float speed = MathHelper.Lerp(12, 25, GetChargeAmount() / 3f);
+                for (int i = 0; i < amt; i++)
+                {
+                    Vector2 v = new Vector2(20, 0).RotatedBy(Rotation);
+                    if (Collision.CanHitLine(Owner.Center, 2, 2, Owner.Center + v, 2, 2)) v = Vector2.Zero;
+                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot fire"), Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
+                }
+                if (GetChargeAmount() <= 2)
+                {
+                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+                }
+                else
+                {
+                    Owner.velocity += Owner.DirectionFrom(NetworkOwner.MousePosition) * 10;
+                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+                }
+
+                Lighting.AddLight(Projectile.Center, 0.6f, 0.4f, 0.1f);
+
+                for (int i = 0; i < 10; i++)
+                {
+                    new SmallSmoke(Owner.Center + (new Vector2(40, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition))), new Vector2(Main.rand.Next(10), 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(20f)), new Color(0f, 0f, 0f, 0.2f)).Spawn();
+                }
+            }
+        }
     }
 
-    int Timer = 0;
-    int ShouldKill = -1;
-    public override void AI()
-    {
-        if (ShouldKill >= 0)
-        {
-            ShouldKill--;
-            Projectile.velocity *= 0.6f;
-            if (ShouldKill == 0) Projectile.Kill();
-        }
-        if (Projectile.ai[2] == 0)
-        {
-            Projectile.ai[2] = Main.rand.NextFloat(5f, 10f);
-        }
-        base.AI();
-        Projectile.rotation = Vector2.Zero.AngleTo(Projectile.velocity);
-        Timer++;
-        if (Timer < 10)
-            Projectile.velocity *= 0.9f;
-        else
-            Projectile.velocity *= 1.05f;
-        Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], Projectile.ai[2], 0.1f);
-        if (Math.Abs(Projectile.velocity.X) > 10 || Projectile.velocity.Y < 0)
-            Projectile.velocity = Projectile.velocity.RotatedBy(MathHelper.ToRadians(Projectile.ai[0]) * Projectile.ai[1]);
-    }
     public override bool PreDraw(ref Color lightColor)
     {
-        var asset = Assets.Textures.Hell.HotShotSlag.Asset;
+        Asset<Texture2D> ChargeTex = Assets.Textures.Hell.HotShot_Charge.Asset;
+        Asset<Texture2D> ChargeGlowTex = Assets.Textures.Hell.HotShot_Charge_Glow.Asset;
+        Asset<Texture2D> PumpTex = Assets.Textures.Hell.HotShot_Pump.Asset;
 
-        PixelRendering.DrawPixelatedSprite(asset.Value, Projectile.Center - Main.screenPosition, asset.Frame(), Color.White, Projectile.rotation, new Vector2(32, 6), new Vector2(Projectile.velocity.Length() / asset.Width() * 3f, 1f));
+        Rectangle ChargeFr = ChargeTex.Frame(1, 5, 0, (int)Math.Floor(ChargeFrame));
+        Rectangle PumpFr = PumpTex.Frame(1, 7, 0, (int)Math.Floor(PumpFrame));
+
+        Main.EntitySpriteDraw(ChargeTex.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, ChargeFr, lightColor, Projectile.rotation, Origin, Scale, Effects);
+        Main.EntitySpriteDraw(ChargeGlowTex.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, ChargeFr, Color.White, Projectile.rotation, Origin, Scale, Effects);
+        Main.EntitySpriteDraw(PumpTex.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, PumpFr, lightColor, Projectile.rotation, Origin, Scale, Effects);
 
         return false;
     }
 }
 
-public class HotShotLargeProjectile : EverProjectile
+public class HotShotBurst : EverProjectile
 {
-    public override string Texture => "Everware/Assets/Textures/Hell/HotShotLargeProjectile";
+    public override string Texture => "Everware/Assets/Textures/Hell/HotShotBurst";
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Projectile.friendly = true;
-        Projectile.knockBack = 2;
-        Projectile.tileCollide = true;
         Projectile.DamageType = DamageClass.Ranged;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.width = 66; Projectile.height = (112 / 4);
     }
-    public override bool OnTileCollide(Vector2 oldVelocity)
+    public override void SetStaticDefaults()
     {
-        if (oldVelocity.X != Projectile.velocity.X)
-            Projectile.velocity.X = -oldVelocity.X * 0.5f;
-        return false;
+        base.SetStaticDefaults();
+        Main.projFrames[Type] = 4;
+    }
+    public override void AI()
+    {
+        Projectile.velocity = Owner.velocity;
+        Projectile.frameCounter += 1;
+        if (Projectile.frameCounter > 3)
+        {
+            Projectile.frame += 1;
+            if (Projectile.frame > 3) Projectile.Kill();
+        }
+        Projectile.Center = Owner.Center + new Vector2(-10, -10 * Owner.direction).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)) + (Owner.DirectionTo(NetworkOwner.MousePosition) * 25);
+        Projectile.rotation = Owner.AngleTo(NetworkOwner.MousePosition);
+    }
+}
+
+public class HotShotBurstLarge : EverProjectile
+{
+    public override string Texture => "Everware/Assets/Textures/Hell/HotShotBurstLarge";
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        Projectile.DamageType = DamageClass.Ranged;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.width = 94; Projectile.height = (230 / 5);
+    }
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+        Main.projFrames[Type] = 5;
+    }
+    public override void AI()
+    {
+        Projectile.velocity = Owner.velocity;
+        Projectile.frameCounter += 1;
+        if (Projectile.frameCounter > 3)
+        {
+            Projectile.frame += 1;
+            if (Projectile.frame > 4) Projectile.Kill();
+        }
+        Projectile.Center = Owner.Center + new Vector2(-10, -10 * Owner.direction).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)) + (Owner.DirectionTo(NetworkOwner.MousePosition) * 35);
+        Projectile.rotation = Owner.AngleTo(NetworkOwner.MousePosition);
     }
 }

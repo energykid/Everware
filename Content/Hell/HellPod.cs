@@ -42,39 +42,31 @@ public class HellPodTileEntity : ModTileEntity
 
     public static void DropLoot(Vector2 position)
     {
-        // for some reason this method is being called precisely four times on the server every time my packet gets sent
-        // it's weird and idk why it's happening, but it's consistently four times, so unless this bugs out for someone,
-        // or i find a better fix, this is what we get right now
-        // thanks obama
-        MPSyncWorkaround++;
-        if (MPSyncWorkaround % 4 == 0)
+        for (int i = 0; i < Main.rand.Next(3, 5); i++)
         {
-            for (int i = 0; i < Main.rand.Next(3, 5); i++)
-            {
-                int randomSelection = Main.rand.Next(PossibleLesserItems.Count);
-                int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
-                   PossibleLesserItems[randomSelection].ItemID, Main.rand.Next(PossibleLesserItems[randomSelection].MinStack, PossibleLesserItems[randomSelection].MaxStack)), true);
-                Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+            int randomSelection = Main.rand.Next(PossibleLesserItems.Count);
+            int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
+               PossibleLesserItems[randomSelection].ItemID, Main.rand.Next(PossibleLesserItems[randomSelection].MinStack, PossibleLesserItems[randomSelection].MaxStack)), true);
+            Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
 
-                if (Main.netMode == NetmodeID.Server)
-                {
-                    NetMessage.SendData(MessageID.SyncItem, number: item);
-                }
+            if (Main.netMode == NetmodeID.Server)
+            {
+                NetMessage.SendData(MessageID.SyncItem, number: item);
             }
-            if (Main.rand.Next(100) >= 50)
-            {
-                int randomSelection = Main.rand.Next(PossibleGreaterItems.Count);
-                int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
-                   PossibleGreaterItems[randomSelection], 1), true);
-                Main.item[item].velocity = Vector2.Zero;
-                Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = true;
-                Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
-                Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = 60;
+        }
+        if (Main.rand.Next(100) >= 50)
+        {
+            int randomSelection = Main.rand.Next(PossibleGreaterItems.Count);
+            int item = Item.NewItem(new EntitySource_Misc("Hell Pod loot"), new Rectangle((int)position.X - 10, (int)position.Y - 10, 20, 20), new Item(
+               PossibleGreaterItems[randomSelection], 1), true);
+            Main.item[item].velocity = Vector2.Zero;
+            Main.item[item].GetGlobalItem<HellPodGlobalItem>().Rare = true;
+            Main.item[item].GetGlobalItem<HellPodGlobalItem>().ShouldHover = true;
+            Main.item[item].GetGlobalItem<HellPodGlobalItem>().SizeTimer = 60;
 
-                if (Main.netMode == NetmodeID.Server)
-                {
-                    NetMessage.SendData(MessageID.SyncItem, number: item);
-                }
+            if (Main.netMode == NetmodeID.Server)
+            {
+                NetMessage.SendData(MessageID.SyncItem, number: item);
             }
         }
     }
@@ -88,33 +80,42 @@ public class HellPodTileEntity : ModTileEntity
             rot = entity.Rotation;
         }
 
-        Vector2 CenterPosition = (new Vector2(x, y) * 16) + new Vector2(24, 24);
-
-        if (Main.netMode == NetmodeID.SinglePlayer || Main.netMode == NetmodeID.Server)
+        // for some reason this method is being called precisely four times on the server every time my packet gets sent
+        // it's weird and idk why it's happening, but it's consistently four times, so unless this bugs out for someone,
+        // or i find a better fix, this is what we get right now
+        // thanks obama
+        MPSyncWorkaround++;
+        if (MPSyncWorkaround % 4 == 0)
         {
-            DropLoot(CenterPosition);
-        }
 
-        if (Main.netMode != NetmodeID.Server)
-        {
-            HellPod.DoThingALot(x, y, (ii, jj, num) =>
+            Vector2 CenterPosition = (new Vector2(x, y) * 16) + new Vector2(24, 24);
+
+            if (Main.netMode == NetmodeID.SinglePlayer || Main.netMode == NetmodeID.Server)
             {
-                new HellPodStalkDebris(new Vector2(ii, jj), rot)
-                {
-                    FrameNum = HellPod.StalkFrame(num).TopLeft() / 18f,
-                    FrameDelay = Math.Abs(num / 2)
-                }
-                .Spawn();
-            });
-
-            new HellPodPopShockwave(CenterPosition).Spawn();
-
-            for (int i = 0; i < 5; i++)
-            {
-                new HellPodDebris(CenterPosition, i, rot).Spawn();
+                DropLoot(CenterPosition);
             }
 
-            SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, CenterPosition);
+            if (Main.netMode != NetmodeID.Server)
+            {
+                HellPod.DoThingALot(x, y, (ii, jj, num) =>
+                {
+                    new HellPodStalkDebris(new Vector2(ii, jj), rot)
+                    {
+                        FrameNum = HellPod.StalkFrame(num).TopLeft() / 18f,
+                        FrameDelay = Math.Abs(num / 2)
+                    }
+                    .Spawn();
+                });
+
+                new HellPodPopShockwave(CenterPosition).Spawn();
+
+                for (int i = 0; i < 5; i++)
+                {
+                    new HellPodDebris(CenterPosition, i, rot).Spawn();
+                }
+
+                SoundEngine.PlaySound(Assets.Sounds.Tile.HellPodDestroy.Asset with { PitchVariance = 0.1f }, CenterPosition);
+            }
         }
 
         for (int i = 0; i < 3; i++)
