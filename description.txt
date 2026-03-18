@@ -10,3 +10,9 @@ added a new menu, "Somewhere Else," with a custom OST and logo
 added music boxes for all existing content with associated music
 you can craft the music box for the new menu theme using all other music boxes in the mod
 various small balancing and gameplay changes
+
+Everware v0.2.0 - bloody hell update
+
+reworked the Eye of Cthulhu, adding new music as well
+added pods which spawn in the Underworld, dropping new loot as well as some harder-to-find vanilla items
+added four new gear drops to go with the pods
