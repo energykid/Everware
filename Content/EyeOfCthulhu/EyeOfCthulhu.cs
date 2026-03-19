@@ -115,18 +115,14 @@ public class EyeOfCthulhu : GlobalNPC
         Phase2Threshold = (int)(npc.lifeMax * 0.6f);
         if (Main.expertMode) Phase2Threshold = (int)(npc.lifeMax * 0.75f);
     }
-    public override void ApplyDifficultyAndPlayerScaling(NPC npc, int numPlayers, float balance, float bossAdjustment)
-    {
-        base.ApplyDifficultyAndPlayerScaling(npc, numPlayers, balance, bossAdjustment);
-
-        Phase2Threshold = (int)(npc.lifeMax * 0.6f);
-        if (Main.expertMode) Phase2Threshold = (int)(npc.lifeMax * 0.75f);
-    }
     public int EyeDilationReset = 0;
     int TargetedPlayer = 0;
     public float Timer = 0f;
     public override void AI(NPC npc)
     {
+        Phase2Threshold = (int)(npc.lifeMax * 0.6f);
+        if (Main.expertMode) Phase2Threshold = (int)(npc.lifeMax * 0.75f);
+
         Timer++;
 
         if (Main.netMode != NetmodeID.Server)
@@ -560,9 +556,9 @@ public class EyeOfCthulhu : GlobalNPC
                         if (npc.ai[0] % 8 >= 2 && npc.ai[0] % 15 < 9)
                         {
                             int i = 0;
-                            if (npc.ai[0] >= Delay + 8) i = 1;
-                            if (npc.ai[0] >= Delay + 16) i = 2;
-                            if (npc.ai[0] >= Delay + 24) i = 3;
+                            if (npc.ai[0] % 32 >= 8) i = 1;
+                            if (npc.ai[0] % 32 >= 16) i = 2;
+                            if (npc.ai[0] % 32 >= 24) i = 3;
 
                             MoveTendril(npc, i, Target.Center + new Vector2(Main.rand.NextFloat(-5, 5), Main.rand.NextFloat(-5, 5)), 1f);
 
