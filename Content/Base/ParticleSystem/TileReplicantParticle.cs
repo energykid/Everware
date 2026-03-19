@@ -23,3 +23,33 @@ public class TileReplicantParticle : Particle
             Main.EntitySpriteDraw(t.Value, position - Main.screenPosition, TileFrame, Lighting.GetColor((position / 16).ToPoint()).MultiplyRGBA(new Color(1f, 1f, 1f, Opacity)), Rotation, new Vector2(8, 8), Scale, SpriteEffects.None);
     }
 }
+
+public class StillTileReplicantParticle : Particle
+{
+    int TileType = TileID.Dirt;
+    public int HideTimer = 0;
+    public float StartingY = 0f;
+    Asset<Texture2D> Texture;
+    Rectangle TileFrame = new Rectangle(0, 0, 16, 16);
+    public StillTileReplicantParticle(int tileType, Rectangle tileFrame, Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null) : base(pos, vel, scale, upd, drw)
+    {
+        TileType = tileType;
+        HideTimer = 60;
+        TileFrame = tileFrame;
+    }
+    public override void Update()
+    {
+        base.Update();
+        HideTimer -= 1;
+        if (HideTimer <= 0) Kill();
+    }
+    public override void Draw()
+    {
+        Point p = (position / 16).ToPoint();
+
+        Asset<Texture2D> t = TextureAssets.Tile[TileType];
+
+        Main.instance.TilesRenderer.DrawSingleTile(Main.instance.TilesRenderer._currentTileDrawInfoNonThreaded,
+            true, -1, Main.screenPosition, Vector2.Zero, p.X, p.Y);
+    }
+}

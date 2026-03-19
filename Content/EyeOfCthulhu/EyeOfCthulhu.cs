@@ -101,7 +101,6 @@ public class EyeOfCthulhu : GlobalNPC
     public override void SetDefaults(NPC npc)
     {
         base.SetDefaults(npc);
-        npc.behindTiles = true;
         npc.aiStyle = -1;
 
         npc.ai[2] = (int)AttackState.TendrilsOut;
@@ -112,6 +111,13 @@ public class EyeOfCthulhu : GlobalNPC
         }
 
         PupilPaletteNum = Main.rand.Next(3);
+
+        Phase2Threshold = (int)(npc.lifeMax * 0.6f);
+        if (Main.expertMode) Phase2Threshold = (int)(npc.lifeMax * 0.75f);
+    }
+    public override void ApplyDifficultyAndPlayerScaling(NPC npc, int numPlayers, float balance, float bossAdjustment)
+    {
+        base.ApplyDifficultyAndPlayerScaling(npc, numPlayers, balance, bossAdjustment);
 
         Phase2Threshold = (int)(npc.lifeMax * 0.6f);
         if (Main.expertMode) Phase2Threshold = (int)(npc.lifeMax * 0.75f);
@@ -546,7 +552,9 @@ public class EyeOfCthulhu : GlobalNPC
                     {
                         EmitRoar(npc);
                     }
-                    if (npc.ai[0] < Delay + 32)
+                    float extraTime = 48;
+                    if (Phase == 1) extraTime = 96;
+                    if (npc.ai[0] < Delay + 32 + (extraTime - 48))
                     {
                         TendrilDamageEnabled = true;
                         if (npc.ai[0] % 8 >= 2 && npc.ai[0] % 15 < 9)
@@ -573,7 +581,7 @@ public class EyeOfCthulhu : GlobalNPC
                         TendrilDamageEnabled = false;
                         npc.velocity *= 0.94f;
                     }
-                    if (npc.ai[0] >= Delay + 48)
+                    if (npc.ai[0] >= Delay + extraTime)
                     {
                         ChangeState(npc, Main.rand.NextBool() ? AttackState.Bleed : AttackState.Multiply);
                     }
@@ -806,12 +814,18 @@ public class EyeOfCthulhu : GlobalNPC
     {
         for (int i = -4; i <= 6; i++)
         {
-            for (int j = -3; j <= 3; j++)
+            for (int j = -3; j <= 5; j++)
             {
                 Vector2 position = new Vector2((pt.X + i) * 16, (pt.Y + j) * 16);
                 Tile t = Main.tile[pt.X + i, pt.Y + j];
-                if (WorldGen.SolidOrSlopedTile(t))
+
+                if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
                 {
+                    StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
+                    {
+                        HideTimer = 60
+                    };
+                    tile0.Spawn();
                     WorldGen.KillTile_MakeTileDust(pt.X + i, pt.Y + j, t);
                     if (!WorldGen.SolidOrSlopedTile(Main.tile[pt.X + i, pt.Y + j - 1]))
                     {
