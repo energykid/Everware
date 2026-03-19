@@ -259,9 +259,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         if (RecoveryAmount < 1f)
-            Main.EntitySpriteDraw(BrokenAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(BrokenAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, BrokenAsset.Frame(), lightColor, Projectile.rotation, Origin, Scale, Effects);
         else
-            Main.EntitySpriteDraw(Asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Frame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+            Main.EntitySpriteDraw(Asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, Asset.Frame(), lightColor, Projectile.rotation, Origin, Scale, Effects);
 
         return false;
     }

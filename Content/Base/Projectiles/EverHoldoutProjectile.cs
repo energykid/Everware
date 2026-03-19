@@ -28,6 +28,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public int HitFrames = 0;
     public bool HasMouseBeenReleased = false;
     public bool Started = false;
+    public bool AnimActive = true;
     public virtual Asset<Texture2D> Asset { get => ModContent.Request<Texture2D>(Texture); }
     public override void SetDefaults()
     {
@@ -43,12 +44,6 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public override void PostAI()
     {
         base.PostAI();
-
-        if (!Started)
-        {
-            Projectile.netUpdate = true;
-        }
-        Started = true;
     }
     public override void SendExtraAI(BinaryWriter writer)
     {
@@ -87,16 +82,22 @@ public abstract class EverHoldoutProjectile : EverProjectile
     }
     public override void AI()
     {
+        Projectile.timeLeft = 10;
+
         if (!NetworkOwner.MouseDown && Started == false) HasMouseBeenReleased = true;
 
         if (Main.LocalPlayer.whoAmI == Projectile.owner)
         {
             MousePosition = Main.MouseWorld;
+
+            if (AnimActive != Owner.ItemAnimationActive)
+                Projectile.netUpdate = true;
+            AnimActive = Owner.ItemAnimationActive;
         }
 
         HitFrames--;
 
-        if (Owner.ItemAnimationActive)
+        if (AnimActive)
         {
             Projectile.ai[0] = Owner.itemTime;
         }
@@ -125,6 +126,12 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         Projectile.Center = Owner.MountedCenter + Offset + new Vector2(Owner.MountXOffset, 0);
         Projectile.rotation = Rotation + RotationOffset;
+
+        if (!Started)
+        {
+            Projectile.netUpdate = true;
+        }
+        Started = true;
     }
     public override bool PreDraw(ref Color lightColor)
     {
