@@ -1,4 +1,5 @@
 ﻿using Everware.Common.Players;
+using Everware.Content.Base.Projectiles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
@@ -9,6 +10,31 @@ namespace Everware.Content.Base.Items;
 
 public abstract class EverWeaponItem : EverItem
 {
+
+    public override void Load()
+    {
+        On_PlayerDrawLayers.DrawHeldProj += CustomItemDraws;
+    }
+
+    private void CustomItemDraws(On_PlayerDrawLayers.orig_DrawHeldProj orig, PlayerDrawSet drawinfo, Projectile proj)
+    {
+        orig(drawinfo, proj);
+
+        Player plr = drawinfo.drawPlayer;
+        if (UseCustomDraw && plr.ItemAnimationActive && plr.HeldItem.type == Item.type)
+        {
+            CustomDraw(drawinfo.drawPlayer, drawinfo.drawPlayer.AngleTo(drawinfo.drawPlayer.GetModPlayer<NetworkPlayer>().MousePosition));
+        }
+    }
+
+    public override void Unload()
+    {
+        On_PlayerDrawLayers.DrawHeldProj -= CustomItemDraws;
+    }
+
+    public virtual void CustomDraw(Player player, float direction) { }
+    public virtual bool UseCustomDraw => false;
+
     public override int DuplicationAmount => 1;
 
     public override int Rarity => ItemRarityID.Blue;
@@ -32,6 +58,17 @@ public abstract class EverWeaponItem : EverItem
     }
     public override bool? UseItem(Player player)
     {
+        if (UseCustomDraw)// && Main.netMode != NetmodeID.Server)
+        {
+            if (player.ownedProjectileCounts[ModContent.ProjectileType<EverCustomDrawProjectile>()] < 1)
+            {
+                Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(player), player.Center, Vector2.Zero, ModContent.ProjectileType<EverCustomDrawProjectile>(),
+                    0, 0f, player.whoAmI);
+                (proj.ModProjectile as EverCustomDrawProjectile).itemType = Item.type;
+                proj.damage = 0;
+                proj.netUpdate = true;
+            }
+        }
         if (HoldoutType != null && player.ownedProjectileCounts[(int)HoldoutType] < 1 && player.heldProj == -1 && !Main.dedServ && Main.myPlayer == player.whoAmI)
         {
             var proj = Projectile.NewProjectileDirect(new EntitySource_Misc("Held Projectile"), player.Center, Vector2.Zero, (int)HoldoutType, Item.damage, Item.knockBack, player.whoAmI);

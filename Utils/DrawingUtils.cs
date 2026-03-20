@@ -5,6 +5,11 @@ namespace Everware.Utils;
 
 public static class DrawingUtils
 {
+
+    public static Vector2 PlayerOffset(Player player)
+    {
+        return new Vector2(0f, player.gfxOffY);
+    }
     public static void DrawTrailBehind(Projectile projectile, Color color1, Color color2, Vector2 offset, bool scaleDown = false, Asset<Texture2D> customTexture = null, float customScale = 1f)
     {
         Asset<Texture2D> tex;

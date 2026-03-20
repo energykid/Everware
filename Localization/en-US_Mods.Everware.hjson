@@ -174,6 +174,11 @@ Items: {
 			Three consecutive pumps before firing maxes your charge and causes heavy recoil when attacking
 			'''
 	}
+
+	UnwieldyStaff: {
+		DisplayName: Unwieldy Staff
+		Tooltip: After a long buildup, summons three magic spikes from the ground
+	}
 }
 
 Biomes: {
@@ -203,6 +208,9 @@ Projectiles: {
 	HotShotHoldout.DisplayName: Hot Shot
 	HotShotBurst.DisplayName: Muzzle Flare
 	HotShotBurstLarge.DisplayName: Muzzle Flare
+	CustomItemDrawProjectile.DisplayName: Custom Item Draw Projectile
+	ManaSpike.DisplayName: Mana Spike
+	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
 }
 
 Buffs: {
