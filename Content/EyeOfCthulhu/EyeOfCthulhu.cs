@@ -144,7 +144,7 @@ public class EyeOfCthulhu : GlobalNPC
         int Distance = 2500;
         foreach (Player player in Main.player)
         {
-            if (player.Distance(npc.Center) < Distance)
+            if (player.Distance(npc.Center) < Distance && !player.dead)
             {
                 Plr = player.whoAmI;
                 Distance = (int)player.Distance(npc.Center);
