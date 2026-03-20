@@ -13,6 +13,11 @@
 	<ItemGroup>
 	  <Folder Include="Assets\Effects\Hell\" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="Daybreak">
+	    <HintPath>Daybreak.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 	<!-- References -->
 

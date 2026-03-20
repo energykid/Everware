@@ -10,6 +10,7 @@ public class RebarRodPlacedUnfriendly : ModWall
         DustType = DustID.Lead;
         Main.wallLight[Type] = true;
         AddMapEntry(new Color(23, 23, 23));
+        Main.wallBlend[Type] = ModContent.WallType<RebarRodPlaced>();
     }
     public override bool Drop(int i, int j, ref int type)
     {

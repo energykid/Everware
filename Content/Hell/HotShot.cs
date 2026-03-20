@@ -1,6 +1,6 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.Items;
-using Everware.Content.Misc;
+using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
@@ -211,6 +211,7 @@ public class HotShotHoldout : EverHoldoutProjectile
                     Vector2 vel = Owner.DirectionFrom(NetworkOwner.MousePosition) * 10;
                     vel *= new Vector2(0.5f, 0.75f);
                     Owner.velocity += vel;
+                    NetMessage.SendData(MessageID.PlayerControls, number: Owner.whoAmI);
                     Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
                 }
 

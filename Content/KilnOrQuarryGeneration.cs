@@ -2,6 +2,7 @@
 using Everware.Content.Quarry;
 using System.Collections.Generic;
 using Terraria.GameContent.Generation;
+using Terraria.ID;
 using Terraria.IO;
 using Terraria.WorldBuilding;
 
@@ -9,6 +10,16 @@ namespace Everware.Content;
 
 public class KilnOrQuarryGeneration : ModSystem
 {
+    public static ushort[] ReplaceableTiles = {
+        TileID.Dirt,
+        TileID.Grass,
+        TileID.CorruptGrass,
+        TileID.CrimsonGrass,
+        TileID.Mud,
+        TileID.ClayBlock,
+        TileID.JungleGrass,
+        TileID.Stone
+    };
     public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
     {
         tasks.Add(new PassLegacy("Generating an abandoned processing site", delegate (GenerationProgress progress, GameConfiguration configuration)

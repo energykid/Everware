@@ -1,6 +1,6 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.Items;
-using Everware.Content.Misc;
+using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,8 +89,6 @@ public class BloodRubyDashPlayer : ModPlayer
 
     public override void ResetEffects()
     {
-        BloodRubyEffect = false;
-
         if (DashTimer <= 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
         {
             if (Player.controlRight && Player.releaseRight && Player.doubleTapCardinalTimer[2] < 15 && Player.doubleTapCardinalTimer[3] == 0)
@@ -102,11 +100,18 @@ public class BloodRubyDashPlayer : ModPlayer
                 DashDir = -1;
             }
         }
+
+        BloodRubyEffect = false;
     }
 
     public override void PreUpdateMovement()
     {
         LerpAmount = MathHelper.Lerp(LerpAmount, 1f, 0.2f);
+
+        if (!CanUseDash())
+        {
+            DashDir = 0;
+        }
 
         if (CanUseDash() && DashDir != 0 && DashDelay == 0)
         {
@@ -128,6 +133,8 @@ public class BloodRubyDashPlayer : ModPlayer
             DashDelay = DashCooldown;
             DashTimer = DashDuration;
             Player.velocity = newVelocity;
+
+            NetMessage.SendData(MessageID.PlayerControls, number: Player.whoAmI);
 
             Explosion();
 

@@ -3,3 +3,5 @@
 /bin
 *.editorconfig
 *.cache
+/Daybreak.dll
+/Daybreak.pdb

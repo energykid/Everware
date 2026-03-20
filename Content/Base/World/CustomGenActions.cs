@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 
@@ -47,7 +48,7 @@ public class CustomGenActions
         {
             ushort type = TileID.Dirt;
 
-            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType])
+            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && KilnOrQuarryGeneration.ReplaceableTiles.Contains(Main.tile[x, y].TileType))
             {
                 type = Main.tile[x, y].TileType;
                 Main.tile[x, y].ResetToType(TileID.Silt);
@@ -131,6 +132,27 @@ public class CustomGenActions
         public override bool Apply(Point origin, int x, int y, params object[] args)
         {
             if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType])
+            {
+                WorldGen.KillTile(x, y, false, false, true);
+                WorldGen.PlaceTile(x, y, id, true);
+            }
+
+            WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
+    public class SetTileFromOtherSafe : GenAction
+    {
+        private ushort id;
+        public SetTileFromOtherSafe(ushort ID)
+        {
+            id = ID;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && KilnOrQuarryGeneration.ReplaceableTiles.Contains(Main.tile[x, y].TileType))
             {
                 WorldGen.KillTile(x, y, false, false, true);
                 WorldGen.PlaceTile(x, y, id, true);

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 
-namespace Everware.Content.Misc;
+namespace Everware.Content.Misc.Particles;
 
 public class SmallSmoke : Particle
 {

@@ -37,7 +37,7 @@ public static class QuarryGenerator
         }
 
         // Create digging hole
-        new CustomGenShapes.Hole(10, Main.rand.Next(5, 7)).Perform(BasePoint, Actions.Chain(new CustomGenActions.SetTileFromOther(TileID.Stone), new Actions.Smooth(true)));
+        new CustomGenShapes.Hole(10, Main.rand.Next(5, 7)).Perform(BasePoint, Actions.Chain(new CustomGenActions.SetTileFromOtherSafe(TileID.Stone), new Actions.Smooth(true)));
         CustomGenShapes.Hole hole = new CustomGenShapes.Hole(6, Main.rand.Next(3, 5));
         CustomGenShapes.Hole hole2 = new CustomGenShapes.Hole(6, hole._passes + 1);
         hole.Perform(BasePoint, new Actions.ClearTile(true));

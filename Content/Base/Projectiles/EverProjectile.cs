@@ -2,12 +2,47 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using System.Linq;
 using Terraria.ID;
 
 namespace Everware.Core.Projectiles;
 
 public abstract class EverProjectile : ModProjectile
 {
+    public override void Load()
+    {
+        EverwarePacketHandler.AddPacket(
+            (mod, reader, whoAmI, identifier) =>
+            {
+                if (identifier == "NetOnHitEnemy")
+                {
+                    int projwhoami = reader.ReadInt32();
+                    int targetwhoami = reader.ReadInt32();
+                    int damage = reader.ReadInt32();
+                    int numberRelays = reader.ReadInt32();
+
+                    Projectile proj = Main.projectile.FirstOrDefault(x => x.identity == projwhoami);
+
+                    if (proj != null)
+                    {
+                        (proj.ModProjectile as EverProjectile).NetOnHitEnemy(Main.npc[targetwhoami]);
+
+                        if (numberRelays == 0)
+                        {
+                            ModPacket p = Mod.GetPacket();
+                            p.Write("NetOnHitEnemy");
+                            p.Write(projwhoami);
+                            p.Write(targetwhoami);
+                            p.Write(damage);
+                            p.Write(numberRelays + 1);
+                            p.Send();
+                        }
+                    }
+                }
+            }
+            );
+    }
+
     /// <summary>
     ///     Shorthand variable that allows for quickly grabbing of the player that owns this projectile.
     /// </summary>
@@ -39,13 +74,9 @@ public abstract class EverProjectile : ModProjectile
 
     #region Networking
     public virtual void NetOnSpawn()
-    {
-
-    }
+    { }
     public virtual void NetOnHitEnemy(NPC npc)
-    {
-
-    }
+    { }
     public override void SendExtraAI(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
@@ -60,8 +91,10 @@ public abstract class EverProjectile : ModProjectile
     {
         ModPacket p = Mod.GetPacket();
         p.Write("NetOnHitEnemy");
-        p.Write(Projectile.whoAmI);
+        p.Write(Projectile.identity);
         p.Write(target.whoAmI);
+        p.Write(damageDone);
+        p.Write(0);
         p.Send();
     }
     #endregion
@@ -83,14 +116,8 @@ public abstract class EverProjectile : ModProjectile
     }
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (Main.netMode != NetmodeID.SinglePlayer)
-        {
-            SendNetHit(target, hit, damageDone);
-        }
-        else
-        {
-            enemyHit = target.whoAmI;
-        }
+        enemyHit = target.whoAmI;
+        Projectile.netUpdate = true;
 
         base.OnHitNPC(target, hit, damageDone);
     }

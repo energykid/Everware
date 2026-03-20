@@ -193,18 +193,16 @@ Projectiles: {
 	KilnpostBreakaway.DisplayName: Kiln Shard
 	RebukerBolt.DisplayName: Rebuker
 	RebukerHoldout.DisplayName: Rebuker
-	CthulhuBloodProjectile.DisplayName: Blood
-	EyeOfCthulhuTendrilHitbox.DisplayName: Cthulhu Tendril
-	BloodRubyExplosion.DisplayName: Explosive Boost
+	CthulhuBloodProjectile.DisplayName: Eye Blood
+	EyeOfCthulhuTendrilHitbox.DisplayName: Eye of Cthulhu
+	BloodRubyExplosion.DisplayName: Explosion
 	FloorIsLava.DisplayName: Molten Lava
 	PyrocleaverProjectile.DisplayName: Pyrocleaver
 	SkullMinion.DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
-	SkullMinionExplosion.DisplayName: Skeletal Explosion
-	HotShotHoldout.DisplayName: Hot Shot Holdout
-	HotShotLargeProjectile.DisplayName: Hot Shot Large Projectile
-	HotShotSlag.DisplayName: Hot Shot Slag
-	HotShotBurst.DisplayName: Hot Shot Burst
-	HotShotBurstLarge.DisplayName: Hot Shot Burst Large
+	SkullMinionExplosion.DisplayName: Explosion
+	HotShotHoldout.DisplayName: Hot Shot
+	HotShotBurst.DisplayName: Muzzle Flare
+	HotShotBurstLarge.DisplayName: Muzzle Flare
 }
 
 Buffs: {

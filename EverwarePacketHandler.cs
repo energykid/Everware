@@ -20,6 +20,7 @@ public static class EverwarePacketHandler
 
         bool shouldRunNewPacketBehavior = true;
 
+        // packets ripped from varia, which do not follow the new system
         switch (str)
         {
             case "MouseWorld": // Mouse world sending
