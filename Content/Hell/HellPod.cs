@@ -89,7 +89,6 @@ public class HellPodTileEntity : ModTileEntity
         MPSyncWorkaround++;
         if (MPSyncWorkaround % 4 == 0)
         {
-
             Vector2 CenterPosition = (new Vector2(x, y) * 16) + new Vector2(24, 24);
 
             if (Main.netMode == NetmodeID.SinglePlayer || Main.netMode == NetmodeID.Server)
@@ -215,6 +214,9 @@ public class HellPodTileEntity : ModTileEntity
                     HellPod.DamagePod(i, j);
                 }
             }
+
+            if (Main.netMode != NetmodeID.SinglePlayer)
+                NetMessage.SendData(MessageID.TileEntitySharing, number: ID);
         }
 
         DistanceYetCalculated = true;

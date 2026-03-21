@@ -212,6 +212,7 @@ class SkullMinionExplosion : EverProjectile
         Projectile.width = Projectile.height = 68;
         Projectile.rotation = Main.rand.NextFloat(-0.2f, 0.2f);
         Projectile.friendly = true;
+        Projectile.tileCollide = false;
         Projectile.frame = 0;
     }
     public override void NetOnHitEnemy(NPC npc)

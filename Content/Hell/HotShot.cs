@@ -26,6 +26,8 @@ public class HotShot : EverWeaponItem
         Item.DefaultToBasicWeapon(24, 60, DamageClass.Ranged);
         Item.autoReuse = true;
         Item.useAmmo = AmmoID.Bullet;
+        Item.width = Assets.Textures.Hell.HotShot.Asset.Width();
+        Item.height = Assets.Textures.Hell.HotShot.Asset.Height();
     }
     public int ChargeLevel = 0;
     public override bool AltFunctionUse(Player player)

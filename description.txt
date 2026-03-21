@@ -16,3 +16,5 @@ Everware v0.2.0 - bloody hell update
 reworked the Eye of Cthulhu, adding new music as well
 added pods which spawn in the Underworld, dropping new loot as well as some harder-to-find vanilla items
 added four new gear drops to go with the pods
+
+Everware 0.2.2 - slight fixes & added one magic weapon

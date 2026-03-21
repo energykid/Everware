@@ -20,6 +20,24 @@ public static class BehaviorUtils
         }
         return baseVec;
     }
+    public static Point Grounded(this Point baseVec)
+    {
+        if (SolidTileOrPlatform(Main.tile[baseVec]))
+        {
+            for (int i = 0; i < 250; i++)
+            {
+                baseVec.Y -= 1;
+                if (!SolidTileOrPlatform(Main.tile[baseVec])) break;
+            }
+            return baseVec;
+        }
+        for (int i = 0; i < 250; i++)
+        {
+            baseVec.Y += 1;
+            if (SolidTileOrPlatform(Main.tile[baseVec])) break;
+        }
+        return baseVec;
+    }
 
     public static bool SolidTileOrPlatform(Tile tile)
     {

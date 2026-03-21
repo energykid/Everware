@@ -50,6 +50,13 @@ public class HellPodGlobalItem : GlobalItem
         }
         return baseVec;
     }
+
+    public override bool OnPickup(Item item, Player player)
+    {
+        ShouldHover = false;
+        Rare = false;
+        return base.OnPickup(item, player);
+    }
     public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
     {
         if (ShouldHover)

@@ -14,6 +14,8 @@ class SkullStaff : EverWeaponItem
         Item.noMelee = true;
         Item.summon = true;
         Item.rare = ItemRarityID.LightRed;
+        Item.width = Assets.Textures.Hell.SkullStaff.Asset.Width();
+        Item.height = Assets.Textures.Hell.SkullStaff.Asset.Height();
     }
     public override void SetStaticDefaults()
     {
