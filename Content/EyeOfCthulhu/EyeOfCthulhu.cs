@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.EyeOfCthulhuRework;
@@ -228,7 +229,7 @@ public class EyeOfCthulhu : GlobalNPC
 
                     if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
                     {
-                        calFables.Call("vfx.displayBossIntroCard", "Eye of Cthulhu", "Night Stalker", 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, "ENNWAY", "");
+                        calFables.Call("vfx.displayBossIntroCard", Language.GetTextValue("NPCName.EyeofCthulhu"), Language.GetTextValue("Mods.Everware.BossIntros.EyeofCthulhu"), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, "ENNWAY", "");
                         Time = 20;
                     }
 

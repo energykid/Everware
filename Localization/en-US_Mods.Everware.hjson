@@ -193,6 +193,8 @@ Biomes: {
 	}
 }
 
+BossIntros.EyeofCthulhu: Night Stalker
+
 Projectiles: {
 	KilnpostHoldout.DisplayName: Kilnpost
 	KilnpostBreakaway.DisplayName: Kiln Shard
