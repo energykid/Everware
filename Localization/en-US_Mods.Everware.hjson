@@ -179,6 +179,11 @@ Items: {
 		DisplayName: Unwieldy Staff
 		Tooltip: After a long buildup, summons three magic spikes from the ground
 	}
+
+	BookOfBoulders: {
+		DisplayName: Book of Boulders
+		Tooltip: Conjures a boulder from above your cursor to crash down on your foes
+	}
 }
 
 Biomes: {
@@ -208,9 +213,10 @@ Projectiles: {
 	HotShotHoldout.DisplayName: Hot Shot
 	HotShotBurst.DisplayName: Muzzle Flare
 	HotShotBurstLarge.DisplayName: Muzzle Flare
-	CustomItemDrawProjectile.DisplayName: Custom Item Draw Projectile
+	CustomItemDrawProjectile.DisplayName: Custom Draw Projectile
 	ManaSpike.DisplayName: Mana Spike
-	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
+	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
+	ConjuredBoulder.DisplayName: Boulder
 }
 
 Buffs: {

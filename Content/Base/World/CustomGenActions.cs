@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Everware.Content.Underground;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria.ID;
 using Terraria.WorldBuilding;
@@ -97,6 +98,19 @@ public class CustomGenActions
         public override bool Apply(Point origin, int x, int y, params object[] args)
         {
             WorldGen.PoundTile(x, y);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+    public class PlaceCaveBook : GenAction
+    {
+        public PlaceCaveBook() { }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (Main.rand.NextBool(10))
+                WorldGen.PlaceTile(x, y, ModContent.TileType<BookOfBouldersTile>(), true);
+            else
+                WorldGen.PlaceTile(x, y, ModContent.TileType<CaveBook>(), true);
             return UnitApply(origin, x, y, args);
         }
     }
@@ -250,6 +264,30 @@ public class CustomGenActions
         }
     }
 
+    public class SetWallBetweenTwo5050 : GenAction
+    {
+        private ushort wallid;
+        private ushort wallid2;
+        public SetWallBetweenTwo5050(ushort wallID, ushort wallID2)
+        {
+            wallid = wallID;
+            wallid2 = wallID2;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (!WorldGen.genRand.NextBool(4))
+            {
+                WorldUtils.ClearWall(x, y);
+                Main.tile[x, y].ClearWallPaintAndCoating();
+                WorldGen.PlaceWall(x, y, Main.rand.NextBool() ? wallid : wallid2);
+
+                WorldUtils.TileFrame(x, y, true);
+            }
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
     public class SetTileBetweenTwo : GenAction
     {
         private ushort id1;
@@ -267,6 +305,31 @@ public class CustomGenActions
             Main.tile[x, y].ResetToType(Main.rand.NextBool() ? id1 : id2);
 
             WorldUtils.TileFrame(x, y, true);
+
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
+    public class SetTileBetweenTwo5050 : GenAction
+    {
+        private ushort id1;
+        private ushort id2;
+        public SetTileBetweenTwo5050(ushort ID1, ushort ID2)
+        {
+            id1 = ID1;
+            id2 = ID2;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (!WorldGen.genRand.NextBool(8))
+            {
+                WorldUtils.ClearTile(x, y);
+
+                Main.tile[x, y].ResetToType(Main.rand.NextBool() ? id1 : id2);
+
+                WorldUtils.TileFrame(x, y, true);
+            }
 
             return UnitApply(origin, x, y, args);
         }

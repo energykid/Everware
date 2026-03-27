@@ -10,7 +10,7 @@ class SkullStaff : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        DefaultToSummonWeapon(50, 2f, 20, 10, ModContent.ProjectileType<SkullMinion>(), ModContent.BuffType<SkullMinionBuff>(), 50);
+        DefaultToSummonWeapon(20, 2f, 20, 10, ModContent.ProjectileType<SkullMinion>(), ModContent.BuffType<SkullMinionBuff>(), 50);
         Item.noMelee = true;
         Item.summon = true;
         Item.rare = ItemRarityID.LightRed;

@@ -31,6 +31,7 @@ public class ParticleSystem : ModSystem
 
 public abstract class Particle : Entity
 {
+    public float[] ai = { 0f, 0f, 0f };
     public Vector2 FrameCount = Vector2.One;
     public Vector2 FrameNum = Vector2.Zero;
     public Color Color = Color.White;
@@ -87,9 +88,9 @@ public abstract class Particle : Entity
             Rectangle frame = Texture.Frame((int)FrameCount.X, (int)FrameCount.Y, (int)FrameNum.X, (int)FrameNum.Y);
 
             if (Pixelated)
-                PixelRendering.DrawPixelatedSprite(Texture.Value, position - Main.screenPosition, frame, Color.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
+                PixelRendering.DrawPixelatedSprite(Texture.Value, position - Main.screenPosition, frame, c.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
             else
-                Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, Color.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
+                Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, c.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
         }
     }
 }

@@ -20,7 +20,6 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-
             SoundEngine.PlaySound(SoundID.Grass);
         }
 
