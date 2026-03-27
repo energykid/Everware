@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Terraria.ID;
 
 namespace Everware.Content.Underground;
@@ -16,8 +17,9 @@ public class CaveBook : ModTile
     }
     public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
     {
+        int ii = (int)(Math.Sin(i * 6.1f) * 20);
         Main.tile[i, j].TileFrameY = 0;
-        Main.tile[i, j].TileFrameX = (short)((i % 5) * 18);
+        Main.tile[i, j].TileFrameX = (short)(Math.Abs(ii % 5) * 18);
         return base.TileFrame(i, j, ref resetFrame, ref noBreak);
     }
     public override IEnumerable<Item> GetItemDrops(int i, int j)
