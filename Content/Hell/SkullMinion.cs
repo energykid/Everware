@@ -62,6 +62,7 @@ class SkullMinion : EverMinion
         Projectile.netUpdate = true;
     }
     NPC targetNPC;
+    public static int AttackFrequency => 80;
     public override void AI()
     {
         Projectile.damage = 0;
@@ -74,14 +75,14 @@ class SkullMinion : EverMinion
         {
             Projectile.hide = false;
         }
-        if (Projectile.ai[0] > 60)
+        if (Projectile.ai[0] > AttackFrequency)
         {
             if (BehaviorUtils.ClosestNPC(ref targetNPC, 650, Owner.Center, hostilesOnly: true, ignoreTiles: true) || (Projectile.OwnerMinionAttackTargetNPC != null))
             {
                 if (Projectile.OwnerMinionAttackTargetNPC != null) targetNPC = Projectile.OwnerMinionAttackTargetNPC;
-                if (Projectile.ai[0] > 90)
+                if (Projectile.ai[0] > AttackFrequency + 30)
                 {
-                    if (Projectile.ai[0] == 91)
+                    if (Projectile.ai[0] == AttackFrequency + 31)
                     {
                         SoundStyle style = Assets.Sounds.Gear.Weapon.ObsidianSkullDash.Asset with
                         {
@@ -90,16 +91,16 @@ class SkullMinion : EverMinion
                         };
                         SoundEngine.PlaySound(style, Projectile.Center);
                     }
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(targetNPC.Center) * (Projectile.ai[0] - 60) * 2f, 0.1f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(targetNPC.Center) * (Projectile.ai[0] - AttackFrequency) * 2f, 0.1f);
                     Projectile.damage = 50;
                 }
             }
             else
             {
                 Projectile.ai[0]--;
-                if (Projectile.ai[0] >= 60)
+                if (Projectile.ai[0] >= AttackFrequency)
                 {
-                    Projectile.ai[0] = 59;
+                    Projectile.ai[0] = AttackFrequency - 1;
                 }
 
                 float a = (float)(Math.Sin(Projectile.ai[0] / 10f));

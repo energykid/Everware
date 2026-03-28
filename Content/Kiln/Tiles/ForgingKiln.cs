@@ -29,6 +29,7 @@ public class ForgingKiln : EverMultitile
         HitSound = style;
         Main.tileNoAttach[Type] = true;
         Main.tileFrameImportant[Type] = true;
+        CreateMapEntryName();
     }
 
     public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)

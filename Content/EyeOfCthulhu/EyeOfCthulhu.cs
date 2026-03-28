@@ -228,7 +228,7 @@ public class EyeOfCthulhu : GlobalNPC
 
                     if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
                     {
-                        calFables.Call("vfx.displayBossIntroCard", "Eye of Cthulhu", "Night Stalker", 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, "ENNWAY", "");
+                        calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), "");
                         Time = 20;
                     }
 
@@ -263,14 +263,14 @@ public class EyeOfCthulhu : GlobalNPC
                 }
                 else
                 {
-                    AI3 = MathHelper.Lerp(AI3, 1f, 0.075f);
+                    AI3 = MathHelper.Lerp(AI3, 1f, 0.1f);
                     if (AI3 < 0.8f)
                     {
                         npc.velocity *= 0.9f;
                         EyeDilation = MathHelper.Lerp(EyeDilation, 1f, 0.2f);
                         npc.ai[1] = 0f;
-                        npc.LerpAngleTowardsPosition(Target.Center, 0.04f, MathHelper.ToRadians(-90f));
-                        npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(AI3 / 20f) * 50f, -700 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.02f, 0.2f);
+                        npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
+                        npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(AI3 / 20f) * 50f, -700 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.02f, 0.3f);
                     }
                     else
                     {
@@ -380,15 +380,30 @@ public class EyeOfCthulhu : GlobalNPC
                 }
                 break;
             case AttackState.Bleed:
-                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -250 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.1f, 0.05f);
-                npc.LerpAngleTowardsPosition(Target.Center, 0.1f, MathHelper.ToRadians(-90f));
+                if (npc.ai[0] == 0)
+                {
+                    VectorTarget = Target.Center;
+                    VectorTarget.X += Math.Sign(Target.Center.X - npc.Center.X) * -140;
+                }
+                VectorTarget += Target.velocity;
+                float max = 14f;
+                float amt = (Easing.KeyFloat(npc.ai[0], 50, 100, 2f, max, Easing.Linear, 0));
+                amt = (Easing.KeyFloat(npc.ai[0], 100, 150, max, 0f, Easing.Linear, amt));
+                VectorTarget.X += Math.Sign(Target.Center.X - npc.Center.X) * amt;
+                npc.VelocityMoveTowardsPosition(GroundedTargetPosition(npc) + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -350 + ((float)Math.Sin(Timer / 17f) * 30f)) + new Vector2(Math.Sign(Target.Center.X - npc.Center.X) * -220, 0), 0.1f, 0.05f);
+                npc.LerpAngleTowardsPosition(VectorTarget, 0.1f, MathHelper.ToRadians(-90f));
                 npc.ai[0]++;
+                float aa = 22; float bb = 15;
+                if (Main.expertMode || Phase == 1)
+                {
+                    aa = 18; bb = 10;
+                }
                 if (npc.ai[0] > 50)
                 {
                     npc.VelocityMoveTowardsPosition(Target.Center + new Vector2((float)Math.Sin(Timer / 20f) * 50f, -200 + ((float)Math.Sin(Timer / 17f) * 30f)), 0.03f, 0.03f, 10);
 
                     npc.velocity *= 0.95f;
-                    if (npc.ai[0] % 25 == 18)
+                    if (npc.ai[0] % aa == bb)
                     {
                         for (int i = 0; i < ((Phase > 0) ? 2 : 1); i++)
                         {
@@ -399,10 +414,10 @@ public class EyeOfCthulhu : GlobalNPC
                             ScreenEffects.AddScreenShake(npc.Center, 10, 0.6f);
 
                             if (Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectileDirect(new EntitySource_Parent(npc, "EoC blood projectile"), PupilPosition(npc), npc.DirectionTo(PupilPosition(npc) + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10))) * 25, ModContent.ProjectileType<CthulhuBloodProjectile>(), BloodProjectileDamage, 2f);
+                                Projectile.NewProjectileDirect(new EntitySource_Parent(npc, "EoC blood projectile"), PupilPosition(npc), npc.DirectionTo(PupilPosition(npc) + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10))) * 17, ModContent.ProjectileType<CthulhuBloodProjectile>(), BloodProjectileDamage, 2f);
                         }
                     }
-                    if (npc.ai[0] % 25 >= 18)
+                    if (npc.ai[0] % aa >= bb)
                     {
                         EyeDilation = MathHelper.Lerp(EyeDilation, 3, 0.4f);
                     }

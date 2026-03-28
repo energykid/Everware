@@ -1,0 +1,236 @@
+Items: {
+	Kilnstone: {
+		DisplayName: Piedra de Forja
+		Tooltip: ""
+	}
+
+	KilnBrick: {
+		DisplayName: Ladrillo de Forja
+		Tooltip: ""
+	}
+
+	KilnstoneArmorBonus: Aumento persistente de la velocidad de minado al minar bloques suaves o piedra
+
+	KilnstoneBrickplate: {
+		DisplayName: Ladrillera de Piedra de Forja
+		Tooltip: ""
+	}
+
+	KilnstoneChausses: {
+		DisplayName: Grebas de Piedra de Forja
+		Tooltip: ""
+	}
+
+	KilnstoneHelmet: {
+		DisplayName: Casco de Piedra de Forja
+		Tooltip: ""
+	}
+
+	KilnBrickWall: {
+		DisplayName: Pared de Ladrillo de Forja
+		Tooltip: ""
+	}
+
+	TestItem: {
+		DisplayName: Objeto de Desarrollador
+		Tooltip: ""
+	}
+
+	ForgingKilnItem: {
+		DisplayName: Horno de Forja
+		Tooltip: ""
+	}
+
+	KilnBrickPlatform: {
+		DisplayName: Plataforma de Ladrillo de Forja
+		Tooltip: ""
+	}
+
+	MakeshiftBed: {
+		DisplayName: Cama Improvisada
+		Tooltip: ""
+	}
+
+	MakeshiftWorkbench: {
+		DisplayName: Mesa de Trabajo Improvisada
+		Tooltip: ""
+	}
+
+	RoughWood: {
+		DisplayName: Madera Áspera
+		Tooltip: ""
+	}
+
+	KilnWorkbench: {
+		DisplayName: Mesa de Trabajo de la Forja
+		Tooltip: ""
+	}
+
+	WornFence: {
+		DisplayName: Cerca Desgastada
+		Tooltip: ""
+	}
+
+	WornWood: {
+		DisplayName: Madera Desgastada
+		Tooltip: ""
+	}
+
+	RebarRod: {
+		DisplayName: Barra de Refuerzo
+		Tooltip: ""
+	}
+
+	SturdyBricks: {
+		DisplayName: Ladrillo Robusto
+		Tooltip: ""
+	}
+
+	WeldingStationItem: {
+		DisplayName: Estación de Soldadura
+		Tooltip: ""
+	}
+
+	RebarArmorBonus: Chance de duplicar la mayoría de ores
+
+	RebarCrest: {
+		DisplayName: Cresta Reforzada
+		Tooltip: ""
+	}
+
+	RebarGridmail: {
+		DisplayName: Reja de Malla Reforzada
+		Tooltip: ""
+	}
+
+	RebarSandals: {
+		DisplayName: Sandalias Reforzadas
+		Tooltip: ""
+	}
+
+	Kilnpost: {
+		DisplayName: Poste de Forja
+		Tooltip: Puede romperse en fragmentos si sueltas <left>
+	}
+
+	Rebuker: {
+		DisplayName: Reprendedor
+		Tooltip: Dispara una penetrante vara de metal cuyo daño se reduce cada golpe que da
+	}
+
+	KilnMusicBox: {
+		DisplayName: Caja de Música (Forja)
+		Tooltip: ""
+	}
+
+	QuarryMusicBox: {
+		DisplayName: Caja de Música (Cantera)
+		Tooltip: ""
+	}
+
+	MenuMusicBox: {
+		DisplayName: Caja de Música (Somewhere Else)
+		Tooltip: ""
+	}
+
+	EyeMusicBox: {
+		DisplayName: Caja de Música (Ojo de Cthulhu)
+		Tooltip: ""
+	}
+
+	BloodRubyCharm: {
+		DisplayName: Rubí del Diablo
+		Tooltip:
+			'''
+			Toca dos veces en una dirección para correr, creando una dañina explosíon detrás de ti
+			Correr te impide caer por un corto momento
+			'''
+	}
+
+	Pyrocleavers: {
+		DisplayName: Pirocuchillas
+		Tooltip:
+			'''
+			Lanza cuchillas fundidas que se derriten en el piso, dejando lava persistente
+			Si golpean una pared, las cuchillas rebotarán
+			'''
+	}
+
+	SkullStaff: {
+		DisplayName: Báculo de Calavera de Obsidiana
+		Tooltip:
+			'''
+			Invoca a una aterradora, burlona y estridente calavera de obsidiana que explota en contacto
+			Se regenera poco despúes de golpear a un enemigo
+			'''
+	}
+
+	HotShot: {
+		DisplayName: Disparo Caliente
+		Tooltip:
+			'''
+			<right> para bombear, aumentando la cantidad de balas y la velocidad pero reduciendo la dispersión
+			Tres bombeos consecutivos antes de disparar lleva tu carga hasta el tope y causa gran retroceso al atacar
+			'''
+	}
+
+	UnwieldyStaff: {
+		DisplayName: Báculo Pesado
+		Tooltip: Tras una largo momento, invoca tres púas mágicas desde el suelo
+	}
+
+	BookOfBoulders: {
+		DisplayName: Tomo de Rocas
+		Tooltip: Conjura una roca encima de tu cursor para que se estrelle en tus enemigos
+	}
+}
+
+Biomes: {
+	KilnMusic: {
+		DisplayName: Forja
+		TownNPCDialogueName: la Forja
+	}
+
+	QuarryMusic: {
+		DisplayName: Cantera
+		TownNPCDialogueName: la Cantera
+	}
+}
+
+Tiles: {
+	WeldingStation.MapEntry: Estación de Soldadura
+	ForgingKiln.MapEntry: Horno de Forja
+}
+
+Projectiles: {
+	KilnpostHoldout.DisplayName: Poste de Forja
+	KilnpostBreakaway.DisplayName: Fragmento de Forja
+	RebukerBolt.DisplayName: Reprendedor
+	RebukerHoldout.DisplayName: Reprendedor
+	CthulhuBloodProjectile.DisplayName: Sangre de Ojo
+	EyeOfCthulhuTendrilHitbox.DisplayName: Ojo de Cthulhu
+	BloodRubyExplosion.DisplayName: Explosión
+	FloorIsLava.DisplayName: Lava Derretida
+	PyrocleaverProjectile.DisplayName: Pirocuchillas
+	SkullMinion.DisplayName: Aterradora, burlona, estridente Calavera de Obsidiana
+	SkullMinionExplosion.DisplayName: Explosión
+	HotShotHoldout.DisplayName: Tiro Caliente
+	HotShotBurst.DisplayName: Boca Ardiente
+	HotShotBurstLarge.DisplayName: Boca Ardiente
+	CustomItemDrawProjectile.DisplayName: Custom Item Draw Projectile
+	ManaSpike.DisplayName: Púa de Maná
+	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
+	ConjuredBoulder.DisplayName: Roca
+}
+
+Buffs: {
+	SkullMinionBuff: {
+		DisplayName: Aterradora, burlona, estridente Calavera de Obsidiana
+		Description: La Aterradora, Burlona, Estridente Calavera de Obsidiana luchará por ti
+	}
+}
+
+BossIntroText: {
+	MusicianENNWAY: ENNWAY
+	EyeOfCthulhu: Acosador Nocturno
+}

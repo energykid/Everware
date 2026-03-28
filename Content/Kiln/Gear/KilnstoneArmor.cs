@@ -1,6 +1,7 @@
 ﻿using Everware.Content.Base.Items;
 using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
+using Everware.Core;
 using Everware.Utils;
 using System;
 using Terraria.ID;
@@ -37,7 +38,7 @@ public class KilnstoneHelmet : EverItem
     {
         {
             player.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetBonus = true;
-            player.setBonus = "Lingering mining speed boost when breaking soft blocks or stone";
+            player.setBonus = LocalizationReferences.Mods.Everware.Items.KilnstoneArmorBonus.GetTextValue();
         }
     }
 }

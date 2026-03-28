@@ -9,6 +9,8 @@ Items: {
 		Tooltip: ""
 	}
 
+	KilnstoneArmorBonus: Lingering mining speed boost when breaking soft blocks or stone
+
 	KilnstoneBrickplate: {
 		DisplayName: Kilnstone Brickplate
 		Tooltip: ""
@@ -89,6 +91,8 @@ Items: {
 		Tooltip: ""
 	}
 
+	RebarArmorBonus: Chance to duplicate most ores
+
 	RebarCrest: {
 		DisplayName: Rebar Crest
 		Tooltip: ""
@@ -99,11 +103,6 @@ Items: {
 		Tooltip: ""
 	}
 
-	RebarLeggings: {
-		DisplayName: Rebar Leggings
-		Tooltip: ""
-	}
-
 	RebarSandals: {
 		DisplayName: Rebar Sandals
 		Tooltip: ""
@@ -111,12 +110,12 @@ Items: {
 
 	Kilnpost: {
 		DisplayName: Kilnpost
-		Tooltip: Can break off into enemies when releasing LMB
+		Tooltip: Can break off into enemies when releasing <left>
 	}
 
 	Rebuker: {
 		DisplayName: Rebuker
-		Tooltip: Fires a piercing metal rod that deals more damage on early hits
+		Tooltip: Fires a piercing metal rod that deals less damage on subsequent hits
 	}
 
 	KilnMusicBox: {
@@ -198,6 +197,11 @@ Biomes: {
 	}
 }
 
+Tiles: {
+	WeldingStation.MapEntry: Welding Station
+	ForgingKiln.MapEntry: Forging Kiln
+}
+
 Projectiles: {
 	KilnpostHoldout.DisplayName: Kilnpost
 	KilnpostBreakaway.DisplayName: Kiln Shard
@@ -224,4 +228,9 @@ Buffs: {
 		DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
 		Description: The terrifying, laughing, screaming obsidian skull will fight for you
 	}
+}
+
+BossIntroText: {
+	MusicianENNWAY: ENNWAY!
+	EyeOfCthulhu: Night Stalker
 }

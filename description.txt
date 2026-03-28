@@ -4,6 +4,7 @@ added the Kiln and Quarry structures, interchangeably generating. generating a d
 added Kilnstone armor and the Kilnpost, craftable only at the Kiln
 added Rebar armor and the Rebuker, craftable only at the Quarry
 
+..
 Everware v0.1.4 - polishing things up before 0.2
 
 added a new menu, "Somewhere Else," with a custom OST and logo
@@ -11,10 +12,25 @@ added music boxes for all existing content with associated music
 you can craft the music box for the new menu theme using all other music boxes in the mod
 various small balancing and gameplay changes
 
+...
 Everware v0.2.0 - bloody hell update
 
 reworked the Eye of Cthulhu, adding new music as well
 added pods which spawn in the Underworld, dropping new loot as well as some harder-to-find vanilla items
 added four new gear drops to go with the pods
 
+....
 Everware 0.2.2 - slight fixes & added one magic weapon
+
+fixed rebar rod walls not merging correctly
+added the Unwieldy Staff, dropping from Tim with a 100% drop rate
+
+.....
+Everware 0.2.3 - extra polishing for 0.2.0
+
+added Spanish localization by Enderpikmin
+nerfed Obsidian Skull Staff damage to 20 and made it attack slightly less frequently
+buffed most Eye of Cthulhu attacks to be a little more aggressive
+changed blood projectile attack so that its trajectory rotates slowly, as well as moving itself to the left/right of the player
+added Book of Boulders, found occasionally in ruined underground houses with newly-spawning books in some rooms
+added text keys for Kiln/Quarry crafting stations, Eye of Cthulhu fables boss text, and armor set bonuses for localizers

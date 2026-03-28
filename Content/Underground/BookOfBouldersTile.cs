@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using Terraria.ID;
 
 namespace Everware.Content.Underground;
@@ -31,6 +32,10 @@ public class BookOfBouldersTile : ModTile
     {
         WorldGen.KillTile(i, j);
         return true;
+    }
+    public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        return base.PreDraw(i, j, spriteBatch);
     }
     public override IEnumerable<Item> GetItemDrops(int i, int j)
     {

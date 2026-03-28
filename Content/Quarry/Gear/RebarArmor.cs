@@ -2,6 +2,7 @@
 using Everware.Content.Base.Tiles.TileData;
 using Everware.Content.Quarry.Tiles;
 using Everware.Content.Quarry.Visual;
+using Everware.Core;
 using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -41,7 +42,7 @@ public class RebarCrest : EverItem
     {
         {
             player.GetModPlayer<RebarSetBonus>().rebarSetBonus = true;
-            player.setBonus = "Chance to duplicate most ores";
+            player.setBonus = LocalizationReferences.Mods.Everware.Items.RebarArmorBonus.GetTextValue();
         }
     }
 

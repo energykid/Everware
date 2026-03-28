@@ -49,7 +49,7 @@ public class CustomGenActions
         {
             ushort type = TileID.Dirt;
 
-            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && KilnOrQuarryGeneration.ReplaceableTiles.Contains(Main.tile[x, y].TileType))
+            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && !KilnOrQuarryGeneration.IrreplaceableTiles.Contains(Main.tile[x, y].TileType))
             {
                 type = Main.tile[x, y].TileType;
                 Main.tile[x, y].ResetToType(TileID.Silt);
@@ -166,7 +166,7 @@ public class CustomGenActions
 
         public override bool Apply(Point origin, int x, int y, params object[] args)
         {
-            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && KilnOrQuarryGeneration.ReplaceableTiles.Contains(Main.tile[x, y].TileType))
+            if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && !KilnOrQuarryGeneration.IrreplaceableTiles.Contains(Main.tile[x, y].TileType))
             {
                 WorldGen.KillTile(x, y, false, false, true);
                 WorldGen.PlaceTile(x, y, id, true);

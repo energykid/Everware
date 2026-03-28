@@ -23,11 +23,11 @@ public class CthulhuBloodProjectile : EverProjectile
         Projectile.ai[0]++;
         if (Projectile.ai[0] < 20)
         {
-            Projectile.velocity *= MathHelper.Lerp(Main.expertMode ? 0.85f : 0.75f, 1f, Projectile.ai[0] / 20f);
+            Projectile.velocity *= MathHelper.Lerp(Main.expertMode ? 0.8f : 0.75f, 1f, Projectile.ai[0] / 20f);
         }
         else
         {
-            Projectile.velocity *= 1.04f;
+            Projectile.velocity *= 1.02f;
         }
         if (Projectile.ai[1] != 1)
         {
