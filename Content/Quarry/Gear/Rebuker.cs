@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Everware.Content.Quarry.Gear;
 
@@ -36,6 +37,7 @@ public class Rebuker : EverWeaponItem
 public class RebukerHoldout : EverHoldoutProjectile
 {
     public override string Texture => "Everware/Assets/Textures/Quarry/RebukerHoldout";
+    public override LocalizedText DisplayName => Language.GetText("Mods.Everware.Items.Rebuker.DisplayName");
     public int FrameY = 0;
     public float RotLerpFactor = 0.6f;
     public override void SetDefaults()

@@ -9,6 +9,7 @@ using ReLogic.Content;
 using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Everware.Content.Quarry.Gear;
 
@@ -42,7 +43,7 @@ public class RebarCrest : EverItem
     {
         {
             player.GetModPlayer<RebarSetBonus>().rebarSetBonus = true;
-            player.setBonus = LocalizationReferences.Mods.Everware.Items.RebarArmorBonus.GetTextValue();
+            player.setBonus = Language.GetTextValue("Mods.Everware.Items.RebarCrest.SetBonus");
         }
     }
 
