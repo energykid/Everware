@@ -78,7 +78,7 @@ Items: {
 	RebarCrest: {
 		DisplayName: Арматурная корона
 		Tooltip: ""
-		SetBonus: Даёт шанс удвоить некоторую добываемую руду
+		SetBonus: Даёт шанс удвоить большинство видов руды при добыче
 	}
 
 	RebarGridmail: {
@@ -92,7 +92,7 @@ Items: {
 	}
 
 	Kilnpost: {
-		DisplayName: Обожишест
+		DisplayName: Обжишест
 		Tooltip: Оставляет осколки во врагах при отпускании ЛКМ
 	}
 
