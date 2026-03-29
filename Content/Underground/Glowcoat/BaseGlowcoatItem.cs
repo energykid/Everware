@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base.Items;
+using System;
 using Terraria.ID;
 
 namespace Everware.Content.Underground.Glowcoat;
@@ -23,15 +24,23 @@ public abstract class BaseGlowcoatItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-            if (Main.tile[(Main.MouseWorld / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(Main.MouseWorld / 16).ToPoint()].TileType])
+            for (int i = 0; i < 6; i++)
             {
-                if (Main.tile[(Main.MouseWorld / 16).ToPoint()].Get<GlowcoatTileData>().color != Color)
+                Dust d = Dust.NewDustDirect(new Vector2(player.Center.X + (player.direction * 16) - 5, player.Center.Y), 10, 2, DustType, (player.direction * 2) + player.velocity.X, Scale: 0.8f);
+
+            }
+            bool inRange = Math.Abs(Player.tileTargetX - (player.Center.X / 16)) < Player.tileRangeX && Math.Abs(Player.tileTargetY - (player.Center.Y / 16)) < Player.tileRangeY;
+            Tile t = Main.tile[Player.tileTargetX, Player.tileTargetY];
+            if (t.HasTile && Main.tileSolid[t.TileType] && inRange)
+            {
+                if (t.Get<GlowcoatTileData>().color != Color)
                 {
                     Point p = (Main.MouseWorld / 16).ToPoint();
-                    GlowcoatSystem.Glowcoat(p.X, p.Y, Color, Chromatic);
+                    GlowcoatSystem.Glowcoat(Player.tileTargetX, Player.tileTargetY, Color, Chromatic);
                     for (int i = 0; i < 15; i++)
                     {
-                        Dust.NewDust(Main.MouseWorld, 0, 0, DustType, Scale: 0.8f);
+                        Dust d = Dust.NewDustDirect(new Vector2((Player.tileTargetX * 16) + 8, (Player.tileTargetY * 16) + 8), 0, 0, DustType, Scale: 1.5f);
+                        d.noGravity = true;
                     }
                     Item.stack--;
                 }

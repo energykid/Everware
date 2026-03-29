@@ -188,6 +188,26 @@ Items: {
 		DisplayName: Magmatic Glowcoat
 		Tooltip: Apply to a tile to give it a deep magmatic glow
 	}
+
+	ArgonGlowcoat: {
+		DisplayName: Argon Glowcoat
+		Tooltip: Apply to a tile to give it a light pink glow
+	}
+
+	KryptonGlowcoat: {
+		DisplayName: Krypton Glowcoat
+		Tooltip: Apply to a tile to give it a bright green glow
+	}
+
+	NeonGlowcoat: {
+		DisplayName: Neon Glowcoat
+		Tooltip: Apply to a tile to give it a bold purple glow
+	}
+
+	XenonGlowcoat: {
+		DisplayName: Xenon Glowcoat
+		Tooltip: Apply to a tile to give it a rich blue glow
+	}
 }
 
 Biomes: {
