@@ -9,7 +9,11 @@ Items: {
 		Tooltip: ""
 	}
 
-	KilnstoneArmorBonus: Aumento persistente de la velocidad de minado al minar bloques suaves o piedra
+	KilnstoneHelmet: {
+		DisplayName: Casco de Piedra de Forja
+		Tooltip: ""
+		SetBonus: Aumento persistente de la velocidad de minado al minar bloques suaves o piedra
+	}
 
 	KilnstoneBrickplate: {
 		DisplayName: Ladrillera de Piedra de Forja
@@ -18,11 +22,6 @@ Items: {
 
 	KilnstoneChausses: {
 		DisplayName: Grebas de Piedra de Forja
-		Tooltip: ""
-	}
-
-	KilnstoneHelmet: {
-		DisplayName: Casco de Piedra de Forja
 		Tooltip: ""
 	}
 
@@ -43,21 +42,6 @@ Items: {
 
 	KilnBrickPlatform: {
 		DisplayName: Plataforma de Ladrillo de Forja
-		Tooltip: ""
-	}
-
-	MakeshiftBed: {
-		DisplayName: Cama Improvisada
-		Tooltip: ""
-	}
-
-	MakeshiftWorkbench: {
-		DisplayName: Mesa de Trabajo Improvisada
-		Tooltip: ""
-	}
-
-	RoughWood: {
-		DisplayName: Madera Áspera
 		Tooltip: ""
 	}
 
@@ -91,11 +75,10 @@ Items: {
 		Tooltip: ""
 	}
 
-	RebarArmorBonus: Chance de duplicar la mayoría de ores
-
 	RebarCrest: {
 		DisplayName: Cresta Reforzada
 		Tooltip: ""
+		SetBonus: Chance de duplicar la mayoría de ores
 	}
 
 	RebarGridmail: {
@@ -197,27 +180,17 @@ Biomes: {
 	}
 }
 
-Tiles: {
-	WeldingStation.MapEntry: Estación de Soldadura
-	ForgingKiln.MapEntry: Horno de Forja
-}
-
 Projectiles: {
-	KilnpostHoldout.DisplayName: Poste de Forja
 	KilnpostBreakaway.DisplayName: Fragmento de Forja
-	RebukerBolt.DisplayName: Reprendedor
-	RebukerHoldout.DisplayName: Reprendedor
+	RebukerBolt.DisplayName: Bara de Metal
 	CthulhuBloodProjectile.DisplayName: Sangre de Ojo
-	EyeOfCthulhuTendrilHitbox.DisplayName: Ojo de Cthulhu
 	BloodRubyExplosion.DisplayName: Explosión
 	FloorIsLava.DisplayName: Lava Derretida
 	PyrocleaverProjectile.DisplayName: Pirocuchillas
 	SkullMinion.DisplayName: Aterradora, burlona, estridente Calavera de Obsidiana
 	SkullMinionExplosion.DisplayName: Explosión
-	HotShotHoldout.DisplayName: Tiro Caliente
 	HotShotBurst.DisplayName: Boca Ardiente
 	HotShotBurstLarge.DisplayName: Boca Ardiente
-	CustomItemDrawProjectile.DisplayName: Custom Item Draw Projectile
 	ManaSpike.DisplayName: Púa de Maná
 	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Roca

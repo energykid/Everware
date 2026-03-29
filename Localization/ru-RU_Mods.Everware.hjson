@@ -1,0 +1,219 @@
+Items: {
+	Kilnstone: {
+		DisplayName: Обжикамень
+		Tooltip: ""
+	}
+
+	KilnBrick: {
+		DisplayName: Кирпич обжигальни
+		Tooltip: ""
+	}
+
+	KilnstoneHelmet: {
+		DisplayName: Обжикаменный шлем
+		Tooltip: ""
+		SetBonus: При разрушении мягких почв или камня даёт бонус к скорости добычи на некоторое время
+	}
+
+	KilnstoneBrickplate: {
+		DisplayName: Обжикаменная кирпичуга
+		Tooltip: ""
+	}
+
+	KilnstoneChausses: {
+		DisplayName: Обжикаменные шоссы
+		Tooltip: ""
+	}
+
+	KilnBrickWall: {
+		DisplayName: Стена из кирпича обжигальни
+		Tooltip: ""
+	}
+
+	TestItem: {
+		DisplayName: Dev Item
+		Tooltip: ""
+	}
+
+	ForgingKilnItem: {
+		DisplayName: Кузнечная обжигальня
+		Tooltip: ""
+	}
+
+	KilnBrickPlatform: {
+		DisplayName: Платформа из кирпича обжигальни
+		Tooltip: ""
+	}
+
+	KilnWorkbench: {
+		DisplayName: Верстак обжигальни
+		Tooltip: ""
+	}
+
+	WornFence: {
+		DisplayName: Износившийся забор
+		Tooltip: ""
+	}
+
+	WornWood: {
+		DisplayName: Износившаяся древесина
+		Tooltip: ""
+	}
+
+	RebarRod: {
+		DisplayName: Арматура
+		Tooltip: ""
+	}
+
+	SturdyBricks: {
+		DisplayName: Прочный кирпич
+		Tooltip: ""
+	}
+
+	WeldingStationItem: {
+		DisplayName: Сварочный стол
+		Tooltip: ""
+	}
+
+	RebarCrest: {
+		DisplayName: Арматурная корона
+		Tooltip: ""
+		SetBonus: Даёт шанс удвоить некоторую добываемую руду
+	}
+
+	RebarGridmail: {
+		DisplayName: Арматурная клетчатая кольчуга
+		Tooltip: ""
+	}
+
+	RebarSandals: {
+		DisplayName: Арматурные сандали
+		Tooltip: ""
+	}
+
+	Kilnpost: {
+		DisplayName: Обожишест
+		Tooltip: Оставляет осколки во врагах при отпускании ЛКМ
+	}
+
+	Rebuker: {
+		DisplayName: Упрекатель
+		Tooltip:
+			'''
+			Стреляет пробивающей врагов арматурой
+			Арматура наносит меньше урона с каждой последующей поражённой целью
+			'''
+	}
+
+	KilnMusicBox: {
+		DisplayName: Музыкальная шкатулка (Обжигальня)
+		Tooltip: ""
+	}
+
+	QuarryMusicBox: {
+		DisplayName: Музыкальная шкатулка (Карьер)
+		Tooltip: ""
+	}
+
+	MenuMusicBox: {
+		DisplayName: Музыкальная шкатулка (Заглавная тема Everware)
+		Tooltip: ""
+	}
+
+	EyeMusicBox: {
+		DisplayName: Музыкальная шкатулка (Глаз Ктулху)
+		Tooltip: ""
+	}
+
+	BloodRubyCharm: {
+		DisplayName: Рубин дьявола
+		Tooltip:
+			'''
+			Нажмите дважды в нужном направлении, чтобы совершить взрывной рывок, наносящий урон врагам
+			Рывок также ненадолго задерживает вас в воздухе
+			'''
+	}
+
+	Pyrocleavers: {
+		DisplayName: Пироруб
+		Tooltip:
+			'''
+			Бросает раскалённый топор, который расплавляется при контакте с землёй, оставляя за собой лаву
+			Отскакивает при попадании в стену
+			'''
+	}
+
+	SkullStaff: {
+		DisplayName: Посох обсидианового черепа
+		Tooltip:
+			'''
+			Призывает ужасающий, смеющийся, кричащий обсидиановый череп, взрывающийся при контакте с врагом
+			Медленно восстанавливается после попадания по врагу
+			'''
+	}
+
+	HotShot: {
+		DisplayName: Огнестрел
+		Tooltip:
+			'''
+			Нажмите ПКМ, чтобы зарядить оружие
+			Каждый уровень заряда выпускает больше пуль, а также имеет большую скорость и меньший разброс
+			Три зарядки подряд максимально заряжают выстрел и вызывают сильную отдачу при атаке
+			'''
+	}
+
+	UnwieldyStaff: {
+		DisplayName: Громоздкий посох
+		Tooltip: После долгой зарядки, вызывает три магических шипа из-под земли
+	}
+
+	BookOfBoulders: {
+		DisplayName: Книга валунов
+		Tooltip: Призывает над курсором раздавливающий врагов валун
+	}
+
+	MagmaticGlowcoat: {
+		DisplayName: Магматическое светящиеся покрытие
+		Tooltip: Используйте на блоках, чтобы они начали излучать мягкий магматический свет
+	}
+}
+
+Biomes: {
+	KilnMusic: {
+		DisplayName: Обжигальня
+		TownNPCDialogueName: Обжигальня
+	}
+
+	QuarryMusic: {
+		DisplayName: Карьер
+		TownNPCDialogueName: Карьер
+	}
+}
+
+Projectiles: {
+	KilnpostBreakaway.DisplayName: Осколок обжишеста
+	RebukerBolt.DisplayName: Арматура
+	CthulhuBloodProjectile.DisplayName: Глазная кровь
+	BloodRubyExplosion.DisplayName: Взрыв
+	FloorIsLava.DisplayName: Раскалённая лава
+	PyrocleaverProjectile.DisplayName: Пироруб
+	SkullMinion.DisplayName: Ужасающий, смеющийся, кричащий обсидиановый череп
+	SkullMinionExplosion.DisplayName: Взрыв
+	HotShotBurst.DisplayName: Вспышка дула
+	HotShotBurstLarge.DisplayName: Вспышка дула
+	ManaSpike.DisplayName: Магический шип
+	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
+	ConjuredBoulder.DisplayName: Валун
+}
+
+Buffs: {
+	SkullMinionBuff: {
+		DisplayName: Ужасающий, смеющийся, кричащий обсидиановый череп
+		Description: За вас сражается ужасающий, смеющийся, кричащий обсидиановый череп
+	}
+}
+
+BossIntroText: {
+	MusicianENNWAY: ENNWAY!
+	EyeOfCthulhu: Ночной наблюдатель
+}

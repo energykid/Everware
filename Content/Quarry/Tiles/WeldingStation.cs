@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
+using Terraria.Localization;
 using Terraria.ObjectData;
 
 namespace Everware.Content.Quarry.Tiles;
@@ -24,11 +25,9 @@ public class WeldingStation : EverMultitile
 
         TileObjectData.addTile(Type);
 
-        CreateMapEntryName();
-
         AnimationFrameHeight = 3 * 18;
 
-        AddMapEntry(new Color(101, 101, 101));
+        AddMapEntry(new Color(101, 101, 101), Language.GetText("Mods.Everware.Items.WeldingStationItem.DisplayName"));
     }
 
     public override void AnimateTile(ref int frame, ref int frameCounter)
