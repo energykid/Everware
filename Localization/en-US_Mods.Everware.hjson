@@ -183,6 +183,11 @@ Items: {
 		DisplayName: Book of Boulders
 		Tooltip: Conjures a boulder from above your cursor to crash down on your foes
 	}
+
+	MagmaticGlowcoat: {
+		DisplayName: Magmatic Glowcoat
+		Tooltip: Apply to a tile to give it a deep magmatic glow
+	}
 }
 
 Biomes: {

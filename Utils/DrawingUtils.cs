@@ -5,7 +5,10 @@ namespace Everware.Utils;
 
 public static class DrawingUtils
 {
-
+    public static Vector2 TileOffset()
+    {
+        return Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+    }
     public static Vector2 PlayerOffset(Player player)
     {
         return new Vector2(0f, player.gfxOffY);

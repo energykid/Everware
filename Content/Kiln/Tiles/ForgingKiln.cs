@@ -24,12 +24,11 @@ public class ForgingKiln : EverMultitile
         AdjTiles = [TileID.Furnaces];
 
         SoundStyle style = new SoundStyle("Everware/Assets/Sounds/Tile/KilnstoneHit");
-        AddMapEntry(new Color(151, 62, 59));
+        AddMapEntry(new Color(151, 62, 59), CreateMapEntryName());
         style.PitchRange = (-0.3f, -0.1f);
         HitSound = style;
         Main.tileNoAttach[Type] = true;
         Main.tileFrameImportant[Type] = true;
-        CreateMapEntryName();
     }
 
     public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)

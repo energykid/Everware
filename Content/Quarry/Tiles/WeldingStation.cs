@@ -24,11 +24,9 @@ public class WeldingStation : EverMultitile
 
         TileObjectData.addTile(Type);
 
-        CreateMapEntryName();
-
         AnimationFrameHeight = 3 * 18;
 
-        AddMapEntry(new Color(101, 101, 101));
+        AddMapEntry(new Color(101, 101, 101), CreateMapEntryName());
     }
 
     public override void AnimateTile(ref int frame, ref int frameCounter)

@@ -1,5 +1,5 @@
 ﻿using Everware.Content.Base.Items;
-using Everware.Content.Kiln;
+using Everware.Content.Underground.Glowcoat;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -22,7 +22,8 @@ public class TestItem : EverItem
         if (player.ItemAnimationJustStarted)
         {
             SoundEngine.PlaySound(SoundID.Grass);
-            KilnGenerator.GenerateKiln(KilnOrQuarryGeneration.GetPointFrom((Main.MouseWorld / 16).ToPoint(), 0, 100));
+
+            Main.tile[(Main.MouseWorld / 16).ToPoint()].Get<GlowcoatTileData>().color = Main.rand.NextBool() ? new Color(228, 140, 80) : new Color(151, 105, 151);
         }
 
         return base.UseItem(player);

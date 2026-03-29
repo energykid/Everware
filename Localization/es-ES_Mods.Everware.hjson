@@ -183,6 +183,11 @@ Items: {
 		DisplayName: Tomo de Rocas
 		Tooltip: Conjura una roca encima de tu cursor para que se estrelle en tus enemigos
 	}
+
+	MagmaticGlowcoat: {
+		// DisplayName: Magmatic Glowcoat
+		// Tooltip: Apply to a tile to give it a deep magmatic glow
+	}
 }
 
 Biomes: {
