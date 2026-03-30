@@ -1,6 +1,8 @@
 ﻿using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
+using Terraria.ID;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Underground.Glowcoat;
@@ -15,6 +17,25 @@ public class GlowcoatGlobalTile : GlobalTile
         }
     }
 }
+public class GlowcoatPaintScraper : GlobalItem
+{
+    public override void UseStyle(Item item, Player player, Rectangle heldItemFrame)
+    {
+        if (item.type == ItemID.PaintScraper || item.type == ItemID.SpectrePaintScraper && player.ItemAnimationJustStarted)
+        {
+            bool inRange = Math.Abs(Player.tileTargetX - (player.Center.X / 16)) < Player.tileRangeX && Math.Abs(Player.tileTargetY - (player.Center.Y / 16)) < Player.tileRangeY;
+            Tile t = Main.tile[Player.tileTargetX, Player.tileTargetY];
+            if (t.HasTile && Main.tileSolid[t.TileType] && inRange)
+            {
+                if (t.Get<GlowcoatTileData>().color != Color.Transparent)
+                {
+                    GlowcoatSystem.Unglowcoat(Player.tileTargetX, Player.tileTargetY);
+                }
+            }
+        }
+    }
+}
+
 public class GlowcoatSystem : ModSystem
 {
     public static void Unglowcoat(int i, int j)
@@ -27,6 +48,8 @@ public class GlowcoatSystem : ModSystem
     }
     public static void Glowcoat(int i, int j, Color color, bool chromatic = false)
     {
+        Unglowcoat(i, j);
+
         Main.tile[i, j].Get<GlowcoatTileData>().color = color;
         Main.tile[i, j].Get<GlowcoatTileData>().chromatic = chromatic;
 
@@ -110,8 +133,6 @@ public class GlowcoatSystem : ModSystem
             GlowcoatedTiles.Add(p);
             t.Get<GlowcoatTileData>().color = tag.Get<Color>("Color_" + PointString(p));
             t.Get<GlowcoatTileData>().chromatic = tag.Get<bool>("Chroma_" + PointString(p));
-
-            Main.NewText(PointString(p));
         }
     }
 

@@ -184,19 +184,14 @@ Items: {
 		Tooltip: Conjures a boulder from above your cursor to crash down on your foes
 	}
 
-	MagmaticGlowcoat: {
-		DisplayName: Magmatic Glowcoat
-		Tooltip: Apply to a tile to give it a deep magmatic glow
-	}
-
 	ArgonGlowcoat: {
 		DisplayName: Argon Glowcoat
-		Tooltip: Apply to a tile to give it a light pink glow
+		Tooltip: Apply to a tile to give it a deep pink glow
 	}
 
 	KryptonGlowcoat: {
 		DisplayName: Krypton Glowcoat
-		Tooltip: Apply to a tile to give it a bright green glow
+		Tooltip: Apply to a tile to give it a flashy green glow
 	}
 
 	NeonGlowcoat: {
@@ -207,6 +202,31 @@ Items: {
 	XenonGlowcoat: {
 		DisplayName: Xenon Glowcoat
 		Tooltip: Apply to a tile to give it a rich blue glow
+	}
+
+	OganessonGlowcoat: {
+		DisplayName: Oganesson Glowcoat
+		Tooltip: Apply to a tile to give it a sleek white glow
+	}
+
+	RadonGlowcoat: {
+		DisplayName: Radon Glowcoat
+		Tooltip: Apply to a tile to give it a bright yellow glow
+	}
+
+	ChromaticGlowcoat: {
+		DisplayName: Chromatic Glowcoat
+		Tooltip: Apply to a tile to give it an illustrious multicolored glow
+	}
+
+	MagmaticGlowcoat: {
+		DisplayName: Magmatic Glowcoat
+		Tooltip: Apply to a tile to give it a tense fiery glow
+	}
+
+	AuroralGlowcoat: {
+		DisplayName: Auroral Glowcoat
+		Tooltip: Apply to a tile to give it a calming icy glow
 	}
 }
 
@@ -242,9 +262,9 @@ Projectiles: {
 	HotShotHoldout.DisplayName: Hot Shot
 	HotShotBurst.DisplayName: Muzzle Flare
 	HotShotBurstLarge.DisplayName: Muzzle Flare
-	CustomItemDrawProjectile.DisplayName: Custom Draw Projectile
+	CustomItemDrawProjectile.DisplayName: Projectile
 	ManaSpike.DisplayName: Mana Spike
-	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
+	EverCustomDrawProjectile.DisplayName: Projectile
 	ConjuredBoulder.DisplayName: Boulder
 }
 
