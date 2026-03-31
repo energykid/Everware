@@ -1,4 +1,5 @@
 ﻿global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
 global using Terraria;
 global using Terraria.Audio;
 global using Terraria.GameContent;

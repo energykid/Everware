@@ -228,6 +228,15 @@ Items: {
 		// DisplayName: Auroral Glowcoat
 		// Tooltip: Apply to a tile to give it a calming icy glow
 	}
+
+	Groundshakers: {
+		// DisplayName: Groundshakers
+		/* Tooltip:
+			'''
+			Double-tap <down> to perform a ground pound
+			Hitting enemies with this move deals damage and bounces you upward
+			''' */
+	}
 }
 
 Biomes: {

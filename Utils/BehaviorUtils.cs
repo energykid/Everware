@@ -2,6 +2,10 @@
 
 public static class BehaviorUtils
 {
+    public static bool IsHostile(this NPC npc)
+    {
+        return (!npc.friendly && !npc.CountsAsACritter);
+    }
     public static Vector2 Grounded(this Vector2 baseVec)
     {
         if (SolidTileOrPlatform(Main.tile[(baseVec / 16).ToPoint()]))
