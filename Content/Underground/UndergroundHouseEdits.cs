@@ -1,31 +1,53 @@
 ﻿using Everware.Content.Base.World;
+using Everware.Content.Underground.DeepCaveLoot;
 using Terraria.GameContent.Biomes.CaveHouse;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 
 namespace Everware.Content.Underground;
 
-[Autoload]
-public class UndergroundHouseEdits : ILoadable
+public class UndergroundHouseEdits : ModSystem
 {
-    public void Load(Mod mod)
+    public static int DeepCaveLayer => (int)(Main.UnderworldLayer * 0.65f);
+
+    public override void PostWorldGen()
+    {
+        for (int i = 0; i < Main.chest.Length; i++)
+        {
+            if (Main.chest[i] != null)
+            {
+                if (Main.chest[i].y > DeepCaveLayer)
+                {
+                    Tile chestTile = Main.tile[Main.chest[i].x, Main.chest[i].y];
+                    if ((int)((float)chestTile.TileFrameX / 36f) == 1) // Gold Chest
+                    {
+                        Chest chest = Main.chest[i];
+                        if (Main.rand.NextBool(6))
+                            chest.item[0] = new Item(ModContent.ItemType<Groundshakers>());
+                    }
+                }
+            }
+        }
+    }
+
+    public override void Load()
     {
         On_HouseBuilder.FillRooms += AddBookshelves;
         On_HouseBuilder.PlaceEmptyRooms += DynamicChangeTileTypes;
     }
-    public void Unload()
+
+    public override void Unload()
     {
         On_HouseBuilder.FillRooms -= AddBookshelves;
         On_HouseBuilder.PlaceEmptyRooms -= DynamicChangeTileTypes;
     }
-
 
     // changes the tile type from wood to gray brick if the house is in the cavern layer
     private void DynamicChangeTileTypes(On_HouseBuilder.orig_PlaceEmptyRooms orig, HouseBuilder self)
     {
         bool normal = self.TileType == TileID.WoodBlock;
 
-        if (self.TopRoom.Top >= Main.UnderworldLayer * 0.65f && normal)
+        if (self.TopRoom.Top >= DeepCaveLayer && normal)
         {
             self.TileType = TileID.GrayBrick;
             self.WallType = WallID.GrayBrick;

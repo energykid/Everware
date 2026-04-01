@@ -233,7 +233,7 @@ Items: {
 		// DisplayName: Groundshakers
 		/* Tooltip:
 			'''
-			Double-tap <down> to perform a ground pound
+			Double-tap DOWN to perform a ground pound
 			Hitting enemies with this move deals damage and bounces you upward
 			''' */
 	}

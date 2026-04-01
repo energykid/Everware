@@ -36,7 +36,7 @@ public class GroundshakersPlayer : ModPlayer
     public override void ResetEffects()
     {
         ParryCooldown -= 1;
-        if (Enabled && ParryCooldown < 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
+        if (Enabled && Player.velocity.Y != 0 && ParryCooldown < 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
         {
             if (Player.controlDown && Player.releaseDown && Player.doubleTapCardinalTimer[0] < 15 && Player.doubleTapCardinalTimer[1] == 0)
             {
@@ -52,7 +52,6 @@ public class GroundshakersPlayer : ModPlayer
         // run this if in game & not inanimate
         if (!Main.gameMenu)
         {
-
             int pC = Player.GetModPlayer<GroundshakersPlayer>().ParryCooldown;
             // only run if parrying is currently possible
             if (pC > 50)
@@ -130,10 +129,10 @@ public class GroundshakersPlayer : ModPlayer
             {
                 if (Main.ActiveNPCs.span[i].IsHostile() && Main.ActiveNPCs.span[i].immune[Player.whoAmI] <= 0 && Main.ActiveNPCs.span[i].active)
                 {
-                    if (Main.ActiveNPCs.span[i].Distance(Player.Bottom) < 95 && Player.Bottom.Y < Main.ActiveNPCs.span[i].Center.Y)
+                    if (Main.ActiveNPCs.span[i].Distance(Player.Bottom) < 80 && Player.Bottom.Y < Main.ActiveNPCs.span[i].Center.Y)
                     {
                         if (Cooldown > 51)
-                            Player.velocity.X = (MathHelper.Lerp(Player.Center.X, Main.ActiveNPCs.span[i].Center.X, 0.2f) - Player.Center.X);
+                            Player.velocity.X = (MathHelper.Lerp(Player.Center.X, Main.ActiveNPCs.span[i].Center.X, 0.35f) - Player.Center.X);
                     }
                 }
             }
