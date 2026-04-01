@@ -1,5 +1,5 @@
 ﻿using Everware.Content.Base.Items;
-using Everware.Content.Underground.Glowcoat;
+using Everware.Content.Gallery;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -9,7 +9,7 @@ public class TestItem : EverItem
     public override string Texture => "Everware/Assets/Textures/Misc/TestItem";
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return false;
+        return true;
     }
     public override void SetDefaults()
     {
@@ -21,9 +21,7 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-            SoundEngine.PlaySound(SoundID.Grass);
-
-            Main.tile[(Main.MouseWorld / 16).ToPoint()].Get<GlowcoatTileData>().color = Main.rand.NextBool() ? new Color(228, 140, 80) : new Color(151, 105, 151);
+            GalleryGenerator.GenerateGallery((Main.MouseWorld / 16).ToPoint());
         }
 
         return base.UseItem(player);
