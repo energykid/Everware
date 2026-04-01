@@ -288,3 +288,19 @@ BossIntroText: {
 	MusicianENNWAY: ENNWAY!
 	EyeOfCthulhu: Night Stalker
 }
+
+ConfigKeys: {
+	StyleSettings: {
+		DisplayName: Style Settings
+		Unchanged: Unchanged
+	}
+}
+
+Configs: {
+	StyleSettings: {
+		eocEnabled: {
+			Label: Eye of Cthulhu Behavior
+			Tooltip: Choose between Vanilla or Everware behavior styles for the Eye of Cthulhu.
+		}
+	}
+}

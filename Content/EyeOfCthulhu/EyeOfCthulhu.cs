@@ -1,8 +1,8 @@
 ﻿using Everware.Common.Systems;
+using Everware.Config;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.IO;
@@ -22,6 +22,11 @@ public class EyeOfCthulhu : GlobalNPC
     public static int DesperationThreshold => Main.expertMode ? Main.masterMode ? 700 : 400 : 250;
     public int Phase2Threshold = 0;
     public int Phase = 0;
+
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return StyleSettings.EoCEnabled;
+    }
 
     // Tendril 0: front left
     // Tendril 1: front right
