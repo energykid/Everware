@@ -249,6 +249,11 @@ Biomes: {
 		DisplayName: Cantera
 		TownNPCDialogueName: la Cantera
 	}
+
+	TheGallery: {
+		// DisplayName: The Gallery
+		// TownNPCDialogueName: the The Gallery
+	}
 }
 
 Tiles: {

@@ -2,5 +2,6 @@
 global using Microsoft.Xna.Framework.Graphics;
 global using Terraria;
 global using Terraria.Audio;
+global using Terraria.DataStructures;
 global using Terraria.GameContent;
 global using Terraria.ModLoader;

@@ -249,6 +249,11 @@ Biomes: {
 		DisplayName: Quarry
 		TownNPCDialogueName: the Quarry
 	}
+
+	TheGallery: {
+		DisplayName: The Gallery
+		TownNPCDialogueName: the The Gallery
+	}
 }
 
 Tiles: {

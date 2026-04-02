@@ -4,10 +4,12 @@ using Terraria.WorldBuilding;
 
 namespace Everware.Content.Gallery;
 
-public class GalleryGenerator
+public class GalleryGeneration
 {
     public static void GenerateGallery(Point center)
     {
+        GallerySystem.GalleryPosition = center;
+
         new Shapes.HalfCircle(75).Perform(new Point(center.X, center.Y + 2), new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
         new Shapes.HalfCircle(75).Perform(center, new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
         new Shapes.HalfCircle(74).Perform(new Point(center.X, center.Y + 1), new CustomGenActions.SetWall(WallID.IceBrick));
