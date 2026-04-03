@@ -39,6 +39,7 @@ public class Snapdragon : ModNPC
         {
             SpineCurve[(int)i] = Vector2.Lerp(NPC.Center, BasePosition, i / 2f);
         }
+        Music = Assets.Sounds.Music.Snapdragon.Slot;
     }
     public override void AI()
     {
@@ -100,7 +101,7 @@ public class Snapdragon : ModNPC
             {
                 Point p = ((BasePosition / 16) + new Vector2(i, j)).ToPoint();
                 if (p.X > 100 && p.X < Main.maxTilesX - 100)
-                    if (p.Y > 100 && p.Y < Main.maxTilesY - 100)
+                    if (p.Y > 100 && p.Y < Main.maxTilesY - 100 && Main.tile[p].HasUnactuatedTile)
                         Main.instance.TilesRenderer.DrawSingleTile(new TileDrawInfo(), true, 0, screenPos, Vector2.Zero, p.X, p.Y);
             }
         }
@@ -121,7 +122,7 @@ public class Snapdragon : ModNPC
         for (int i = 0; i < SpinePositions.Length; i++)
         {
             var t = SpineTex;
-            if ((i + 1) % 4 == 3) t = topLayer ? CollarSpineTex_Top : CollarSpineTex;
+            if ((i + 1) % 4 == 3 && i < SpinePositions.Length - 2) t = topLayer ? CollarSpineTex_Top : CollarSpineTex;
             if (i == 1) t = NeckTex;
 
             Rectangle f = t.Frame();
@@ -139,13 +140,12 @@ public class Snapdragon : ModNPC
     {
         float rot = -NPC.rotation * 3f;
 
-        rot = MathHelper.Clamp(rot, -1.2f, 1.2f);
+        rot = MathHelper.Clamp(rot, -0.5f, 0.5f);
 
-        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 2f)).RotatedBy(rot) + new Vector2(0, 40), 0.2f);
-        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 3), -100), 0.35f);
+        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 2f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
+        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 3), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
 
         SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 25f) * 2f, (float)Math.Sin(GlobalTimer.Value / 24f) * 2f);
         SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 15f) * 2f, (float)Math.Sin(GlobalTimer.Value / 14f) * 2f);
-
     }
 }

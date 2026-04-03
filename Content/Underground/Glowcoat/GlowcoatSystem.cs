@@ -1,5 +1,4 @@
 ﻿using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria.ID;
@@ -62,42 +61,45 @@ public class GlowcoatSystem : ModSystem
 
     private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
     {
-        var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-        GlowEffect.Parameters.Color = Color.Blue.ToVector4();
-        GlowEffect.Apply();
-
-        for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
+        if (!solidLayer)
         {
-            for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
+            var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+            GlowEffect.Parameters.Color = Color.Blue.ToVector4();
+            GlowEffect.Apply();
+
+            for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
             {
-                Point a = (Main.screenPosition / 16).ToPoint();
-                a.X += i; a.Y += j;
-                Tile t = Main.tile[a];
-
-                if (t.HasTile)
+                for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
                 {
-                    Main.spriteBatch.End();
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.EffectMatrix);
+                    Point a = (Main.screenPosition / 16).ToPoint();
+                    a.X += i; a.Y += j;
+                    Tile t = Main.tile[a];
 
-                    Color c = t.Get<GlowcoatTileData>().color;
-                    if (c != Color.Transparent)
+                    if (t.HasTile)
                     {
-                        GlowEffect.Parameters.Color = c.ToVector4();
-                        if (t.Get<GlowcoatTileData>().chromatic)
-                            GlowEffect.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
-                        GlowEffect.Apply();
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.EffectMatrix);
 
-                        Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
+                        Color c = t.Get<GlowcoatTileData>().color;
+                        if (c != Color.Transparent)
+                        {
+                            GlowEffect.Parameters.Color = c.ToVector4();
+                            if (t.Get<GlowcoatTileData>().chromatic)
+                                GlowEffect.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
+                            GlowEffect.Apply();
 
-                        for (float k = 0; k < 360; k += 90)
-                            Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                            Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
+
+                            for (float k = 0; k < 360; k += 90)
+                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                        }
                     }
                 }
             }
-        }
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null);
+        }
 
         orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
     }

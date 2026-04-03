@@ -1,6 +1,4 @@
 ﻿using Everware.Content.Base.Items;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using Terraria.ID;
 
@@ -36,7 +34,7 @@ public abstract class BaseGlowcoatItem : EverItem
         {
             bool inRange = Math.Abs(Player.tileTargetX - (player.Center.X / 16)) < Player.tileRangeX && Math.Abs(Player.tileTargetY - (player.Center.Y / 16)) < Player.tileRangeY;
             Tile t = Main.tile[Player.tileTargetX, Player.tileTargetY];
-            if (t.HasTile && Main.tileSolid[t.TileType] && inRange)
+            if (t.HasTile && inRange)
             {
                 if (t.Get<GlowcoatTileData>().color != Color)
                 {
