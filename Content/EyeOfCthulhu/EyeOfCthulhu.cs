@@ -3,10 +3,8 @@ using Everware.Config;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using ReLogic.Content;
 using System;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -231,10 +229,13 @@ public class EyeOfCthulhu : GlobalNPC
 
                     int Time = 14;
 
-                    if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                    if (!Main.dedServ)
                     {
-                        calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), "");
-                        Time = 20;
+                        if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                        {
+                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), "Hemolacriac Hunt");
+                            Time = 20;
+                        }
                     }
 
                     if (TendrilsOut <= 3)

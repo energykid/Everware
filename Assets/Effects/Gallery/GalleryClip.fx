@@ -1,5 +1,3 @@
-#include "../Utilities.fxh"
-
 sampler uImage0 : register(s0);
 sampler uImage1 : register(s1);
 
@@ -25,14 +23,11 @@ sampler2D FillSampler = sampler_state
 
 float4 Effect(float2 coords : TEXCOORD0) : COLOR0
 {
-    float4 col = tex2D(uImage0, coords);
+    float4 col = tex2D(FillSampler, coords);
     if (col.r > 0.0)
     {
-        float4 c = tex2D(FillSampler, (coords + float2(Parallax, 0.0)) / FillResolution * TextResolution);
-        
-        c.rgb *= vignetteMult(coords);
-        c.a *= col.r;
-    
+        float4 c = tex2D(uImage0, coords + float2(Parallax, 0.0)) * MultColor;
+        c *= col.r;
         return c;
     }
     return float4(0.0, 0.0, 0.0, 0.0);

@@ -15,7 +15,7 @@ public class GalleryGeneration
         new Shapes.HalfCircle(75).Perform(new Point(center.X, center.Y + 2), new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
         new Shapes.HalfCircle(75).Perform(center, new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
 
-        new Shapes.Rectangle(new Rectangle(-150, -30, 300, 33)).Perform(center, new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
+        new Shapes.Rectangle(new Rectangle(-150, -30, 300, 35)).Perform(center, new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
 
         new Shapes.Rectangle(new Rectangle(-150, -28, 300, 29)).Perform(center, new Actions.Clear());
 
@@ -24,8 +24,8 @@ public class GalleryGeneration
 
         for (int i = 0; i < 3; i++)
         {
-            new Shapes.Rectangle(new Rectangle(-75 - (i * 20) - 3, -28, 6, 29)).Perform(center, new CustomGenActions.SetWall(WallID.GraniteBlock));
-            new Shapes.Rectangle(new Rectangle(75 + (i * 20) - 3, -28, 6, 29)).Perform(center, new CustomGenActions.SetWall(WallID.GraniteBlock));
+            new Shapes.Rectangle(new Rectangle(-75 - (i * 20) - 5, -28, 10, 29)).Perform(center, new CustomGenActions.SetWall(WallID.GraniteBlock));
+            new Shapes.Rectangle(new Rectangle(75 + (i * 20) - 5, -28, 10, 29)).Perform(center, new CustomGenActions.SetWall(WallID.GraniteBlock));
         }
 
         new Shapes.HalfCircle(72).Perform(center, Actions.Chain(new Actions.ClearTile(true), new Actions.Smooth(true)));

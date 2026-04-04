@@ -42,6 +42,8 @@ public abstract class BaseGlowcoatItem : EverItem
                     for (int i = 0; i < 6; i++)
                     {
                         Dust d = Dust.NewDustDirect(new Vector2(player.Center.X + (player.direction * 16) - 5, player.Center.Y), 10, 2, DustType, (player.direction * 2) + player.velocity.X, Scale: 0.8f);
+                        d.noGravity = true;
+                        if (Chromatic) d.color = Main.DiscoColor;
                     }
                     Point p = (Main.MouseWorld / 16).ToPoint();
                     GlowcoatSystem.Glowcoat(Player.tileTargetX, Player.tileTargetY, Color, Chromatic);
@@ -49,6 +51,7 @@ public abstract class BaseGlowcoatItem : EverItem
                     {
                         Dust d = Dust.NewDustDirect(new Vector2((Player.tileTargetX * 16) + 8, (Player.tileTargetY * 16) + 8), 0, 0, DustType, Scale: 1.5f);
                         d.noGravity = true;
+                        if (Chromatic) d.color = Main.DiscoColor;
                     }
                     Item.stack--;
                 }

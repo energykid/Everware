@@ -1,16 +1,11 @@
-#include "../Utilities.fxh"
-
 sampler uImage0 : register(s0);
 sampler uImage1 : register(s1);
 
-float2 TextResolution;
-float2 FillResolution;
-
-float Parallax;
-
-float4 MultColor;
+float BandWidth;
 
 float Timer;
+
+float Parallax;
 
 texture FillTexture;
 sampler2D FillSampler = sampler_state
@@ -25,17 +20,18 @@ sampler2D FillSampler = sampler_state
 
 float4 Effect(float2 coords : TEXCOORD0) : COLOR0
 {
-    float4 col = tex2D(uImage0, coords);
-    if (col.r > 0.0)
+    float4 col1 = tex2D(FillSampler, coords);
+    float4 col = tex2D(uImage0, coords + float2(Parallax, 0.0));
+    if (col.a > 0.0)
     {
-        float4 c = tex2D(FillSampler, (coords + float2(Parallax, 0.0)) / FillResolution * TextResolution);
-        
-        c.rgb *= vignetteMult(coords);
-        c.a *= col.r;
-    
-        return c;
+        col.a *= sin((Timer + coords.x) * BandWidth) * sin((Timer + coords.x) * BandWidth);
+        col.a *= col1.r;
     }
-    return float4(0.0, 0.0, 0.0, 0.0);
+    if (col1.r < 0.5)
+    {
+        col = float4(0.0, 0.0, 0.0, 0.0);
+    }
+    return col;
 }
 
 technique Shader

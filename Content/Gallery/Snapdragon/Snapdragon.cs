@@ -1,7 +1,6 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using Everware.Utils;
-using ReLogic.Content;
 using System;
 
 namespace Everware.Content.Gallery.Snapdragon;
@@ -43,6 +42,8 @@ public class Snapdragon : ModNPC
     }
     public override void AI()
     {
+        NPC.rotation = MathHelper.Clamp(NPC.rotation, -0.5f, 0.5f);
+
         if (!start)
         {
             for (float i = 0; i < 15; i++)
