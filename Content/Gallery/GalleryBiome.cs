@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base;
+using Terraria.ID;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Gallery;
@@ -14,9 +15,9 @@ public class GallerySystem : ModSystem
     {
         if (Main.LocalPlayer.Distance(GalleryPosition.ToVector2() * 16) < 3000)
         {
-            for (int i = -75; i <= 75; i++)
+            for (int i = -75; i <= 75; i += 2)
             {
-                for (int j = -75; j <= 0; j++)
+                for (int j = -75; j <= 0; j += 2)
                 {
                     int xx = GalleryPosition.X + i;
                     int yy = GalleryPosition.Y + j;
@@ -26,7 +27,7 @@ public class GallerySystem : ModSystem
                         {
                             Tile t = Main.tile[xx, yy];
                             if (!t.HasTile && new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j).Distance(GalleryPosition.ToVector2()) < 75)
-                                Lighting.AddLight(GalleryPosition.X + i, GalleryPosition.Y + j, 0.5f, 0.5f, 1f);
+                                Lighting.AddLight(new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j) * 16f, TorchID.Ice);
                         }
                     }
                 }
@@ -142,8 +143,22 @@ public class GalleryBiome : ModBiome
             // Front background etchings (glows)
             Main.spriteBatch.Draw(BGFrontGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), Color.White, 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
+            Vector2 pos = Main.screenPosition;
+
+            if (Lighting.NotRetro)
+                Main.screenPosition += new Vector2(180);
+            if (Lighting.Mode == Terraria.Graphics.Light.LightMode.White)
+                Main.screenPosition += new Vector2(0, -6);
+
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.BackgroundViewMatrix.EffectMatrix);
+
+            self.DrawBlack(true);
+
+            Main.screenPosition = pos;
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
         }
         orig(self);
     }

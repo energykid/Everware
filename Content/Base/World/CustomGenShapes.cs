@@ -1,10 +1,56 @@
-﻿using System;
+﻿using Everware.Utils;
+using System;
 using Terraria.WorldBuilding;
 
 namespace Everware.Content.Base.World;
 
 public static class CustomGenShapes
 {
+    public class Triangle : GenShape
+    {
+        Point vert1 = Point.Zero;
+        Point vert2 = Point.Zero;
+        Point vert3 = Point.Zero;
+        Rectangle rect = Rectangle.Empty;
+        public Triangle(Point V1, Point V2, Point V3)
+        {
+            vert1 = V1;
+            vert2 = V2;
+            vert3 = V3;
+            float negativeX = Math.Min(vert1.X, Math.Min(vert2.X, vert3.X));
+            float negativeY = Math.Min(vert1.Y, Math.Min(vert2.Y, vert3.Y));
+            float positiveX = Math.Max(vert1.X, Math.Max(vert2.X, vert3.X));
+            float positiveY = Math.Max(vert1.Y, Math.Max(vert2.Y, vert3.Y));
+            rect = new Rectangle((int)negativeX, (int)negativeY, (int)positiveX, (int)positiveY);
+        }
+
+        public override bool Perform(Point origin, GenAction action)
+        {
+            if (!Apply(origin, action))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool Apply(Point origin, GenAction action)
+        {
+            for (int i = origin.X + rect.X; i <= origin.X + rect.Width; i++)
+            {
+                for (int j = origin.Y + rect.Y; j <= origin.Y + rect.Height; j++)
+                {
+                    if (MathUtils.PointInTriangle(new Point(i - origin.X, j - origin.Y), vert1, vert2, vert3))
+                    {
+                        if (!UnitApply(action, origin, i, j))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
     public class Hole : GenShape
     {
         public int _passes;
