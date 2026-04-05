@@ -237,6 +237,11 @@ Items: {
 			Hitting enemies with this move deals damage and bounces you upward
 			'''
 	}
+
+	WeatheredWood: {
+		DisplayName: Weathered Wood
+		Tooltip: ""
+	}
 }
 
 Biomes: {

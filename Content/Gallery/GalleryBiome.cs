@@ -15,9 +15,9 @@ public class GallerySystem : ModSystem
     {
         if (Main.LocalPlayer.Distance(GalleryPosition.ToVector2() * 16) < 3000)
         {
-            for (int i = -75; i <= 75; i += 2)
+            for (int i = -75; i <= 75; i += 1)
             {
-                for (int j = -75; j <= 0; j += 2)
+                for (int j = -75; j <= 0; j += 1)
                 {
                     int xx = GalleryPosition.X + i;
                     int yy = GalleryPosition.Y + j;
@@ -26,8 +26,11 @@ public class GallerySystem : ModSystem
                         if (yy > 250 && yy < Main.maxTilesY - 250)
                         {
                             Tile t = Main.tile[xx, yy];
-                            if (!t.HasTile && new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j).Distance(GalleryPosition.ToVector2()) < 75)
-                                Lighting.AddLight(new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j) * 16f, TorchID.Ice);
+                            if (new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j).Distance(GalleryPosition.ToVector2()) < 75)
+                            {
+                                if (!t.HasTile)
+                                    Lighting.AddLight(new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j) * 16f, TorchID.Ice);
+                            }
                         }
                     }
                 }
@@ -56,10 +59,10 @@ public class GalleryBiome : ModBiome
     public override SceneEffectPriority Priority => SceneEffectPriority.Environment;
     public override void Load()
     {
-        On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
+        On_Main.DoDraw_WallsAndBlacks += DoDraw_WallsAndBlacks;
     }
 
-    private void On_Main_DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+    private void DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
     {
         if (!Main.gameInactive)
         {
@@ -143,29 +146,45 @@ public class GalleryBiome : ModBiome
             // Front background etchings (glows)
             Main.spriteBatch.Draw(BGFrontGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), Color.White, 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
-            Vector2 pos = Main.screenPosition;
-
-            if (Lighting.NotRetro)
-                Main.screenPosition += new Vector2(180);
-            if (Lighting.Mode == Terraria.Graphics.Light.LightMode.White)
-                Main.screenPosition += new Vector2(0, -6);
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.BackgroundViewMatrix.EffectMatrix);
-
-            self.DrawBlack(true);
-
-            Main.screenPosition = pos;
-
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+
+            DrawBlack();
         }
+
         orig(self);
+    }
+
+    public void DrawBlack()
+    {
+        for (int i = -85; i <= 85; i += 1)
+        {
+            for (int j = -85; j <= 0; j += 1)
+            {
+                int xx = GallerySystem.GalleryPosition.X + i;
+                int yy = GallerySystem.GalleryPosition.Y + j;
+                if (xx > 250 && xx < Main.maxTilesX - 250)
+                {
+                    if (yy > 250 && yy < Main.maxTilesY - 250)
+                    {
+                        Tile t = Main.tile[xx, yy];
+                        if (new Vector2(GallerySystem.GalleryPosition.X + i, GallerySystem.GalleryPosition.Y + j).Distance(GallerySystem.GalleryPosition.ToVector2()) < 85)
+                        {
+                            if (t.HasTile && Lighting.GetColor(xx, yy).R < 0.01f && Lighting.GetColor(xx, yy).G < 0.01f && Lighting.GetColor(xx, yy).B < 0.01f)
+                            {
+                                Asset<Texture2D> SinglePixel = Assets.Textures.Misc.SinglePixel.Asset;
+                                Main.EntitySpriteDraw(SinglePixel.Value, new Vector2(xx * 16, yy * 16) - Main.screenPosition, SinglePixel.Frame(), Color.Black, 0f, Vector2.Zero, 16f, SpriteEffects.None);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public override void Unload()
     {
-        On_Main.DoDraw_WallsAndBlacks -= On_Main_DoDraw_WallsAndBlacks;
+        On_Main.DoDraw_WallsAndBlacks -= DoDraw_WallsAndBlacks;
     }
 
     public override string Name => "TheGallery";

@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base.World;
+using Everware.Content.Kiln.Tiles;
 using Everware.Content.Underground.DeepCaveLoot;
 using Terraria.GameContent.Biomes.CaveHouse;
 using Terraria.ID;
@@ -54,6 +55,24 @@ public class UndergroundHouseEdits : ModSystem
         }
 
         orig(self);
+
+        foreach (Rectangle rect in self.Rooms)
+        {
+            for (int i = rect.Left; i <= rect.Right; i++)
+            {
+                for (int j = rect.Top; j <= rect.Bottom; j++)
+                {
+                    if (Main.tile[i, j].TileType == TileID.WoodBlock && Main.tile[i, j].HasTile)
+                        Main.tile[i, j].ResetToType(WorldGen.genRand.NextBool(3) ? (ushort)ModContent.TileType<WornWoodPlaced>() : (ushort)ModContent.TileType<WeatheredWoodPlaced>());
+
+                    if (Main.tile[i, j].HasTile && WorldGen.genRand.NextBool(3))
+                    {
+                        if (Main.tile[i, j].TileType == TileID.GrayBrick)
+                            Main.tile[i, j].ResetToType(TileID.Stone);
+                    }
+                }
+            }
+        }
     }
 
     // adds platform bookshelves to the walls on occasion
