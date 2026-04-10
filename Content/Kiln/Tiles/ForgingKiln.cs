@@ -3,9 +3,7 @@ using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Base.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 
@@ -38,7 +36,7 @@ public class ForgingKiln : EverMultitile
             Main.instance.TilesRenderer.AddSpecialPoint(i, j, TileDrawing.TileCounterType.CustomNonSolid);
 
             bool b = true;
-            foreach (Particle p in ParticleSystem.AllParticles)
+            foreach (Particle p in ParticleSystem.MainParticleLayer.AllParticles)
             {
                 if (p is ForgingKilnSmokePillar)
                 {

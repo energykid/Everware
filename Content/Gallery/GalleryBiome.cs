@@ -1,5 +1,5 @@
 ﻿using Everware.Content.Base;
-using Terraria.ID;
+using Terraria.Graphics.Light;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Gallery;
@@ -8,41 +8,27 @@ public class GallerySystem : ModSystem
 {
     public override void Load()
     {
-        On_Main.DoLightTiles += LightBackground;
+        On_TileLightScanner.GetTileLight += On_TileLightScanner_GetTileLight; ;
     }
 
-    private void LightBackground(On_Main.orig_DoLightTiles orig, Main self)
+    private void On_TileLightScanner_GetTileLight(On_TileLightScanner.orig_GetTileLight orig, TileLightScanner self, int x, int y, out Vector3 outputColor)
     {
+        orig(self, x, y, out outputColor);
+
         if (Main.LocalPlayer.Distance(GalleryPosition.ToVector2() * 16) < 3000)
         {
-            for (int i = -75; i <= 75; i += 1)
+            Tile t = Main.tile[x, y];
+            if (new Vector2(x, y).Distance(GalleryPosition.ToVector2()) < 75 && y < GalleryPosition.Y)
             {
-                for (int j = -75; j <= 0; j += 1)
-                {
-                    int xx = GalleryPosition.X + i;
-                    int yy = GalleryPosition.Y + j;
-                    if (xx > 250 && xx < Main.maxTilesX - 250)
-                    {
-                        if (yy > 250 && yy < Main.maxTilesY - 250)
-                        {
-                            Tile t = Main.tile[xx, yy];
-                            if (new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j).Distance(GalleryPosition.ToVector2()) < 75)
-                            {
-                                if (!t.HasTile)
-                                    Lighting.AddLight(new Vector2(GalleryPosition.X + i, GalleryPosition.Y + j) * 16f, TorchID.Ice);
-                            }
-                        }
-                    }
-                }
+                if (!t.HasTile)
+                    outputColor += new Vector3(0.45f, 0.45f, 1f);
             }
         }
-
-        orig(self);
     }
 
     public override void Unload()
     {
-        On_Main.DoLightTiles -= LightBackground;
+        On_TileLightScanner.GetTileLight -= On_TileLightScanner_GetTileLight;
     }
     public static Point GalleryPosition = Point.Zero;
     public override void SaveWorldData(TagCompound tag)
@@ -64,7 +50,7 @@ public class GalleryBiome : ModBiome
 
     private void DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
     {
-        if (!Main.gameInactive)
+        if (!Main.gameMenu)
         {
             float parallax = (Main.screenPosition.X / -20000f) * Main.caveParallax;
             float parallax2 = ((Main.screenPosition.X - (GallerySystem.GalleryPosition.ToVector2() * 16).X) / -20000f) * Main.caveParallax;
@@ -102,19 +88,19 @@ public class GalleryBiome : ModBiome
             Vector2 midOffset = new Vector2(parallaxOrigin, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, ParallaxEffect.Shader, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, ParallaxEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
             // Looping background texture in the very back
             Main.spriteBatch.Draw(BGMask.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0.25f, 0.25f, 0.5f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.GameViewMatrix.ZoomMatrix);
 
             // Middle background
             Main.spriteBatch.Draw(BGMiddle.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0.5f, 0.5f, 1f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.GameViewMatrix.ZoomMatrix);
 
             GalleryClipColor.Parameters.MultColor = new Color(0f, 0f, 0f, 0.2f).ToVector4();
             GalleryClipColor.Apply();
@@ -123,13 +109,13 @@ public class GalleryBiome : ModBiome
             Main.spriteBatch.Draw(BGMiddleGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0f, 0f, 0f, 0.2f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
             // Middle background etchings (glows)
             Main.spriteBatch.Draw(BGMiddleGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), Color.White, 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
 
             // Front background etchings (shadows)
             Main.spriteBatch.Draw(BGFront.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0.5f, 0.5f, 1f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
@@ -141,17 +127,16 @@ public class GalleryBiome : ModBiome
             ShineEffect.Apply();
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.BackgroundViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
             // Front background etchings (glows)
             Main.spriteBatch.Draw(BGFrontGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), Color.White, 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
 
             DrawBlack();
         }
-
         orig(self);
     }
 

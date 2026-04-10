@@ -296,7 +296,10 @@ Buffs: {
 
 BossIntroText: {
 	MusicianENNWAY: ENNWAY!
+	MusicHemolacriac: Hemolacriac Hunt
+	MusicCenterpiece: Centerpiece
 	EyeOfCthulhu: Night Stalker
+	Snapdragon: Sculptor's Masterwork
 }
 
 ConfigKeys: {

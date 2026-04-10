@@ -2,9 +2,7 @@
 using Everware.Content.Base;
 using Everware.Content.Base.Items;
 using Everware.Utils;
-using ReLogic.Content;
 using System;
-using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.Underground.DeepCaveLoot;
@@ -12,6 +10,7 @@ namespace Everware.Content.Underground.DeepCaveLoot;
 [AutoloadEquip(EquipType.Shoes)]
 public class Groundshakers : EverItem
 {
+    public override int DuplicationAmount => 1;
     public static int Damage => 20;
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/Groundshakers";
     public override void SetDefaults()

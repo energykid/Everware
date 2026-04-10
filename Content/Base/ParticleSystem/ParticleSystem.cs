@@ -1,31 +1,22 @@
 ﻿using Everware.Common.Systems;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System.Collections.Generic;
 using Terraria.ID;
 
 namespace Everware.Content.Base.ParticleSystem;
 
 public class ParticleSystem : ModSystem
 {
-    public static List<Particle> AllParticles = [];
+    public static ParticleLayer MainParticleLayer = new();
 
     public override void PostDrawTiles()
     {
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, Main.GameViewMatrix.ZoomMatrix);
-        for (int i = 0; i < AllParticles.Count; i++)
-        {
-            AllParticles[i].Draw();
-        }
+        MainParticleLayer.Draw();
         Main.spriteBatch.End();
     }
 
     public override void PostUpdateEverything()
     {
-        for (int i = 0; i < AllParticles.Count; i++)
-        {
-            AllParticles[i].Update();
-        }
+        MainParticleLayer.Update();
     }
 }
 
@@ -54,13 +45,25 @@ public abstract class Particle : Entity
     public void Spawn()
     {
         if (Main.netMode != NetmodeID.Server)
-            ParticleSystem.AllParticles.Add(this);
+            ParticleSystem.MainParticleLayer.AllParticles.Add(this);
     }
 
     public void Kill()
     {
         if (Main.netMode != NetmodeID.Server)
-            ParticleSystem.AllParticles.Remove(this);
+            ParticleSystem.MainParticleLayer.AllParticles.Remove(this);
+    }
+
+    public void Spawn(ParticleLayer layer)
+    {
+        if (Main.netMode != NetmodeID.Server)
+            layer.AllParticles.Add(this);
+    }
+
+    public void Kill(ParticleLayer layer)
+    {
+        if (Main.netMode != NetmodeID.Server)
+            layer.AllParticles.Remove(this);
     }
 
     public Particle(Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null)
