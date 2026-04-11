@@ -1,6 +1,7 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
+using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
 using System;
 
@@ -21,6 +22,14 @@ public class Snapdragon : ModNPC
     public float HeadFrame = 3;
     public float HeadOpacity = 0f;
     public bool start = false;
+    public Vector2 TargetPosition = Vector2.Zero;
+    public static int FrostBreathDamage => 40;
+    public override void BossHeadSlot(ref int index)
+    {
+        if (HeadOpacity < 0.5f)
+            index = -1;
+        base.BossHeadSlot(ref index);
+    }
     public enum AttackState
     {
         Intro,
@@ -73,8 +82,6 @@ public class Snapdragon : ModNPC
     {
         if (HeadOpacity > 0.9f) HeadOpacity = 1f;
 
-        NPC.rotation = MathHelper.Clamp(NPC.rotation, -0.5f, 0.5f);
-
         if (!start)
         {
             for (float i = 0; i < 15; i++)
@@ -95,6 +102,7 @@ public class Snapdragon : ModNPC
         {
             #region Intro
             case AttackState.Intro:
+                NPC.dontTakeDamage = true;
                 HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
                 CurveAnimation_Idle();
                 NPC.TargetClosest();
@@ -113,7 +121,7 @@ public class Snapdragon : ModNPC
                     NumSpineSegmentsActive++;
                     if (NumSpineSegmentsActive == SpinePositions.Length + 8)
                     {
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Emerge.Asset, NPC.Center);
+                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Roar.Asset, NPC.Center);
 
                         if (!Main.dedServ)
                         {
@@ -187,12 +195,13 @@ public class Snapdragon : ModNPC
             #region Idle
             case AttackState.Idle:
 
+                NPC.dontTakeDamage = false;
                 HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
                 CurveAnimation_Idle();
 
                 NPC.TargetClosest();
 
-                NPC.rotation = MathHelper.Lerp(NPC.rotation, (NPC.Center.X - Target.Center.X) * 0.001f, 0.1f);
+                NPC.rotation = MathHelper.Lerp(NPC.rotation, (NPC.Center.X - Target.Center.X) * 0.001f, 0.02f);
 
                 float maxDist = NPC.Center.Distance(BasePosition);
                 maxDist = MathHelper.Clamp(maxDist, 200, 250);
@@ -217,7 +226,7 @@ public class Snapdragon : ModNPC
                     SpinePositions[(int)i] = Vector2.Lerp(SpinePositions[(int)i], off, v);
                 }
 
-                if (NPC.ai[0] > 200) ChangeAttackState(AttackState.Roar);
+                if (NPC.ai[0] > 140) ChangeAttackState(AttackState.FrostBreath);
                 break;
             #endregion
             #region Roar
@@ -226,10 +235,14 @@ public class Snapdragon : ModNPC
                 ClampPositioning();
                 NPC.rotation = MathHelper.Lerp(NPC.rotation, (NPC.Center.X - Target.Center.X) * 0.001f, 0.4f);
                 if (NPC.ai[0] < 25)
+                {
+                    NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
+                    HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
                     NPC.VelocityMoveTowardsPosition(BasePosition + new Vector2(0, -200), 0.1f, 0.05f, 2);
+                }
                 else
                 {
-                    if (NPC.ai[0] == 30) SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Emerge.Asset, NPC.Center);
+                    if (NPC.ai[0] == 30) SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Roar.Asset, NPC.Center);
 
                     HeadOffset = new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-1, 1));
 
@@ -241,6 +254,42 @@ public class Snapdragon : ModNPC
                     NPC.VelocityMoveTowardsPosition(BasePosition + (BasePosition.DirectionTo(Target.Center) * 300) + new Vector2(0, -200), 0.2f, 0.2f);
                 }
                 if (NPC.ai[0] > 70)
+                {
+                    ChangeAttackState(AttackState.Idle);
+                }
+                break;
+            #endregion
+            #region Frost Breath
+            case AttackState.FrostBreath:
+                CurveAnimation_Active();
+                ClampPositioning();
+                float rotOffset = Easing.KeyFloat(NPC.ai[0], 60, 182, NPC.direction * -20, NPC.direction * 110, Easing.Linear, NPC.direction * -20);
+                NPC.rotation = MathHelper.Lerp(NPC.rotation, ((NPC.Center.X - Target.Center.X) * 0.001f) + MathHelper.ToRadians(-rotOffset), 0.4f);
+                if (NPC.ai[0] < 65)
+                {
+                    NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
+                    HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
+                    TargetPosition = Target.Center.Grounded();
+                    TargetPosition.X += (NPC.direction * 200);
+                    NPC.VelocityMoveTowardsPosition(BasePosition + new Vector2(0, -200), 0.1f, 0.05f, 2);
+                }
+                else
+                {
+                    if (NPC.ai[0] == 70)
+                    {
+                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_FrostBreath.Asset, NPC.Center);
+                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Emerge.Asset, NPC.Center);
+                    }
+                    HeadOffset = new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-1, 1));
+
+                    BreatheFrost(NPC.AngleTo(TargetPosition) + (-NPC.direction * MathHelper.ToRadians(NPC.direction * rotOffset)) + MathHelper.ToRadians(NPC.direction * 25));
+
+                    ScreenEffects.DimScreen(MathHelper.Lerp(0.65f, 0f, NPC.ai[0] / 180f));
+                    ScreenEffects.AddScreenShake(NPC.Center, 4, 0.7f);
+
+                    NPC.VelocityMoveTowardsPosition(BasePosition + (BasePosition.DirectionTo(Target.Center) * 50) + new Vector2(0, -300), 0.2f, 0.2f);
+                }
+                if (NPC.ai[0] > 180)
                 {
                     ChangeAttackState(AttackState.Idle);
                 }
@@ -272,7 +321,75 @@ public class Snapdragon : ModNPC
             }
             #endregion
         }
+        else
+        {
+
+            NPC.rotation = MathHelper.Lerp(NPC.rotation, MathHelper.Clamp(NPC.rotation, -0.5f, 0.5f), 0.1f);
+            NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
+        }
     }
+    public void BreatheFrost(float rotation)
+    {
+        Asset<Texture2D>[] assets = {
+        Assets.Textures.Misc.Smoke1.Asset,
+        Assets.Textures.Misc.Smoke2.Asset,
+        Assets.Textures.Misc.Smoke3.Asset};
+
+        Vector2 spawnPos = NPC.Center + ((HeadFrame > 2 ? new Vector2(60, 110) : (HeadFrame < 2 ? new Vector2(-60, 110) : new Vector2(0, 95))).RotatedBy(NPC.rotation));
+
+        new TextureFlashParticle(spawnPos + (rotation.ToRotationVector2() * 20f), (rotation.ToRotationVector2() * 220f).RotatedByRandom(0.01f), Vector2.One, assets[Main.rand.Next(assets.Length)])
+        {
+            Opacity = 1f,
+            Pixelated = true,
+            AffectedByLight = true,
+            Color = Color.White,
+            Scale = new Vector2(1f, 0.1f),
+            UpdateFunction = FrostBreathUpdateFunc
+        }.Spawn();
+
+        Projectile.NewProjectile(new EntitySource_Parent(NPC, "Snapdragon Frost Breath"), NPC.Center, rotation.ToRotationVector2() * 220, ModContent.ProjectileType<SnapdragonFrostBreathHitbox>(), FrostBreathDamage, 4f);
+    }
+    public static Particle.ParticleFunction FrostBreathSparkleFunc = P =>
+    {
+        if (P.velocity.Length() > 2)
+            P.Rotation = P.velocity.AngleFrom(Vector2.Zero);
+        P.ai[0]++;
+        if (P.ai[0] < P.ai[1]) P.Scale = Vector2.Lerp(P.Scale, new Vector2(0.3f, P.ai[2]), 0.4f);
+        else P.Scale = Vector2.Lerp(P.Scale, new Vector2(-0.1f, 0.1f), 0.5f);
+        if (P.Scale.X < -0.05f) P.Kill();
+    };
+    public static Particle.ParticleFunction FrostBreathUpdateFunc = P =>
+    {
+        if (Main.rand.NextBool(5) && P.velocity.Length() > 50)
+        {
+            new TextureFlashParticle(P.Center + new Vector2(Main.rand.NextFloat(-200, 200), Main.rand.NextFloat(-40, 40)).RotatedBy(P.Rotation), P.velocity * 0.5f, Vector2.One, Assets.Textures.Misc.LensFlash.Asset)
+            {
+                Opacity = 0.5f,
+                Pixelated = true,
+                AffectedByLight = true,
+                Color = Color.AliceBlue.MultiplyRGBA(new(1f, 1f, 1f, 0f)),
+                Scale = new Vector2(0.1f, 0f),
+                ai = new float[]{
+                0f,
+                Main.rand.Next(5, 10),
+                Main.rand.NextFloat(0.15f, 0.25f)
+            },
+                UpdateFunction = FrostBreathSparkleFunc
+            }.Spawn();
+        }
+
+        P.ai[0]++;
+        if (P.ai[0] > 10)
+            P.velocity = P.velocity.RotatedBy(-Math.Sign(P.velocity.X) * 0.04f);
+        P.velocity *= 0.8f;
+        P.Color = Color.Lerp(Color.Transparent, Color.GhostWhite, P.Opacity);
+        P.Color = Color.Lerp(P.Color, Color.Transparent, P.Opacity * 0.5f);
+        P.Color = Color.Lerp(P.Color, Color.Transparent, 0.7f);
+        P.Rotation = Vector2.Zero.AngleTo(P.velocity);
+        P.Scale = Vector2.Lerp(P.Scale, new Vector2(Math.Max(1f / 256f * P.velocity.Length(), 0.4f), 0.5f), 0.3f);
+        P.Opacity *= 0.9f;
+        if (P.Opacity < 0.05f) P.Kill();
+    };
     public void ClampPositioning()
     {
         float maxDist = NPC.Center.Distance(BasePosition);
@@ -369,8 +486,21 @@ public class Snapdragon : ModNPC
 
         rot = MathHelper.Clamp(rot, -0.5f, 0.5f);
 
-        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 2f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
-        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 3), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
+        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
+        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
+
+        SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 25f) * 2f, (float)Math.Sin(GlobalTimer.Value / 24f) * 2f);
+        SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 15f) * 2f, (float)Math.Sin(GlobalTimer.Value / 14f) * 2f);
+    }
+
+    public void CurveAnimation_Active()
+    {
+        float rot = -NPC.rotation * 3f;
+
+        rot = MathHelper.Clamp(rot, -0.5f, 0.5f);
+
+        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
+        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
 
         SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 25f) * 2f, (float)Math.Sin(GlobalTimer.Value / 24f) * 2f);
         SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 15f) * 2f, (float)Math.Sin(GlobalTimer.Value / 14f) * 2f);

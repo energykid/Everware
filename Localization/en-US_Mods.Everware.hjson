@@ -285,6 +285,7 @@ Projectiles: {
 	ManaSpike.DisplayName: Mana Spike
 	EverCustomDrawProjectile.DisplayName: Projectile
 	ConjuredBoulder.DisplayName: Boulder
+	SnapdragonFrostBreathHitbox.DisplayName: Snapdragon Frost Breath Hitbox
 }
 
 Buffs: {
@@ -319,3 +320,4 @@ Configs: {
 }
 
 NPCs.Snapdragon.DisplayName: Snapdragon
+DeathReason.SnapdragonIce: experienced absolute zero.
