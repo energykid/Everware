@@ -267,6 +267,7 @@ public class Snapdragon : ModNPC
                 NPC.rotation = MathHelper.Lerp(NPC.rotation, ((NPC.Center.X - Target.Center.X) * 0.001f) + MathHelper.ToRadians(-rotOffset), 0.4f);
                 if (NPC.ai[0] < 65)
                 {
+                    FrostBreathLength = 0f;
                     NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
                     HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
                     TargetPosition = Target.Center.Grounded();
@@ -275,6 +276,19 @@ public class Snapdragon : ModNPC
                 }
                 else
                 {
+                    Point p = (NPC.Center / 16f).ToPoint();
+                    float length = 0f;
+                    for (int i = 0; i < 50; i++)
+                    {
+                        length += 16f * 5f;
+                        p += (FrostBreathAngle.ToRotationVector2() * 5).ToPoint();
+                        if (p.X < 100 || p.X > Main.maxTilesX - 100) break;
+                        if (p.Y < 100 || p.Y > Main.maxTilesY - 100) break;
+                        if (Main.tile[p].HasTile)
+                        {
+                            if (Main.tileSolid[Main.tile[p].TileType]) break;
+                        }
+                    }
                     if (NPC.ai[0] == 70)
                     {
                         SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_FrostBreath.Asset, NPC.Center);
@@ -282,7 +296,12 @@ public class Snapdragon : ModNPC
                     }
                     HeadOffset = new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-1, 1));
 
-                    BreatheFrost(NPC.AngleTo(TargetPosition) + (-NPC.direction * MathHelper.ToRadians(NPC.direction * rotOffset)) + MathHelper.ToRadians(NPC.direction * 25));
+                    float rot = NPC.AngleTo(TargetPosition) + (-NPC.direction * MathHelper.ToRadians(NPC.direction * rotOffset)) + MathHelper.ToRadians(NPC.direction * 25);
+                    BreatheFrost(rot);
+
+                    FrostBreathAngle = rot - MathHelper.ToRadians(90f);
+                    FrostBreathWidth = MathHelper.Lerp(FrostBreathWidth, 300, 0.05f);
+                    FrostBreathLength = MathHelper.Lerp(FrostBreathLength, length * 3f, 0.2f);
 
                     ScreenEffects.DimScreen(MathHelper.Lerp(0.65f, 0f, NPC.ai[0] / 180f));
                     ScreenEffects.AddScreenShake(NPC.Center, 4, 0.7f);
@@ -299,7 +318,11 @@ public class Snapdragon : ModNPC
 
         if (CurrentAttack != AttackState.Intro)
         {
-            HeadOffset *= 0.9f;
+            HeadOffset *= 0.96f;
+        }
+        if (CurrentAttack != AttackState.FrostBreath)
+        {
+            FrostBreathWidth *= 0.7f;
         }
 
         // Check if current attack isn't intro/idle since those two states handle this logic in the switch statement
@@ -323,10 +346,13 @@ public class Snapdragon : ModNPC
         }
         else
         {
-
             NPC.rotation = MathHelper.Lerp(NPC.rotation, MathHelper.Clamp(NPC.rotation, -0.5f, 0.5f), 0.1f);
             NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
         }
+    }
+    public Vector2 MouthPosition()
+    {
+        return NPC.Center + ((HeadFrame > 2 ? new Vector2(50, 130) : (HeadFrame < 2 ? new Vector2(-50, 130) : new Vector2(0, 95))).RotatedBy(NPC.rotation));
     }
     public void BreatheFrost(float rotation)
     {
@@ -335,8 +361,9 @@ public class Snapdragon : ModNPC
         Assets.Textures.Misc.Smoke2.Asset,
         Assets.Textures.Misc.Smoke3.Asset};
 
-        Vector2 spawnPos = NPC.Center + ((HeadFrame > 2 ? new Vector2(60, 110) : (HeadFrame < 2 ? new Vector2(-60, 110) : new Vector2(0, 95))).RotatedBy(NPC.rotation));
+        Vector2 spawnPos = MouthPosition();
 
+        /*
         new TextureFlashParticle(spawnPos + (rotation.ToRotationVector2() * 20f), (rotation.ToRotationVector2() * 220f).RotatedByRandom(0.01f), Vector2.One, assets[Main.rand.Next(assets.Length)])
         {
             Opacity = 1f,
@@ -346,6 +373,7 @@ public class Snapdragon : ModNPC
             Scale = new Vector2(1f, 0.1f),
             UpdateFunction = FrostBreathUpdateFunc
         }.Spawn();
+        */
 
         Projectile.NewProjectile(new EntitySource_Parent(NPC, "Snapdragon Frost Breath"), NPC.Center, rotation.ToRotationVector2() * 220, ModContent.ProjectileType<SnapdragonFrostBreathHitbox>(), FrostBreathDamage, 4f);
     }
@@ -405,6 +433,12 @@ public class Snapdragon : ModNPC
     {
         if (!Main.dedServ) SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Hit.Asset.WithPitchVariance(0.1f).WithVolumeScale(0.5f), NPC.Center);
     }
+
+    public static readonly InstancedRequestableTarget BreathTarget = new InstancedRequestableTarget();
+    public override void SetStaticDefaults()
+    {
+        Main.ContentThatNeedsRenderTargets.Add(BreathTarget);
+    }
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         Asset<Texture2D> HeadTex = Assets.Textures.Gallery.Snapdragon.Snapdragon_Head.Asset;
@@ -422,6 +456,11 @@ public class Snapdragon : ModNPC
                     if (p.Y > 100 && p.Y < Main.maxTilesY - 100 && Main.tile[p].HasUnactuatedTile)
                         Main.instance.TilesRenderer.DrawSingleTile(new TileDrawInfo(), true, 0, screenPos, Vector2.Zero, p.X, p.Y);
             }
+        }
+
+        if (FrostBreathWidth > 1f)
+        {
+
         }
 
         if (HeadOpacity > 0f)
@@ -505,4 +544,9 @@ public class Snapdragon : ModNPC
         SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 25f) * 2f, (float)Math.Sin(GlobalTimer.Value / 24f) * 2f);
         SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 15f) * 2f, (float)Math.Sin(GlobalTimer.Value / 14f) * 2f);
     }
+
+    public float FrostBreathTimer = 0f;
+    public float FrostBreathWidth = 0f;
+    public float FrostBreathLength = 0f;
+    public float FrostBreathAngle = 0f;
 }

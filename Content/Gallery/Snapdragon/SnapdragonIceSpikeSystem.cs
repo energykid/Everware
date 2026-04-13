@@ -1,4 +1,5 @@
-﻿using Everware.Common.Systems;
+﻿using Daybreak.Common.Rendering;
+using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Utils;
 using System;
@@ -105,6 +106,16 @@ public class SnapdragonIceSpikeSystem : ModSystem
             Vector2 scrP = (Main.screenLastPosition - Main.screenPosition);
             scrP = new Vector2((float)Math.Floor(scrP.X / 2) * 2, (float)Math.Floor(scrP.Y / 2) * 2);
 
+            var breathTarget = ScreenspaceTargetPool.Shared.Rent(
+                Main.instance.GraphicsDevice,
+                (width, height) => (width / 2, height / 2)
+            );
+
+            using (breathTarget.Scope(clearColor: Color.Transparent))
+            {
+
+            }
+
             InstancedRequestableTarget target = IceSpikeTarget;
 
             target.Request(width, height, 0, () =>
@@ -162,7 +173,7 @@ public class SnapdragonIceSpikeSystem : ModSystem
 
             if (target.TryGetTarget(0, out RenderTarget2D spikeTarget))
             {
-                var IceSpikeEffect = Assets.Effects.Gallery.SnapdragonIceSpikeColoration.CreateEffect();
+                var IceSpikeEffect = Assets.Effects.Gallery.Snapdragon.SnapdragonIceSpikeColoration.CreateEffect();
                 IceSpikeEffect.Parameters.Resolution = spikeTarget.Size();
                 IceSpikeEffect.Parameters.Parallax = -Main.screenPosition / 4000f;
                 IceSpikeEffect.Parameters.Timer = GlobalTimer.Value / 60f;

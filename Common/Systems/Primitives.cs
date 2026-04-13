@@ -94,9 +94,6 @@ public sealed class PrimitiveDrawing : ILoadable
 
     public static void DrawPrimitiveStrip(List<Vector2> vertices, List<Color> colors, Texture2D sprite = null, List<Vector2> texcoords = null, bool add = false, Effect eff = null)
     {
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, eff, Main.GameViewMatrix.TransformationMatrix);
-
         List<VertexPositionColorTexture> vv = [];
         short[] ii = new short[vertices.Count + 4];
 
@@ -270,128 +267,6 @@ public sealed class PrimitiveDrawing : ILoadable
 
         //effect.Dispose();
     }
-    public static void DrawPrimitiveTriList(List<Vector2> vertices, List<Color> colors, Texture2D sprite = null, List<Vector2> texcoords = null, bool add = false, Effect eff = null)
-    {
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, eff, Main.GameViewMatrix.TransformationMatrix);
-
-        List<VertexPositionColorTexture> vv = [];
-        short[] ii = new short[vertices.Count + 4];
-
-        for (int i = 0; i <= vertices.Count + 2; i++)
-        {
-            Vector2 t = Vector2.Zero;
-            if (i < vertices.Count)
-            {
-                if (texcoords != null)
-                {
-                    t = texcoords[i];
-                }
-
-                vv.Add(new VertexPositionColorTexture(new Vector3(vertices[i], 0), colors[i], t));
-                ii[i] = (short)(i);
-            }
-            else
-            {
-                vv.Add(new VertexPositionColorTexture(new Vector3(vertices[vertices.Count - 1], 0), Color.Transparent, t));
-                ii[i] = (short)(i);
-            }
-        }
-
-        if (effect == null)
-            effect = new BasicEffect(Main.graphics.GraphicsDevice);
-
-        if (eff != null)
-        {
-            foreach (EffectPass pass in eff.CurrentTechnique.Passes)
-            {
-                //effect.CurrentTechnique.Passes.Append(pass);
-            }
-        }
-
-        effect.World = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f);
-        effect.View = Main.GameViewMatrix.TransformationMatrix;
-        effect.Projection = Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -1f, 1f);
-
-        if (sprite != null)
-        {
-            effect.Texture = sprite;
-            effect.TextureEnabled = true;
-        }
-        effect.VertexColorEnabled = true;
-
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, add ? BlendState.Additive : BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, eff, Main.GameViewMatrix.TransformationMatrix);
-
-        DrawPrimitive(PrimitiveType.TriangleList, vv.ToArray(), ii, effect);
-
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Main.GameViewMatrix.TransformationMatrix);
-
-        //effect.Dispose();
-    }
-
-    public static void DrawPrimitiveLine(List<Vector2> vertices, List<Color> colors, Texture2D sprite = null, List<Vector2> texcoords = null, bool add = false, Effect eff = null)
-    {
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, eff, Main.GameViewMatrix.TransformationMatrix);
-
-        List<VertexPositionColorTexture> vv = [];
-        short[] ii = new short[vertices.Count + 4];
-
-        for (int i = 0; i <= vertices.Count + 2; i++)
-        {
-            Vector2 t = Vector2.Zero;
-            if (i < vertices.Count)
-            {
-                if (texcoords != null)
-                {
-                    t = texcoords[i];
-                }
-
-                vv.Add(new VertexPositionColorTexture(new Vector3(vertices[i], 0), colors[i], t));
-                ii[i] = (short)(i);
-            }
-            else
-            {
-                vv.Add(new VertexPositionColorTexture(new Vector3(vertices[vertices.Count - 1], 0), Color.Transparent, t));
-                ii[i] = (short)(i);
-            }
-        }
-
-        if (effect == null)
-            effect = new BasicEffect(Main.graphics.GraphicsDevice);
-
-        if (eff != null)
-        {
-            foreach (EffectPass pass in eff.CurrentTechnique.Passes)
-            {
-                //effect.CurrentTechnique.Passes.Append(pass);
-            }
-        }
-
-        effect.World = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f);
-        effect.View = Main.GameViewMatrix.TransformationMatrix;
-        effect.Projection = Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -1f, 1f);
-
-        if (sprite != null)
-        {
-            effect.Texture = sprite;
-            effect.TextureEnabled = true;
-        }
-        effect.VertexColorEnabled = true;
-
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, add ? BlendState.Additive : BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, eff, Main.GameViewMatrix.TransformationMatrix);
-
-        DrawPrimitive(PrimitiveType.LineStrip, vv.ToArray(), ii, effect);
-
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Main.GameViewMatrix.TransformationMatrix);
-
-        //effect.Dispose();
-    }
-
     public static void DrawPrimitive(PrimitiveType type, VertexPositionColorTexture[] vertices, short[] indices, Effect effect)
     {
         if (vertices.Length <= 0 || indices.Length <= 0 || effect == null)
