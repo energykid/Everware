@@ -285,7 +285,7 @@ Projectiles: {
 	ManaSpike.DisplayName: Púa de Maná
 	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Roca
-	// SnapdragonFrostBreathHitbox.DisplayName: Snapdragon Frost Breath Hitbox
+	// SnapdragonFrostBreathHitbox.DisplayName: Snapdragon
 }
 
 Buffs: {

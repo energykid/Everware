@@ -34,6 +34,7 @@ public abstract class Particle : Entity
     public bool DrawBelowEntities = false;
     public bool AffectedByLight = true;
     public float Opacity = 1f;
+    public BaseParticleLayer LayerRenderedTo;
 
     public virtual Asset<Texture2D> Texture => null;
 
@@ -42,8 +43,11 @@ public abstract class Particle : Entity
     public ParticleFunction UpdateFunction;
     public ParticleFunction DrawFunction;
 
+    public override Vector2 VisualPosition => (position - Main.screenPosition) * LayerRenderedTo.Scale;
+
     public void Spawn()
     {
+        LayerRenderedTo = ParticleSystem.MainParticleLayer;
         if (Main.netMode != NetmodeID.Server)
             ParticleSystem.MainParticleLayer.AllParticles.Add(this);
     }
@@ -51,19 +55,14 @@ public abstract class Particle : Entity
     public void Kill()
     {
         if (Main.netMode != NetmodeID.Server)
-            ParticleSystem.MainParticleLayer.AllParticles.Remove(this);
+            LayerRenderedTo.AllParticles.Remove(this);
     }
 
     public void Spawn(ParticleLayer layer)
     {
+        LayerRenderedTo = layer;
         if (Main.netMode != NetmodeID.Server)
             layer.AllParticles.Add(this);
-    }
-
-    public void Kill(ParticleLayer layer)
-    {
-        if (Main.netMode != NetmodeID.Server)
-            layer.AllParticles.Remove(this);
     }
 
     public Particle(Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null)
@@ -73,6 +72,7 @@ public abstract class Particle : Entity
         Scale = scale;
         UpdateFunction = upd;
         DrawFunction = drw;
+        LayerRenderedTo = ParticleSystem.MainParticleLayer;
     }
 
     public virtual void Update()
@@ -91,9 +91,9 @@ public abstract class Particle : Entity
             Rectangle frame = Texture.Frame((int)FrameCount.X, (int)FrameCount.Y, (int)FrameNum.X, (int)FrameNum.Y);
 
             if (Pixelated)
-                PixelRendering.DrawPixelatedSprite(Texture.Value, position - Main.screenPosition, frame, c.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
+                PixelRendering.DrawPixelatedSprite(Texture.Value, VisualPosition, frame, c.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
             else
-                Main.EntitySpriteDraw(Texture.Value, position - Main.screenPosition, frame, c.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
+                Main.EntitySpriteDraw(Texture.Value, VisualPosition, frame, c.MultiplyRGBA(new(1f, 1f, 1f, Opacity)), Rotation, Origin != -Vector2.One ? Origin : frame.Size() / 2f, Scale, Effects);
         }
     }
 }

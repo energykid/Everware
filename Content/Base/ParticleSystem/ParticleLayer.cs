@@ -5,6 +5,7 @@ namespace Everware.Content.Base.ParticleSystem;
 public abstract class BaseParticleLayer
 {
     public List<Particle> AllParticles = [];
+    public float Scale = 1f;
 
     public void Draw()
     {
@@ -25,4 +26,9 @@ public abstract class BaseParticleLayer
 
 public class ParticleLayer : BaseParticleLayer
 {
+    public ParticleLayer() { }
+    public ParticleLayer(float sc)
+    {
+        Scale = sc;
+    }
 }

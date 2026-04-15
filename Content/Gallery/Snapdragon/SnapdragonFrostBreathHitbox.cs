@@ -32,6 +32,10 @@ public class SnapdragonFrostBreathHitbox : EverProjectile
             if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType]) break;
         }
 
+        SoundStyle asset = Assets.Sounds.NPC.Snapdragon_Assemble.Asset;
+        asset.MaxInstances = 20;
+        if (Main.rand.NextBool(2)) SoundEngine.PlaySound(asset.WithPitchVariance(0.6f).WithPitchOffset(0.4f).WithVolumeScale(0.3f), pos);
+
         if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType])
         {
             float p1 = MathHelper.PiOver2;

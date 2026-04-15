@@ -8,7 +8,7 @@ public class TestItem : EverItem
     public override string Texture => "Everware/Assets/Textures/Misc/TestItem";
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return true;
+        return false;
     }
     public override void SetDefaults()
     {
@@ -20,7 +20,7 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-            Gallery.GalleryGeneration.GenerateGallery((Main.MouseWorld / 16).ToPoint());
+            //player.MountedCenter = pos.ToVector2() * 16f;
         }
 
         return base.UseItem(player);
