@@ -4,10 +4,7 @@ using Everware.Content.Quarry.Tiles;
 using Everware.Content.Quarry.Visual;
 using Everware.Core;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.Quarry.Gear;
@@ -40,10 +37,8 @@ public class RebarCrest : EverItem
     }
     public override void UpdateArmorSet(Player player)
     {
-        {
-            player.GetModPlayer<RebarSetBonus>().rebarSetBonus = true;
-            player.setBonus = LocalizationReferences.Mods.Everware.Items.RebarArmorBonus.GetTextValue();
-        }
+        player.GetModPlayer<RebarSetBonus>().rebarSetBonus = true;
+        player.setBonus = LocalizationReferences.Mods.Everware.Items.RebarArmorBonus.GetTextValue();
     }
 
     public override void SetStaticDefaults()
