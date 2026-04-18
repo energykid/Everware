@@ -286,6 +286,7 @@ Projectiles: {
 	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Roca
 	// SnapdragonFrostBreathHitbox.DisplayName: Snapdragon
+	// SnapFreezeProjectile.DisplayName: Snap Freeze Projectile
 }
 
 Buffs: {

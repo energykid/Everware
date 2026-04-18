@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Terraria.ID;
+﻿using Terraria.ID;
 
 namespace Everware.Content.Base.ParticleSystem;
 

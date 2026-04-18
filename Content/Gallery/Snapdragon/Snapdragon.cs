@@ -1,15 +1,14 @@
-﻿using Everware.Common.Systems;
-using Everware.Content.Base;
+﻿using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
 using System;
-using Terraria.ID;
+using System.IO;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
 [AutoloadBossHead]
-public class Snapdragon : ModNPC
+public partial class Snapdragon : ModNPC
 {
     public Player Target => Main.player[NPC.target];
     public override string Texture => "Everware/Assets/Textures/Gallery/Snapdragon/Snapdragon_Head";
@@ -22,19 +21,15 @@ public class Snapdragon : ModNPC
     public Vector2 HeadOffset = Vector2.Zero;
     public float HeadFrame = 3;
     public float JawOpening = 0f;
+    bool Roaring = false;
     public float HeadOpacity = 0f;
     public bool SpineVisible = true;
     public bool start = false;
     public Vector2 TargetPosition = Vector2.Zero;
     public bool CenteredForAttacks = true;
-    public static int FrostBreathDamage => 110;
+    public static int FrostBreathDamage => 80;
     public static int IceSpikeDamage => 35;
-    public override void BossHeadSlot(ref int index)
-    {
-        if (HeadOpacity < 0.5f)
-            index = -1;
-        base.BossHeadSlot(ref index);
-    }
+    public static int BiteDamage => 95;
     public enum AttackState
     {
         Intro,
@@ -42,6 +37,7 @@ public class Snapdragon : ModNPC
         Idle, // Idle animation, do nothing then decide on an attack
         Roar, // Roar, knocking the player back but otherwise doing nothing
 
+        Bite, // Try to bite the player
         Burrow, // Relocate to a different part of the arena, causing icicles to fall while doing so
         BeakBash, // Slam beak-first into the ground while facing the player, causing debris to come from the ground
         FrostBreath, // Breathe frost at the player then rotate upwards, filling an entire side of the arena with solid, spiky ice and
@@ -50,9 +46,49 @@ public class Snapdragon : ModNPC
     }
     public void ChangeAttackState(AttackState stateTo)
     {
-        NPC.ai[0] = 0; NPC.ai[1] = 0; CurrentAttack = stateTo;
+        NPC.ai[0] = 0; NPC.ai[1] = 0;
+
+        CurrentAttack = stateTo;
+    }
+    public void PickAttack()
+    {
+        AttackState[] states = {
+            AttackState.FrostBreath,
+            AttackState.SnapFreeze
+        };
+
+        ChangeAttackState(states[Main.rand.Next(states.Length)]);
+
+        NPC.netUpdate = true;
+    }
+    public void TryBurrow()
+    {
+        if (NPC.Distance(Target.Center) < 400) ChangeAttackState(AttackState.Bite);
+        else ChangeAttackState(AttackState.Burrow);
+        NPC.netUpdate = true;
     }
     public AttackState CurrentAttack = AttackState.Intro;
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write((int)CurrentAttack);
+        writer.WriteVector2(TargetPosition);
+        writer.WriteVector2(BasePosition);
+        writer.Write(CenteredForAttacks);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        CurrentAttack = (AttackState)reader.ReadInt32();
+        TargetPosition = reader.ReadVector2();
+        BasePosition = reader.ReadVector2();
+        CenteredForAttacks = reader.ReadBoolean();
+    }
+    #region Boss Properties
+    public override void BossHeadSlot(ref int index)
+    {
+        if (HeadOpacity < 0.5f)
+            index = -1;
+        base.BossHeadSlot(ref index);
+    }
     public override void SetDefaults()
     {
         if (!Main.dedServ)
@@ -91,9 +127,10 @@ public class Snapdragon : ModNPC
         scale *= 1.5f;
         return base.DrawHealthBar(hbPosition, ref scale, ref position);
     }
-    bool Roaring = false;
+    #endregion
     public override void AI()
     {
+        NPC.damage = 0;
         if (HeadOpacity > 0.9f) HeadOpacity = 1f;
 
         if (!start)
@@ -116,374 +153,34 @@ public class Snapdragon : ModNPC
 
         switch (CurrentAttack)
         {
-            #region Intro
             case AttackState.Intro:
-                NPC.dontTakeDamage = true;
-                HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
-                CurveAnimation_Idle();
-                NPC.TargetClosest();
-                SoundStyle s1 = Assets.Sounds.NPC.Snapdragon_Ambience.Asset;
-                s1.MaxInstances = 5;
-                if (NPC.ai[0] % 30 == 10 && NumSpineSegmentsActive < SpinePositions.Length) SoundEngine.PlaySound(s1.WithVolumeScale(2f).WithPitchVariance(0.2f), NPC.Center);
-                NPC.Center = Vector2.Lerp(NPC.Center, BasePosition + new Vector2(0, -280), 0.1f);
-                if (NPC.ai[0] % 8 == 0 && NPC.ai[0] > 30)
-                {
-                    if (NumSpineSegmentsActive < SpinePositions.Length)
-                    {
-                        SoundStyle s = Assets.Sounds.NPC.Snapdragon_Assemble.Asset;
-                        s.MaxInstances = 20;
-                        SoundEngine.PlaySound(s.WithPitchOffset(-1f + (NPC.ai[0] / 100)).WithVolumeScale(NPC.ai[0] / 200), NPC.Center);
-                    }
-                    NumSpineSegmentsActive++;
-                    if (NumSpineSegmentsActive == SpinePositions.Length + 8)
-                    {
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Roar.Asset, NPC.Center);
-
-                        if (!Main.dedServ)
-                        {
-                            if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
-                            {
-                                calFables.Call("vfx.displayBossIntroCard", NPC.TypeName, Mods.Everware.BossIntroText.Snapdragon.GetTextValue(), 100, false, Color.CadetBlue, Color.White, Color.CadetBlue, Color.CadetBlue, Mods.Everware.BossIntroText.MusicCenterpiece.GetTextValue(), Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue());
-                            }
-                        }
-                    }
-                    if (NumSpineSegmentsActive == SpinePositions.Length + 16)
-                    {
-                        ChangeAttackState(AttackState.Idle);
-                    }
-                }
-                if (NumSpineSegmentsActive >= SpinePositions.Length + 8 && NumSpineSegmentsActive < SpinePositions.Length + 16)
-                {
-                    JawOpening = MathHelper.Lerp(JawOpening, 12f, 0.1f);
-
-                    Roaring = true;
-
-                    ScreenEffects.AddScreenShake(NPC.Center, 5f, 0.7f);
-                    ScreenEffects.DimScreen(0.25f);
-                    ScreenEffects.ZoomScreen(0.5f);
-
-                    HeadOffset = new Vector2(Main.rand.NextFloat(-1, 1) * 2f, Main.rand.NextFloat(-1, 1) * 2f);
-
-                    if (HeadFrame != 3) NPC.rotation -= MathHelper.ToRadians((HeadFrame - 3) * 2.5f);
-
-                    NPC.VelocityMoveTowardsPosition(BasePosition + (BasePosition.DirectionTo(Target.Center) * 300) + new Vector2(0, -200), 0.2f, 0.2f);
-                }
-                else
-                {
-                    if (NumSpineSegmentsActive >= SpinePositions.Length)
-                    {
-                        HeadOpacity = MathHelper.Lerp(HeadOpacity, 1f, 0.2f);
-                        HeadOffset.Y *= 0.9f;
-                        HeadOffset.X *= 0.75f;
-                    }
-                    else
-                        HeadOffset = BasePosition - NPC.Center;
-                }
-
-                if (NumSpineSegmentsActive < SpinePositions.Length + 16)
-                    ScreenEffects.PanTo(Vector2.Lerp(BasePosition, BasePosition + new Vector2(0, -50), NPC.ai[0] / 230));
-
-                NPC.rotation = MathHelper.Lerp(NPC.rotation, (NPC.Center.X - Target.Center.X) * 0.001f, 0.4f);
-
-                float maxDist1 = NPC.Center.Distance(BasePosition);
-                maxDist1 = MathHelper.Clamp(maxDist1, 200, 250);
-
-                NPC.VelocityMoveTowardsPosition(Target.Center + new Vector2(-20f + (float)(Math.Sin(NPC.ai[0] / 60) * 100f), -220 + (float)(Math.Sin(NPC.ai[0] / 63) * 20f)), 0.1f, 0.05f, 20);
-
-                Vector2 outPos1 = new Vector2(maxDist1, 0).RotatedBy(BasePosition.AngleTo(NPC.Center));
-
-                NPC.Center = Vector2.Lerp(NPC.Center, BasePosition + (outPos1 * new Vector2(0.7f, 1.0f)), 0.3f);
-
-                for (float i = 14; i >= 0; i--)
-                {
-                    if (i >= Easing.KeyFloat(NumSpineSegmentsActive, 0, 15, 15, 0, Easing.Linear))
-                    {
-                        float skewX = (NPC.Center.X - BasePosition.X) * MathHelper.Lerp(0.2f, 0.1f, (i / 15f));
-                        float skew = Math.Abs(NPC.Center.X - BasePosition.X) * 0.2f;
-                        skew -= 10;
-                        if (skew < 0) skew = 0;
-                        float v = Easing.KeyFloat(i, 0, 7, 1f, 0.2f, Easing.OutExpo, 0f);
-                        v = 0.1f;
-
-                        Vector2 off = (MathUtils.CubicBezier2(NPC.Center + new Vector2(0, -10).RotatedBy(NPC.rotation), SpineCurve[1], SpineCurve[0], BasePosition, i / 15f));
-
-                        SpinePositions[(int)i] = Vector2.Lerp(SpinePositions[(int)i], off, v);
-                    }
-                }
+                IntroAttackState();
                 break;
-            #endregion
-            #region Idle
             case AttackState.Idle:
-
-                NPC.dontTakeDamage = false;
-                HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
-                CurveAnimation_Idle();
-
-                NPC.TargetClosest();
-
-                NPC.rotation = MathHelper.Lerp(NPC.rotation, (NPC.Center.X - Target.Center.X) * 0.001f, 0.02f);
-
-                float maxDist = NPC.Center.Distance(BasePosition);
-                maxDist = MathHelper.Clamp(maxDist, 200, 250);
-
-                NPC.VelocityMoveTowardsPosition(Target.Center + new Vector2(-20f + (float)(Math.Sin(NPC.ai[0] / 60) * 100f), -220 + (float)(Math.Sin(NPC.ai[0] / 63) * 20f)), 0.1f, 0.05f, 20);
-
-                Vector2 outPos = new Vector2(maxDist, 0).RotatedBy(BasePosition.AngleTo(NPC.Center));
-
-                NPC.Center = Vector2.Lerp(NPC.Center, BasePosition + (outPos * new Vector2(0.7f, 1.0f)), 0.3f);
-
-                for (float i = 0; i < 15; i++)
-                {
-                    float skewX = (NPC.Center.X - BasePosition.X) * MathHelper.Lerp(0.2f, 0.1f, (i / 15f));
-                    float skew = Math.Abs(NPC.Center.X - BasePosition.X) * 0.2f;
-                    skew -= 10;
-                    if (skew < 0) skew = 0;
-                    float v = Easing.KeyFloat(i, 0, 7, 1f, 0.2f, Easing.OutExpo, 0f);
-                    v = Easing.KeyFloat(i, 7, 15, 0.2f, 1f, Easing.InExpo, v);
-
-                    Vector2 off = (MathUtils.CubicBezier2(NPC.Center + new Vector2(0, -10).RotatedBy(NPC.rotation), SpineCurve[1], SpineCurve[0], BasePosition, i / 15f));
-
-                    SpinePositions[(int)i] = Vector2.Lerp(SpinePositions[(int)i], off, v);
-                }
-
-                int amtOfTime = 140;
-                if (Main.expertMode) amtOfTime = 100;
-                if (Main.masterMode) amtOfTime = 60;
-
-                if (NPC.ai[0] > amtOfTime) ChangeAttackState(AttackState.FrostBreath);
+                IdleAttackState();
                 break;
-            #endregion
-            #region Roar
             case AttackState.Roar:
-                CurveAnimation_Idle();
-                ClampPositioning();
-                NPC.rotation = MathHelper.Lerp(NPC.rotation, (NPC.Center.X - Target.Center.X) * 0.001f, 0.4f);
-                if (NPC.ai[0] < 25)
-                {
-                    NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
-                    HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((Target.Center.X - NPC.Center.X) * 1.35f)), 0, 6);
-                    NPC.VelocityMoveTowardsPosition(BasePosition + new Vector2(0, -200), 0.1f, 0.05f, 2);
-                }
-                else
-                {
-                    Roaring = true;
-
-                    if (NPC.ai[0] == 30) SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Roar.Asset, NPC.Center);
-
-                    HeadOffset = new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-1, 1));
-
-                    if (HeadFrame != 3) NPC.rotation -= MathHelper.ToRadians((HeadFrame - 3) * (NPC.ai[0] / 20));
-
-                    if (NPC.ai[0] < 40)
-                    {
-                        JawOpening = MathHelper.Lerp(JawOpening, 12f, 0.1f);
-                        ScreenEffects.DimScreen(0.25f);
-                        ScreenEffects.AddScreenShake(NPC.Center, 7, 0.7f);
-                    }
-                    else
-                    {
-                        JawOpening = MathHelper.Lerp(JawOpening, 10f, 0.05f);
-                    }
-
-                    NPC.VelocityMoveTowardsPosition(BasePosition + (BasePosition.DirectionTo(Target.Center) * 300) + new Vector2(0, -200), 0.2f, 0.2f);
-                }
-                if (NPC.ai[0] > 70)
-                {
-                    ChangeAttackState(AttackState.Idle);
-                }
+                RoarAttackState();
                 break;
-            #endregion
-            #region Frost Breath
             case AttackState.FrostBreath:
-                CurveAnimation_Active();
-                ClampPositioning();
-                float rotOffset = Easing.KeyFloat(NPC.ai[0], 60, 182, NPC.direction * -20, NPC.direction * 110, Easing.Linear, NPC.direction * -20);
-                NPC.rotation = MathHelper.Lerp(NPC.rotation, ((NPC.Center.X - Target.Center.X) * 0.001f) + MathHelper.ToRadians(-rotOffset), 0.4f);
-                if (NPC.ai[0] < 65)
-                {
-                    Roaring = true;
-
-                    JawOpening = MathHelper.Lerp(JawOpening, 8f, 0.05f);
-
-                    FrostBreathLength = 0f;
-                    NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
-                    TargetPosition = Target.Center.Grounded();
-                    TargetPosition.X += (NPC.direction * 200);
-                    HeadFrame = (int)MathHelper.Clamp(3 + (MathHelper.ToRadians((TargetPosition.X - NPC.Center.X) * 1.35f)), 0, 6);
-                    NPC.VelocityMoveTowardsPosition(BasePosition + new Vector2(0, -200), 0.1f, 0.05f, 2);
-                }
-                else
-                {
-                    Point p = (NPC.Center / 16f).ToPoint();
-                    float length = 0f;
-                    for (int i = 0; i < 50; i++)
-                    {
-                        length += 16f * 5f;
-                        p += (FrostBreathAngle.ToRotationVector2() * 5).ToPoint();
-                        if (p.X < 100 || p.X > Main.maxTilesX - 100) break;
-                        if (p.Y < 100 || p.Y > Main.maxTilesY - 100) break;
-                        if (Main.tile[p].HasTile)
-                        {
-                            if (Main.tileSolid[Main.tile[p].TileType]) break;
-                        }
-                    }
-                    if (NPC.ai[0] == 70)
-                    {
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_FrostBreath.Asset, NPC.Center);
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Emerge.Asset, NPC.Center);
-                    }
-                    HeadOffset = new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2));
-
-                    JawOpening = MathHelper.Lerp(JawOpening, 12f, 0.1f);
-
-                    Roaring = true;
-
-                    float rot = NPC.AngleTo(TargetPosition) + (-NPC.direction * MathHelper.ToRadians(NPC.direction * rotOffset)) + MathHelper.ToRadians(NPC.direction * 25);
-                    BreatheFrost(rot);
-
-                    FrostBreathAngle = rot - MathHelper.ToRadians(90f);
-                    FrostBreathWidth = MathHelper.Lerp(FrostBreathWidth, 300, 0.05f);
-                    FrostBreathLength = MathHelper.Lerp(FrostBreathLength, length * 3f, 0.2f);
-
-                    ScreenEffects.DimScreen(MathHelper.Lerp(0.65f, 0f, NPC.ai[0] / 180f));
-                    ScreenEffects.AddScreenShake(NPC.Center, 4, 0.7f);
-
-                    NPC.VelocityMoveTowardsPosition(BasePosition + (BasePosition.DirectionTo(Target.Center) * 50) + new Vector2(0, -300), 0.2f, 0.2f);
-                }
-                if (NPC.ai[0] > 180)
-                {
-                    ChangeAttackState(AttackState.Burrow);
-                }
+                FrostBreathAttackState();
                 break;
-            #endregion
-            #region Burrow
             case AttackState.Burrow:
-                NPC.direction = HeadFrame > 3 ? 1 : -1;
-                float a = 0f;
-                float BurrowWindupTime = 35;
-                float BurrowWindupSpeed = 15;
-                float DigTime = 50;
-                if (NPC.ai[0] == 1) SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_BurrowWindup.Asset, NPC.Center);
-                if (NPC.ai[0] < BurrowWindupTime)
-                {
-                    HeadFrame = NPC.direction > 0 ? 6 : 0;
-
-                    Vector2 v = new Vector2(0, -400);
-                    v = Easing.KeyVector2(NPC.ai[0], 0f, BurrowWindupSpeed / 3f * 2f, new Vector2(0, -300), new Vector2(NPC.direction * 100, -250), Easing.InOutBack);
-                    v = Easing.KeyVector2(NPC.ai[0], BurrowWindupSpeed / 3f * 2f, BurrowWindupSpeed, new Vector2(NPC.direction * 50, -250), new Vector2(NPC.direction * 100, 50), Easing.InExpo);
-                    if (NPC.ai[0] > 18) v = new Vector2(NPC.direction * 300, 50);
-
-                    a = Math.Clamp(Easing.InCirc(NPC.ai[0] / BurrowWindupTime * 1.2f), 0f, 1f);
-
-                    NPC.rotation = MathHelper.Lerp(NPC.rotation, MathHelper.PiOver4 * NPC.direction * (a * 2f), 0.2f);
-
-                    NPC.VelocityMoveTowardsPosition(BasePosition + v, 0.15f, a);
-
-                    if (NPC.ai[0] == 12)
-                    {
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_BurrowDig.Asset, NPC.Center);
-                    }
-
-                    if (NPC.ai[0] > 12)
-                    {
-                        NPC.velocity *= 1.2f;
-                        if (NPC.Center.Y > BasePosition.Y - 100) NPC.ai[0] = BurrowWindupTime - 1;
-                    }
-
-                    SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)) + new Vector2(0, 40), 0.2f);
-                    SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
-
-                    SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + new Vector2(-NPC.direction * 300, 0).RotatedBy(NPC.rotation), a);
-                    SpineCurve[1] = Vector2.Lerp(SpineCurve[1], Vector2.Lerp(NPC.Center, BasePosition, 0.3f) + new Vector2(-NPC.direction * 100, 0).RotatedBy(NPC.rotation), a);
-                }
-                else
-                {
-                    NPC.velocity = Vector2.Lerp(NPC.Center, BasePosition, 0.08f) - NPC.Center;
-                    a = 0.5f;
-                    if (NPC.ai[0] % 10 == 2)
-                    {
-                        SoundEngine.PlaySound(SoundID.WormDig, NPC.Center);
-                    }
-                    if (NPC.ai[0] == BurrowWindupTime)
-                    {
-                        for (float i = 0; i < 40; i++)
-                        {
-                            Vector2 p = Vector2.Lerp(NPC.Center, BasePosition, i / 40f);
-                            ThrowShardParticle((p + new Vector2(Main.rand.NextFloat(-30f, 30f), -50f)).Grounded(), new Vector2(MathHelper.Lerp(NPC.direction * 15f, 0f, i / 40f), Main.rand.NextFloat(-12f, -6f)), 1.25f);
-                        }
-                        ThrowTileReplicants(NPC, (NPC.Center / 16).ToPoint(), 10, 5);
-
-                        a = 1f;
-
-                        SpineVisible = false;
-
-                        HeadOpacity = 0f;
-
-                        CenteredForAttacks = !CenteredForAttacks;
-                        if (!CenteredForAttacks) BasePosition.X += Main.rand.NextFloat(-750, -400) * (Main.rand.NextBool() ? 1 : -1);
-                        else BasePosition = GallerySystem.GalleryPosition.ToVector2() * 16f;
-                    }
-                    if (NPC.ai[0] == BurrowWindupTime + DigTime)
-                    {
-                        SpineCurve[0] = BasePosition;
-                        SpineCurve[1] = BasePosition;
-                        MoveSpineDefault(1f);
-
-                        SpineVisible = true;
-
-                        NPC.Center = BasePosition;
-
-                        NPC.rotation = 0f;
-
-                        SoundEngine.PlaySound(SoundID.DD2_CrystalCartImpact, NPC.Center);
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_Ambience.Asset, NPC.Center);
-                        ResetSpine();
-                    }
-                    if (NPC.ai[0] < BurrowWindupTime + DigTime - 10)
-                    {
-                        ThrowShardParticle((NPC.Center + new Vector2(Main.rand.NextFloat(-30f, 30f), -50f)).Grounded(), new Vector2(Main.rand.NextFloat(-4f, 4f), Main.rand.NextFloat(-8f, -5f)));
-                    }
-                    if (NPC.ai[0] > BurrowWindupTime + DigTime)
-                    {
-                        if (NPC.ai[0] < BurrowWindupTime + DigTime + 2)
-                        {
-                            SpineCurve[0] = BasePosition;
-                            SpineCurve[1] = BasePosition;
-                            MoveSpineDefault(1f);
-                        }
-
-                        if (NPC.ai[0] == BurrowWindupTime + DigTime + 6)
-                        {
-                            for (int i = 0; i < 10; i++)
-                                ThrowShardParticle((NPC.Center + new Vector2(Main.rand.NextFloat(-30f, 30f), -50f)).Grounded(), new Vector2(Main.rand.NextFloat(-4f, 4f), Main.rand.NextFloat(-8f, -5f)), 1.7f);
-
-                            ThrowTileReplicants(NPC, ((NPC.Center + new Vector2(0, -50)).Grounded() / 16).ToPoint(), 10, 5);
-
-                            SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_BurrowEmerge.Asset, NPC.Center);
-                        }
-
-                        HeadOpacity = MathHelper.Lerp(HeadOpacity, 1f, 0.35f);
-
-                        NPC.VelocityMoveTowardsPosition(BasePosition + new Vector2(0, -400), 0.1f, 0.2f);
-
-                        if (NPC.ai[0] > BurrowWindupTime + DigTime + 6)
-                        {
-                            ChangeAttackState(AttackState.Idle);
-                        }
-                    }
-                }
-                MoveSpineDefault(a);
+                BurrowAttackState();
                 break;
-            #endregion
-            #region Snap Freeze
             case AttackState.SnapFreeze:
-
+                SnapFreezeAttackState();
                 break;
-            #endregion
+            case AttackState.Bite:
+                BiteAttackState();
+                break;
+            case AttackState.BeakBash:
+                BeakBashAttackState();
+                break;
         }
 
         if (!Roaring)
-            JawOpening = MathHelper.Lerp(JawOpening, 6f, 0.2f);
+            JawOpening = MathHelper.Lerp(JawOpening, 1f, 0.2f);
 
         if (CurrentAttack != AttackState.Intro)
         {
@@ -533,6 +230,29 @@ public class Snapdragon : ModNPC
     public Vector2 MouthPosition()
     {
         return NPC.Center + ((HeadFrame > 2 ? new Vector2(50, 130) : (HeadFrame < 2 ? new Vector2(-50, 130) : new Vector2(0, 95))).RotatedBy(NPC.rotation));
+    }
+    public void PuffFrost(float rotation, Vector2 scaleOfPuff, float scaleOfParticles)
+    {
+        Asset<Texture2D>[] assets = {
+        Assets.Textures.Gallery.Snapdragon.FrostBreathParticle1.Asset,
+        Assets.Textures.Gallery.Snapdragon.FrostBreathParticle2.Asset,
+        Assets.Textures.Gallery.Snapdragon.FrostBreathParticle3.Asset};
+
+        Vector2 spawnPos = Vector2.Lerp(MouthPosition(), NPC.Center, 0.3f);
+
+        for (int i = 0; i < 20; i++)
+            new TextureFlashParticle(spawnPos, (new Vector2(Main.rand.NextFloat(0f, 1f), Main.rand.NextFloat(-1f, 1f)) * scaleOfPuff).RotatedBy(rotation).RotatedByRandom(0.4f), Vector2.One, assets[Main.rand.Next(assets.Length)])
+            {
+                Opacity = 0.05f,
+                AffectedByLight = false,
+                Pixelated = true,
+                Color = Color.CadetBlue.MultiplyRGBA(new(0.4f, 0.45f, 0.5f, 0.45f)),
+                Scale = new Vector2(0.1f, 0.1f) * scaleOfParticles,
+                UpdateFunction = FrostPuffUpdateFunc,
+                ai = [
+                0f, 0f, Main.rand.NextFloat(-0.2f, 0.2f)
+                ]
+            }.Spawn();
     }
     public void BreatheFrost(float rotation)
     {
@@ -611,6 +331,15 @@ public class Snapdragon : ModNPC
         if (P.ai[0] > 10)
         {
         }
+        if (P.Opacity < 0.01f) P.Kill();
+    };
+    public static Particle.ParticleFunction FrostPuffUpdateFunc = P =>
+    {
+        P.velocity *= 0.95f;
+        P.Opacity *= 0.98f;
+        P.Color = Color.Lerp(P.Color, Color.Transparent, 0.05f);
+        P.Rotation += P.velocity.X * 0.1f;
+        P.Scale = Vector2.Lerp(P.Scale, new Vector2(0.5f, 0.5f), 0.1f);
         if (P.Opacity < 0.01f) P.Kill();
     };
     public void ClampPositioning()
@@ -695,6 +424,8 @@ public class Snapdragon : ModNPC
     {
         Asset<Texture2D> HeadTex = Assets.Textures.Gallery.Snapdragon.Snapdragon_Head.Asset;
         Asset<Texture2D> JawTex = Assets.Textures.Gallery.Snapdragon.Snapdragon_Jaw.Asset;
+        Asset<Texture2D> HeadGlow = Assets.Textures.Gallery.Snapdragon.Snapdragon_Head_Glow.Asset;
+        Asset<Texture2D> JawGlow = Assets.Textures.Gallery.Snapdragon.Snapdragon_Jaw_Glow.Asset;
         Asset<Texture2D> CollarTex = Assets.Textures.Gallery.Snapdragon.Snapdragon_Collar.Asset;
 
         if (SpineVisible)
@@ -708,13 +439,16 @@ public class Snapdragon : ModNPC
             float dir = HeadFrame < 3 ? -1 : 1;
 
             Rectangle collarFrame = CollarTex.Frame(5, frameX: (int)Math.Round(HeadFrame / 7 * 5));
-            Rectangle headFrame = HeadTex.Frame(7, 13, (int)Math.Round(HeadFrame), (int)Math.Round(HeadFrame == 0 || HeadFrame == 6 ? JawOpening : 0));
+            Rectangle headFrame = HeadTex.Frame(7, 8, (int)Math.Round(HeadFrame), (int)Math.Round(HeadFrame == 0 || HeadFrame == 6 ? JawOpening : 0));
             float jawRot = 0f;
-            if (HeadFrame != 0 && HeadFrame != 6) jawRot += (dir * 0.06f * (JawOpening - 6));
-            else jawRot += (dir * 0.02f * (JawOpening - 6));
+            if (HeadFrame != 0 && HeadFrame != 6) jawRot += (dir * 0.06f * (JawOpening));
+            else jawRot += (dir * 0.02f * (JawOpening));
+            Vector2 headOff = new Vector2(NPC.direction * 12, 0).RotatedBy(NPC.rotation);
             Main.EntitySpriteDraw(CollarTex.Value, HeadOffset + NPC.Center + new Vector2(0, 10) - screenPos + (NPC.DirectionTo(BasePosition) * 10), collarFrame, drawColor.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), 0f, collarFrame.Size() / 2f, 1f, SpriteEffects.None);
-            Main.EntitySpriteDraw(JawTex.Value, HeadOffset + NPC.Center - screenPos + new Vector2(0, 25), headFrame, drawColor.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), NPC.rotation + jawRot, headFrame.Size() / 2f, 1f, SpriteEffects.None);
-            Main.EntitySpriteDraw(HeadTex.Value, HeadOffset + NPC.Center - screenPos + new Vector2(0, 25), headFrame, drawColor.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), NPC.rotation, headFrame.Size() / 2f, 1f, SpriteEffects.None);
+            Main.EntitySpriteDraw(JawTex.Value, HeadOffset + NPC.Center - screenPos + new Vector2(0, 25) + headOff, headFrame, drawColor.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), NPC.rotation + jawRot, headFrame.Size() / 2f, 1f, SpriteEffects.None);
+            Main.EntitySpriteDraw(JawGlow.Value, HeadOffset + NPC.Center - screenPos + new Vector2(0, 25) + headOff, headFrame, Color.White.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), NPC.rotation + jawRot, headFrame.Size() / 2f, 1f, SpriteEffects.None);
+            Main.EntitySpriteDraw(HeadTex.Value, HeadOffset + NPC.Center - screenPos + new Vector2(0, 25) + headOff, headFrame, drawColor.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), NPC.rotation, headFrame.Size() / 2f, 1f, SpriteEffects.None);
+            Main.EntitySpriteDraw(HeadGlow.Value, HeadOffset + NPC.Center - screenPos + new Vector2(0, 25) + headOff, headFrame, Color.White.MultiplyRGBA(new(HeadOpacity, HeadOpacity, HeadOpacity, HeadOpacity)), NPC.rotation, headFrame.Size() / 2f, 1f, SpriteEffects.None);
         }
 
         int x1 = (int)(NPC.Center.X / 16) - 5;
@@ -799,8 +533,14 @@ public class Snapdragon : ModNPC
 
         rot = MathHelper.Clamp(rot, -0.5f, 0.5f);
 
-        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
-        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
+        rot = Easing.KeyFloat(Math.Abs(NPC.rotation), MathHelper.PiOver2, MathHelper.Pi, rot, 0f, Easing.Linear, rot);
+
+        rot = Math.Abs(rot) * NPC.direction;
+
+        SpineCurve[0] = Vector2.Lerp(SpineCurve[0],
+            Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
+        SpineCurve[1] = Vector2.Lerp(SpineCurve[1],
+            NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(Math.Abs(NPC.rotation) * NPC.direction * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(0f), 0), 0.35f);
 
         SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 25f) * 2f, (float)Math.Sin(GlobalTimer.Value / 24f) * 2f);
         SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 15f) * 2f, (float)Math.Sin(GlobalTimer.Value / 14f) * 2f);
@@ -812,11 +552,17 @@ public class Snapdragon : ModNPC
 
         rot = MathHelper.Clamp(rot, -0.5f, 0.5f);
 
-        SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
-        SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
+        rot = Easing.KeyFloat(Math.Abs(NPC.rotation), MathHelper.PiOver2, MathHelper.Pi, rot, 0f, Easing.Linear, rot);
 
-        SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 25f) * 2f, (float)Math.Sin(GlobalTimer.Value / 24f) * 2f);
-        SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 15f) * 2f, (float)Math.Sin(GlobalTimer.Value / 14f) * 2f);
+        rot = Math.Abs(rot) * NPC.direction;
+
+        SpineCurve[0] = Vector2.Lerp(SpineCurve[0],
+            Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * NPC.direction)).RotatedBy(-rot) + new Vector2(0, 40), 0.2f);
+        SpineCurve[1] = Vector2.Lerp(SpineCurve[1],
+            NPC.Center + (NPC.DirectionTo(BasePosition) * 200).RotatedBy(rot) + new Vector2(-NPC.direction * 100, -100) + new Vector2(MathHelper.ToDegrees(0f), 0), 0.35f);
+
+        SpineCurve[0] += new Vector2((float)Math.Sin(GlobalTimer.Value / 1.5f) * 1f, (float)Math.Sin(GlobalTimer.Value / 0.75f) * 1f);
+        SpineCurve[1] -= new Vector2((float)Math.Sin(GlobalTimer.Value / 2f) * 1f, (float)Math.Sin(GlobalTimer.Value / 0.5f) * 1f);
     }
 
     public float FrostBreathTimer = 0f;

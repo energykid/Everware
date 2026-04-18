@@ -213,6 +213,16 @@ public class Easing
         return 1 - InCirc((1 - t) * 2) / 2;
     }
 
+    public static float OutInCirc(float t)
+    {
+        if (t < 0.5)
+        {
+            return OutCirc(t * 2) / 2;
+        }
+
+        return 1 - OutCirc((1 - t) * 2) / 2;
+    }
+
     public static float InElastic(float t)
     {
         return 1 - OutElastic(1 - t);

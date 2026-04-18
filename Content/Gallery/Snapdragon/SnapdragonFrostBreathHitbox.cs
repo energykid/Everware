@@ -1,4 +1,5 @@
 ﻿using Everware.Core.Projectiles;
+using System;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
@@ -18,6 +19,8 @@ public class SnapdragonFrostBreathHitbox : EverProjectile
     }
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
+        float length = Math.Abs(Projectile.timeLeft - 15f);
+
         Vector2 pos = Projectile.Center + new Vector2(Main.rand.NextFloat(-20, 20), Main.rand.NextFloat(-20, 20));
 
         for (int i = 0; i < 75; i++)
@@ -45,7 +48,7 @@ public class SnapdragonFrostBreathHitbox : EverProjectile
                 p1 = -MathHelper.PiOver2;
                 p2 = MathHelper.PiOver2;
             }
-            SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -Projectile.velocity * 1.5f, (Projectile.velocity * 0.2f).RotatedBy(p1), (Projectile.velocity * 0.2f).RotatedBy(p2)));
+            SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -Projectile.velocity * 1.5f * (length / 3f), (Projectile.velocity * 0.2f).RotatedBy(p1), (Projectile.velocity * 0.2f).RotatedBy(p2)));
         }
 
         Projectile.Kill();
