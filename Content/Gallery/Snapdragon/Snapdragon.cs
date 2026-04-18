@@ -4,12 +4,18 @@ using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
 using System;
 using System.IO;
+using Terraria.ID;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
 [AutoloadBossHead]
 public partial class Snapdragon : ModNPC
 {
+    public override void SetStaticDefaults()
+    {
+        NPCID.Sets.TrailCacheLength[Type] = 3;
+        NPCID.Sets.TrailingMode[Type] = 10;
+    }
     public Player Target => Main.player[NPC.target];
     public override string Texture => "Everware/Assets/Textures/Gallery/Snapdragon/Snapdragon_Head";
     public override string BossHeadTexture => "Everware/Assets/Textures/Gallery/Snapdragon/Snapdragon_Head_Boss";
@@ -263,21 +269,7 @@ public partial class Snapdragon : ModNPC
 
         Vector2 spawnPos = MouthPosition();
 
-        for (int i = 0; i < 20; i++)
-            new TextureFlashParticle(spawnPos - ((rotation.ToRotationVector2() * 40f).RotatedByRandom(2f)), (rotation.ToRotationVector2() * 220f).RotatedByRandom(0.4f), Vector2.One, assets[Main.rand.Next(assets.Length)])
-            {
-                Opacity = 0.2f,
-                AffectedByLight = false,
-                Pixelated = true,
-                Color = Color.White.MultiplyRGBA(new(1f, 1f, 1f, 0f)),
-                Scale = new Vector2(3f, 0f),
-                UpdateFunction = FrostBreathUpdateFunc,
-                ai = [
-                0f, 0f, Main.rand.NextFloat(-0.3f, 0.3f)
-                ]
-            }.Spawn();
-
-        Projectile.NewProjectile(new EntitySource_Parent(NPC, "Snapdragon Frost Breath"), NPC.Center, rotation.ToRotationVector2() * 220, ModContent.ProjectileType<SnapdragonFrostBreathHitbox>(), FrostBreathDamage, 4f);
+        Projectile.NewProjectile(new EntitySource_Parent(NPC, "Snapdragon Frost Breath"), Vector2.Lerp(MouthPosition(), NPC.Center, 0.2f), rotation.ToRotationVector2().RotatedByRandom(0.1f) * 65, ModContent.ProjectileType<SnapdragonFrostBreath>(), FrostBreathDamage, 4f, ai1: NPC.whoAmI);
     }
     public static Particle.ParticleFunction FrostBreathSparkleFunc = P =>
     {
@@ -321,11 +313,8 @@ public partial class Snapdragon : ModNPC
         {
             P.velocity = P.velocity.RotatedBy(-Math.Sign(P.velocity.X) * 0.04f);
             P.velocity *= 0.75f;
-            P.Opacity *= 0.75f;
+            P.Opacity *= 0.85f;
         }
-        P.Color = Color.Lerp(Color.Transparent, Color.GhostWhite, P.Opacity);
-        P.Color = Color.Lerp(P.Color, Color.Transparent, P.Opacity * 0.5f);
-        P.Color = Color.Lerp(P.Color, Color.Transparent, 0.7f);
         P.Rotation = Vector2.Zero.AngleTo(P.velocity);
         P.Scale = Vector2.Lerp(P.Scale, new Vector2(2f, 2f), 0.3f);
         if (P.ai[0] > 10)

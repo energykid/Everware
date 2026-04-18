@@ -442,6 +442,7 @@ public partial class Snapdragon : ModNPC
     }
     public void BeakBashAttackState()
     {
+
     }
     public void RotateTowardsPlayer(out float rot2)
     {

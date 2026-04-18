@@ -286,6 +286,7 @@ Projectiles: {
 	EverCustomDrawProjectile.DisplayName: Projectile
 	ConjuredBoulder.DisplayName: Boulder
 	SnapdragonFrostBreathHitbox.DisplayName: Snapdragon
+	SnapdragonFrostBreath.DisplayName: Snapdragon Frost Breath
 	SnapFreezeProjectile.DisplayName: Snap Freeze Projectile
 }
 

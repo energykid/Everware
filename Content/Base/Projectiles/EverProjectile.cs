@@ -1,5 +1,4 @@
 ﻿using Everware.Common.Players;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using System.Linq;

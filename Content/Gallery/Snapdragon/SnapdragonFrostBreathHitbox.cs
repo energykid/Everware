@@ -3,23 +3,51 @@ using System;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
-public class SnapdragonFrostBreathHitbox : EverProjectile
+public class SnapdragonFrostBreath : EverProjectile
 {
     public override string Texture => "Everware/Assets/Textures/Misc/SinglePixel";
+    public override int? TrailSeparation => 10;
+    public bool Hit = false;
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Projectile.width = Projectile.height = 250;
+        Projectile.ai[0] = 0f;
+        Projectile.width = Projectile.height = 128;
         Projectile.hostile = true;
         Projectile.damage = 40;
         Projectile.knockBack = 3;
-        Projectile.hide = true;
-        Projectile.timeLeft = 15;
+        Projectile.timeLeft = 40;
+        Projectile.ai[2] = Main.rand.NextFloat(-0.3f, 0.3f);
         Projectile.tileCollide = true;
+        Projectile.rotation = Main.rand.NextFloat(3f);
+    }
+    public override void AI()
+    {
+        Projectile.rotation += Projectile.ai[2];
+        Projectile.velocity *= 0.99f;
+        Projectile.scale = MathHelper.Lerp(Projectile.scale, 2f, 0.05f);
+        Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 9.9f, 0.05f);
+    }
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Asset<Texture2D> MainTexture = Assets.Textures.Gallery.Snapdragon.SnapdragonFrostBreath.Asset;
+
+        Rectangle fr = MainTexture.Frame(1, 10, frameY: (int)Math.Floor(Projectile.ai[0]));
+
+        Color c = Color.Lerp(Color.White, Color.Blue, Projectile.ai[0] / 10f);
+
+        for (float i = 0; i < Projectile.oldPos.Length; i++)
+        {
+            Main.EntitySpriteDraw(MainTexture.Value, Projectile.oldPos[(int)i] + (Projectile.Size / 2) - Main.screenPosition, fr, new Color(0.0f, 0.005f, 0.06f, 0.0f), Projectile.rotation, fr.Size() / 2f, MathHelper.Lerp(Projectile.scale * 1.1f, 0f, i / 10f), SpriteEffects.None);
+        }
+
+        Main.EntitySpriteDraw(MainTexture.Value, Projectile.Center - Main.screenPosition, fr, c.MultiplyRGBA(new Color(0.8f, 0.85f, 1f, 0f)), Projectile.rotation, fr.Size() / 2f, Projectile.scale, SpriteEffects.None);
+
+        return false;
     }
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        float length = Math.Abs(Projectile.timeLeft - 15f);
+        float length = Math.Abs(Projectile.timeLeft - 40f);
 
         Vector2 pos = Projectile.Center + new Vector2(Main.rand.NextFloat(-20, 20), Main.rand.NextFloat(-20, 20));
 
@@ -35,23 +63,28 @@ public class SnapdragonFrostBreathHitbox : EverProjectile
             if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType]) break;
         }
 
-        SoundStyle asset = Assets.Sounds.NPC.Snapdragon_Assemble.Asset;
-        asset.MaxInstances = 20;
-        if (Main.rand.NextBool(2)) SoundEngine.PlaySound(asset.WithPitchVariance(0.6f).WithPitchOffset(0.4f).WithVolumeScale(0.3f), pos);
+        Vector2 v1 = Projectile.velocity;
+        v1.Normalize();
+        v1 *= length;
 
-        if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType])
+        if (!Hit)
         {
-            float p1 = MathHelper.PiOver2;
-            float p2 = -MathHelper.PiOver2;
-            if (oldVelocity.X < 0)
+            if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType])
             {
-                p1 = -MathHelper.PiOver2;
-                p2 = MathHelper.PiOver2;
+                float p1 = MathHelper.PiOver2;
+                float p2 = -MathHelper.PiOver2;
+                if (oldVelocity.X < 0)
+                {
+                    p1 = -MathHelper.PiOver2;
+                    p2 = MathHelper.PiOver2;
+                }
+                SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -v1 * (length / 5f), (v1 * 0.5f).RotatedBy(p1), (v1 * 0.5f).RotatedBy(p2)));
             }
-            SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -Projectile.velocity * 1.5f * (length / 3f), (Projectile.velocity * 0.2f).RotatedBy(p1), (Projectile.velocity * 0.2f).RotatedBy(p2)));
         }
 
-        Projectile.Kill();
+        Projectile.velocity = oldVelocity * 0.8f;
+
+        Hit = true;
 
         return false;
     }
