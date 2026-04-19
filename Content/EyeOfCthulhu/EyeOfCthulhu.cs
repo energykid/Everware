@@ -837,11 +837,19 @@ public class EyeOfCthulhu : GlobalNPC
                 Vector2 position = new Vector2((pt.X + i) * 16, (pt.Y + j) * 16);
                 Tile t = Main.tile[pt.X + i, pt.Y + j];
 
-                bool NotSalt = true;
-
-                if (NotSalt)
+                if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
                 {
-                    if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
+                    bool NotSalt = true;
+
+                    if (ModLoader.TryGetMod("SpiritReforged", out Mod spiritReforged))
+                    {
+                        var a = spiritReforged.Find<ModTile>("SaltBlockReflective");
+                        if (t.TileType == a.Type)
+                        {
+                            NotSalt = false;
+                        }
+                    }
+                    if (NotSalt)
                     {
                         StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
                         {
