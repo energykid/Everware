@@ -832,31 +832,43 @@ public class EyeOfCthulhu : GlobalNPC
 
                 if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
                 {
-                    StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
+                    bool spawn = true;
+                    if (ModLoader.TryGetMod("SpiritReforged", out Mod spiritReforged))
                     {
-                        HideTimer = 60
-                    };
-                    tile0.Spawn();
-                    WorldGen.KillTile_MakeTileDust(pt.X + i, pt.Y + j, t);
-                    if (!WorldGen.SolidOrSlopedTile(Main.tile[pt.X + i, pt.Y + j - 1]))
+                        var a = spiritReforged.Find<ModTile>("SaltBlockReflective");
+                        if (t.TileType == a.Type)
+                        {
+                            spawn = false;
+                        }
+                    }
+                    if (spawn)
                     {
-                        Vector2 altVel = npc.velocity;
-                        altVel.Normalize();
-                        TileReplicantParticle tile = new TileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), new Vector2(0, -4f + (Math.Abs((float)i / 3f))), Vector2.One, P =>
+                        StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
                         {
-                            (P as TileReplicantParticle).HideTimer--;
-                            if ((P as TileReplicantParticle).HideTimer > 0) P.position -= P.velocity;
-                            else
-                            {
-                                P.velocity.Y += 0.4f;
-                                if (P.position.Y > (P as TileReplicantParticle).StartingY) P.Kill();
-                            }
-                        })
-                        {
-                            HideTimer = Math.Abs(i) * 5,
-                            StartingY = position.Y + 8
+                            HideTimer = 60
                         };
-                        tile.Spawn();
+                        tile0.Spawn();
+                        WorldGen.KillTile_MakeTileDust(pt.X + i, pt.Y + j, t);
+                        if (!WorldGen.SolidOrSlopedTile(Main.tile[pt.X + i, pt.Y + j - 1]))
+                        {
+                            Vector2 altVel = npc.velocity;
+                            altVel.Normalize();
+                            TileReplicantParticle tile = new TileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), new Vector2(0, -4f + (Math.Abs((float)i / 3f))), Vector2.One, P =>
+                            {
+                                (P as TileReplicantParticle).HideTimer--;
+                                if ((P as TileReplicantParticle).HideTimer > 0) P.position -= P.velocity;
+                                else
+                                {
+                                    P.velocity.Y += 0.4f;
+                                    if (P.position.Y > (P as TileReplicantParticle).StartingY) P.Kill();
+                                }
+                            })
+                            {
+                                HideTimer = Math.Abs(i) * 5,
+                                StartingY = position.Y + 8
+                            };
+                            tile.Spawn();
+                        }
                     }
                 }
             }

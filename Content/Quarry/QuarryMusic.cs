@@ -1,5 +1,4 @@
-﻿using Everware.Content.Kiln.Tiles;
-using Everware.Content.Quarry.Tiles;
+﻿using Everware.Content.Quarry.Tiles;
 using System;
 using Terraria.ID;
 
@@ -10,7 +9,7 @@ public class QuarryMusic : ModBiome
     public override int Music => Assets.Sounds.Music.Quarry.Slot;
     public override bool IsBiomeActive(Player player)
     {
-        return player.GetModPlayer<KilnQuarryMusicStats>().quarryTiles > 20 && player.GetModPlayer<KilnQuarryMusicStats>().siltTiles > 10;
+        return player.GetModPlayer<KilnQuarryMusicStats>().quarryTiles > 10 && player.GetModPlayer<KilnQuarryMusicStats>().siltTiles > 10 && (player.Center.Y / 16f) < Main.worldSurface;
     }
 }
 public class QuarryMusicSystem : ModSystem
@@ -19,7 +18,6 @@ public class QuarryMusicSystem : ModSystem
     {
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().siltTiles += tileCounts[TileID.Silt];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().quarryTiles += tileCounts[ModContent.TileType<SturdyBricksPlaced>()];
-        Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().quarryTiles += tileCounts[ModContent.TileType<WornWoodPlaced>()];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().quarryTiles += tileCounts[ModContent.TileType<WeldingStation>()];
     }
 

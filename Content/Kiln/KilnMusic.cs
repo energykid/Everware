@@ -9,7 +9,7 @@ public class KilnMusic : ModBiome
     public override int Music => Assets.Sounds.Music.Kiln.Slot;
     public override bool IsBiomeActive(Player player)
     {
-        return player.GetModPlayer<KilnQuarryMusicStats>().kilnTiles > 20 && player.GetModPlayer<KilnQuarryMusicStats>().siltTiles > 10;
+        return player.GetModPlayer<KilnQuarryMusicStats>().kilnTiles > 20 && player.GetModPlayer<KilnQuarryMusicStats>().siltTiles > 10 && (player.Center.Y / 16f) < Main.worldSurface;
     }
 }
 public class KilnMusicSystem : ModSystem
