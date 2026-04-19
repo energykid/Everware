@@ -74,7 +74,6 @@ public class SnapdragonFrostBreath : EverProjectile
         {
             if (Main.rand.NextBool(3))
             {
-
                 float p1 = MathHelper.PiOver2;
                 float p2 = -MathHelper.PiOver2;
                 if (oldVelocity.X < 0)
@@ -85,6 +84,7 @@ public class SnapdragonFrostBreath : EverProjectile
                 Vector2 v = v1 * (length / 5f);
                 SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -v, (v1 * 0.5f).RotatedBy(p1), (v1 * 0.5f).RotatedBy(p2)));
 
+                SoundEngine.PlaySound((Assets.Sounds.NPC.Snapdragon_Assemble.Asset with { MaxInstances = 30 }).WithPitchVariance(0.3f).WithPitchOffset(-0.3f + (v.Length() / 230f)), Projectile.Center);
             }
             Hit = true;
         }
