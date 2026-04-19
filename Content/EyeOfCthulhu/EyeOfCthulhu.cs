@@ -6,6 +6,7 @@ using Everware.Utils;
 using System;
 using System.IO;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.EyeOfCthulhuRework;
@@ -878,6 +879,7 @@ public class EyeOfCthulhu : GlobalNPC
 public class EyeOfCthulhuTendrilHitbox : ModProjectile
 {
     public override string Texture => "Everware/Textures/SkewedRadialBlast";
+    public override LocalizedText DisplayName => Language.GetText("NPCName.EyeofCthulhu");
 
     public override void SetDefaults()
     {

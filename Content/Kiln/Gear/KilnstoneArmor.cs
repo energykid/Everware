@@ -5,6 +5,7 @@ using Everware.Core;
 using Everware.Utils;
 using System;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Everware.Content.Kiln.Gear;
 
@@ -38,7 +39,7 @@ public class KilnstoneHelmet : EverItem
     {
         {
             player.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetBonus = true;
-            player.setBonus = LocalizationReferences.Mods.Everware.Items.KilnstoneArmorBonus.GetTextValue();
+            player.setBonus = Language.GetTextValue("Mods.Everware.Items.KilnstoneHelmet.SetBonus");
         }
     }
 }

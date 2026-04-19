@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Everware.Content.Kiln.Gear;
 
@@ -39,6 +40,7 @@ public class Kilnpost : EverWeaponItem
 public class KilnpostHoldout : EverHoldoutProjectile
 {
     public override string Texture => "Everware/Assets/Textures/Kiln/Kilnpost";
+    public override LocalizedText DisplayName => Language.GetText("Mods.Everware.Items.Kilnpost.DisplayName");
     string State = "Thrust";
     float Spin = 0f;
     float BaseRot = 0f;

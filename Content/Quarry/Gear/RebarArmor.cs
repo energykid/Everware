@@ -6,6 +6,7 @@ using Everware.Core;
 using Everware.Utils;
 using System.IO;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Everware.Content.Quarry.Gear;
 

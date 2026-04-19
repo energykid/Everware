@@ -8,6 +8,7 @@ using ReLogic.Content;
 using System;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Everware.Content.Hell;
 
@@ -60,6 +61,7 @@ public class HotShotHoldout : EverHoldoutProjectile
 {
     bool AltF = false;
     public override string Texture => "Everware/Assets/Textures/Hell/HotShot";
+    public override LocalizedText DisplayName => Language.GetText("Mods.Everware.Items.HotShot.DisplayName");
 
     public override void SetStaticDefaults()
     {

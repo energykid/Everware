@@ -9,7 +9,11 @@ Items: {
 		Tooltip: ""
 	}
 
-	KilnstoneArmorBonus: Lingering mining speed boost when breaking soft blocks or stone
+	KilnstoneHelmet: {
+		DisplayName: Kilnstone Helmet
+		Tooltip: ""
+		SetBonus: Lingering mining speed boost when breaking soft blocks or stone
+	}
 
 	KilnstoneBrickplate: {
 		DisplayName: Kilnstone Brickplate
@@ -18,11 +22,6 @@ Items: {
 
 	KilnstoneChausses: {
 		DisplayName: Kilnstone Chausses
-		Tooltip: ""
-	}
-
-	KilnstoneHelmet: {
-		DisplayName: Kilnstone Helmet
 		Tooltip: ""
 	}
 
@@ -43,21 +42,6 @@ Items: {
 
 	KilnBrickPlatform: {
 		DisplayName: Kiln Brick Platform
-		Tooltip: ""
-	}
-
-	MakeshiftBed: {
-		DisplayName: Makeshift Bed
-		Tooltip: ""
-	}
-
-	MakeshiftWorkbench: {
-		DisplayName: Makeshift Workbench
-		Tooltip: ""
-	}
-
-	RoughWood: {
-		DisplayName: Rough Wood
 		Tooltip: ""
 	}
 
@@ -91,11 +75,10 @@ Items: {
 		Tooltip: ""
 	}
 
-	RebarArmorBonus: Chance to duplicate most ores
-
 	RebarCrest: {
 		DisplayName: Rebar Crest
 		Tooltip: ""
+		SetBonus: Chance to duplicate most ores
 	}
 
 	RebarGridmail: {
@@ -261,24 +244,15 @@ Biomes: {
 	}
 }
 
-Tiles: {
-	WeldingStation.MapEntry: Welding Station
-	ForgingKiln.MapEntry: Forging Kiln
-}
-
 Projectiles: {
-	KilnpostHoldout.DisplayName: Kilnpost
 	KilnpostBreakaway.DisplayName: Kiln Shard
-	RebukerBolt.DisplayName: Rebuker
-	RebukerHoldout.DisplayName: Rebuker
+	RebukerBolt.DisplayName: Metal Rod
 	CthulhuBloodProjectile.DisplayName: Eye Blood
-	EyeOfCthulhuTendrilHitbox.DisplayName: Eye of Cthulhu
 	BloodRubyExplosion.DisplayName: Explosion
 	FloorIsLava.DisplayName: Molten Lava
 	PyrocleaverProjectile.DisplayName: Pyrocleaver
 	SkullMinion.DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
 	SkullMinionExplosion.DisplayName: Explosion
-	HotShotHoldout.DisplayName: Hot Shot
 	HotShotBurst.DisplayName: Muzzle Flare
 	HotShotBurstLarge.DisplayName: Muzzle Flare
 	CustomItemDrawProjectile.DisplayName: Projectile
