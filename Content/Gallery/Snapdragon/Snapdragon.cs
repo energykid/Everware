@@ -269,7 +269,7 @@ public partial class Snapdragon : ModNPC
 
         Vector2 spawnPos = MouthPosition();
 
-        Projectile.NewProjectile(new EntitySource_Parent(NPC, "Snapdragon Frost Breath"), Vector2.Lerp(MouthPosition(), NPC.Center, 0.2f), rotation.ToRotationVector2().RotatedByRandom(0.1f) * 65, ModContent.ProjectileType<SnapdragonFrostBreath>(), FrostBreathDamage, 4f, ai1: NPC.whoAmI);
+        Projectile.NewProjectile(new EntitySource_Parent(NPC, "Snapdragon Frost Breath"), Vector2.Lerp(MouthPosition(), NPC.Center, 0.2f), rotation.ToRotationVector2().RotatedByRandom(0.1f) * 25, ModContent.ProjectileType<SnapdragonFrostBreath>(), FrostBreathDamage, 4f, ai1: NPC.whoAmI);
     }
     public static Particle.ParticleFunction FrostBreathSparkleFunc = P =>
     {

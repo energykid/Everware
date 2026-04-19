@@ -442,7 +442,48 @@ public partial class Snapdragon : ModNPC
     }
     public void BeakBashAttackState()
     {
+        NPC.direction = HeadFrame > 3 ? 1 : -1;
+        float a = 0f;
+        float BurrowWindupTime = 35;
+        float BurrowWindupSpeed = 15;
+        float DigTime = 50;
+        if (NPC.ai[0] == 1) SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_BurrowWindup.Asset, NPC.Center);
+        if (NPC.ai[0] < BurrowWindupTime)
+        {
+            HeadFrame = NPC.direction > 0 ? 6 : 0;
 
+            Vector2 v = new Vector2(0, -400);
+            v = Easing.KeyVector2(NPC.ai[0], 0f, BurrowWindupSpeed / 3f * 2f, new Vector2(0, -300), new Vector2(NPC.direction * 100, -250), Easing.InOutBack);
+            v = Easing.KeyVector2(NPC.ai[0], BurrowWindupSpeed / 3f * 2f, BurrowWindupSpeed, new Vector2(NPC.direction * 50, -250), new Vector2(NPC.direction * 100, 50), Easing.InExpo);
+            if (NPC.ai[0] > 18) v = new Vector2(NPC.direction * 300, 50);
+
+            a = Math.Clamp(Easing.InCirc(NPC.ai[0] / BurrowWindupTime * 1.2f), 0f, 1f);
+
+            NPC.rotation = MathHelper.Lerp(NPC.rotation, MathHelper.PiOver4 * NPC.direction * (a * 2f), 0.2f);
+
+            NPC.VelocityMoveTowardsPosition(BasePosition + v, 0.15f, a);
+
+            if (NPC.ai[0] == 12)
+            {
+                SoundEngine.PlaySound(Assets.Sounds.NPC.Snapdragon_BurrowDig.Asset, NPC.Center);
+            }
+
+            if (NPC.ai[0] > 12)
+            {
+                NPC.velocity *= 1.2f;
+                if (NPC.Center.Y > BasePosition.Y - 100) NPC.ai[0] = BurrowWindupTime - 1;
+            }
+
+            SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + (NPC.DirectionTo(BasePosition) * (-50 * Math.Abs(NPC.rotation) * 0.1f)) + new Vector2(0, 40), 0.2f);
+            SpineCurve[1] = Vector2.Lerp(SpineCurve[1], NPC.Center + (NPC.DirectionTo(BasePosition) * 200) + new Vector2(MathHelper.ToDegrees(NPC.rotation * 0.1f), -100) + new Vector2(MathHelper.ToDegrees(NPC.rotation), 0), 0.35f);
+
+            SpineCurve[0] = Vector2.Lerp(SpineCurve[0], Vector2.Lerp(NPC.Center, BasePosition, 0.6f) + new Vector2(-NPC.direction * 300, 0).RotatedBy(NPC.rotation), a);
+            SpineCurve[1] = Vector2.Lerp(SpineCurve[1], Vector2.Lerp(NPC.Center, BasePosition, 0.3f) + new Vector2(-NPC.direction * 100, 0).RotatedBy(NPC.rotation), a);
+        }
+        else
+        {
+            ChangeAttackState(AttackState.SnapFreeze);
+        }
     }
     public void RotateTowardsPlayer(out float rot2)
     {

@@ -24,6 +24,7 @@ public class SnapdragonFrostBreath : EverProjectile
     public override void AI()
     {
         Projectile.rotation += Projectile.ai[2];
+        if (Projectile.ai[0] < 3) Projectile.velocity *= 1.15f;
         Projectile.velocity *= 0.99f;
         Projectile.scale = MathHelper.Lerp(Projectile.scale, 2f, 0.05f);
         Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 9.9f, 0.05f);
@@ -41,7 +42,9 @@ public class SnapdragonFrostBreath : EverProjectile
             Main.EntitySpriteDraw(MainTexture.Value, Projectile.oldPos[(int)i] + (Projectile.Size / 2) - Main.screenPosition, fr, new Color(0.0f, 0.005f, 0.06f, 0.0f), Projectile.rotation, fr.Size() / 2f, MathHelper.Lerp(Projectile.scale * 1.1f, 0f, i / 10f), SpriteEffects.None);
         }
 
-        Main.EntitySpriteDraw(MainTexture.Value, Projectile.Center - Main.screenPosition, fr, c.MultiplyRGBA(new Color(0.8f, 0.85f, 1f, 0f)), Projectile.rotation, fr.Size() / 2f, Projectile.scale, SpriteEffects.None);
+        Main.EntitySpriteDraw(MainTexture.Value, Projectile.Center - Main.screenPosition, fr, c.MultiplyRGBA(new Color(0.5f, 0.65f, 1f, 0f)), Projectile.rotation, fr.Size() / 2f, Projectile.scale, SpriteEffects.None);
+
+        Main.EntitySpriteDraw(MainTexture.Value, Projectile.Center - Main.screenPosition, fr, c.MultiplyRGBA(new Color(0.4f, 0.65f, 1f, 0f)), Projectile.rotation, fr.Size() / 2f, Projectile.scale, SpriteEffects.None);
 
         return false;
     }
@@ -65,12 +68,13 @@ public class SnapdragonFrostBreath : EverProjectile
 
         Vector2 v1 = Projectile.velocity;
         v1.Normalize();
-        v1 *= length;
+        v1 *= MathHelper.Clamp(length * 10, 70, 100);
 
-        if (!Hit)
+        if (!Hit && Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType])
         {
-            if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType])
+            if (Main.rand.NextBool(3))
             {
+
                 float p1 = MathHelper.PiOver2;
                 float p2 = -MathHelper.PiOver2;
                 if (oldVelocity.X < 0)
@@ -78,13 +82,14 @@ public class SnapdragonFrostBreath : EverProjectile
                     p1 = -MathHelper.PiOver2;
                     p2 = MathHelper.PiOver2;
                 }
-                SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -v1 * (length / 5f), (v1 * 0.5f).RotatedBy(p1), (v1 * 0.5f).RotatedBy(p2)));
+                Vector2 v = v1 * (length / 5f);
+                SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -v, (v1 * 0.5f).RotatedBy(p1), (v1 * 0.5f).RotatedBy(p2)));
+
             }
+            Hit = true;
         }
 
         Projectile.velocity = oldVelocity * 0.8f;
-
-        Hit = true;
 
         return false;
     }
