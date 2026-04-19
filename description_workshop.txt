@@ -34,3 +34,4 @@ pil - [i]artist[/i]
 Dandy - [i]artist[/i]
 
 Enderpikmin - [i]localizer (ES)[/i]
+Nexora & Kraken - [i]localizers (RU)[/i]

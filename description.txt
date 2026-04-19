@@ -38,6 +38,6 @@ added text keys for Kiln/Quarry crafting stations, Eye of Cthulhu fables boss te
 .....
 Everware 0.2.4 - small fixed and Russian localization
 
-added Russian localization by Nexora
+added Russian localization by Nexora & Kraken
 made the Eye of Cthulhu temporarily not spawn tile ripples when hitting reflective salt from Spirit Reforged
 caused Kiln and Quarry music to stop playing underground, and slightly improved the way the area is detected for music
