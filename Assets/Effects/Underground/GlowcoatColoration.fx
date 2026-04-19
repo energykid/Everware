@@ -25,7 +25,7 @@ float4 Effect(float2 coords : TEXCOORD0) : COLOR0
 {
     float4 col = tex2D(uImage0, coords);
     if (col.a > 0)
-        return Color;
+        return float4(Color.rgb, col.a);
     else
         return col;
 }

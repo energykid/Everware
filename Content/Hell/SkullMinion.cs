@@ -91,7 +91,9 @@ class SkullMinion : EverMinion
                         };
                         SoundEngine.PlaySound(style, Projectile.Center);
                     }
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(targetNPC.Center) * (Projectile.ai[0] - AttackFrequency) * 2f, 0.1f);
+                    float velTarget = (Projectile.ai[0] - AttackFrequency) * 2f;
+                    velTarget = Math.Clamp(velTarget, 0f, 25f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(targetNPC.Center) * velTarget, 0.1f);
                     Projectile.damage = 50;
                 }
             }

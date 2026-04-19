@@ -1,6 +1,7 @@
 ﻿using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
+using Terraria.ID;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Underground.Glowcoat;
@@ -15,6 +16,25 @@ public class GlowcoatGlobalTile : GlobalTile
         }
     }
 }
+public class GlowcoatPaintScraper : GlobalItem
+{
+    public override void UseStyle(Item item, Player player, Rectangle heldItemFrame)
+    {
+        if (item.type == ItemID.PaintScraper || item.type == ItemID.SpectrePaintScraper && player.ItemAnimationJustStarted)
+        {
+            bool inRange = Math.Abs(Player.tileTargetX - (player.Center.X / 16)) < Player.tileRangeX && Math.Abs(Player.tileTargetY - (player.Center.Y / 16)) < Player.tileRangeY;
+            Tile t = Main.tile[Player.tileTargetX, Player.tileTargetY];
+            if (t.HasTile && inRange)
+            {
+                if (t.Get<GlowcoatTileData>().color != Color.Transparent)
+                {
+                    GlowcoatSystem.Unglowcoat(Player.tileTargetX, Player.tileTargetY);
+                }
+            }
+        }
+    }
+}
+
 public class GlowcoatSystem : ModSystem
 {
     public static void Unglowcoat(int i, int j)
@@ -27,6 +47,8 @@ public class GlowcoatSystem : ModSystem
     }
     public static void Glowcoat(int i, int j, Color color, bool chromatic = false)
     {
+        Unglowcoat(i, j);
+
         Main.tile[i, j].Get<GlowcoatTileData>().color = color;
         Main.tile[i, j].Get<GlowcoatTileData>().chromatic = chromatic;
 
@@ -39,42 +61,45 @@ public class GlowcoatSystem : ModSystem
 
     private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
     {
-        var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-        GlowEffect.Parameters.Color = Color.Blue.ToVector4();
-        GlowEffect.Apply();
-
-        for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
+        if (!solidLayer)
         {
-            for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
+            var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+            GlowEffect.Parameters.Color = Color.Blue.ToVector4();
+            GlowEffect.Apply();
+
+            for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
             {
-                Point a = (Main.screenPosition / 16).ToPoint();
-                a.X += i; a.Y += j;
-                Tile t = Main.tile[a];
-
-                if (t.HasTile)
+                for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
                 {
-                    Main.spriteBatch.End();
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.EffectMatrix);
+                    Point a = (Main.screenPosition / 16).ToPoint();
+                    a.X += i; a.Y += j;
+                    Tile t = Main.tile[a];
 
-                    Color c = t.Get<GlowcoatTileData>().color;
-                    if (c != Color.Transparent)
+                    if (t.HasTile)
                     {
-                        GlowEffect.Parameters.Color = c.ToVector4();
-                        if (t.Get<GlowcoatTileData>().chromatic)
-                            GlowEffect.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
-                        GlowEffect.Apply();
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.EffectMatrix);
 
-                        Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
+                        Color c = t.Get<GlowcoatTileData>().color;
+                        if (c != Color.Transparent)
+                        {
+                            GlowEffect.Parameters.Color = c.ToVector4();
+                            if (t.Get<GlowcoatTileData>().chromatic)
+                                GlowEffect.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
+                            GlowEffect.Apply();
 
-                        for (float k = 0; k < 360; k += 90)
-                            Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                            Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
+
+                            for (float k = 0; k < 360; k += 90)
+                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                        }
                     }
                 }
             }
-        }
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null);
+        }
 
         orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
     }
@@ -110,8 +135,6 @@ public class GlowcoatSystem : ModSystem
             GlowcoatedTiles.Add(p);
             t.Get<GlowcoatTileData>().color = tag.Get<Color>("Color_" + PointString(p));
             t.Get<GlowcoatTileData>().chromatic = tag.Get<bool>("Chroma_" + PointString(p));
-
-            Main.NewText(PointString(p));
         }
     }
 

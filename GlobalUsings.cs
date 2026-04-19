@@ -1,5 +1,9 @@
-﻿global using Microsoft.Xna.Framework;
+﻿global using Daybreak.Common.Rendering;
+global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
+global using ReLogic.Content;
 global using Terraria;
 global using Terraria.Audio;
+global using Terraria.DataStructures;
 global using Terraria.GameContent;
 global using Terraria.ModLoader;

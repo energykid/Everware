@@ -167,9 +167,63 @@ Items: {
 		Tooltip: Conjures a boulder from above your cursor to crash down on your foes
 	}
 
+	ArgonGlowcoat: {
+		DisplayName: Argon Glowcoat
+		Tooltip: Apply to a tile to give it a deep pink glow
+	}
+
+	KryptonGlowcoat: {
+		DisplayName: Krypton Glowcoat
+		Tooltip: Apply to a tile to give it a flashy green glow
+	}
+
+	NeonGlowcoat: {
+		DisplayName: Neon Glowcoat
+		Tooltip: Apply to a tile to give it a bold purple glow
+	}
+
+	XenonGlowcoat: {
+		DisplayName: Xenon Glowcoat
+		Tooltip: Apply to a tile to give it a rich blue glow
+	}
+
+	OganessonGlowcoat: {
+		DisplayName: Oganesson Glowcoat
+		Tooltip: Apply to a tile to give it a sleek white glow
+	}
+
+	RadonGlowcoat: {
+		DisplayName: Radon Glowcoat
+		Tooltip: Apply to a tile to give it a bright yellow glow
+	}
+
+	ChromaticGlowcoat: {
+		DisplayName: Chromatic Glowcoat
+		Tooltip: Apply to a tile to give it an illustrious multicolored glow
+	}
+
 	MagmaticGlowcoat: {
 		DisplayName: Magmatic Glowcoat
-		Tooltip: Apply to a tile to give it a deep magmatic glow
+		Tooltip: Apply to a tile to give it a tense fiery glow
+	}
+
+	AuroralGlowcoat: {
+		DisplayName: Auroral Glowcoat
+		Tooltip: Apply to a tile to give it a calming icy glow
+	}
+
+	Groundshakers: {
+		DisplayName: Groundshakers
+		Tooltip:
+			'''
+			Double-tap DOWN to perform a ground pound
+			Hitting enemies with this move deals damage and bounces you upward
+			'''
+	}
+
+	WeatheredWood: {
+		DisplayName: Weathered Wood
+		Tooltip: ""
 	}
 }
 
@@ -182,6 +236,11 @@ Biomes: {
 	QuarryMusic: {
 		DisplayName: Quarry
 		TownNPCDialogueName: the Quarry
+	}
+
+	TheGallery: {
+		DisplayName: The Gallery
+		TownNPCDialogueName: the The Gallery
 	}
 }
 
@@ -196,9 +255,13 @@ Projectiles: {
 	SkullMinionExplosion.DisplayName: Explosion
 	HotShotBurst.DisplayName: Muzzle Flare
 	HotShotBurstLarge.DisplayName: Muzzle Flare
+	CustomItemDrawProjectile.DisplayName: Projectile
 	ManaSpike.DisplayName: Mana Spike
-	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
+	EverCustomDrawProjectile.DisplayName: Projectile
 	ConjuredBoulder.DisplayName: Boulder
+	SnapdragonFrostBreathHitbox.DisplayName: Snapdragon
+	SnapdragonFrostBreath.DisplayName: Snapdragon Frost Breath
+	SnapFreezeProjectile.DisplayName: Snap Freeze Projectile
 }
 
 Buffs: {
@@ -210,5 +273,27 @@ Buffs: {
 
 BossIntroText: {
 	MusicianENNWAY: ENNWAY!
+	MusicHemolacriac: Hemolacriac Hunt
+	MusicCenterpiece: Centerpiece
 	EyeOfCthulhu: Night Stalker
+	Snapdragon: Sculptor's Masterwork
 }
+
+ConfigKeys: {
+	StyleSettings: {
+		DisplayName: Style Settings
+		Unchanged: Unchanged
+	}
+}
+
+Configs: {
+	StyleSettings: {
+		eocEnabled: {
+			Label: Eye of Cthulhu Behavior
+			Tooltip: Choose between Vanilla or Everware behavior styles for the Eye of Cthulhu.
+		}
+	}
+}
+
+NPCs.Snapdragon.DisplayName: Snapdragon
+DeathReason.SnapdragonIce: experienced absolute zero.

@@ -1,12 +1,10 @@
 ﻿using Everware.Common.Systems;
+using Everware.Config;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
@@ -23,6 +21,11 @@ public class EyeOfCthulhu : GlobalNPC
     public static int DesperationThreshold => Main.expertMode ? Main.masterMode ? 700 : 400 : 250;
     public int Phase2Threshold = 0;
     public int Phase = 0;
+
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return StyleSettings.EoCEnabled;
+    }
 
     // Tendril 0: front left
     // Tendril 1: front right
@@ -227,10 +230,13 @@ public class EyeOfCthulhu : GlobalNPC
 
                     int Time = 14;
 
-                    if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                    if (!Main.dedServ)
                     {
-                        calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), "");
-                        Time = 20;
+                        if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                        {
+                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), Mods.Everware.BossIntroText.MusicHemolacriac.GetTextValue());
+                            Time = 20;
+                        }
                     }
 
                     if (TendrilsOut <= 3)
@@ -831,33 +837,38 @@ public class EyeOfCthulhu : GlobalNPC
                 Vector2 position = new Vector2((pt.X + i) * 16, (pt.Y + j) * 16);
                 Tile t = Main.tile[pt.X + i, pt.Y + j];
 
-                if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
+                bool NotSalt = true;
+
+                if (NotSalt)
                 {
-                    StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
+                    if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
                     {
-                        HideTimer = 60
-                    };
-                    tile0.Spawn();
-                    WorldGen.KillTile_MakeTileDust(pt.X + i, pt.Y + j, t);
-                    if (!WorldGen.SolidOrSlopedTile(Main.tile[pt.X + i, pt.Y + j - 1]))
-                    {
-                        Vector2 altVel = npc.velocity;
-                        altVel.Normalize();
-                        TileReplicantParticle tile = new TileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), new Vector2(0, -4f + (Math.Abs((float)i / 3f))), Vector2.One, P =>
+                        StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
                         {
-                            (P as TileReplicantParticle).HideTimer--;
-                            if ((P as TileReplicantParticle).HideTimer > 0) P.position -= P.velocity;
-                            else
-                            {
-                                P.velocity.Y += 0.4f;
-                                if (P.position.Y > (P as TileReplicantParticle).StartingY) P.Kill();
-                            }
-                        })
-                        {
-                            HideTimer = Math.Abs(i) * 5,
-                            StartingY = position.Y + 8
+                            HideTimer = 60
                         };
-                        tile.Spawn();
+                        tile0.Spawn();
+                        WorldGen.KillTile_MakeTileDust(pt.X + i, pt.Y + j, t);
+                        if (!WorldGen.SolidOrSlopedTile(Main.tile[pt.X + i, pt.Y + j - 1]))
+                        {
+                            Vector2 altVel = npc.velocity;
+                            altVel.Normalize();
+                            TileReplicantParticle tile = new TileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), new Vector2(0, -4f + (Math.Abs((float)i / 3f))), Vector2.One, P =>
+                            {
+                                (P as TileReplicantParticle).HideTimer--;
+                                if ((P as TileReplicantParticle).HideTimer > 0) P.position -= P.velocity;
+                                else
+                                {
+                                    P.velocity.Y += 0.4f;
+                                    if (P.position.Y > (P as TileReplicantParticle).StartingY) P.Kill();
+                                }
+                            })
+                            {
+                                HideTimer = Math.Abs(i) * 5,
+                                StartingY = position.Y + 8
+                            };
+                            tile.Spawn();
+                        }
                     }
                 }
             }

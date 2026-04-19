@@ -3,7 +3,6 @@ using Everware.Content.Base.Projectiles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
-using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.Base.Items;
@@ -55,6 +54,7 @@ public abstract class EverWeaponItem : EverItem
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Item.value = Item.rare * 5000;
     }
     public override bool? UseItem(Player player)
     {

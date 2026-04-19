@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Mono.Cecil.Cil;
+﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
@@ -62,6 +61,7 @@ namespace Everware.Common.Systems
                 }
                 else PrimitiveDrawing.DrawPrimitiveStrip(vertices, colors, sprite, texcoords, additive, shaderEffect);
             }
+            /*
             else if (primitiveType == PrimitiveType.LineStrip)
             {
                 if (!shouldBlowUp)
@@ -77,6 +77,7 @@ namespace Everware.Common.Systems
                 }
                 else PrimitiveDrawing.DrawPrimitiveLine(vertices, colors, sprite, texcoords, additive, shaderEffect);
             }
+            */
         }
     }
 
