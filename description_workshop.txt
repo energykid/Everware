@@ -4,18 +4,14 @@
 
 -+=+-
 
-[h2]this mod adds content, no restrictions.[/h2]
+Everware is a work-in-progress mod which, at large, adds general content, improvements to vanilla, and reworks for some content!
 
-no set theme - any addition or change is fair game so long as i want to create it!
+i try my best to make sure attention is given to details and take care to make content feel at home in Terraria, while still giving it my own spin.
 
-i try my best to make sure attention is given to details and take care to make content feel at home in Terraria while giving it my own spin.
-
-current content in Everware spans a short portion of the game.
-
-this includes two interchangeable world structures of which you get one per world: the Kiln and the Quarry.
+currently, this mod adds two interchangeable world structures of which you get one per world: the Kiln and the Quarry.
 i have also reworked the Eye of Cthulhu, and added extra loot to the Underworld.
 
-extra care has been taken to hone as many details as possible in the content!
+extra care has been taken to hone as many details as possible!
 
 [b]once downloaded, check the mod's in-game description for more details![/b]
 
@@ -24,6 +20,8 @@ extra care has been taken to hone as many details as possible in the content!
 
 [img]https://i.postimg.cc/fSXKqcM6/Quarry-Preview.gif[/img]
 [i]pictured above: the Quarry[/i]
+
+[url=https://discord.gg/invite/nUQHaW55bv]click here to join the Everware discord![/url]
 
 -+=+-
 
