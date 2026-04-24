@@ -14,9 +14,18 @@ public sealed class NetworkPlayer : ModPlayer
 
     public int AnimationTime = 0;
 
-    public override void PostUpdate()
+    public override void Load()
     {
-        base.PostUpdate();
+        EverwarePacketHandler.AddPacket((mod, reader, whoAmI, identifier) =>
+        {
+            if (identifier == "RightClickNotifier")
+            {
+                int player = reader.ReadInt32();
+                bool isRightClicking = reader.ReadBoolean();
+
+                Main.player[player].GetModPlayer<NetworkPlayer>().RightClicking = isRightClicking;
+            }
+        });
     }
 
     public override void PreUpdate()
@@ -71,5 +80,13 @@ public sealed class NetworkPlayer : ModPlayer
         }
 
         return base.CanUseItem(item);
+    }
+}
+
+public static class RightClickPlayerExtension
+{
+    public static bool RightClicking(this Player plr)
+    {
+        return plr.GetModPlayer<NetworkPlayer>().RightClicking;
     }
 }

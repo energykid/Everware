@@ -255,6 +255,7 @@ Projectiles: {
 	SkullMinionExplosion.DisplayName: Explosión
 	HotShotBurst.DisplayName: Boca Ardiente
 	HotShotBurstLarge.DisplayName: Boca Ardiente
+	// CustomItemDrawProjectile.DisplayName: Projectile
 	ManaSpike.DisplayName: Púa de Maná
 	EverCustomDrawProjectile.DisplayName: Ever Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Roca

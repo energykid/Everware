@@ -273,8 +273,12 @@ Buffs: {
 
 BossIntroText: {
 	MusicianENNWAY: ENNWAY!
+	MusicKiln: Wildfire
+	MusicQuarry: Stonecutter
 	MusicHemolacriac: Hemolacriac Hunt
+	MusicGallery: House Of Glass
 	MusicCenterpiece: Centerpiece
+	MusicOptimist: Chromium and Positivity
 	EyeOfCthulhu: Night Stalker
 	Snapdragon: Sculptor's Masterwork
 }
