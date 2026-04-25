@@ -114,7 +114,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
         Owner.heldProj = Projectile.whoAmI;
 
         if (AutoDirection)
-            Owner.direction = Math.Sign(new Vector2(1, 0).RotatedBy(Rotation).X);
+            Owner.direction = NetworkOwner.MousePosition.X < Owner.Center.X ? -1 : 1;
 
         Owner.SetCompositeArmBack(false, Player.CompositeArmStretchAmount.None, 0f);
         Owner.SetCompositeArmFront(false, Player.CompositeArmStretchAmount.None, 0f);

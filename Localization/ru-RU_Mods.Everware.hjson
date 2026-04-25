@@ -277,6 +277,7 @@ Projectiles: {
 	// SnapdragonFrostBreathHitbox.DisplayName: Snapdragon
 	// SnapdragonFrostBreath.DisplayName: Snapdragon Frost Breath
 	// SnapFreezeProjectile.DisplayName: Snap Freeze Projectile
+	// ShardShredderProj.DisplayName: Shard Shredder Proj
 }
 
 Buffs: {
