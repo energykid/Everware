@@ -22,6 +22,7 @@ public class Rebuker : EverWeaponItem
         base.SetDefaults();
         Item.DefaultToBasicWeapon(20, 45, DamageClass.Ranged);
         Item.knockBack = 1f;
+        Item.value = Sell.Silver(50);
     }
 
     public override void AddRecipes()

@@ -28,7 +28,6 @@ public class EverwareTitle : ModMenu
         UpdateTimer++;
 
         var Background = Assets.Textures.Menu.MenuBackground.Asset;
-        var Foreground = Assets.Textures.Menu.MenuArtForeground.Asset;
         var Mist = Assets.Textures.Menu.MenuLayer1.Asset;
         var PartialVignette = Assets.Textures.Menu.MenuLayer2.Asset;
         var Outline = Assets.Textures.Menu.MenuLayer3.Asset;

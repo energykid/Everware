@@ -6,7 +6,7 @@ namespace Everware.Content.Base.ParticleSystem;
 public class TexturePulseParticle : Particle
 {
     public string TextureString;
-    public virtual Asset<Texture2D> Texture => ModContent.Request<Texture2D>(TextureString);
+    public override Asset<Texture2D> Texture => ModContent.Request<Texture2D>(TextureString);
     public float Decrement = 0.9f;
 
     public Vector2 scaleDestination = Vector2.Zero;

@@ -1,4 +1,5 @@
-﻿using Everware.Common.Systems;
+﻿using Everware.Common.Players;
+using Everware.Common.Systems;
 using Everware.Content.Base.Items;
 using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
@@ -6,6 +7,7 @@ using Everware.Utils;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
@@ -29,8 +31,17 @@ public class HotShot : EverWeaponItem
         Item.useAmmo = AmmoID.Bullet;
         Item.width = Assets.Textures.Hell.HotShot.Asset.Width();
         Item.height = Assets.Textures.Hell.HotShot.Asset.Height();
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
     public int ChargeLevel = 0;
+    public override void NetSend(BinaryWriter writer)
+    {
+        writer.Write(ChargeLevel);
+    }
+    public override void NetReceive(BinaryReader reader)
+    {
+        ChargeLevel = reader.ReadInt32();
+    }
     public override bool AltFunctionUse(Player player)
     {
         return true;
@@ -54,6 +65,10 @@ public class HotShot : EverWeaponItem
             Item.useAnimation = 18;
         }
         return base.CanUseItem(player);
+    }
+    public override void UseAnimation(Player player)
+    {
+        player.SendRightClick();
     }
 }
 
@@ -81,6 +96,11 @@ public class HotShotHoldout : EverHoldoutProjectile
     float ChargeFrame = 0f;
     public override void AI()
     {
+        if (Projectile.ai[1] == 0)
+        {
+            Owner.SendRightClick();
+        }
+
         Projectile.velocity = Vector2.Zero;
 
         AmmoType = AmmoID.Bullet;
@@ -99,7 +119,7 @@ public class HotShotHoldout : EverHoldoutProjectile
             ChargeFrame = shot.ChargeLevel;
         }
 
-        if (Owner.altFunctionUse == 2 || AltF)
+        if (Owner.RightClicking() || AltF)
         {
             AltF = true;
             if (GetChargeAmount() > 0)
@@ -107,7 +127,7 @@ public class HotShotHoldout : EverHoldoutProjectile
                 Lighting.AddLight(Projectile.Center, 0.4f, 0.2f, 0.025f);
             }
 
-            if (Projectile.ai[1] == 1)
+            if (Projectile.ai[1] == 2)
             {
                 Rotation = Owner.AngleTo(NetworkOwner.MousePosition).AngleLerp(Vector2.Zero.AngleTo(new Vector2(0, 2)), 0.5f);
                 RotationOffset = MathHelper.ToRadians(30 * Owner.direction);
@@ -131,19 +151,15 @@ public class HotShotHoldout : EverHoldoutProjectile
         }
         else
         {
-            if (Projectile.ai[1] == 1)
+            if (Projectile.ai[1] == 2)
             {
                 Fire();
-            }
-            float ItemAnim = Owner.itemAnimationMax;
-
-            if (Projectile.ai[1] == 3)
-            {
                 if (Owner.HeldItem.ModItem is HotShot sh)
                 {
                     sh.ChargeLevel = 0;
                 }
             }
+            float ItemAnim = Owner.itemAnimationMax;
 
             if (GetChargeAmount() > 0)
             {

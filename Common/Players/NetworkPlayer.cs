@@ -1,8 +1,24 @@
 ﻿using Everware.Core.Projectiles;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace Everware.Common.Players;
 
+public sealed class NetworkPlayerItem : GlobalItem
+{
+    public override bool? UseItem(Item item, Player player)
+    {
+        if (player.altFunctionUse == 2)
+        {
+            player.SendRightClick(true);
+        }
+        else
+        {
+            player.SendRightClick(false);
+        }
+        return base.UseItem(item, player);
+    }
+}
 public sealed class NetworkPlayer : ModPlayer
 {
     public static float GlobalTimer;
@@ -24,9 +40,20 @@ public sealed class NetworkPlayer : ModPlayer
                 bool isRightClicking = reader.ReadBoolean();
 
                 Main.player[player].GetModPlayer<NetworkPlayer>().RightClicking = isRightClicking;
+
+                if (Main.dedServ)
+                {
+                    ModPacket p = mod.GetPacket();
+                    p.Write("RightClickNotifier");
+                    p.Write(player);
+                    p.Write(isRightClicking);
+                    p.Send();
+                }
             }
         });
     }
+
+    public bool RightClicked = false;
 
     public override void PreUpdate()
     {
@@ -80,13 +107,5 @@ public sealed class NetworkPlayer : ModPlayer
         }
 
         return base.CanUseItem(item);
-    }
-}
-
-public static class RightClickPlayerExtension
-{
-    public static bool RightClicking(this Player plr)
-    {
-        return plr.GetModPlayer<NetworkPlayer>().RightClicking;
     }
 }

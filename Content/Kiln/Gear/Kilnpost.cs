@@ -27,6 +27,7 @@ public class Kilnpost : EverWeaponItem
         base.SetDefaults();
         Item.DefaultToBasicWeapon(8, 40, DamageClass.Melee);
         Item.knockBack = 1f;
+        Item.value = Sell.Silver(50);
     }
     public override void AddRecipes()
     {

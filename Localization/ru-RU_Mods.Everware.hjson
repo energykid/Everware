@@ -230,6 +230,16 @@ Items: {
 		// DisplayName: Weathered Wood
 		// Tooltip: ""
 	}
+
+	ShardShredder: {
+		// DisplayName: Shard Shredder
+		// Tooltip: ""
+	}
+
+	KilnstoneWall: {
+		// DisplayName: Kilnstone Wall
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -278,8 +288,12 @@ Buffs: {
 
 BossIntroText: {
 	MusicianENNWAY: ENNWAY!
+	// MusicKiln: Wildfire
+	// MusicQuarry: Stonecutter
 	// MusicHemolacriac: Hemolacriac Hunt
+	// MusicGallery: House Of Glass
 	// MusicCenterpiece: Centerpiece
+	// MusicOptimist: Chromium and Positivity
 	EyeOfCthulhu: Ночной наблюдатель
 	// Snapdragon: Sculptor's Masterwork
 }

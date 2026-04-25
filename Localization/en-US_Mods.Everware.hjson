@@ -225,6 +225,16 @@ Items: {
 		DisplayName: Weathered Wood
 		Tooltip: ""
 	}
+
+	ShardShredder: {
+		DisplayName: Shard Shredder
+		Tooltip: ""
+	}
+
+	KilnstoneWall: {
+		DisplayName: Kilnstone Wall
+		Tooltip: ""
+	}
 }
 
 Biomes: {

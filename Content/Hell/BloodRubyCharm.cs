@@ -24,6 +24,7 @@ public class BloodRubyCharm : EverItem
         Item.height = 32;
         Item.defense = 2;
         Item.rare = 5;
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
 
     public override void UpdateAccessory(Player player, bool hideVisual)

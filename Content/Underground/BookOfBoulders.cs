@@ -19,6 +19,7 @@ public class BookOfBoulders : EverWeaponItem
         Item.noMelee = true;
         Item.shootSpeed = 1;
         Item.damage = 30;
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {

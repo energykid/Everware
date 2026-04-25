@@ -20,6 +20,7 @@ public class KilnstoneHelmet : EverItem
     {
         base.SetDefaults();
         Item.DefaultToArmor(2);
+        Item.value = Sell.Silver(30);
     }
 
     public override void AddRecipes()
@@ -53,6 +54,7 @@ public class KilnstoneBrickplate : EverItem
     {
         base.SetDefaults();
         Item.DefaultToArmor(2);
+        Item.value = Sell.Silver(40);
     }
 
     public override void AddRecipes()
@@ -73,6 +75,7 @@ public class KilnstoneChausses : EverItem
     {
         base.SetDefaults();
         Item.DefaultToArmor(1);
+        Item.value = Sell.Silver(30);
     }
 
     public override void AddRecipes()

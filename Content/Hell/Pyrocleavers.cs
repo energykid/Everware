@@ -22,6 +22,7 @@ public class Pyrocleavers : EverWeaponItem
         Item.width = Item.height = 32;
         Item.autoReuse = true;
         Item.UseSound = SoundID.DD2_MonkStaffSwing with { PitchRange = (0f, 0.4f), MaxInstances = 5 };
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {

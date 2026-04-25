@@ -1,4 +1,6 @@
-﻿namespace Everware.Utils;
+﻿using Terraria.ID;
+
+namespace Everware.Utils;
 
 public static class BehaviorUtils
 {
@@ -64,7 +66,6 @@ public static class BehaviorUtils
                 target = Main.npc[overrideTarget];
                 return true;
             }
-
         }
         for (int k = 0; k < 200; k++)
         {
@@ -73,7 +74,7 @@ public static class BehaviorUtils
             bool found = distance < maxDistance && possibleTarget.active && (Collision.CanHit(position, 0, 0, possibleTarget.Center, 0, 0) || ignoreTiles);
             if (hostilesOnly)
             {
-                if (possibleTarget.friendly || possibleTarget.townNPC || possibleTarget.dontTakeDamage || possibleTarget.CountsAsACritter)
+                if (possibleTarget.friendly || possibleTarget.townNPC || possibleTarget.dontTakeDamage || possibleTarget.CountsAsACritter || possibleTarget.type == NPCID.TargetDummy)
                     found = false;
             }
             if (found)

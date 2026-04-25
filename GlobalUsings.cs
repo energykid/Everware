@@ -7,3 +7,5 @@ global using Terraria.Audio;
 global using Terraria.DataStructures;
 global using Terraria.GameContent;
 global using Terraria.ModLoader;
+global using Everware;
+global using System;

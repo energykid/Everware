@@ -2,6 +2,11 @@
 
 public class SnapdragonSoul : ModNPC
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return false;
+    }
+    public override string Texture => "Everware/Assets/Textures/Gallery/Snapdragon/Snapdragon_Head";
     public override void SetDefaults()
     {
         NPC.defense = 2;

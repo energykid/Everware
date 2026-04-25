@@ -16,6 +16,7 @@ class SkullStaff : EverWeaponItem
         Item.rare = ItemRarityID.LightRed;
         Item.width = Assets.Textures.Hell.SkullStaff.Asset.Width();
         Item.height = Assets.Textures.Hell.SkullStaff.Asset.Height();
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
     public override void SetStaticDefaults()
     {

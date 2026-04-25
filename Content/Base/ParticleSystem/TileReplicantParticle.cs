@@ -27,13 +27,10 @@ public class StillTileReplicantParticle : Particle
     int TileType = TileID.Dirt;
     public int HideTimer = 0;
     public float StartingY = 0f;
-    Asset<Texture2D> Texture;
-    Rectangle TileFrame = new Rectangle(0, 0, 16, 16);
     public StillTileReplicantParticle(int tileType, Rectangle tileFrame, Vector2 pos, Vector2 vel, Vector2 scale, ParticleFunction upd = null, ParticleFunction drw = null) : base(pos, vel, scale, upd, drw)
     {
         TileType = tileType;
         HideTimer = 60;
-        TileFrame = tileFrame;
     }
     public override void Update()
     {

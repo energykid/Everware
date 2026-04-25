@@ -17,6 +17,7 @@ public class Groundshakers : EverItem
     {
         Item.DefaultToAccessory(26, 28);
         Item.rare = ItemRarityID.Orange;
+        Item.value = Sell.Gold(1) + Sell.Silver(35);
     }
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
