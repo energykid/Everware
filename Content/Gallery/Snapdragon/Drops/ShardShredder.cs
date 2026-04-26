@@ -78,6 +78,7 @@ public class ShardShredderProj : EverHoldoutProjectile
     {
         AmmoType = AmmoID.Bullet;
         Time++;
+        AutoDirection = true;
         Owner.direction = NetworkOwner.MousePosition.X < Owner.Center.X ? -1 : 1;
         Effects = Owner.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
         Origin = new Vector2(10, Owner.direction == -1 ? 28 : 12);
@@ -89,6 +90,10 @@ public class ShardShredderProj : EverHoldoutProjectile
 
         if (Owner.RightClicking())
         {
+            if (Owner.HeldItem.ModItem is ShardShredder shsh)
+            {
+                shsh.Fullness = MathHelper.Lerp(shsh.Fullness, 1f, 0.1f);
+            }
             // Reload animation
             if (Projectile.ai[1] == 0)
             {
@@ -96,6 +101,12 @@ public class ShardShredderProj : EverHoldoutProjectile
             }
                 Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
             Rotation = Rotation.AngleLerp(Rotation + RotationOffset, 0.05f);
+            Vector2 IceEjectVel = new Vector2(-1f, 0.2f).RotatedBy(Projectile.rotation);
+            if (Projectile.ai[1] < 15 && Projectile.ai[1] > 2)
+            {
+                Vector2 v = (IceEjectVel * Main.rand.NextFloat(40, 50)).RotatedByRandom(0.2f);
+                new SmallMistFade(IcePosition() + (v / 2f), v / 30, Color.AliceBlue.MultiplyRGBA(new(1f, 1f, 1f, 0.5f)), new Vector2(0.4f, 0.4f)).Spawn();
+            }
             if (Projectile.ai[1] <= 10)
             {
                 RotationOffset = MathHelper.Lerp(RotationOffset, Owner.direction * MathHelper.PiOver4 * 0.05f, 0.4f);
@@ -106,10 +117,6 @@ public class ShardShredderProj : EverHoldoutProjectile
             }
             else
             {
-                if (Owner.HeldItem.ModItem is ShardShredder shsh)
-                {
-                    shsh.Fullness = MathHelper.Lerp(shsh.Fullness, 1f, 0.2f);
-                }
                 RotationOffset = MathHelper.Lerp(RotationOffset, Owner.direction * MathHelper.PiOver4 * 0.1f, 0.3f);
                 if (Projectile.ai[1] > 45)
                 {
@@ -168,18 +175,31 @@ public class ShardShredderProj : EverHoldoutProjectile
     }
     public Vector2 MuzzlePosition()
     {
-        return Owner.MountedCenter + (new Vector2(10, (3 * Owner.direction)).RotatedBy(Rotation));
+        return Owner.MountedCenter + (new Vector2(20, (3 * Owner.direction)).RotatedBy(Rotation));
+    }
+    public Vector2 IcePosition()
+    {
+        return Owner.MountedCenter + (new Vector2(10, (12 * Owner.direction)).RotatedBy(Rotation));
     }
     public override bool PreDraw(ref Color lightColor)
     {
         var MainAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredderProj.Asset;
         var IceAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder_Ice.Asset;
+        var FlashAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder_Flash.Asset;
 
         var MainFrame = MainAsset.Frame(verticalFrames: 5, frameY: (int)Projectile.ai[2]);
         var IceFrame = IceAsset.Frame(verticalFrames: 6, frameY: 5 - ((int)Math.Floor(GunFullness() * 5)));
 
+        var FlashFrame = FlashAsset.Frame(verticalFrames: 2, frameY: (int)Math.Floor(Time / 3f));
+
         Main.EntitySpriteDraw(MainAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, MainFrame, lightColor, Projectile.rotation, Origin, Scale, Effects);
-        Main.EntitySpriteDraw(IceAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, IceFrame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+        Main.EntitySpriteDraw(IceAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, IceFrame, Color.Lerp(lightColor, Color.White, GunFullness() / 2f), Projectile.rotation, Origin, Scale, Effects);
+
+        Vector2 flashOrigin = Origin + new Vector2(-66, Owner.direction == 1 ? -6 : -18);
+
+        if (!Owner.RightClicking())
+            Main.EntitySpriteDraw(FlashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, FlashFrame, Color.White, Rotation, flashOrigin, Scale, Effects);
+        
         return false;
     }
     public float GunFullness()

@@ -75,9 +75,6 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
     public override bool PreAI()
     {
-        if (AutoDirection)
-            Owner.direction = Math.Sign((NetworkOwner.MousePosition.X - Owner.Center.X));
-
         return true;
     }
     public override void AI()
