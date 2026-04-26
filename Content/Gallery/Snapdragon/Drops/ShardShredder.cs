@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Common.Systems;
+using Everware.Content.Base.Items;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
@@ -24,12 +25,13 @@ public class ShardShredder : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(10, 4, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(10, 2, DamageClass.Ranged);
         Item.autoReuse = true;
         Item.useAmmo = AmmoID.Bullet;
         Item.width = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder.Asset.Width();
         Item.height = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder.Asset.Height();
         Item.value = Sell.Gold(4) + Sell.Silver(75);
+        Item.rare = ItemRarityID.Pink;
     }
     public float Fullness = 0;
     public override void NetSend(BinaryWriter writer)
@@ -50,8 +52,8 @@ public class ShardShredder : EverWeaponItem
     }
     public override bool CanUseItem(Player player)
     {
-        Item.useTime = 4;
-        Item.useAnimation = 4;
+        Item.useTime = 2;
+        Item.useAnimation = 2;
         if (player.altFunctionUse == 2)
         {
             Item.useTime = 55;
@@ -123,10 +125,6 @@ public class ShardShredderProj : EverHoldoutProjectile
                     RotationOffset *= 0.8f;
                     Rotation = Rotation.AngleLerp(Owner.AngleTo(NetworkOwner.MousePosition), 0.25f);
                 }
-                else
-                {
-                    //new TextureFlashParticle(Owner.MountedCenter + new Vector2(Owner.direction * 5, 10).RotatedBy(Projectile.rotation), Owner.DirectionFrom(NetworkOwner.MousePosition) * 5f, new Vector2(1f, 1f), Assets.Textures.Misc.Smoke2.Asset).Spawn();
-                }
             }
         }
         else
@@ -144,11 +142,13 @@ public class ShardShredderProj : EverHoldoutProjectile
 
                 if (it != null)
                 {
+                    ScreenEffects.AddScreenShake(Projectile.Center, 2f, 0.1f);
                     Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition(), new Vector2(20, 0).RotatedBy(Rotation), it.shoot, Projectile.damage, Projectile.knockBack, Projectile.owner);
 
                     if (GunFullness() > 0.2f)
                     {
-                        Projectile p = Projectile.NewProjectileDirect(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition(), new Vector2(20, 0).RotatedBy(Rotation + Main.rand.NextFloat(-0.2f, 0.2f)), ProjectileID.IceSpike, Projectile.damage, Projectile.knockBack, Projectile.owner);
+                        ScreenEffects.AddScreenShake(Projectile.Center, 4f, 0.4f);
+                        Projectile p = Projectile.NewProjectileDirect(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition() + (Projectile.rotation.ToRotationVector2() * 45), new Vector2(1f, 0).RotatedBy(Rotation + Main.rand.NextFloat(-0.1f, 0.1f)), ModContent.ProjectileType<ShardShredderIcicle>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
                         p.friendly = true;
                         p.hostile = false;
                     }
@@ -198,7 +198,7 @@ public class ShardShredderProj : EverHoldoutProjectile
         Vector2 flashOrigin = Origin + new Vector2(-66, Owner.direction == 1 ? -6 : -18);
 
         if (!Owner.RightClicking())
-            Main.EntitySpriteDraw(FlashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, FlashFrame, Color.White, Rotation, flashOrigin, Scale, Effects);
+            Main.EntitySpriteDraw(FlashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, FlashFrame, new Color(1f, 1f, 1f, 0.5f), Rotation, flashOrigin, Scale, Effects);
         
         return false;
     }
