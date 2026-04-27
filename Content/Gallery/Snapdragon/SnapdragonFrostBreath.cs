@@ -1,5 +1,4 @@
 ﻿using Everware.Core.Projectiles;
-using System;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
@@ -54,39 +53,42 @@ public class SnapdragonFrostBreath : EverProjectile
 
         Vector2 pos = Projectile.Center + new Vector2(Main.rand.NextFloat(-20, 20), Main.rand.NextFloat(-20, 20));
 
-        for (int i = 0; i < 75; i++)
-        {
-            Vector2 v = Projectile.velocity;
-            v.Normalize();
-            v *= 10;
-            pos += v;
-            Point p = (pos / 16).ToPoint();
-            if (p.X < 100 || p.X > Main.maxTilesX - 100) break;
-            if (p.Y < 100 || p.Y > Main.maxTilesY - 100) break;
-            if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType]) break;
-        }
+        Point p = (pos / 16).ToPoint();
 
-        Vector2 v1 = Projectile.velocity;
-        v1.Normalize();
-        v1 *= MathHelper.Clamp(length * 10, 70, 100);
-
-        if (!Hit && Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType])
+        if (WorldGen.InWorld(p.X, p.Y))
         {
-            if (Main.rand.NextBool(3))
+            for (int i = 0; i < 75; i++)
             {
-                float p1 = MathHelper.PiOver2;
-                float p2 = -MathHelper.PiOver2;
-                if (oldVelocity.X < 0)
-                {
-                    p1 = -MathHelper.PiOver2;
-                    p2 = MathHelper.PiOver2;
-                }
-                Vector2 v = v1 * (length / 5f);
-                SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -v, (v1 * 0.5f).RotatedBy(p1), (v1 * 0.5f).RotatedBy(p2)));
-
-                SoundEngine.PlaySound((Assets.Sounds.NPC.Snapdragon_Assemble.Asset with { MaxInstances = 30 }).WithPitchVariance(0.3f).WithPitchOffset(-0.3f + (v.Length() / 230f)), Projectile.Center);
+                Vector2 v = Projectile.velocity;
+                v.Normalize();
+                v *= 10;
+                if (p.X < 100 || p.X > Main.maxTilesX - 100) break;
+                if (p.Y < 100 || p.Y > Main.maxTilesY - 100) break;
+                if (Main.tile[(pos / 16).ToPoint()].HasTile && Main.tileSolid[Main.tile[(pos / 16).ToPoint()].TileType]) break;
             }
-            Hit = true;
+
+            Vector2 v1 = Projectile.velocity;
+            v1.Normalize();
+            v1 *= MathHelper.Clamp(length * 10, 70, 100);
+
+            if (!Hit && Main.tile[p].HasTile && Main.tileSolid[Main.tile[p].TileType])
+            {
+                if (Main.rand.NextBool(3))
+                {
+                    float p1 = MathHelper.PiOver2;
+                    float p2 = -MathHelper.PiOver2;
+                    if (oldVelocity.X < 0)
+                    {
+                        p1 = -MathHelper.PiOver2;
+                        p2 = MathHelper.PiOver2;
+                    }
+                    Vector2 v = v1 * (length / 5f);
+                    SnapdragonIceSpikeSystem.AllTriangles.Add(new SnapdragonIceSpikeSystem.IceTriangle(pos, -v, (v1 * 0.5f).RotatedBy(p1), (v1 * 0.5f).RotatedBy(p2)));
+
+                    SoundEngine.PlaySound((Assets.Sounds.NPC.Snapdragon_Assemble.Asset with { MaxInstances = 30 }).WithPitchVariance(0.3f).WithPitchOffset(-0.3f + (v.Length() / 230f)), Projectile.Center);
+                }
+                Hit = true;
+            }
         }
 
         Projectile.velocity = oldVelocity * 0.8f;

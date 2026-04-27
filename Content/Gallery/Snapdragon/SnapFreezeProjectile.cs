@@ -1,4 +1,5 @@
-﻿using Everware.Core.Projectiles;
+﻿using Everware.Content.Misc.Particles;
+using Everware.Core.Projectiles;
 using Everware.Utils;
 using Terraria.ID;
 
@@ -22,6 +23,16 @@ public class SnapFreezeProjectile : EverProjectile
     Vector2 Scale = Vector2.Zero;
     public override void AI()
     {
+        if (Main.rand.NextBool(8))
+            new AnimationParticle(Projectile.Center + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10)), Projectile.velocity * 0.5f, Color.White, Assets.Textures.Gallery.Snapdragon.Drops.Sparkle.Asset, 4)
+            {
+                AffectedByLight = false,
+                Color = Color.White,
+                Rotation = Main.rand.NextFloat(MathHelper.TwoPi),
+                Pixelated = true,
+                Scale = new Vector2(Main.rand.NextFloat(0.5f, 1f), Main.rand.NextFloat(0.6f, 1f))
+            }.Spawn();
+
         float time1 = 9;
 
         Scale = Easing.KeyVector2(Projectile.ai[0], 0, time1, Vector2.Zero, new Vector2(1f, 1f), Easing.Linear, Scale);

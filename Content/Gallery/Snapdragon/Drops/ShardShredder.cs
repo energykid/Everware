@@ -1,14 +1,8 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.Items;
-using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ID;
 
 namespace Everware.Content.Gallery.Snapdragon.Drops;
@@ -25,7 +19,7 @@ public class ShardShredder : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(10, 2, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(16, 2, DamageClass.Ranged);
         Item.autoReuse = true;
         Item.useAmmo = AmmoID.Bullet;
         Item.width = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder.Asset.Width();
@@ -75,6 +69,7 @@ public class ShardShredderProj : EverHoldoutProjectile
         base.SetDefaults();
         Projectile.width = Asset.Width();
         Projectile.height = Asset.Height();
+        Projectile.damage = 12;
     }
     public override void AI()
     {
@@ -101,7 +96,7 @@ public class ShardShredderProj : EverHoldoutProjectile
             {
                 SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.ShardShredder_Reload.Asset, Projectile.Center);
             }
-                Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
+            Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
             Rotation = Rotation.AngleLerp(Rotation + RotationOffset, 0.05f);
             Vector2 IceEjectVel = new Vector2(-1f, 0.2f).RotatedBy(Projectile.rotation);
             if (Projectile.ai[1] < 15 && Projectile.ai[1] > 2)
@@ -132,7 +127,7 @@ public class ShardShredderProj : EverHoldoutProjectile
             Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
 
             Projectile.ai[2] -= 0.5f;
-            if (Time == 2)
+            if (Time == 1)
             {
                 Projectile.ai[2] = 4;
                 FrontArmExtension = 0;
@@ -142,13 +137,16 @@ public class ShardShredderProj : EverHoldoutProjectile
 
                 if (it != null)
                 {
-                    ScreenEffects.AddScreenShake(Projectile.Center, 2f, 0.1f);
-                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition(), new Vector2(20, 0).RotatedBy(Rotation), it.shoot, Projectile.damage, Projectile.knockBack, Projectile.owner);
+                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition(), new Vector2(20, 0).RotatedBy(Rotation), it.shoot, 15, Projectile.knockBack, Projectile.owner);
 
-                    if (GunFullness() > 0.2f)
+                    if (GunFullness() > 0.1f)
                     {
-                        ScreenEffects.AddScreenShake(Projectile.Center, 4f, 0.4f);
-                        Projectile p = Projectile.NewProjectileDirect(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition() + (Projectile.rotation.ToRotationVector2() * 45), new Vector2(1f, 0).RotatedBy(Rotation + Main.rand.NextFloat(-0.1f, 0.1f)), ModContent.ProjectileType<ShardShredderIcicle>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                        ScreenEffects.AddScreenShake(Projectile.Center, 3f, 0.1f);
+                        Projectile p = Projectile.NewProjectileDirect(new EntitySource_Parent(Projectile, "Shard Shredder ice"), MuzzlePosition() + (Projectile.rotation.ToRotationVector2() * 45), new Vector2(1f, 0).RotatedBy(Rotation + Main.rand.NextFloat(-0.1f, 0.1f)), ModContent.ProjectileType<ShardShredderIcicle>(), Projectile.damage * 2, Projectile.knockBack, Projectile.owner);
+                        p.rotation = Owner.AngleTo(NetworkOwner.MousePosition) + Main.rand.NextFloat(-0.1f, 0.1f);
+                        p.ai[1] = p.rotation;
+                        p.ai[2] = Main.rand.NextFloat(-0.3f, 0.3f);
+                        p.velocity = p.rotation.ToRotationVector2();
                         p.friendly = true;
                         p.hostile = false;
                     }
@@ -156,16 +154,16 @@ public class ShardShredderProj : EverHoldoutProjectile
 
                 SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.ShardShredder_Fire.Asset with { Volume = 0.4f, MaxInstances = 18, PitchVariance = 0.2f }, Projectile.Center);
 
-                if (GunFullness() > 0.2f)
+                if (GunFullness() > 0.1f)
                 {
                     SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.ShardShredder_Ice.Asset with { Volume = 0.3f, MaxInstances = 18, PitchVariance = 0.2f }, Projectile.Center);
                 }
             }
-            Offset *= 0.6f;
+            Offset *= 0.5f;
 
             if (Owner.HeldItem.ModItem is ShardShredder shsh)
             {
-                shsh.Fullness *= 0.99f;
+                shsh.Fullness *= 0.98f;
             }
         }
 
@@ -184,22 +182,32 @@ public class ShardShredderProj : EverHoldoutProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         var MainAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredderProj.Asset;
+        var GlowAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder_Glow.Asset;
         var IceAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder_Ice.Asset;
         var FlashAsset = Assets.Textures.Gallery.Snapdragon.Drops.ShardShredder_Flash.Asset;
 
         var MainFrame = MainAsset.Frame(verticalFrames: 5, frameY: (int)Projectile.ai[2]);
-        var IceFrame = IceAsset.Frame(verticalFrames: 6, frameY: 5 - ((int)Math.Floor(GunFullness() * 5)));
+        var GlowFrame = GlowAsset.Frame();
+        var IceFrame = IceAsset.Frame(verticalFrames: 6, frameY: 5 - ((int)Math.Floor(GunFullness() * 6)));
 
         var FlashFrame = FlashAsset.Frame(verticalFrames: 2, frameY: (int)Math.Floor(Time / 3f));
 
+        float flashScale = 1.5f;
+        flashScale -= Time / 8f;
+
+        float glowScale = MathHelper.Lerp(3f, 0f, (float)(lightColor.R + lightColor.G + lightColor.B / 3f) / 255f);
+        if (Owner.RightClicking()) glowScale = 0f;
+
         Main.EntitySpriteDraw(MainAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, MainFrame, lightColor, Projectile.rotation, Origin, Scale, Effects);
+        Main.EntitySpriteDraw(GlowAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, GlowFrame, Color.Lerp(Color.Transparent, Color.White, glowScale), Projectile.rotation, Origin, Scale, Effects);
         Main.EntitySpriteDraw(IceAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, IceFrame, Color.Lerp(lightColor, Color.White, GunFullness() / 2f), Projectile.rotation, Origin, Scale, Effects);
 
-        Vector2 flashOrigin = Origin + new Vector2(-66, Owner.direction == 1 ? -6 : -18);
+        Vector2 flashOrigin = (Origin + new Vector2(-66, Owner.direction == 1 ? -6 : -18));
+        flashOrigin.X /= flashScale;
 
         if (!Owner.RightClicking())
-            Main.EntitySpriteDraw(FlashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, FlashFrame, new Color(1f, 1f, 1f, 0.5f), Rotation, flashOrigin, Scale, Effects);
-        
+            Main.EntitySpriteDraw(FlashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, FlashFrame, new Color(1f, 1f, 1f, 0.5f), Rotation, flashOrigin, Scale * new Vector2(flashScale, 1f), Effects);
+
         return false;
     }
     public float GunFullness()

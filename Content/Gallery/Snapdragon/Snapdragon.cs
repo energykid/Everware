@@ -2,7 +2,6 @@
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using System;
 using System.IO;
 using Terraria.ID;
 
@@ -208,7 +207,7 @@ public partial class Snapdragon : ModNPC
             NPC.direction = Target.Center.X > NPC.Center.X ? 1 : -1;
         }
 
-        NPC.dontTakeDamage = !SpineVisible;
+        NPC.dontTakeDamage = (!SpineVisible || HeadOpacity < 0.1f);
     }
     public void ResetSpine()
     {

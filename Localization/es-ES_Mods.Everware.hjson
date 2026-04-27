@@ -226,14 +226,19 @@ Items: {
 		// Tooltip: ""
 	}
 
-	ShardShredder: {
-		// DisplayName: Shard Shredder
-		// Tooltip: ""
-	}
-
 	KilnstoneWall: {
 		// DisplayName: Kilnstone Wall
 		// Tooltip: ""
+	}
+
+	ShardShredder: {
+		// DisplayName: Shard Shredder
+		/* Tooltip:
+			'''
+			Right click to insert ice into the minigun
+			When firing, the minigun will rapidly chill and convert small chunks of ice into large shards for extra damage
+			After a while, however, it will still run out of ice
+			''' */
 	}
 }
 
