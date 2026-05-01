@@ -19,6 +19,7 @@ public class SnapFreezeProjectile : EverProjectile
         Projectile.knockBack = 3f;
         Projectile.tileCollide = true;
         if (!Main.dedServ) Frame = Main.rand.Next(3);
+        Projectile.coldDamage = true;
     }
     Vector2 Scale = Vector2.Zero;
     public override void AI()

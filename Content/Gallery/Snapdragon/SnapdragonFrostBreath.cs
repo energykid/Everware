@@ -19,6 +19,7 @@ public class SnapdragonFrostBreath : EverProjectile
         Projectile.ai[2] = Main.rand.NextFloat(-0.3f, 0.3f);
         Projectile.tileCollide = true;
         Projectile.rotation = Main.rand.NextFloat(3f);
+        Projectile.coldDamage = true;
     }
     public override void AI()
     {

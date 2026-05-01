@@ -1,5 +1,4 @@
 ﻿using Everware.Common.Players;
-using System;
 using System.IO;
 using System.Linq;
 using Terraria.ID;
@@ -8,6 +7,7 @@ namespace Everware.Core.Projectiles;
 
 public abstract class EverProjectile : ModProjectile
 {
+    public override string Texture => "Everware/Assets/Textures/Misc/TestItem";
     public override void Load()
     {
         EverwarePacketHandler.AddPacket(
