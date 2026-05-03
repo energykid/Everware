@@ -9,6 +9,10 @@ namespace Everware.Content.Gallery.Snapdragon.Drops;
 
 public class ShardShredder : EverWeaponItem
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return false;
+    }
     public override string Texture => "Everware/Assets/Textures/Gallery/Snapdragon/Drops/ShardShredder";
     public override int? HoldoutType => ModContent.ProjectileType<ShardShredderProj>();
     public override void SetStaticDefaults()

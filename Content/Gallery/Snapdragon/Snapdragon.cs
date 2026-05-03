@@ -10,6 +10,10 @@ namespace Everware.Content.Gallery.Snapdragon;
 [AutoloadBossHead]
 public partial class Snapdragon : ModNPC
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return false;
+    }
     public override void SetStaticDefaults()
     {
         NPCID.Sets.TrailCacheLength[Type] = 3;

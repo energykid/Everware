@@ -284,6 +284,7 @@ Projectiles: {
 	// SnapFreezeProjectile.DisplayName: Snap Freeze Projectile
 	// ShardShredderProj.DisplayName: Shard Shredder Proj
 	// ShardShredderIcicle.DisplayName: Shard Shredder Icicle
+	// SnapdragonIceSpike.DisplayName: Snapdragon Ice Spike
 }
 
 Buffs: {

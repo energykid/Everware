@@ -11,6 +11,10 @@ namespace Everware.Content.Gallery;
 
 public class GallerySystem : ModSystem
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return false;
+    }
     bool HasGalleryFailed = false;
     public override void OnWorldLoad()
     {

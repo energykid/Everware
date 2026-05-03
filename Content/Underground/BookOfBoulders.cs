@@ -1,14 +1,14 @@
 ﻿using Everware.Common.Players;
 using Everware.Content.Base.Items;
 using Everware.Utils;
-using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.Underground;
 
-public class BookOfBoulders : EverWeaponItem
+public class BookOfBoulders : EverTomeWeapon
 {
     public override string Texture => "Everware/Assets/Textures/Underground/BookOfBoulders";
+    public override Asset<Texture2D> TomeAsset => Assets.Textures.Underground.BookOfBoulders_Holdout.Asset;
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -17,6 +17,7 @@ public class BookOfBoulders : EverWeaponItem
         Item.shoot = ModContent.ProjectileType<ConjuredBoulder>();
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.noMelee = true;
+        Item.noUseGraphic = true;
         Item.shootSpeed = 1;
         Item.damage = 30;
         Item.value = Sell.Gold(1) + Sell.Silver(50);
