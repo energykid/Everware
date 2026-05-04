@@ -317,5 +317,10 @@ Configs: {
 	}
 }
 
-// NPCs.Snapdragon.DisplayName: Snapdragon
+NPCs: {
+	// Snapdragon.DisplayName: Snapdragon
+	// SculptorNPC.DisplayName: Sculptor
+}
+
+// Bestiary.Sculptor: He is the Sculptor.
 // DeathReason.SnapdragonIce: experienced absolute zero.
