@@ -114,6 +114,8 @@ public class SculptorTradeUIState : UIState
             SoundEngine.PlaySound(Assets.Sounds.NPC.ChiselComplete.Asset);
             List<string> key = ["One", "Two", "Three"];
             SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.SculptAnimationFinished.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+
+            StatueSlot.SetChiselPoints(0f);
             StatueSlot.SetItemFinal();
         }
         if (Timer > 30 && Timer % 8 == 0)
@@ -300,14 +302,13 @@ public class SculptorStatueSlot : UIElement
 
             using (chiselTarget.Scope(clearColor: Color.Transparent))
             {
-                Main.spriteBatch.Begin(sb with { SamplerState = SamplerState.PointClamp });
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null);
 
                 Main.instance.DrawItem_GetBasics(inv, 0, out Texture2D tx, out Rectangle fr, out Rectangle gmFr);
 
                 if (!DrawChiselAnim)
-                    Main.EntitySpriteDraw(tx, new(100, 100), fr, Color.White, 0f, new Vector2((float)Math.Ceiling((float)fr.Center.X) - 0.5f, (float)Math.Ceiling((float)fr.Center.Y) - 0.5f), 0.5f, SpriteEffects.None);
-
-                if (inv2 != null && DrawChiselAnim)
+                    Main.EntitySpriteDraw(tx, new Vector2(100, 100), fr, Color.White, 0f, fr.Size() / 2f, 0.5f, SpriteEffects.None);
+                else if (inv2 != null)
                 {
                     Vector2 cen = new(100, 100);
 

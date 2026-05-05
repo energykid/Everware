@@ -28,13 +28,30 @@ public abstract class EverStatueTile : EverMultitile
     }
     public override void HitWire(int i, int j)
     {
+        Point pos = new(i, j);
+        while (Main.tile[pos].TileFrameX != 0)
+        {
+            pos.X--;
+        }
+        while (Main.tile[pos].TileFrameY != 0)
+        {
+            pos.Y--;
+        }
+
+        for (int k = 0; k < Width; k++)
+        {
+            for (int l = 0; l < Height; l++)
+            {
+                Wiring.SkipWire(pos.X + k, pos.Y + l);
+            }
+        }
+
         if (TileEntity.TryGet(i, j, out EverStatueTileEntity te))
         {
             if (te.Cooldown <= 0)
             {
-                Point pos = new(i, j);
-                OnPulse(pos);
                 te.Cooldown = MaxCooldown;
+                OnPulse(pos);
             }
         }
 
@@ -42,10 +59,22 @@ public abstract class EverStatueTile : EverMultitile
     }
     public override void PlaceInWorld(int i, int j, Item item)
     {
-        base.PlaceInWorld(i, j, item);
+        Point pos = new Point(i, j);
+
+        while (Main.tile[pos].TileFrameX != 0)
+        {
+            pos.X--;
+        }
+        while (Main.tile[pos].TileFrameY != 0)
+        {
+            pos.Y--;
+        }
+
+        TileEntity.PlaceEntityNet(pos.X, pos.Y, ModContent.TileEntityType<EverStatueTileEntity>());
     }
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
+        Main.NewText(new Point(i, j));
         if (TileEntity.TryGet(i, j, out EverStatueTileEntity te))
         {
             te.Kill(i, j);
@@ -63,12 +92,15 @@ public class EverStatueTileEntity : ModTileEntity
 
     public override bool IsTileValidForEntity(int x, int y)
     {
-        return true;
+        return ModContent.GetModTile(Main.tile[x, y].TileType) is EverStatueTile && Main.tile[x, y].HasTile;
     }
 
     public override void PostGlobalUpdate()
     {
-        Main.NewText("a");
+    }
+
+    public override void Update()
+    {
         Cooldown--;
     }
 }

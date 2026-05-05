@@ -242,7 +242,7 @@ Items: {
 	}
 
 	CrystalHeartStatueItem: {
-		DisplayName: Crystal Heart Statue Item
+		DisplayName: Crystal Heart Statue
 		Tooltip: ""
 	}
 }
@@ -259,8 +259,8 @@ Biomes: {
 	}
 
 	TheGallery: {
-		DisplayName: The Gallery
-		TownNPCDialogueName: the The Gallery
+		DisplayName: Gallery
+		TownNPCDialogueName: the Gallery
 	}
 }
 
