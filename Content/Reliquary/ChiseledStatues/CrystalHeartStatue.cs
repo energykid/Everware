@@ -18,6 +18,7 @@ public class CrystalHeartStatue : EverStatueTile
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/CrystalHeartStatue";
     public override void OnPulse(Point pos)
     {
-        Main.NewText("BOOM!!!!!!!!!");
+        SoundEngine.PlaySound(SoundID.DD2_CrystalCartImpact, pos.ToVector2() * 16);
+        Item.NewItem(new EntitySource_Misc("Crystal Heart Statue"), GetRect(pos), ItemID.Heart);
     }
 }

@@ -84,6 +84,10 @@ public abstract class EverStatueTile : EverMultitile
     {
 
     }
+    public Rectangle GetRect(Point pos)
+    {
+        return new Rectangle(pos.X * 16, pos.Y * 16, Width * 16, Height * 16);
+    }
 }
 
 public class EverStatueTileEntity : ModTileEntity
