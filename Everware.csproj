@@ -13,7 +13,6 @@
 	<ItemGroup>
 	  <Folder Include="Assets\Effects\Hell\" />
 	  <Folder Include="Assets\Effects\Underground\" />
-	  <Folder Include="Content\Reliquary\ChiseledStatues\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Reference Include="Daybreak">

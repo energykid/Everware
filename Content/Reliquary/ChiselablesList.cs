@@ -8,8 +8,7 @@ public class ChiselablesList : ModSystem
     public static List<Chiselable> AllChiselables = [];
     public override void Load()
     {
-        AllChiselables.Add(new Chiselable(ItemID.AngelStatue, ItemID.BoulderStatue));
-        AllChiselables.Add(new Chiselable(ItemID.ImpStatue, ItemID.ImpStaff));
+
     }
     public override void Unload()
     {

@@ -240,6 +240,11 @@ Items: {
 			After a while, however, it will still run out of ice
 			''' */
 	}
+
+	CrystalHeartStatueItem: {
+		// DisplayName: Crystal Heart Statue Item
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
