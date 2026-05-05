@@ -1,10 +1,7 @@
 ﻿using Everware.Content.Base.Items;
 using Everware.Core.Projectiles;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.Hell;
@@ -16,7 +13,7 @@ public class Pyrocleavers : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(20, 25, DamageClass.Melee);
+        Item.DefaultToBasicWeapon(28, 25, DamageClass.Melee);
         Item.shoot = ModContent.ProjectileType<PyrocleaverProjectile>();
         Item.shootSpeed = 8f;
         Item.width = Item.height = 32;

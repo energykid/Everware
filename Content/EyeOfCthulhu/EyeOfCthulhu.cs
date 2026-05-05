@@ -3,7 +3,6 @@ using Everware.Config;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using System;
 using System.IO;
 using Terraria.ID;
 using Terraria.Localization;
@@ -21,11 +20,6 @@ public class EyeOfCthulhu : GlobalNPC
     public static int DesperationThreshold => Main.expertMode ? Main.masterMode ? 700 : 400 : 250;
     public int Phase2Threshold = 0;
     public int Phase = 0;
-
-    public override bool IsLoadingEnabled(Mod mod)
-    {
-        return StyleSettings.EoCEnabled;
-    }
 
     // Tendril 0: front left
     // Tendril 1: front right
@@ -72,7 +66,7 @@ public class EyeOfCthulhu : GlobalNPC
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        return ReworkEnabled && entity.type == NPCID.EyeofCthulhu;
+        return StyleSettings.EoCEnabled && entity.type == NPCID.EyeofCthulhu;
     }
     public override bool CanHitPlayer(NPC npc, Player target, ref int cooldownSlot)
     {

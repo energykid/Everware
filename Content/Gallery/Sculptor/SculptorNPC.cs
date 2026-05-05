@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Everware.Content.Reliquary;
+using System.Collections.Generic;
+using System.IO;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 
@@ -7,7 +9,18 @@ namespace Everware.Content.Gallery.Sculptor;
 public class SculptorNPC : ModNPC
 {
     private static Profiles.StackedNPCProfile Profile;
-
+    public bool Focused = false;
+    public int FocusedPlayer = -1;
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        base.SendExtraAI(writer);
+        writer.Write(Focused);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        base.ReceiveExtraAI(reader);
+        Focused = reader.ReadBoolean();
+    }
     public override void SetDefaults()
     {
         NPC.friendly = true;
@@ -22,6 +35,30 @@ public class SculptorNPC : ModNPC
         NPC.knockBackResist = 0.5f;
 
         AnimationType = NPCID.Guide;
+    }
+    public override string GetChat()
+    {
+        List<string> key = ["One", "Two", "Three", "Four", "Five", "Six"];
+        return Mods.Everware.NPCs.SculptorNPC.Dialogue.Greeting.GetChildText(key[Main.rand.Next(key.Count)]).Value;
+    }
+    public override void SetChatButtons(ref string button, ref string button2)
+    {
+        button = Mods.Everware.NPCs.SculptorNPC.Chisel.GetTextValue();
+        button2 = Mods.Everware.NPCs.SculptorNPC.Reliquary.GetTextValue();
+    }
+    public override void OnChatButtonClicked(bool firstButton, ref string shopName)
+    {
+        if (firstButton)
+        {
+            ReliquaryUISystem.OpenTrade(NPC);
+        }
+        else
+        {
+            ReliquaryUISystem.OpenUI();
+        }
+        Focused = true;
+        FocusedPlayer = Main.myPlayer;
+        NPC.netUpdate = true;
     }
     public override void SetStaticDefaults()
     {
@@ -134,5 +171,16 @@ public class SculptorNPC : ModNPC
     {
         itemWidth = 60;
         itemHeight = 60;
+    }
+    public override void AI()
+    {
+        if (Focused)
+        {
+            NPC.velocity.X = 0f;
+            if (Main.player.IndexInRange(FocusedPlayer))
+            {
+                NPC.direction = Math.Sign(Main.player[FocusedPlayer].Center.X - NPC.Center.X);
+            }
+        }
     }
 }

@@ -1,14 +1,9 @@
-﻿using Everware.Common.Players;
-using Everware.Common.Systems;
+﻿using Everware.Common.Systems;
 using Everware.Content.Base.Items;
 using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 
@@ -26,7 +21,7 @@ public class HotShot : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(24, 60, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(30, 60, DamageClass.Ranged);
         Item.autoReuse = true;
         Item.useAmmo = AmmoID.Bullet;
         Item.width = Assets.Textures.Hell.HotShot.Asset.Width();

@@ -319,7 +319,60 @@ Configs: {
 
 NPCs: {
 	Snapdragon.DisplayName: Snapdragon
-	SculptorNPC.DisplayName: Sculptor
+
+	SculptorNPC: {
+		DisplayName: Sculptor
+		Reliquary: Reliquary
+		Chisel: Chisel
+		BestiaryEntry: This lonesome master artist has made his home in an underground gallery of ice sculptures, where he's explored and searched for inspiration for decades.
+
+		Dialogue: {
+			Greeting: {
+				One: Who keeps leaving those bat statues everywhere anyways? Mighty strange thing to sculpt fifteen different times.
+				Two: I've dropped my chisel somewhere and I can't seem to find it. Have you seen it in the ice anywhere?
+				Three: I used to make stone sculptures in the jungle, but they kept getting stolen every time I looked away!
+				Four: I know you've been finding statues everywhere, but please take care with that pickaxe. You'll damage them!
+				Five: You know, some of the pieces people keep showing me are a tad... simplistic. I could add my own touch, if you wanted.
+				Six: Oh, the skeleton one? That wasn't me. Really, it wasn't. Why do you ask?
+			}
+
+			TradeGreeting: {
+				One: Just show me a statue and I'll see what I can do!
+				Two: Alright, let me grab my tools...
+				Three: Another collaboration? Splendid!
+			}
+
+			NoStatue: {
+				One: There's no statue to chisel up, friend.
+				Two: You don't seem to have any statue ready.
+				Three: Are you gonna bring a statue?
+			}
+
+			InvalidStatue: {
+				One: Unfortunately I can't do anything with this one.
+				Two: Hmm, coming up short on how to save this one.
+				Three: I can't really improve this design.
+			}
+
+			AngelStatue: {
+				One: Who even made this thing?
+				Two: I can be crass on occasion, but do you take me for a barbarian?
+				Three: Who do you think I am, a pastor?
+			}
+
+			SculptAnimation: {
+				One: Hmm, here goes...
+				Two: Let's see...
+				Three: A little here, a little there...
+			}
+
+			SculptAnimationFinished: {
+				One: And... done! Enjoy!
+				Two: Yes, this is better!
+				Three: That's more to my liking!
+			}
+		}
+	}
 }
 
 Bestiary.Sculptor: He is the Sculptor.

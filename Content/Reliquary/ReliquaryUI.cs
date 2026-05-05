@@ -1,6 +1,5 @@
 ﻿using Everware.Content.Gallery.Sculptor;
 using System.Collections.Generic;
-using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.UI;
 
@@ -34,7 +33,7 @@ public class ReliquaryUISystem : ModSystem
     private GameTime _lastUpdateUiGameTime;
     public override void PostUpdateInput()
     {
-        if (Interface?.CurrentState != null)
+        if (Interface?.CurrentState == State)
         {
             PlayerInput.LockVanillaMouseScroll("Everware: Sculptor and Reliquary");
         }
@@ -46,7 +45,7 @@ public class ReliquaryUISystem : ModSystem
         {
             Interface.Update(gameTime);
 
-            if (!SculptorNearby(Main.LocalPlayer, out NPC guide, 100) && !ReliquaryOpenedFromInventory)
+            if (!SculptorNearby(Main.LocalPlayer, out NPC guide, 350) && !ReliquaryOpenedFromInventory)
             {
                 CloseUI();
             }
@@ -75,33 +74,46 @@ public class ReliquaryUISystem : ModSystem
                 InterfaceScaleType.UI));
         }
     }
-
-
-    public static void OpenUI()
-    {
-        Interface.SetState(State);
-    }
-    public static void OpenTrade(NPC? sculptor = null)
-    {
-        if (sculptor == null)
-        {
-            State.Position = Main.ScreenSize.ToVector2() / 2f;
-        }
-        Sculptor = sculptor;
-        Interface.SetState(TradeState);
-    }
-    public static void CloseUI()
-    {
-        Interface.SetState(null);
-        ReliquaryOpenedFromInventory = false;
-    }
-
-    public override void PostUpdateNPCs()
+    public override void PreUpdateEntities()
     {
         if (Sculptor != null)
         {
             TradeState.Position = Sculptor.Center + new Vector2(0, -120);
         }
+    }
+
+    public static void OpenUI()
+    {
+        Main.CloseNPCChatOrSign();
+        Interface.SetState(State);
+    }
+    public static void OpenTrade(NPC? sculptor = null)
+    {
+        Main.CloseNPCChatOrSign();
+
+        List<string> key = ["One", "Two", "Three"];
+        TradeState.SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.TradeGreeting.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+
+        if (sculptor == null)
+        {
+            State.Position = Main.ScreenSize.ToVector2() / 2f;
+        }
+        Main.playerInventory = true;
+        Sculptor = sculptor;
+        Interface.SetState(TradeState);
+    }
+    public static void CloseUI()
+    {
+        if (Sculptor != null)
+        {
+            if (Sculptor.ModNPC is SculptorNPC sculptor)
+            {
+                sculptor.Focused = false;
+                Sculptor.netUpdate = true;
+            }
+        }
+        Interface.SetState(null);
+        ReliquaryOpenedFromInventory = false;
     }
 
     public bool SculptorNearby(Player player, out NPC sculptor, float dist)
@@ -121,42 +133,5 @@ public class ReliquaryUISystem : ModSystem
         }
 
         return b;
-    }
-}
-public class ReliquaryUIState : UIState
-{
-    public UIPanel BigPanel;
-    public Vector2 Position;
-
-    public override void OnInitialize()
-    {
-        BigPanel = new UIPanel();
-        BigPanel.Width.Set(1920 * 0.5f, 0f);
-        BigPanel.Height.Set(1080 * 0.5f, 0f);
-        BigPanel.HAlign = 0.5f;
-        BigPanel.VAlign = 0.5f;
-        Append(BigPanel);
-    }
-    public override void Update(GameTime gameTime)
-    {
-        base.Update(gameTime);
-    }
-}
-public class SculptorTradeUIState : UIState
-{
-    public UIPanel BigPanel;
-    public Vector2 Position;
-
-    public override void OnInitialize()
-    {
-        BigPanel = new UIPanel();
-        BigPanel.Width.Set(300, 0f);
-        BigPanel.Height.Set(100, 0f);
-        Append(BigPanel);
-    }
-    public override void Update(GameTime gameTime)
-    {
-        BigPanel.Left.Set(Position.X - 150 - Main.screenPosition.X, 0f);
-        BigPanel.Top.Set(Position.Y - 50 - Main.screenPosition.Y, 0f);
     }
 }
