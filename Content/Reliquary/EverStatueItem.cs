@@ -14,5 +14,6 @@ public abstract class EverStatueItem : EverPlaceableItem
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
 }

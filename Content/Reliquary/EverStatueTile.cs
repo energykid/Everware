@@ -74,11 +74,7 @@ public abstract class EverStatueTile : EverMultitile
     }
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
-        Main.NewText(new Point(i, j));
-        if (TileEntity.TryGet(i, j, out EverStatueTileEntity te))
-        {
-            te.Kill(i, j);
-        }
+        base.KillTile(i, j, ref fail, ref effectOnly, ref noItem);
     }
     public virtual void OnPulse(Point pos)
     {
@@ -106,5 +102,9 @@ public class EverStatueTileEntity : ModTileEntity
     public override void Update()
     {
         Cooldown--;
+        if (!IsTileValidForEntity(Position.X, Position.Y))
+        {
+            Kill(Position.X, Position.Y);
+        }
     }
 }
