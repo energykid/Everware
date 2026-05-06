@@ -1,10 +1,4 @@
 ﻿using Everware.Content.Base.Tiles;
-using Everware.Content.Hell;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ID;
 using Terraria.ObjectData;
 

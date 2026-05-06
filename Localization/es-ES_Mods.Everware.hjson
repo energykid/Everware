@@ -245,6 +245,8 @@ Items: {
 		// DisplayName: Crystal Heart Statue
 		// Tooltip: ""
 	}
+
+	// PowerHeart.DisplayName: Power Heart
 }
 
 Biomes: {
@@ -291,6 +293,11 @@ Buffs: {
 	SkullMinionBuff: {
 		DisplayName: Aterradora, burlona, estridente Calavera de Obsidiana
 		Description: La Aterradora, Burlona, Estridente Calavera de Obsidiana luchará por ti
+	}
+
+	PowerHealingBuff: {
+		// DisplayName: Power Healing
+		// Description: Your healing has accelerated rapidly
 	}
 }
 

@@ -245,6 +245,8 @@ Items: {
 		DisplayName: Crystal Heart Statue
 		Tooltip: ""
 	}
+
+	PowerHeart.DisplayName: Power Heart
 }
 
 Biomes: {
@@ -291,6 +293,11 @@ Buffs: {
 	SkullMinionBuff: {
 		DisplayName: Terrifying, Laughing, Screaming Obsidian Skull
 		Description: The terrifying, laughing, screaming obsidian skull will fight for you
+	}
+
+	PowerHealingBuff: {
+		DisplayName: Power Healing
+		Description: Your healing has accelerated rapidly
 	}
 }
 

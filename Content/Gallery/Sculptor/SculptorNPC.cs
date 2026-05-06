@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Gallery.Sculptor;
 
@@ -181,6 +182,22 @@ public class SculptorNPC : ModNPC
             {
                 NPC.direction = Math.Sign(Main.player[FocusedPlayer].Center.X - NPC.Center.X);
             }
+        }
+    }
+}
+public class SculptorTownNPCArrivalSystem : ModSystem
+{
+    public static bool SculptorAvailable = false;
+    public override void SaveWorldData(TagCompound tag)
+    {
+        if (SculptorAvailable)
+            tag.Add("Everware Sculptor Available", true);
+    }
+    public override void LoadWorldData(TagCompound tag)
+    {
+        if (tag.TryGet("Everware Sculptor Available", out bool available))
+        {
+            SculptorAvailable = available;
         }
     }
 }
