@@ -1,5 +1,5 @@
 ﻿using Everware.Content.Base.World;
-using System;
+using Everware.Content.Gallery.Sculptor;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 
@@ -11,27 +11,38 @@ public class GalleryGeneration
     {
         GallerySystem.GalleryPosition = center;
 
+        // Open dome
         new Shapes.HalfCircle(74).Perform(new Point(center.X, center.Y + 1), new Actions.Clear());
 
+        // Dome walls
         new Shapes.HalfCircle(75).Perform(new Point(center.X, center.Y + 2), new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
         new Shapes.HalfCircle(75).Perform(center, new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
 
+        //Floor
         new Shapes.Rectangle(new Rectangle(-150, -30, 300, 35)).Perform(center, new Actions.SetTileKeepWall(TileID.IceBrick, true, true));
 
+        // Halls
         new Shapes.Rectangle(new Rectangle(-150, -28, 300, 29)).Perform(center, new Actions.Clear());
 
+        // Hall backgrounds
         new Shapes.Rectangle(new Rectangle(-150, -28, 75, 29)).Perform(center, new CustomGenActions.SetWall(WallID.IceBrick));
         new Shapes.Rectangle(new Rectangle(75, -28, 75, 29)).Perform(center, new CustomGenActions.SetWall(WallID.IceBrick));
 
+        // Hall granite backgrounds
         for (int i = 0; i < 3; i++)
         {
             new Shapes.Rectangle(new Rectangle(-75 - (i * 20) - 5, -28, 10, 29)).Perform(center, new CustomGenActions.SetWall(WallID.GraniteBlock));
             new Shapes.Rectangle(new Rectangle(75 + (i * 20) - 5, -28, 10, 29)).Perform(center, new CustomGenActions.SetWall(WallID.GraniteBlock));
         }
 
+        // Clear out dome
         new Shapes.HalfCircle(72).Perform(center, new Actions.ClearTile(true));
         new Shapes.HalfCircle(76).Perform(center, new Actions.Smooth(true));
 
+        // Frozen sculptor
+        WorldGen.PlaceObject(center.X, center.Y - 2, ModContent.TileType<FrozenSculptor>());
+
+        // Ice spikes from the ceiling
         for (int i = -45; i <= 45; i += Main.rand.Next(3, 9))
         {
             float rot = i;

@@ -248,7 +248,7 @@ Items: {
 
 	CrystalHeartStatueItem: {
 		// DisplayName: Crystal Heart Statue
-		// Tooltip: ""
+		// Tooltip: When wired, spawns a [c/E295B7:Power Heart] which restores 60 HP over 5 seconds
 	}
 
 	// PowerHeart.DisplayName: Power Heart

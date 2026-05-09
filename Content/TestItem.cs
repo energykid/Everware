@@ -1,6 +1,6 @@
 ﻿using Everware.Content.Base.Items;
+using Everware.Content.Gallery;
 using Everware.Content.Gallery.Sculptor;
-using Everware.Content.Reliquary;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -10,7 +10,7 @@ public class TestItem : EverItem
     public override string Texture => "Everware/Assets/Textures/Misc/TestItem";
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return true;
+        return false;
     }
     public override void SetDefaults()
     {
@@ -26,6 +26,11 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
+            Point center = GallerySystem.GalleryPosition;
+
+            WorldGen.PlaceObject(center.X, center.Y - 2, ModContent.TileType<FrozenSculptor>());
+
+            /*
             if (player.altFunctionUse != 2)
             {
                 NPC? npc = null;
@@ -39,6 +44,7 @@ public class TestItem : EverItem
                 ReliquaryUISystem.OpenUI();
                 ReliquaryUISystem.ReliquaryOpenedFromInventory = true;
             }
+            */
         }
 
         return base.UseItem(player);

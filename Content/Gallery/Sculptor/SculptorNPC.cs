@@ -12,6 +12,10 @@ public class SculptorNPC : ModNPC
     private static Profiles.StackedNPCProfile Profile;
     public bool Focused = false;
     public int FocusedPlayer = -1;
+    public override bool CanTownNPCSpawn(int numTownNPCs)
+    {
+        return numTownNPCs >= 2 && SculptorTownNPCArrivalSystem.SculptorAvailable;
+    }
     public override void SendExtraAI(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
@@ -45,21 +49,16 @@ public class SculptorNPC : ModNPC
     public override void SetChatButtons(ref string button, ref string button2)
     {
         button = Mods.Everware.NPCs.SculptorNPC.Chisel.GetTextValue();
-        button2 = Mods.Everware.NPCs.SculptorNPC.Reliquary.GetTextValue();
     }
     public override void OnChatButtonClicked(bool firstButton, ref string shopName)
     {
         if (firstButton)
         {
             ReliquaryUISystem.OpenTrade(NPC);
+            Focused = true;
+            FocusedPlayer = Main.myPlayer;
+            NPC.netUpdate = true;
         }
-        else
-        {
-            ReliquaryUISystem.OpenUI();
-        }
-        Focused = true;
-        FocusedPlayer = Main.myPlayer;
-        NPC.netUpdate = true;
     }
     public override void SetStaticDefaults()
     {

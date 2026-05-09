@@ -11,10 +11,6 @@ namespace Everware.Content.Gallery;
 
 public class GallerySystem : ModSystem
 {
-    public override bool IsLoadingEnabled(Mod mod)
-    {
-        return false;
-    }
     bool HasGalleryFailed = false;
     public override void OnWorldLoad()
     {
@@ -33,7 +29,7 @@ public class GallerySystem : ModSystem
     }
     public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
     {
-        tasks.Add(new PassLegacy("Generating a sculpture gallery", delegate (GenerationProgress progress, GameConfiguration configuration)
+        tasks.Add(new PassLegacy("Generating a frozen gallery", delegate (GenerationProgress progress, GameConfiguration configuration)
         {
             int snowDirection = 0;
 

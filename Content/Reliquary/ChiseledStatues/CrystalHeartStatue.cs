@@ -65,8 +65,9 @@ public class PowerHealingBuff : ModBuff
     public override void PostDraw(SpriteBatch spriteBatch, int buffIndex, BuffDrawParams drawParams)
     {
         Asset<Texture2D> MainTex = Assets.Textures.Reliquary.ChiseledStatues.PowerHeart.Asset;
-        spriteBatch.Draw(MainTex.Value, drawParams.Position + new Vector2(16) + new Vector2(0f, 4f), MainTex.Frame(), new(0f, 0f, 0f, 0.3f), (float)Math.Sin(GlobalTimer.Value / 90f) * 0.1f, MainTex.Size() / 2f, 0.9f + ((float)Math.Sin(GlobalTimer.Value / 60f) * 0.1f), SpriteEffects.None, 0f);
-        spriteBatch.Draw(MainTex.Value, drawParams.Position + new Vector2(16) + new Vector2(0f, -2f), MainTex.Frame(), Color.White, (float)Math.Sin(GlobalTimer.Value / 90f) * 0.1f, MainTex.Size() / 2f, 1f + ((float)Math.Sin(GlobalTimer.Value / 60f) * 0.15f), SpriteEffects.None, 0f);
+        Color c = drawParams.DrawColor;
+        spriteBatch.Draw(MainTex.Value, drawParams.Position + new Vector2(16) + new Vector2(0f, 4f), MainTex.Frame(), new Color(0f, 0f, 0f, 0.3f).MultiplyRGBA(c), (float)Math.Sin(GlobalTimer.Value / 90f) * 0.1f, MainTex.Size() / 2f, 0.9f + ((float)Math.Sin(GlobalTimer.Value / 60f) * 0.1f), SpriteEffects.None, 0f);
+        spriteBatch.Draw(MainTex.Value, drawParams.Position + new Vector2(16) + new Vector2(0f, -2f), MainTex.Frame(), Color.White.MultiplyRGBA(c), (float)Math.Sin(GlobalTimer.Value / 90f) * 0.1f, MainTex.Size() / 2f, 1f + ((float)Math.Sin(GlobalTimer.Value / 60f) * 0.15f), SpriteEffects.None, 0f);
     }
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/PowerHealingBuff";
     public override bool ReApply(Player player, int time, int buffIndex)
