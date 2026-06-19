@@ -252,6 +252,13 @@ Items: {
 	}
 
 	// PowerHeart.DisplayName: Power Heart
+
+	CrystalStarStatueItem: {
+		// DisplayName: Crystal Star Statue
+		// Tooltip: When wired, spawns a [c/AA95E1:Power Star] which increases your magic attack speed greatly but slightly decreases magic damage
+	}
+
+	// PowerStar.DisplayName: Power Star
 }
 
 Biomes: {
@@ -303,6 +310,11 @@ Buffs: {
 	PowerHealingBuff: {
 		// DisplayName: Power Healing
 		// Description: Your healing has accelerated rapidly
+	}
+
+	PowerManaBuff: {
+		// DisplayName: Power Magic
+		// Description: Your magic attacks have accelerated rapidly
 	}
 }
 

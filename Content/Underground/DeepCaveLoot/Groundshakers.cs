@@ -2,7 +2,6 @@
 using Everware.Content.Base;
 using Everware.Content.Base.Items;
 using Everware.Utils;
-using System;
 using Terraria.ID;
 
 namespace Everware.Content.Underground.DeepCaveLoot;
