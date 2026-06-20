@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Everware.Utils;
+﻿namespace Everware.Utils;
 
 public class Easing
 {

@@ -1,6 +1,5 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using System;
 using System.Collections.Generic;
 using Terraria.Graphics.Light;
 
@@ -99,6 +98,7 @@ namespace Everware.Common.Systems
                 }
 
                 c.Emit(OpCodes.Call, typeof(PixelRendering).GetMethod("DrawAllPixelatedSprites"));
+                c.Emit(OpCodes.Call, typeof(GlowRendering).GetMethod("DrawGlows"));
             };
         }
 

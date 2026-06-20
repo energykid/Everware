@@ -1,7 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-using System.IO;
+﻿using System.IO;
 using Terraria.ID;
 
 namespace Everware.Core.Projectiles;
@@ -29,6 +26,8 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public bool HasMouseBeenReleased = false;
     public bool Started = false;
     public bool AnimActive = true;
+    public float Timer = 0f;
+    public virtual bool SinglePersistent => false;
     public virtual Asset<Texture2D> Asset { get => ModContent.Request<Texture2D>(Texture); }
     public override void SetDefaults()
     {
@@ -53,6 +52,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
         writer.Write(HitFrames);
         writer.Write(HasMouseBeenReleased);
         writer.Write(Started);
+        writer.Write(Timer);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
@@ -62,6 +62,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
         HitFrames = reader.ReadInt32();
         HasMouseBeenReleased = reader.ReadBoolean();
         Started = reader.ReadBoolean();
+        Timer = reader.ReadSingle();
     }
     public override void NetOnSpawn()
     {
@@ -77,6 +78,30 @@ public abstract class EverHoldoutProjectile : EverProjectile
     {
         return true;
     }
+
+    public void DeleteIfAnimationOver()
+    {
+        if (ShouldKill())
+        {
+            Projectile.Kill();
+        }
+    }
+    public void SetPositionAndRotation()
+    {
+        Projectile.Center = Owner.MountedCenter + Offset + new Vector2(Owner.MountXOffset, 0);
+        Projectile.rotation = Rotation + RotationOffset;
+    }
+    public void SetCompositeArms()
+    {
+        Owner.SetCompositeArmBack(false, Player.CompositeArmStretchAmount.None, 0f);
+        Owner.SetCompositeArmFront(false, Player.CompositeArmStretchAmount.None, 0f);
+
+        if (TwoHanded || !FrontHanded)
+            Owner.SetCompositeArmBack(true, StretchAmountFromExtension(BackArmExtension), Rotation + BackArmRotationOffset - MathHelper.ToRadians(90f));
+        if (TwoHanded || FrontHanded)
+            Owner.SetCompositeArmFront(true, StretchAmountFromExtension(FrontArmExtension), Rotation + FrontArmRotationOffset - MathHelper.ToRadians(90f));
+    }
+
     public override void AI()
     {
         Projectile.timeLeft = 10;
@@ -101,11 +126,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
         else
         {
             Projectile.ai[0]--;
-
-            if (ShouldKill())
-            {
-                Projectile.Kill();
-            }
+            DeleteIfAnimationOver();
         }
 
         Owner.heldProj = Projectile.whoAmI;
@@ -113,16 +134,8 @@ public abstract class EverHoldoutProjectile : EverProjectile
         if (AutoDirection)
             Owner.direction = NetworkOwner.MousePosition.X < Owner.Center.X ? -1 : 1;
 
-        Owner.SetCompositeArmBack(false, Player.CompositeArmStretchAmount.None, 0f);
-        Owner.SetCompositeArmFront(false, Player.CompositeArmStretchAmount.None, 0f);
-
-        if (TwoHanded || !FrontHanded)
-            Owner.SetCompositeArmBack(true, StretchAmountFromExtension(BackArmExtension), Rotation + BackArmRotationOffset - MathHelper.ToRadians(90f));
-        if (TwoHanded || FrontHanded)
-            Owner.SetCompositeArmFront(true, StretchAmountFromExtension(FrontArmExtension), Rotation + FrontArmRotationOffset - MathHelper.ToRadians(90f));
-
-        Projectile.Center = Owner.MountedCenter + Offset + new Vector2(Owner.MountXOffset, 0);
-        Projectile.rotation = Rotation + RotationOffset;
+        SetCompositeArms();
+        SetPositionAndRotation();
 
         if (!Started)
         {
@@ -154,6 +167,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
     }
     public virtual bool ShouldKill()
     {
+        if (SinglePersistent) return !Owner.ItemAnimationActive;
         return Projectile.ai[0] < -2 && !Persist;
     }
     public static Player.CompositeArmStretchAmount StretchAmountFromExtension(float ext)

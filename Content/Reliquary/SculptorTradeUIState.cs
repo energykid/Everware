@@ -292,7 +292,6 @@ public class SculptorStatueSlot : UIElement
         Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, 1f + Scale, SpriteEffects.None);
         if (inv != null)
         {
-
             var chiselTarget = ScreenspaceTargetPool.Shared.Rent(
                 Main.instance.GraphicsDevice,
                 (width, height) => (200, 200)
@@ -300,12 +299,14 @@ public class SculptorStatueSlot : UIElement
 
             Main.instance.DrawItem_GetBasics(inv, 0, out Texture2D tx, out Rectangle fr, out Rectangle gmFr);
 
+            float sc2 = 1f - ((float)Math.Clamp((fr.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
+
             Main.spriteBatch.End(out var sb);
 
             if (!DrawChiselAnim)
             {
                 Main.spriteBatch.Begin(sb);
-                Main.EntitySpriteDraw(tx, position, fr, Color.White, 0f, fr.Size() / 2f, (1f + (Scale * 3f)), SpriteEffects.None);
+                Main.EntitySpriteDraw(tx, position, fr, Color.White, 0f, fr.Size() / 2f, (1f + (Scale * 3f)) * sc2, SpriteEffects.None);
             }
             else
             {
@@ -319,15 +320,17 @@ public class SculptorStatueSlot : UIElement
 
                         Main.instance.DrawItem_GetBasics(inv2, 0, out Texture2D newItemTx, out Rectangle fr2, out Rectangle gmFr2);
 
+                        sc2 = 1f - ((float)Math.Clamp((fr2.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
+
                         List<Vector2> v2s1 = [];
                         List<Color> cols1 = [];
                         List<Vector2> tcs1 = [];
 
                         for (int i = 0; i < ChiselPoints.Length; i++)
                         {
-                            Vector2 point = cen + ((ChiselPoints[i] - new Vector2(0.5f, 0.5f)) * (fr2.Size() / 2f));
+                            Vector2 point = cen + ((ChiselPoints[i] - new Vector2(0.5f, 0.5f)) * (fr2.Size() / 2f) * sc2);
                             v2s1.Add(point);
-                            v2s1.Add(point with { Y = cen.Y + fr2.Height / 4f });
+                            v2s1.Add(point with { Y = cen.Y + (fr2.Height / 4f * sc2) });
                             cols1.Add(Color.White);
                             cols1.Add(Color.White);
                             tcs1.Add(ChiselPoints[i]);
@@ -342,9 +345,9 @@ public class SculptorStatueSlot : UIElement
 
                         for (int i = 0; i < ChiselPoints.Length; i++)
                         {
-                            Vector2 point = cen + ((ChiselPoints[i] - new Vector2(0.5f, 0.5f)) * (fr.Size() / 2f));
+                            Vector2 point = cen + ((ChiselPoints[i] - new Vector2(0.5f, 0.5f)) * (fr.Size() / 2f) * sc2);
                             v2s.Add(point);
-                            v2s.Add(point with { Y = cen.Y - fr.Height / 4f });
+                            v2s.Add(point with { Y = cen.Y - (fr.Height / 4f * sc2) });
                             cols.Add(Color.White);
                             cols.Add(Color.White);
                             tcs.Add(ChiselPoints[i]);

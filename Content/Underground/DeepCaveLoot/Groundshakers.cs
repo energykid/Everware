@@ -46,10 +46,10 @@ public class GroundshakersPlayer : ModPlayer
 
         Enabled = false;
     }
-    public override void TransformDrawData(ref PlayerDrawSet drawInfo)
+    public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
     {
         // run this if in game & not inanimate
-        if (!Main.gameMenu)
+        if (!Main.gameMenu && !Player.isDisplayDollOrInanimate)
         {
             int pC = Player.GetModPlayer<GroundshakersPlayer>().ParryCooldown;
             // only run if parrying is currently possible
@@ -63,8 +63,8 @@ public class GroundshakersPlayer : ModPlayer
                 StreakEffect.Parameters.Coords = new Vector2(0.5f, 0.1f);
                 StreakEffect.Apply();
 
-                var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-                GlowEffect.Parameters.Color = c.MultiplyRGBA(Lighting.GetColor((Player.Center / 16).ToPoint())).ToVector4();
+                var GlowEffect = Assets.Effects.Misc.PureColorEffect.CreateColorEffect();
+                GlowEffect.Parameters.MultiplyColor = c.MultiplyRGBA(Lighting.GetColor((Player.Center / 16).ToPoint())).ToVector4();
                 GlowEffect.Apply();
 
                 Main.spriteBatch.End();
@@ -92,6 +92,7 @@ public class GroundshakersPlayer : ModPlayer
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
             }
         }
+        base.DrawEffects(drawInfo, ref r, ref g, ref b, ref a, ref fullBright);
     }
     public float Cooldown => Player.GetModPlayer<GroundshakersPlayer>().ParryCooldown;
     public override void PreUpdateMovement()
@@ -141,7 +142,6 @@ public class GroundshakersPlayer : ModPlayer
     {
         if (Cooldown > 50)
         {
-            Player.AddImmuneTime(cooldownSlot, 1);
             for (int i = 0; i < Main.ActiveNPCs.span.Length; i++)
             {
                 if (Main.ActiveNPCs.span[i].IsHostile() && Main.ActiveNPCs.span[i].immune[Player.whoAmI] <= 0 && Main.ActiveNPCs.span[i].active)
@@ -156,6 +156,10 @@ public class GroundshakersPlayer : ModPlayer
                     }
                 }
             }
+            return false;
+        }
+        if (Cooldown > 40 || Math.Abs(Spin) > 0.1)
+        {
             return false;
         }
         return base.CanBeHitByNPC(npc, ref cooldownSlot);
