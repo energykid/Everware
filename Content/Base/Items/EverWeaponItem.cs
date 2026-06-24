@@ -1,14 +1,45 @@
 ﻿using Everware.Common.Players;
 using Everware.Content.Base.Projectiles;
+using Everware.Content.Misc;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Base.Items;
 
 public abstract class EverWeaponItem : EverItem
 {
+    public float MeterFill = 0f;
+    public virtual Vector4[] MeterColors() => [Color.DarkGray.ToVector4(), Color.LightSlateGray.ToVector4(), Color.White.ToVector4()];
+    public virtual Vector4[] MeterColors2() => [Color.Black.ToVector4(), Color.SlateGray.ToVector4(), Color.White.ToVector4()];
+
+    public override void NetSend(BinaryWriter writer)
+    {
+        base.NetSend(writer);
+        writer.Write(MeterFill);
+    }
+    public override void NetReceive(BinaryReader reader)
+    {
+        base.NetReceive(reader);
+        MeterFill = reader.ReadSingle();
+    }
+
+    public virtual void ChargeMeter(float amt)
+    {
+        MeterFill = MathHelper.Clamp(MeterFill + amt, 0f, 1f);
+        ChargeMeters.LocalChargeMeterVisibility = 3f;
+    }
+    public virtual void SetMeter(float amt)
+    {
+        MeterFill = MathHelper.Clamp(amt, 0f, 1f);
+        ChargeMeters.LocalChargeMeterVisibility = 3f;
+    }
+    public virtual bool IsMeterFull()
+    {
+        return MeterFill >= 1f;
+    }
 
     public override void Load()
     {

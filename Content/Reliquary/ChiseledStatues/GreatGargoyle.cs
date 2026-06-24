@@ -5,7 +5,6 @@ using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
-using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
@@ -13,6 +12,17 @@ namespace Everware.Content.Reliquary.ChiseledStatues;
 public class GreatGargoyle : EverWeaponItem
 {
     public static Color GreenYellow => new Color(110, 214, 0);
+
+    public override Vector4[] MeterColors()
+    {
+        return [new Color(24, 24, 24).ToVector4(),
+            GreenYellow.ToVector4(), new Color(255, 255, 150).ToVector4()];
+    }
+    public override Vector4[] MeterColors2()
+    {
+        return [new Color(24, 24, 24).ToVector4(),
+            new Color(58, 44, 105).ToVector4(), Color.CadetBlue.ToVector4()];
+    }
 
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/GreatGargoyle";
 
@@ -75,17 +85,6 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
         Projectile.localNPCHitCooldown = 20;
     }
 
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        base.SendExtraAI(writer);
-        writer.Write(Owner.GetModPlayer<GreatGargoylePlayer>().GargoyleCharges);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        base.ReceiveExtraAI(reader);
-        Owner.GetModPlayer<GreatGargoylePlayer>().GargoyleCharges = reader.ReadInt32();
-    }
-
     public override void ModifyDamageHitbox(ref Rectangle hitbox)
     {
         Vector2 cen = Owner.MountedCenter + new Vector2(50, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition));
@@ -105,7 +104,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
         return true;
     }
     bool Flip = false;
-    public bool ShouldRunScare => Owner.GetModPlayer<GreatGargoylePlayer>().GargoyleCharges >= 4;
+    public bool ShouldRunScare => Owner.GetEverWeaponItem().IsMeterFull();
     public bool Scare = false;
     public override void AI()
     {
@@ -178,7 +177,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
                 Effects = SpriteEffects.None;
             }
 
-            if (Owner.GetModPlayer<GreatGargoylePlayer>().GargoyleCharges < 0)
+            if (Owner.GetEverWeaponItem().MeterFill <= 0f)
                 Scale *= Easing.KeyFloat(Timer, 0, 20, 0f, 1f, Easing.OutExpo, 1f);
             if (ShouldRunScare || !NetworkOwner.MouseDown)
                 Scale *= Easing.KeyFloat(Timer, 60, 91, 1f, 0f, Easing.InExpo, 1f);
@@ -203,7 +202,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             Origin = new Vector2(70 / 2, 64 / 2);
 
-            Owner.GetModPlayer<GreatGargoylePlayer>().GargoyleCharges = 0;
+            Owner.GetEverWeaponItem().SetMeter(0f);
 
             Scale *= Easing.KeyFloat(Timer, 70, 91, 1f, 0f, Easing.InExpo, 1f);
 
@@ -221,7 +220,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             if ((Timer % 6).ValueAt(2, speed) && Timer > 40 && Timer < 60)
             {
-                float Radius = 200;
+                float Radius = 700;
 
                 if (!Main.dedServ)
                 {
@@ -229,7 +228,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
                     {
                         if (npc.Distance(Owner.Center) < Radius && npc.IsHostile())
                         {
-                            if (Timer.ValueAt(56, speed))
+                            if (Timer.ValueAt(44, speed))
                             {
                                 if (!npc.GetGlobalNPC<GreatGargoyleTagNPC>().Tagged)
                                     npc.GetGlobalNPC<GreatGargoyleTagNPC>().Tag(npc, 10);
@@ -256,9 +255,9 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
     float ExtraRotationOffset = 0f;
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
+        Owner.GetEverWeaponItem().ChargeMeter(0.1f);
         ScreenEffects.AddScreenShake(target.Center, 7f, 0.7f);
         Pause = 5;
-        Owner.GetModPlayer<GreatGargoylePlayer>().GargoyleCharges++;
         SoundEngine.PlaySound(SoundID.DD2_CrystalCartImpact.WithPitchOffset(-0.7f), Projectile.Center);
         base.OnHitNPC(target, hit, damageDone);
     }
@@ -298,9 +297,4 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
         return false;
     }
-}
-
-public class GreatGargoylePlayer : ModPlayer
-{
-    public int GargoyleCharges = 0;
 }

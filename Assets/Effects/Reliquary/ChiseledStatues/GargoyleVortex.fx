@@ -34,7 +34,7 @@ float2 swirlWithSpirals(float2 uv, float2 center, float amt, float extraRotation
 float4 Effect(float2 coords : TEXCOORD0) : COLOR0
 {
     float2 c = swirlWithSpirals(coords, float2(0.5, 0.5), Amount, ExtraRotation);
-    float2 c2 = pixelateCoords(c, Resolution);
+    float2 c2 = pixelateCoords(c, Resolution / 2.0);
     
     float4 col = tex2D(uImage0, c2);
     float4 col1 = tex2D(FillSampler, coords + float2(Time, 0.0));

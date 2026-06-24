@@ -20,6 +20,8 @@ public class GreatGargoyleTagNPC : GlobalNPC
                 GreatGargoyleTagNPC taggedNPC = npc.GetGlobalNPC<GreatGargoyleTagNPC>();
                 if (taggedNPC.Tagged)
                 {
+                    float v = npc.width + npc.height / 2;
+
                     var asset = Assets.Textures.Reliquary.ChiseledStatues.GreatGargoyle_Vortex.Asset;
                     var asset2 = Assets.Textures.Reliquary.ChiseledStatues.GreatGargoyle_VortexLoopingInternal.Asset;
 
@@ -40,7 +42,7 @@ public class GreatGargoyleTagNPC : GlobalNPC
                     Main.spriteBatch.End(out var sb);
                     Main.spriteBatch.Begin(sb with { CustomEffect = eff.Shader, BlendState = BlendState.AlphaBlend, SamplerState = SamplerState.PointClamp });
 
-                    Main.EntitySpriteDraw(asset.Value, npc.Center - Main.screenPosition, asset.Frame(), Color.White, 0f, asset.Size() / 2f, taggedNPC.Scale * 1.15f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(asset.Value, npc.Center - Main.screenPosition, asset.Frame(), Color.White, 0f, asset.Size() / 2f, taggedNPC.Scale * (new Vector2(v, v) / new Vector2(60, 60)) * 1.15f, SpriteEffects.None);
 
                     Main.spriteBatch.End();
 
@@ -54,7 +56,7 @@ public class GreatGargoyleTagNPC : GlobalNPC
 
                     Main.spriteBatch.Begin(sb with { CustomEffect = eff.Shader, BlendState = BlendState.AlphaBlend, SamplerState = SamplerState.PointClamp });
 
-                    Main.EntitySpriteDraw(asset.Value, npc.Center - Main.screenPosition, asset.Frame(), Color.White, 0f, asset.Size() / 2f, taggedNPC.Scale, SpriteEffects.None);
+                    Main.EntitySpriteDraw(asset.Value, npc.Center - Main.screenPosition, asset.Frame(), Color.White, 0f, asset.Size() / 2f, taggedNPC.Scale * (new Vector2(v, v) / new Vector2(60, 60)), SpriteEffects.None);
 
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(sb);

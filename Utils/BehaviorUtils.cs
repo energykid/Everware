@@ -1,9 +1,15 @@
-﻿using Terraria.ID;
+﻿using Everware.Content.Base.Items;
+using Terraria.ID;
 
 namespace Everware.Utils;
 
 public static class BehaviorUtils
 {
+    public static EverWeaponItem GetEverWeaponItem(this Player player)
+    {
+        if (player.HeldItem.ModItem is EverWeaponItem it) return it;
+        return null;
+    }
     public static bool IsHostile(this NPC npc)
     {
         return (!npc.friendly && !npc.CountsAsACritter);
