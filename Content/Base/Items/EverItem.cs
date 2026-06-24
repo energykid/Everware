@@ -15,8 +15,11 @@ public abstract class EverItem : ModItem
     {
         base.SetDefaults();
         Item.rare = Rarity;
-        Item.height = Asset.Width();
-        Item.width = Asset.Height();
+        if (Asset != null)
+        {
+            Item.height = Asset.Width();
+            Item.width = Asset.Height();
+        }
     }
 
     public override void SetStaticDefaults()

@@ -1,11 +1,9 @@
-﻿using Daybreak.Common.Rendering;
-using Everware.Common.Systems;
+﻿using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using System;
 using System.Collections.Generic;
-using Terraria.Localization;
+using Terraria.ID;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
@@ -53,13 +51,17 @@ public class SnapdragonIceSpikeSystem : ModSystem
                 {
                     AllTriangles[i].Update();
 
+                    Dust.NewDustPerfect(AllTriangles[i].Center + (AllTriangles[i].P1 * AllTriangles[i].Scale), DustID.Ice);
+                    Dust.NewDustPerfect(AllTriangles[i].Center + (AllTriangles[i].P2 * AllTriangles[i].Scale), DustID.Ice);
+                    Dust.NewDustPerfect(AllTriangles[i].Center + (AllTriangles[i].P3 * AllTriangles[i].Scale), DustID.Ice);
+
                     foreach (Player plr in Main.ActivePlayers)
                     {
                         if (MathUtils.PointInTriangle(plr.Center, AllTriangles[i].Center + (AllTriangles[i].P1 * AllTriangles[i].Scale), AllTriangles[i].Center + (AllTriangles[i].P2 * AllTriangles[i].Scale), AllTriangles[i].Center + (AllTriangles[i].P3 * AllTriangles[i].Scale)))
                         {
                             if (plr.immuneTime <= 0)
                             {
-                                plr.Hurt(PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(plr.name + " " + Mods.Everware.DeathReason.SnapdragonIce.GetText())), Snapdragon.IceSpikeDamage, Math.Sign(plr.Center.X - AllTriangles[i].Center.X), false, false, false, 20);
+                                plr.Hurt(SnapdragonIceSpike.DeathReason(plr), Snapdragon.IceSpikeDamage, Math.Sign(plr.Center.X - AllTriangles[i].Center.X), false, false, false, 20);
 
                                 plr.immune = true;
                                 plr.immuneTime = 20;

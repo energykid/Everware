@@ -1,7 +1,6 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.NPCs;
 using Everware.Utils;
-using System;
 using Terraria.ID;
 
 namespace Everware.Content.Gallery.Snapdragon;

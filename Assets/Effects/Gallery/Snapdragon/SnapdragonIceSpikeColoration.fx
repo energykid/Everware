@@ -66,6 +66,6 @@ technique Shader
 {
     pass Effect
     {
-        PixelShader = compile ps_2_0 Effect();
+        PixelShader = compile ps_3_0 Effect();
     }
 }

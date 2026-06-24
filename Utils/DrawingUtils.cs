@@ -1,9 +1,44 @@
-﻿using ReLogic.Content;
-
-namespace Everware.Utils;
+﻿namespace Everware.Utils;
 
 public static class DrawingUtils
 {
+    public static void DrawGlowWithPadding(Texture2D texture, Vector2 position, Rectangle frame, Color c, float rotation, Vector2 origin, Vector2 scale, SpriteEffects eff = SpriteEffects.None, float radius = 0.15f)
+    {
+        int padding = 60;
+
+        Rectangle fr = frame;
+        fr.Width += padding;
+        fr.Height += padding;
+
+        var glowTarget = ScreenspaceTargetPool.Shared.Rent(
+            Main.instance.GraphicsDevice,
+            (Width, Height) => (fr.Width, fr.Height)
+        );
+
+        Main.spriteBatch.End(out var sb);
+        using (glowTarget.Scope(clearColor: Color.Transparent))
+        {
+            Main.spriteBatch.Begin();
+            Main.spriteBatch.Draw(texture, new Vector2(padding / 2, padding / 2), frame, Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+            Main.spriteBatch.End();
+        }
+        Main.spriteBatch.Begin(sb);
+
+        var GlowEffect = Assets.Effects.Misc.GlowBlur.CreateEffect();
+        GlowEffect.Parameters.Color = c.ToVector4();
+        GlowEffect.Parameters.Radius = radius;
+        GlowEffect.Apply();
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+
+        Main.EntitySpriteDraw(glowTarget.Target, position, fr, Color.White, rotation, origin + new Vector2(padding / 2, padding / 2), scale, eff);
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(sb);
+
+        glowTarget.Dispose();
+    }
     public static Vector2 TileOffset()
     {
         return Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);

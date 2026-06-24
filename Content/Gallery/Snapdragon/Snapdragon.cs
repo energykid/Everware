@@ -10,9 +10,11 @@ namespace Everware.Content.Gallery.Snapdragon;
 [AutoloadBossHead]
 public partial class Snapdragon : ModNPC
 {
+    public static bool ShouldLoadForTesting = true;
+
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return false;
+        return ShouldLoadForTesting;
     }
     public override void SetStaticDefaults()
     {

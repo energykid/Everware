@@ -11,7 +11,7 @@ public class ShardShredder : EverWeaponItem
 {
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return false;
+        return Snapdragon.ShouldLoadForTesting;
     }
     public override string Texture => "Everware/Assets/Textures/Gallery/Snapdragon/Drops/ShardShredder";
     public override int? HoldoutType => ModContent.ProjectileType<ShardShredderProj>();

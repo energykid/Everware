@@ -5,7 +5,7 @@ using Terraria.Graphics.Light;
 
 namespace Everware.Common.Systems
 {
-    public struct PixelatedDraw
+    public struct DeferredSprite
     {
         public Texture2D sprite;
         public Vector2 position;
@@ -25,7 +25,7 @@ namespace Everware.Common.Systems
         public bool additive;
         public bool postAll;
     }
-    public struct PixelatedPrim
+    public struct DeferredPrim
     {
         public Texture2D sprite;
         public List<Vector2> vertices;
@@ -84,8 +84,8 @@ namespace Everware.Common.Systems
     {
         public static RenderTarget2D PixelatedRenderTarget;
         public static RenderTarget2D AdditivePixelatedRenderTarget;
-        public static List<PixelatedDraw> Draws = [];
-        public static List<PixelatedPrim> Prims = [];
+        public static List<DeferredSprite> Draws = [];
+        public static List<DeferredPrim> Prims = [];
         public override void Load()
         {
             IL_Main.DoDraw += il =>
@@ -98,7 +98,6 @@ namespace Everware.Common.Systems
                 }
 
                 c.Emit(OpCodes.Call, typeof(PixelRendering).GetMethod("DrawAllPixelatedSprites"));
-                c.Emit(OpCodes.Call, typeof(GlowRendering).GetMethod("DrawGlows"));
             };
         }
 
@@ -176,7 +175,7 @@ namespace Everware.Common.Systems
             Effect eff = null;
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-            foreach (PixelatedDraw draw in Draws)
+            foreach (DeferredSprite draw in Draws)
             {
                 if (eff != draw.shaderEffect)
                 {
@@ -197,7 +196,7 @@ namespace Everware.Common.Systems
                 }
             }
 
-            foreach (PixelatedPrim prim in Prims)
+            foreach (DeferredPrim prim in Prims)
             {
                 if (!prim.additive)
                 {
@@ -218,7 +217,7 @@ namespace Everware.Common.Systems
 
             eff = null;
 
-            foreach (PixelatedDraw draw in Draws)
+            foreach (DeferredSprite draw in Draws)
             {
                 if (eff != draw.shaderEffect)
                 {
@@ -239,7 +238,7 @@ namespace Everware.Common.Systems
                 }
             }
 
-            foreach (PixelatedPrim prim in Prims)
+            foreach (DeferredPrim prim in Prims)
             {
                 if (prim.additive)
                 {
@@ -267,7 +266,7 @@ namespace Everware.Common.Systems
 
         public static void DrawPixelatedSprite(Texture2D sprite, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect = SpriteEffects.None, bool additive = false, Effect effect = null, Action setparams = null)
         {
-            PixelatedDraw draw = new PixelatedDraw
+            DeferredSprite draw = new DeferredSprite
             {
                 sprite = sprite,
                 position = position,
@@ -285,14 +284,14 @@ namespace Everware.Common.Systems
             Draws.Add(draw);
         }
 
-        public static void DrawPixelatedSprite(PixelatedDraw draw)
+        public static void DrawPixelatedSprite(DeferredSprite draw)
         {
             Draws.Add(draw);
         }
 
-        public static PixelatedDraw PixelatedSprite(Texture2D sprite, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect = SpriteEffects.None, bool additive = false, Effect effect = null, Action setparams = null)
+        public static DeferredSprite PixelatedSprite(Texture2D sprite, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect = SpriteEffects.None, bool additive = false, Effect effect = null, Action setparams = null)
         {
-            PixelatedDraw draw = new PixelatedDraw
+            DeferredSprite draw = new DeferredSprite
             {
                 sprite = sprite,
                 position = position,
@@ -310,9 +309,9 @@ namespace Everware.Common.Systems
             return draw;
         }
 
-        public static void DrawPixelatedPrims(List<Vector2> vertices, List<Color> colors, List<Vector2> texcoords, Texture2D sprite = null, bool additive = false, Effect effect = null, bool line = false, Action setparams = null)
+        public static void DrawDeferredPrims(List<Vector2> vertices, List<Color> colors, List<Vector2> texcoords, Texture2D sprite = null, bool additive = false, Effect effect = null, bool line = false, Action setparams = null)
         {
-            PixelatedPrim draw = new PixelatedPrim
+            DeferredPrim draw = new DeferredPrim
             {
                 sprite = sprite,
                 vertices = vertices,
@@ -328,14 +327,14 @@ namespace Everware.Common.Systems
             Prims.Add(draw);
         }
 
-        public static void DrawPixelatedPrims(PixelatedPrim prim)
+        public static void DrawDeferredPrims(DeferredPrim prim)
         {
             Prims.Add(prim);
         }
 
-        public static PixelatedPrim PixelatedPrim(List<Vector2> vertices, List<Color> colors, List<Vector2> texcoords, Texture2D sprite = null, bool additive = false, Effect effect = null, bool line = false, Action setparams = null)
+        public static DeferredPrim DeferredPrim(List<Vector2> vertices, List<Color> colors, List<Vector2> texcoords, Texture2D sprite = null, bool additive = false, Effect effect = null, bool line = false, Action setparams = null)
         {
-            PixelatedPrim draw = new PixelatedPrim
+            DeferredPrim draw = new DeferredPrim
             {
                 sprite = sprite,
                 vertices = vertices,

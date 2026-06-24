@@ -262,7 +262,12 @@ Items: {
 
 	GreatGargoyle: {
 		// DisplayName: Great Gargoyle
-		// Tooltip: ""
+		/* Tooltip:
+			'''
+			Hitting enemies builds up charge
+			After a certain amount of charge buildup, the Gargoyle will awaken
+			This deals summon damage to nearby enemies and tags them for increased melee and summon damage
+			''' */
 		// SummonDamage: summon damage when awakened
 	}
 }

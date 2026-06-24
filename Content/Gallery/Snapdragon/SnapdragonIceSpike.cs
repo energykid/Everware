@@ -1,10 +1,13 @@
 ﻿using Everware.Core.Projectiles;
 using Everware.Utils;
+using Terraria.Localization;
 
 namespace Everware.Content.Gallery.Snapdragon;
 
 public class SnapdragonIceSpike : EverProjectile
 {
+    public static PlayerDeathReason DeathReason(Player plr) => PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(plr.name + " " + Mods.Everware.DeathReason.SnapdragonIce.GetText()));
+
     public Vector2 Position1 = Vector2.Zero;
     public Vector2 Position2 = Vector2.Zero;
     public Vector2 Position3 = Vector2.Zero;
