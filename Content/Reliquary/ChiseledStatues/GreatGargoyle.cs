@@ -20,8 +20,8 @@ public class GreatGargoyle : EverWeaponItem
     }
     public override Vector4[] MeterColors2()
     {
-        return [new Color(24, 24, 24).ToVector4(),
-            new Color(58, 44, 105).ToVector4(), Color.CadetBlue.ToVector4()];
+        return [GreenYellow.ToVector4(),
+            Color.Yellow.ToVector4(), new Color(255, 255, 150).ToVector4()];
     }
 
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/GreatGargoyle";
@@ -30,12 +30,12 @@ public class GreatGargoyle : EverWeaponItem
 
     public override int? HoldoutType => ModContent.ProjectileType<GreatGargoyleHoldout>();
 
-    public static int SummonDamage => 22;
+    public static int SummonDamage => 52;
 
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(40, 90, DamageClass.Melee);
+        Item.DefaultToBasicWeapon(182, 90, DamageClass.Melee);
     }
     public override void SetStaticDefaults()
     {
@@ -108,6 +108,11 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
     public bool Scare = false;
     public override void AI()
     {
+        if (Glow > 0.1f)
+        {
+            Lighting.AddLight(Projectile.Center, new Vector3(0.2f, 0.9f, 0.4f) * Glow);
+        }
+
         if (!Started) Scare = ShouldRunScare;
 
         float speed = Owner.GetAttackSpeed(DamageClass.Melee);
@@ -177,8 +182,9 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
                 Effects = SpriteEffects.None;
             }
 
-            if (Owner.GetEverWeaponItem().MeterFill <= 0f)
-                Scale *= Easing.KeyFloat(Timer, 0, 20, 0f, 1f, Easing.OutExpo, 1f);
+            if (Owner.GetEverWeaponItem() != null)
+                if (Owner.GetEverWeaponItem().MeterFill <= 0f)
+                    Scale *= Easing.KeyFloat(Timer, 0, 20, 0f, 1f, Easing.OutExpo, 1f);
             if (ShouldRunScare || !NetworkOwner.MouseDown)
                 Scale *= Easing.KeyFloat(Timer, 60, 91, 1f, 0f, Easing.InExpo, 1f);
         }
@@ -202,7 +208,8 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             Origin = new Vector2(70 / 2, 64 / 2);
 
-            Owner.GetEverWeaponItem().SetMeter(0f);
+            if (Owner.GetEverWeaponItem() != null)
+                Owner.GetEverWeaponItem().SetMeter(0f);
 
             Scale *= Easing.KeyFloat(Timer, 70, 91, 1f, 0f, Easing.InExpo, 1f);
 
@@ -220,7 +227,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             if ((Timer % 6).ValueAt(2, speed) && Timer > 40 && Timer < 60)
             {
-                float Radius = 700;
+                float Radius = 400;
 
                 if (!Main.dedServ)
                 {
@@ -255,7 +262,8 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
     float ExtraRotationOffset = 0f;
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Owner.GetEverWeaponItem().ChargeMeter(0.1f);
+        if (Owner.GetEverWeaponItem() != null)
+            Owner.GetEverWeaponItem().ChargeMeter(0.1f);
         ScreenEffects.AddScreenShake(target.Center, 7f, 0.7f);
         Pause = 5;
         SoundEngine.PlaySound(SoundID.DD2_CrystalCartImpact.WithPitchOffset(-0.7f), Projectile.Center);

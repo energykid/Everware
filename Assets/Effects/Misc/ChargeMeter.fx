@@ -20,12 +20,10 @@ sampler2D FillSampler = sampler_state
     Mipfilter = POINT;
 };
 
-float2 Resolution;
-
 float4 Effect(float2 coords : TEXCOORD0) : COLOR0
 {
     float4 col = tex2D(uImage0, coords);
-    float4 col2 = tex2D(FillSampler, (coords / Resolution) + float2(Time, 0));
+    float4 col2 = tex2D(FillSampler, (coords) + float2(Time, 0));
     
     if (col.a > 0.0)
     {

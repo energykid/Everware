@@ -28,6 +28,7 @@ public abstract class EverWeaponItem : EverItem
 
     public virtual void ChargeMeter(float amt)
     {
+        ChargeMeters.LocalChargeMeterAnim = 1f;
         MeterFill = MathHelper.Clamp(MeterFill + amt, 0f, 1f);
         ChargeMeters.LocalChargeMeterVisibility = 3f;
     }

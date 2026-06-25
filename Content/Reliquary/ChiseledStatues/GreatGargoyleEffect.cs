@@ -20,6 +20,8 @@ public class GreatGargoyleTagNPC : GlobalNPC
                 GreatGargoyleTagNPC taggedNPC = npc.GetGlobalNPC<GreatGargoyleTagNPC>();
                 if (taggedNPC.Tagged)
                 {
+                    Lighting.AddLight(npc.Center, new Vector3(0.2f, 0.9f, 0.4f) * 0.7f);
+
                     float v = npc.width + npc.height / 2;
 
                     var asset = Assets.Textures.Reliquary.ChiseledStatues.GreatGargoyle_Vortex.Asset;
