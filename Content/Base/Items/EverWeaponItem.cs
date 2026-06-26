@@ -15,6 +15,8 @@ public abstract class EverWeaponItem : EverItem
     public virtual Vector4[] MeterColors() => [Color.DarkGray.ToVector4(), Color.LightSlateGray.ToVector4(), Color.White.ToVector4()];
     public virtual Vector4[] MeterColors2() => [Color.Black.ToVector4(), Color.SlateGray.ToVector4(), Color.White.ToVector4()];
 
+    public virtual int HitCount => 1;
+
     public override void NetSend(BinaryWriter writer)
     {
         base.NetSend(writer);
@@ -76,6 +78,23 @@ public abstract class EverWeaponItem : EverItem
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.RemoveAll(TT => { return TT.Name == "BuffTime"; });
+
+        if (HitCount != 1)
+        {
+            for (int i = 0; i < tooltips.Count; i++)
+            {
+                if (tooltips[i].Name == "Damage")
+                {
+                    TooltipLine line1 = new TooltipLine("Hits 2 Times", Mods.Everware.Items.Hits.GetText().Value + " " + HitCount.ToString() + " " + Mods.Everware.Items.Times.GetText().Value)
+                    {
+                        OverrideColor = new Color(0.75f, 0.75f, 0.75f)
+                    };
+
+                    tooltips.Insert(i + 1, line1);
+                    break;
+                }
+            }
+        }
 
         base.ModifyTooltips(tooltips);
     }

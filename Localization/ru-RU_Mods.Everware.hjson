@@ -264,12 +264,15 @@ Items: {
 		// DisplayName: Great Gargoyle
 		/* Tooltip:
 			'''
-			Hitting enemies builds up charge
-			After a certain amount of charge buildup, the Gargoyle will awaken
-			This deals summon damage to nearby enemies and tags them for increased melee and summon damage
+			Hitting enemies builds up your [c/A3FF33:Charge Meter]
+			After a certain amount of meter buildup, the Gargoyle will awaken
+			This harms and tags nearby enemies for increased melee and summon damage
 			''' */
 		// SummonDamage: summon damage when awakened
 	}
+
+	// Hits: Hits
+	// Times: times
 }
 
 Biomes: {
@@ -304,13 +307,13 @@ Projectiles: {
 	ManaSpike.DisplayName: Магический шип
 	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Валун
-	// SnapdragonFrostBreathHitbox.DisplayName: Snapdragon
-	// SnapdragonFrostBreath.DisplayName: Snapdragon Frost Breath
-	// SnapFreezeProjectile.DisplayName: Snap Freeze Projectile
-	// ShardShredderProj.DisplayName: Shard Shredder Proj
-	// ShardShredderIcicle.DisplayName: Shard Shredder Icicle
-	// SnapdragonIceSpike.DisplayName: Snapdragon Ice Spike
-	// GreatGargoyleHoldout.DisplayName: Great Gargoyle Holdout
+	// SnapdragonFrostBreathHitbox.DisplayName: Frost Breath
+	// SnapdragonFrostBreath.DisplayName: Frost Breath
+	// SnapFreezeProjectile.DisplayName: Snap Freeze
+	// ShardShredderProj.DisplayName: Shard Shredder
+	// ShardShredderIcicle.DisplayName: Icicle
+	// SnapdragonIceSpike.DisplayName: Ice Spike
+	// GreatGargoyleHoldout.DisplayName: Great Gargoyle
 }
 
 Buffs: {

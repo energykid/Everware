@@ -26,16 +26,18 @@ public class GreatGargoyle : EverWeaponItem
 
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/GreatGargoyle";
 
-    public override int Rarity => ItemRarityID.Blue;
+    public override int Rarity => 6;
 
     public override int? HoldoutType => ModContent.ProjectileType<GreatGargoyleHoldout>();
 
-    public static int SummonDamage => 52;
+    public static int SummonDamage => 90;
+
+    public override int HitCount => 2;
 
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(182, 90, DamageClass.Melee);
+        Item.DefaultToBasicWeapon(132, 90, DamageClass.Melee);
     }
     public override void SetStaticDefaults()
     {
@@ -46,26 +48,28 @@ public class GreatGargoyle : EverWeaponItem
     {
         return base.PreDrawTooltipLine(line, ref yOffset);
     }
-    static int DamageTooltipLineIndex = 0;
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        base.ModifyTooltips(tooltips);
-
         for (int i = 0; i < tooltips.Count; i++)
         {
             if (tooltips[i].Name == "Damage")
             {
-                DamageTooltipLineIndex = i + 1;
-
-                TooltipLine line = new TooltipLine("Extra Summon Damage", "(" + SummonDamage.ToString() + " " + Mods.Everware.Items.GreatGargoyle.SummonDamage.GetText() + ")")
+                TooltipLine line2 = new TooltipLine("Extra Summon Damage", SummonDamage.ToString() + " " + Mods.Everware.Items.GreatGargoyle.SummonDamage.GetText())
                 {
                     OverrideColor = new Color(0.8f, 1f, 1f)
                 };
+                TooltipLine line3 = new TooltipLine("Hits 3 Times", Mods.Everware.Items.Hits.GetText().Value + " 3 " + Mods.Everware.Items.Times.GetText().Value)
+                {
+                    OverrideColor = new Color(0.6f, 0.75f, 0.75f)
+                };
 
-                tooltips.Insert(i + 1, line);
+                tooltips.Insert(i + 1, line3);
+                tooltips.Insert(i + 1, line2);
                 break;
             }
         }
+
+        base.ModifyTooltips(tooltips);
     }
 }
 

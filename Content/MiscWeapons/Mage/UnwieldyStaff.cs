@@ -1,10 +1,6 @@
 ﻿using Everware.Common.Players;
 using Everware.Content.Base.Items;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-using Terraria.DataStructures;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 
@@ -24,6 +20,7 @@ class UnwieldyStaffLootPool : GlobalNPC
 
 class UnwieldyStaff : EverWeaponItem
 {
+    public override int HitCount => 3;
     public override string Texture => "Everware/Assets/Textures/MiscWeapons/UnwieldyStaff";
     public override bool UseCustomDraw => true;
     float angle = 0f;
