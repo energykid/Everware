@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-
-namespace Everware.Content.Menu;
+﻿namespace Everware.Content.Menu;
 
 public class EverwareTitle : ModMenu
 {
