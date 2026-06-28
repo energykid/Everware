@@ -42,15 +42,15 @@ public class EverwarePanel : ModPanelStyle
                 v.X *= 0.6f;
 
                 float k = 0f;
-                k = Easing.KeyFloat(A, 0f, 0.2f, 1f, 0f, Easing.OutCirc, k);
-                k = Easing.KeyFloat(A, 0.2f, 1f, 0f, 1f, Easing.Linear, k);
+                k = Easing.KeyFloat(A, 0f, 0.35f, 1f, 0f, Easing.OutCirc, k);
+                k = Easing.KeyFloat(A, 0.35f, 1f, 0f, 1f, Easing.Linear, k);
 
                 float sc = 1f;
                 sc = Easing.KeyFloat(A, 0.7f, 1f, 1f, 0f, Easing.Linear, sc);
 
                 v *= MathHelper.Lerp(2f, 1f, sc);
 
-                Vector2 pos = new Vector2(22, -5) + v;
+                Vector2 pos = new Vector2(26, -8) + v;
                 int Frame = (int)Math.Floor(k * 7);
 
                 Draws.Add(new BubbleDraw(pos, Frame, sc));
@@ -73,7 +73,8 @@ public class EverwarePanel : ModPanelStyle
         void DrawStuff(List<BubbleDraw> Draws, SpriteBatch spriteBatch, SpriteBatchSnapshot sb, float amount, float range = 0.1f, bool grayscaleOnly = false)
         {
             float a = Easing.InOutBack(HoverAmount);
-            float Scale = 0.9f + ((float)Math.Sin(Timer / 100f) * 0.1f) + (a * 0.1f);
+            float b = (float)Math.Ceiling(a * 5);
+            float Scale = 0.9f + ((float)Math.Sin(Timer / 100f) * 0.1f) + (b * 0.05f);
             float Rotation = ((float)Math.Sin(Timer / 113f) * 0.1f);
 
             var dims = GetDimensions().ToRectangle();
@@ -151,7 +152,7 @@ public class EverwarePanel : ModPanelStyle
     public static float HoverAmount = 0f;
     public override bool PreDraw(UIPanel element, SpriteBatch sb)
     {
-        HoverAmount = MathHelper.Clamp(MathHelper.Lerp(HoverAmount, Hovered ? 1.5f : -0.5f, 0.1f), 0f, 1f);
+        HoverAmount = MathHelper.Clamp(MathHelper.Lerp(HoverAmount, Hovered ? 1.5f : -0.5f, 0.15f), 0f, 1f);
 
         return base.PreDraw(element, sb);
     }
@@ -212,7 +213,7 @@ public class EverwarePanel : ModPanelStyle
 
         Color color = Color.White.MultiplyRGBA(new(alpha, alpha, alpha, alpha));
 
-        float a = (float)Math.Floor(Easing.InOutBack(HoverAmount));
+        float a = (float)Math.Ceiling(Easing.InOutBack(HoverAmount));
         dimensions.X -= a * 2f;
         dimensions.Y -= a * 2f;
         dimensions.Width += a * 4f;

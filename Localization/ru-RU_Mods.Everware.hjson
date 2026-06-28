@@ -273,6 +273,11 @@ Items: {
 
 	// Hits: Hits
 	// Times: times
+
+	MasterLockpick: {
+		// DisplayName: Master Lockpick
+		// Tooltip: ""
+	}
 }
 
 Biomes: {

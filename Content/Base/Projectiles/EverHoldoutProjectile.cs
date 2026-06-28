@@ -115,6 +115,11 @@ public abstract class EverHoldoutProjectile : EverProjectile
             if (AnimActive != Owner.ItemAnimationActive)
                 Projectile.netUpdate = true;
             AnimActive = Owner.ItemAnimationActive;
+
+            if (!Owner.HeldItem.autoReuse && Owner.itemAnimation <= 1)
+            {
+                AnimActive = false;
+            }
         }
 
         HitFrames--;
@@ -168,6 +173,7 @@ public abstract class EverHoldoutProjectile : EverProjectile
     public virtual bool ShouldKill()
     {
         if (SinglePersistent) return !Owner.ItemAnimationActive;
+        if (!Owner.HeldItem.autoReuse) return Owner.itemAnimation <= 1;
         return Projectile.ai[0] < -2 && !Persist;
     }
     public static Player.CompositeArmStretchAmount StretchAmountFromExtension(float ext)

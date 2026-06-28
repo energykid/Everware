@@ -1,12 +1,13 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base.ParticleSystem;
+using Everware.Content.Reliquary;
 using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace Everware.Content.Reliquary;
+namespace Everware.Content.Gallery.Sculptor;
 
 public class SculptorTradeUIState : UIState
 {
