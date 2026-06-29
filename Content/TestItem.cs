@@ -1,6 +1,5 @@
 ﻿using Everware.Content.Base.Items;
-using Everware.Content.Gallery;
-using Everware.Content.Gallery.Sculptor;
+using Everware.Content.Quarry;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -10,7 +9,7 @@ public class TestItem : EverItem
     public override string Texture => "Everware/Assets/Textures/Misc/TestItem";
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return false;
+        return true;
     }
     public override void SetDefaults()
     {
@@ -26,9 +25,7 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-            Point center = GallerySystem.GalleryPosition;
-
-            WorldGen.PlaceObject(center.X, center.Y - 2, ModContent.TileType<FrozenSculptor>());
+            QuarryGenerator.GenerateQuarry(KilnOrQuarryGeneration.GetPointFrom(new Point(Main.spawnTileX, Main.spawnTileY)));
 
             /*
             if (player.altFunctionUse != 2)

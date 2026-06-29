@@ -273,7 +273,7 @@ Items: {
 		// DisplayName: Master Lockpick
 		/* Tooltip:
 			'''
-			Unlocks gold chests when swung
+			Unlocks gold and steel chests when swung
 			'Great for picking master locks!'
 			''' */
 	}
@@ -337,14 +337,17 @@ Buffs: {
 	}
 }
 
-BossIntroText: {
-	MusicianENNWAY: ENNWAY
+MusicText: {
+	// MusicianENNWAY: ENNWAY!
 	// MusicKiln: Wildfire
 	// MusicQuarry: Stonecutter
 	// MusicHemolacriac: Hemolacriac Hunt
 	// MusicGallery: House Of Glass
 	// MusicCenterpiece: Centerpiece
 	// MusicOptimist: Chromium and Positivity
+}
+
+BossIntroText: {
 	EyeOfCthulhu: Acosador Nocturno
 	// Snapdragon: Sculptor's Masterwork
 }

@@ -187,16 +187,50 @@ public class SculptorNPC : ModNPC
 public class SculptorTownNPCArrivalSystem : ModSystem
 {
     public static bool SculptorAvailable = false;
+    public static Vector2 SculptorPosition = Vector2.Zero;
+    public static string SculptorName = "";
+    public override void PreSaveAndQuit()
+    {
+        int npc = NPC.FindFirstNPC(ModContent.NPCType<SculptorNPC>());
+        if (npc != -1)
+        {
+            SculptorPosition = Main.npc[npc].position;
+            SculptorName = Main.npc[npc].GivenName;
+        }
+        else
+        {
+            SculptorPosition = Vector2.Zero;
+            SculptorName = "";
+        }
+    }
     public override void SaveWorldData(TagCompound tag)
     {
         if (SculptorAvailable)
             tag.Add("Everware Sculptor Available", true);
+
+        // respawn the sculptor manually if world is left and rejoined
+        // this is because town NPCs despawn by default on leaving the world if they have no home;
+        // but the gallery can also be the sculptor's "home"
+
+        tag.Add("Everware Sculptor Position", SculptorPosition);
+        tag.Add("Everware Sculptor Name", SculptorName);
     }
     public override void LoadWorldData(TagCompound tag)
     {
         if (tag.TryGet("Everware Sculptor Available", out bool available))
         {
             SculptorAvailable = available;
+        }
+        if (tag.TryGet("Everware Sculptor Position", out Vector2 position))
+        {
+            if (NPC.CountNPCS(ModContent.NPCType<SculptorNPC>()) == 0 && position != Vector2.Zero)
+            {
+                NPC npc = NPC.NewNPCDirect(new EntitySource_Misc("Sculptor Respawn"), (int)position.X, (int)position.Y, ModContent.NPCType<SculptorNPC>());
+                if (tag.TryGet("Everware Sculptor Name", out string name))
+                {
+                    npc.GivenName = name;
+                }
+            }
         }
     }
 }

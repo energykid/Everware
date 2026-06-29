@@ -1,5 +1,4 @@
-﻿using Everware.Common.Systems;
-using Everware.Content.Base.ParticleSystem;
+﻿using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Reliquary;
 using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
@@ -34,6 +33,7 @@ public class SculptorTradeUIState : UIState
             BackgroundColor = Color.Transparent,
             BorderColor = Color.Transparent
         };
+
         DialogueText.Left.Set(0, 0f);
         DialogueText.Top.Set(0, 0f);
         DialogueText.Width.Set(300, 0f);
@@ -293,6 +293,7 @@ public class SculptorStatueSlot : UIElement
         Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, 1f + Scale, SpriteEffects.None);
         if (inv != null)
         {
+            /*
             var chiselTarget = ScreenspaceTargetPool.Shared.Rent(
                 Main.instance.GraphicsDevice,
                 (width, height) => (200, 200)
@@ -370,6 +371,7 @@ public class SculptorStatueSlot : UIElement
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(sb);
             }
+            */
         }
 
         SculptorTradeUIState.Layer.Draw();

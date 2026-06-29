@@ -228,7 +228,7 @@ public class EyeOfCthulhu : GlobalNPC
                     {
                         if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
                         {
-                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), Mods.Everware.BossIntroText.MusicHemolacriac.GetTextValue());
+                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.MusicText.MusicianENNWAY.GetTextValue(), Mods.Everware.MusicText.MusicHemolacriac.GetTextValue());
                             Time = 20;
                         }
                     }

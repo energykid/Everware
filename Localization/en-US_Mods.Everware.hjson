@@ -337,7 +337,7 @@ Buffs: {
 	}
 }
 
-BossIntroText: {
+MusicText: {
 	MusicianENNWAY: ENNWAY!
 	MusicKiln: Wildfire
 	MusicQuarry: Stonecutter
@@ -345,6 +345,9 @@ BossIntroText: {
 	MusicGallery: House Of Glass
 	MusicCenterpiece: Centerpiece
 	MusicOptimist: Chromium and Positivity
+}
+
+BossIntroText: {
 	EyeOfCthulhu: Night Stalker
 	Snapdragon: Sculptor's Masterwork
 }

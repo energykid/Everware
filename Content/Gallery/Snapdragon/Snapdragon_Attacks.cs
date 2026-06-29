@@ -34,7 +34,7 @@ public partial class Snapdragon : ModNPC
                 {
                     if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
                     {
-                        calFables.Call("vfx.displayBossIntroCard", NPC.TypeName, Mods.Everware.BossIntroText.Snapdragon.GetTextValue(), 100, false, Color.CadetBlue, Color.White, Color.CadetBlue, Color.CadetBlue, Mods.Everware.BossIntroText.MusicCenterpiece.GetTextValue(), Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue());
+                        calFables.Call("vfx.displayBossIntroCard", NPC.TypeName, Mods.Everware.BossIntroText.Snapdragon.GetTextValue(), 100, false, Color.CadetBlue, Color.White, Color.CadetBlue, Color.CadetBlue, Mods.Everware.MusicText.MusicCenterpiece.GetTextValue(), Mods.Everware.MusicText.MusicianENNWAY.GetTextValue());
                     }
                 }
             }
