@@ -11,11 +11,11 @@ public class Groundshakers : EverItem
 {
     public override int DuplicationAmount => 1;
     public static int Damage => 20;
+    public override int Rarity => 3;
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/Groundshakers";
     public override void SetDefaults()
     {
         Item.DefaultToAccessory(26, 28);
-        Item.rare = ItemRarityID.Orange;
         Item.value = Sell.Gold(1) + Sell.Silver(35);
     }
     public override void UpdateAccessory(Player player, bool hideVisual)

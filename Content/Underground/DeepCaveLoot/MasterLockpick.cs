@@ -2,7 +2,7 @@
 using Everware.Utils;
 using Terraria.ID;
 
-namespace Everware.Content.Underground;
+namespace Everware.Content.Underground.DeepCaveLoot;
 
 public class MasterLockpick : EverWeaponItem
 {
@@ -91,9 +91,10 @@ public class MasterLockpick : EverWeaponItem
 
                     var c = Chest.FindChest(p.X, p.Y);
 
-                    if (Main.tile[p].TileType == TileID.Containers)
+                    bool ChestViable = (Main.tile[p].TileType == TileID.Containers && Main.tile[p].TileFrameX == (18 * 2 * 2)) || Main.tile[p].TileType == ModContent.TileType<SteelChestTile>();
+                    if (ChestViable)
                     {
-                        if (Chest.IsLocked(p.X, p.Y) && Main.tile[p].TileFrameX == (18 * 2 * 2))
+                        if (Chest.IsLocked(p.X, p.Y))
                         {
                             SoundEngine.PlaySound(SoundID.Item175.WithPitchOffset(-0.3f), player.Center);
                             SoundEngine.PlaySound(SoundID.Item178.WithPitchOffset(-0.5f), player.Center);

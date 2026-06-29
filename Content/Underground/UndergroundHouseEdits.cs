@@ -1,6 +1,7 @@
 ﻿using Everware.Content.Base.World;
 using Everware.Content.Kiln.Tiles;
 using Everware.Content.Underground.DeepCaveLoot;
+using System.Collections.Generic;
 using Terraria.GameContent.Biomes.CaveHouse;
 using Terraria.ID;
 using Terraria.WorldBuilding;
@@ -11,20 +12,44 @@ public class UndergroundHouseEdits : ModSystem
 {
     public static int DeepCaveLayer => (int)(Main.UnderworldLayer * 0.65f);
 
+    public static List<int> DeepCaveLoot = [];
+    public override void OnModLoad()
+    {
+        DeepCaveLoot = [
+        ModContent.ItemType<Groundshakers>(),
+        ModContent.ItemType<MasterLockpick>()
+        ];
+    }
+
     public override void PostWorldGen()
     {
         for (int i = 0; i < Main.chest.Length; i++)
         {
             if (Main.chest[i] != null)
             {
-                if (Main.chest[i].y > DeepCaveLayer)
+                Tile chestTile = Main.tile[Main.chest[i].x, Main.chest[i].y];
+                if ((int)((float)chestTile.TileFrameX / 36f) == 1) // Gold Chest
                 {
-                    Tile chestTile = Main.tile[Main.chest[i].x, Main.chest[i].y];
-                    if ((int)((float)chestTile.TileFrameX / 36f) == 1) // Gold Chest
+                    if (Main.chest[i].y > DeepCaveLayer)
+                    {
+                        for (int k = 0; k < 2; k++)
+                        {
+                            for (int l = 0; l < 2; l++)
+                            {
+                                Tile t = Main.tile[Main.chest[i].x + k, Main.chest[i].y + l];
+                                t.TileType = (ushort)ModContent.TileType<SteelChestTile>();
+                                t.TileFrameX -= 36;
+                            }
+                        }
+                        Chest.Lock(Main.chest[i].x, Main.chest[i].y);
+                        Chest chest = Main.chest[i];
+                        chest.item[0] = new Item(DeepCaveLoot[Main.rand.Next(DeepCaveLoot.Count)]);
+                    }
+                    else
                     {
                         Chest chest = Main.chest[i];
-                        if (Main.rand.NextBool(6))
-                            chest.item[0] = new Item(ModContent.ItemType<Groundshakers>());
+                        if (Main.rand.NextBool(2))
+                            chest.AddItemToShop(new Item(ItemID.GoldenKey));
                     }
                 }
             }

@@ -271,11 +271,11 @@ Items: {
 
 	MasterLockpick: {
 		DisplayName: Master Lockpick
-		Tooltip: 
-		'''
-		Unlocks gold chests when swung
-		'Great for picking master locks!'
-		'''
+		Tooltip:
+			'''
+			Unlocks gold and steel chests when swung
+			'Great for picking master locks!'
+			'''
 	}
 }
 
@@ -425,3 +425,10 @@ NPCs: {
 
 Bestiary.Sculptor: An old, wisened artist from times before yours. Despite being trapped in a mysterious icy gallery, he seems not to have lost his passion for his craft!
 DeathReason.SnapdragonIce: experienced absolute zero.
+
+Tiles: {
+	SteelChestTile: {
+		MapEntry0: Steel Chest
+		MapEntry1: Locked Steel Chest
+	}
+}
