@@ -6,7 +6,7 @@ namespace Everware.Content.Underground.DeepCaveLoot;
 
 public class MasterLockpick : EverWeaponItem
 {
-    public override string Texture => "Everware/Assets/Textures/Underground/MasterLockpick";
+    public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/MasterLockpick";
     public override int Rarity => 3;
     public bool Smashed = false;
     public override bool UseCustomDraw => true;
@@ -26,7 +26,7 @@ public class MasterLockpick : EverWeaponItem
     }
     public override void CustomDraw(Player player, float direction)
     {
-        var asset = Assets.Textures.Underground.MasterLockpick.Asset;
+        var asset = Assets.Textures.Underground.DeepCaveLoot.MasterLockpick.Asset;
 
         SpriteEffects eff = SpriteEffects.None;
         float dir = 20f;
