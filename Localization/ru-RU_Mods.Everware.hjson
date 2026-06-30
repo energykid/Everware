@@ -282,6 +282,11 @@ Items: {
 			'Great for picking master locks!'
 			''' */
 	}
+
+	SteelChestItem: {
+		// DisplayName: Steel Chest Item
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
