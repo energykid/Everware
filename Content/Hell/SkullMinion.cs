@@ -4,11 +4,7 @@ using Everware.Content.Base.Buffs;
 using Everware.Content.Base.Projectiles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using System.Collections.Generic;
-using Terraria.DataStructures;
 using Terraria.ID;
 
 namespace Everware.Content.Hell;

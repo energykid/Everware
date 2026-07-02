@@ -23,4 +23,9 @@ public class SteelChestItem : EverPlaceableItem
     public override int Rarity => 3;
     public override int PlacementID => ModContent.TileType<SteelChestTile>();
     public override string Texture => "Everware/Assets/Textures/Underground/SteelChestItem";
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        Item.value = Sell.Silver(45);
+    }
 }

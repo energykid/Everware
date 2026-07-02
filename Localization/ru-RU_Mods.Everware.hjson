@@ -284,8 +284,13 @@ Items: {
 	}
 
 	SteelChestItem: {
-		// DisplayName: Steel Chest Item
+		// DisplayName: Steel Chest
 		// Tooltip: ""
+	}
+
+	MagmaticAmmokit: {
+		// DisplayName: Magmatic Ammokit
+		// Tooltip: Ranged critical strikes create an explosion which hits behind the enemy
 	}
 }
 
@@ -328,6 +333,7 @@ Projectiles: {
 	// ShardShredderIcicle.DisplayName: Icicle
 	// SnapdragonIceSpike.DisplayName: Ice Spike
 	// GreatGargoyleHoldout.DisplayName: Great Gargoyle
+	// MagmaticExplosion.DisplayName: Magmatic Explosion
 }
 
 Buffs: {

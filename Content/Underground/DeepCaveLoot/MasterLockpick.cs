@@ -114,7 +114,7 @@ public class MasterLockpick : EverWeaponItem
         base.SetDefaults();
         Item.DefaultToBasicWeapon(6, 20, DamageClass.Generic);
         Item.UseSound = null;
-        Item.value = Sell.Gold(1) + Sell.Silver(75);
+        Item.value = Sell.Gold(1) + Sell.Silver(35);
         Item.width = 36;
         Item.height = 34;
         Item.noMelee = false;

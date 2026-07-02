@@ -1,7 +1,24 @@
 ﻿namespace Everware.Utils;
 
+[Autoload]
 public static class DrawingUtils
 {
+    public static void EverEntitySpriteDraw(Asset<Texture2D> texture, Vector2 position, Vector2 origin, float rotation = 0f, int framesV = 1, int frameNumV = 0)
+    {
+        Main.EntitySpriteDraw(texture.Value, position, texture.Frame(1, framesV, 0, frameNumV), Color.White, rotation, origin, Vector2.One, 0);
+    }
+    public static void EverEntitySpriteDraw(Asset<Texture2D> texture, Vector2 position, Vector2 origin, Vector2 scale, float rotation = 0f, int framesV = 1, int frameNumV = 0)
+    {
+        Main.EntitySpriteDraw(texture.Value, position, texture.Frame(1, framesV, 0, frameNumV), Color.White, rotation, origin, scale, 0);
+    }
+    public static void EverEntitySpriteDraw(Asset<Texture2D> texture, Vector2 position, Vector2 origin, Color color, float rotation = 0f, int framesV = 1, int frameNumV = 0)
+    {
+        Main.EntitySpriteDraw(texture.Value, position, texture.Frame(1, framesV, 0, frameNumV), color, rotation, origin, Vector2.One, 0);
+    }
+    public static void EverEntitySpriteDraw(Asset<Texture2D> texture, Vector2 position, Vector2 origin, Vector2 scale, Color color, float rotation = 0f, int framesV = 1, int frameNumV = 0)
+    {
+        Main.EntitySpriteDraw(texture.Value, position, texture.Frame(1, framesV, 0, frameNumV), color, rotation, origin, Vector2.One, 0);
+    }
     public static void DrawGlowWithPadding(Texture2D texture, Vector2 position, Rectangle frame, Color c, float rotation, Vector2 origin, Vector2 scale, SpriteEffects eff = SpriteEffects.None, float radius = 0.15f)
     {
         int padding = 60;
