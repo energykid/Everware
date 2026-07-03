@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base.Items;
+using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
@@ -34,7 +35,8 @@ public class MagmaticAmmokitPlayer : ModPlayer
     {
         if (proj.DamageType == DamageClass.Ranged && hit.Crit)
         {
-            SoundEngine.PlaySound(SoundID.NPCDeath14.WithPitchOffset(1f), proj.Center);
+            SoundEngine.PlaySound(SoundID.NPCDeath14.WithPitchOffset(1f).WithVolumeScale(0.2f), proj.Center);
+            SoundEngine.PlaySound(SoundID.Item99.WithPitchOffset(0.5f), proj.Center);
 
             Projectile proj2 = Projectile.NewProjectileDirect(new EntitySource_Parent(target, "Magmatic Ammokit"), proj.Center, Vector2.Zero, ModContent.ProjectileType<MagmaticExplosion>(),
                 hit.Damage * 2 / 3, 2f, proj.owner, 0, target.whoAmI);
@@ -67,20 +69,35 @@ public class MagmaticExplosion : EverProjectile
     }
     public override void ModifyDamageHitbox(ref Rectangle hitbox)
     {
+        Point cen = OutputPosition().ToPoint();
+        cen += new Vector2(Target.Size.Length(), 0).RotatedBy(Projectile.rotation).ToPoint();
+        base.ModifyDamageHitbox(ref hitbox);
+        hitbox = new Rectangle(cen.X - 30, cen.Y - 30, 60, 60);
+    }
+    public NPC Target => Main.npc[(int)Projectile.ai[1]];
+    public Vector2 OutputPosition()
+    {
         Vector2 inc = new Vector2(2, 0).RotatedBy(Projectile.rotation);
 
         Vector2 outPosition = Projectile.Center;
         float radius = Target.Size.Length() * 0.35f;
         while (outPosition.Distance(Target.Center) < radius) outPosition += inc;
 
-        Point cen = outPosition.ToPoint();
-        cen += new Vector2(Target.Size.Length(), 0).RotatedBy(Projectile.rotation).ToPoint();
-        base.ModifyDamageHitbox(ref hitbox);
-        hitbox = new Rectangle(cen.X - 30, cen.Y - 30, 60, 60);
+        return outPosition;
     }
-    public NPC Target => Main.npc[(int)Projectile.ai[1]];
     public override void AI()
     {
+        if (!Start)
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                Vector2 v = Projectile.rotation.ToRotationVector2();
+                v.Normalize();
+                new SmallSmoke(OutputPosition() + (new Vector2(Main.rand.NextFloat(0, 30), Main.rand.NextFloat(-10, 10)).RotatedBy(Projectile.rotation)), v * Main.rand.NextFloat(8f), Color.Black.MultiplyRGBA(new Color(0.2f, 0.2f, 0.2f, 0.5f))).Spawn();
+            }
+            Start = true;
+        }
+
         Lighting.AddLight(Projectile.Center, new Vector3(0.2f, 0.1f, 0f) * MathHelper.Lerp(6f, 0f, Projectile.ai[0] / 8f));
 
         Projectile.Center += Target.velocity + vel;
@@ -88,6 +105,17 @@ public class MagmaticExplosion : EverProjectile
         vel *= 0.7f;
 
         Projectile.ai[0] = MathHelper.Lerp(Projectile.ai[0], 10f, 0.1f);
+
+        Projectile.ai[2]++;
+
+        if (Projectile.ai[2] < 10 && Projectile.ai[2] % 2 == 0)
+        {
+            new AnimationParticle(OutputPosition() + (new Vector2(Main.rand.NextFloat(0, 30), Main.rand.NextFloat(-10, 10)).RotatedBy(Projectile.rotation)), Projectile.rotation.ToRotationVector2() * Main.rand.NextFloat(8f), Color.White, Assets.Textures.Underground.DeepCaveLoot.MagmaticPop.Asset, 6)
+            {
+                Rotation = Projectile.rotation
+            }.Spawn();
+
+        }
 
         if (Projectile.ai[0] > 8) Projectile.Kill();
     }
