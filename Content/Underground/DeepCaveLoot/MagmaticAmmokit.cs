@@ -20,6 +20,7 @@ public class MagmaticAmmokit : EverItem
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
         base.UpdateAccessory(player, hideVisual);
+        player.GetCritChance<RangedDamageClass>() += 5;
         player.GetModPlayer<MagmaticAmmokitPlayer>().Enabled = true;
     }
 }

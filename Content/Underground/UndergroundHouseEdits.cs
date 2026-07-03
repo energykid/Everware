@@ -17,7 +17,8 @@ public class UndergroundHouseEdits : ModSystem
     {
         DeepCaveLoot = [
         ModContent.ItemType<Groundshakers>(),
-        ModContent.ItemType<MasterLockpick>()
+        ModContent.ItemType<MasterLockpick>(),
+        ModContent.ItemType<MagmaticAmmokit>()
         ];
     }
 
