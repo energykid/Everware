@@ -292,9 +292,14 @@ Items: {
 		// DisplayName: Magmatic Ammokit
 		/* Tooltip:
 			'''
-			+5% ranged critical strike chance
+			+5% increased ranged critical strike chance
 			Ranged critical strikes create an explosion which hits behind the enemy
 			''' */
+	}
+
+	Whetstone: {
+		// DisplayName: Whetstone
+		// Tooltip: ""
 	}
 }
 

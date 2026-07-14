@@ -291,6 +291,11 @@ Items: {
 			Ranged critical strikes create an explosion which hits behind the enemy
 			'''
 	}
+
+	Whetstone: {
+		DisplayName: Whetstone
+		Tooltip: ""
+	}
 }
 
 Biomes: {

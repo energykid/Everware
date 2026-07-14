@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Common.Players;
+using Everware.Content.Base.Items;
 using Terraria.ID;
 
 namespace Everware.Utils;
@@ -9,6 +10,10 @@ public static class BehaviorUtils
     {
         if (player.HeldItem.ModItem is EverWeaponItem it) return it;
         return null;
+    }
+    public static NetworkPlayer NetworkHandler(this Player player)
+    {
+        return player.GetModPlayer<NetworkPlayer>();
     }
     public static bool IsHostile(this NPC npc)
     {
