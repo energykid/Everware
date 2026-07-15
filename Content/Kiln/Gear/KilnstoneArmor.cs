@@ -3,7 +3,6 @@ using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Core;
 using Everware.Utils;
-using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Kiln.Gear;
@@ -201,7 +200,7 @@ public class IncreaseKilnstoneSetBonusPacket : EverPacket
     public override void Read(Mod mod, BinaryReader reader, int playerID)
     {
         Player = reader.ReadInt32();
-        Power = reader.ReadSingle();
+        Power = reader.ReadInt32();
 
         Main.player[Player].GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += Power;
 
