@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Terraria.ID;
 
-namespace Everware.Utils;
+namespace Everware.Common;
 
 public abstract class EverPacket : ILoadable
 {

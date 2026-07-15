@@ -1,5 +1,4 @@
 ﻿using Everware.Common.Players;
-using Everware.Utils;
 using System.IO;
 using Terraria.ID;
 

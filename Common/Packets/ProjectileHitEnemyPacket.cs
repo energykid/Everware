@@ -1,5 +1,4 @@
 ﻿using Everware.Core.Projectiles;
-using Everware.Utils;
 using System.IO;
 using System.Linq;
 using Terraria.ID;

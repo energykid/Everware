@@ -1,6 +1,6 @@
-﻿using Everware.Content.Base;
+﻿using Everware.Common;
+using Everware.Content.Base;
 using Everware.Content.Base.Tiles;
-using Everware.Utils;
 using System.Collections.Generic;
 using System.IO;
 using Terraria.ID;

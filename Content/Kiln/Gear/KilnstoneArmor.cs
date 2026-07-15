@@ -1,9 +1,12 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Common;
+using Everware.Content.Base.Items;
 using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Core;
 using Everware.Utils;
 using Terraria.ID;
+using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace Everware.Content.Kiln.Gear;
 
