@@ -30,7 +30,6 @@ public class ReliquaryUISystem : ModSystem
         State = null;
         TradeState = null;
     }
-    private GameTime _lastUpdateUiGameTime;
     public override void PostUpdateInput()
     {
         if (Interface?.CurrentState == State)
@@ -40,7 +39,6 @@ public class ReliquaryUISystem : ModSystem
     }
     public override void UpdateUI(GameTime gameTime)
     {
-        _lastUpdateUiGameTime = gameTime;
         if (Interface?.CurrentState != null)
         {
             Interface.Update(gameTime);
@@ -65,20 +63,22 @@ public class ReliquaryUISystem : ModSystem
                 "Everware: Sculptor and Reliquary",
                 delegate
                 {
-                    if (_lastUpdateUiGameTime != null && Interface?.CurrentState != null)
+                    if (Interface?.CurrentState != null)
                     {
-                        Interface.Draw(Main.spriteBatch, _lastUpdateUiGameTime);
+                        Interface.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
                     }
                     return true;
                 },
                 InterfaceScaleType.UI));
         }
     }
-    public override void PreUpdateEntities()
+    public override void PostUpdateEverything()
     {
         if (Sculptor != null)
         {
             TradeState.Position = Sculptor.Center + new Vector2(0, -120);
+            if (Main.LocalPlayer.talkNPC != -1)
+                Main.CloseNPCChatOrSign();
         }
     }
 
@@ -89,18 +89,19 @@ public class ReliquaryUISystem : ModSystem
     }
     public static void OpenTrade(NPC? sculptor = null)
     {
-        Main.CloseNPCChatOrSign();
-
-        List<string> key = ["One", "Two", "Three"];
-        TradeState.SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.TradeGreeting.GetChildText(key[Main.rand.Next(key.Count)]).Value);
-
         if (sculptor == null)
         {
             State.Position = Main.ScreenSize.ToVector2() / 2f;
         }
+        else
+        {
+            Sculptor = sculptor;
+        }
         Main.playerInventory = true;
-        Sculptor = sculptor;
         Interface.SetState(TradeState);
+
+        List<string> key = ["One", "Two", "Three"];
+        TradeState.SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.TradeGreeting.GetChildText(key[Main.rand.Next(key.Count)]).Value);
     }
     public static void CloseUI()
     {

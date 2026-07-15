@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Terraria.ID;
 
 namespace Everware.Content.Reliquary;
 
@@ -18,7 +17,16 @@ public class ChiselablesList : ModSystem
 public class Chiselable
 {
     public int BaseStatue;
+    public int UpgradeMaterial;
+    public int UpgradeStack = 1;
     public int UpgradedStatue;
+    public Chiselable(int Base, int Upgrade, int Material, int Stack)
+    {
+        BaseStatue = Base;
+        UpgradeMaterial = Material;
+        UpgradeStack = Stack;
+        UpgradedStatue = Upgrade;
+    }
     public Chiselable(int Base, int Upgrade)
     {
         BaseStatue = Base;

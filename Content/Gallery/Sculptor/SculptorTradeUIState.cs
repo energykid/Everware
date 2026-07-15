@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base.ParticleSystem;
+﻿using Everware.Common.Systems;
+using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Reliquary;
 using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
@@ -15,7 +16,9 @@ public class SculptorTradeUIState : UIState
     public UITextBox DialogueText;
     public UIButton<string> ChiselButton;
     public SculptorStatueSlot StatueSlot;
+    public SculptorStatueSlot MaterialSlot;
     Item[] Statue = { new Item(ItemID.None) };
+    Item[] Material = { new Item(ItemID.None) };
     public Vector2 Position;
     public bool CanBeQuit = true;
     public int Timer = 0;
@@ -51,35 +54,53 @@ public class SculptorTradeUIState : UIState
         ChiselButton.Height.Set(30, 0f);
         ChiselButton.OnLeftClick += Trade;
 
-        StatueSlot = new SculptorStatueSlot(Statue, 0, 0);
+        StatueSlot = new SculptorStatueSlot();
         StatueSlot.Left.Set(0f, 0.04f);
         StatueSlot.Top.Set(0f, -0.25f);
         StatueSlot.HAlign = 1f;
         StatueSlot.VAlign = 1f;
 
+        MaterialSlot = new SculptorStatueSlot();
+        MaterialSlot.Left.Set(0f, 0.04f);
+        MaterialSlot.Top.Set(0f, -0.25f);
+        MaterialSlot.HAlign = 1f;
+        MaterialSlot.VAlign = 1f;
+        MaterialSlot.Scale = 0.75f;
+
+        Append(BigPanel);
         BigPanel.Append(StatueSlot);
+        BigPanel.Append(MaterialSlot);
         BigPanel.Append(ChiselButton);
         BigPanel.Append(DialogueText);
-        Append(BigPanel);
     }
 
     public void Trade(UIMouseEvent evt, UIElement listeningElement)
     {
-        List<string> key = ["One", "Two", "Three"];
-        SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NoStatue.GetChildText(key[Main.rand.Next(key.Count)]).Value);
-        if (Statue[0].Name.Contains(" Statue"))
-            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.InvalidStatue.GetChildText(key[Main.rand.Next(key.Count)]).Value);
-        /*if (Statue[0].type == ItemID.AngelStatue)
-            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.AngelStatue.GetChildText(key[Main.rand.Next(key.Count)]).Value);
-        else*/
+        if (Timer < 0)
         {
-            foreach (Chiselable ch in ChiselablesList.AllChiselables)
+            if (StatueSlot._itemArray[0] != null && MaterialSlot._itemArray[0] != null)
             {
-                if (StatueSlot._itemArray[0].type == ch.BaseStatue)
+                List<string> key = ["One", "Two", "Three"];
+                SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NoStatue.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                if (Statue[0].Name.Contains(" Statue"))
+                    SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.InvalidStatue.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                /*if (Statue[0].type == ItemID.AngelStatue)
+                    SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.AngelStatue.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                else*/
                 {
-                    StatueSlot.StartChiseling(ch.UpgradedStatue);
-                    SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.SculptAnimation.GetChildText(key[Main.rand.Next(key.Count)]).Value);
-                    Timer = 60;
+                    foreach (Chiselable ch in ChiselablesList.AllChiselables)
+                    {
+                        if (StatueSlot._itemArray[0].type == ch.BaseStatue
+                            && MaterialSlot._itemArray[0].type == ch.UpgradeMaterial
+                            && MaterialSlot._itemArray[0].stack >= ch.UpgradeStack)
+                        {
+                            MaterialSlot._itemArray[0].stack -= ch.UpgradeStack;
+                            if (MaterialSlot._itemArray[0].stack <= 0) MaterialSlot._itemArray[0] = new Item(ItemID.None);
+                            StatueSlot.StartChiseling(ch.UpgradedStatue);
+                            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.SculptAnimation.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                            Timer = 60;
+                        }
+                    }
                 }
             }
         }
@@ -131,6 +152,11 @@ public class SculptorTradeUIState : UIState
         StatueSlot.HAlign = 1f;
         StatueSlot.VAlign = 1f;
 
+        MaterialSlot.Left.Set(0f, 0.01f);
+        MaterialSlot.Top.Set(0f, -0.4f);
+        MaterialSlot.HAlign = 0.92f;
+        MaterialSlot.VAlign = 1f;
+
         float v = 200;
         if (Main.screenHeight > 1000) v = -50;
 
@@ -144,18 +170,33 @@ public class SculptorTradeUIState : UIState
 
         if (StatueSlot.IsMouseHovering)
         {
-            StatueSlot.Scale = MathHelper.Lerp(StatueSlot.Scale, 0.1f, 0.4f);
+            StatueSlot.Scale = MathHelper.Lerp(StatueSlot.Scale, 1.1f, 0.4f);
         }
         else
         {
-            StatueSlot.Scale = MathHelper.Lerp(StatueSlot.Scale, 0f, 0.4f);
+            StatueSlot.Scale = MathHelper.Lerp(StatueSlot.Scale, 1f, 0.4f);
+        }
+
+        if (MaterialSlot.IsMouseHovering)
+        {
+            MaterialSlot.Scale = MathHelper.Lerp(MaterialSlot.Scale, 0.9f, 0.4f);
+        }
+        else
+        {
+            MaterialSlot.Scale = MathHelper.Lerp(MaterialSlot.Scale, 0.75f, 0.4f);
         }
     }
 }
-
-
 public class SculptorStatueSlot : UIElement
 {
+    public float Scale = 1f;
+
+    public Item[] _itemArray = new Item[1] {
+        new Item(ItemID.None)
+    };
+
+    public int _itemSlotContext;
+
     public class SculptorHammerChiselParticle : Particle
     {
         float Outset = 0f;
@@ -224,19 +265,9 @@ public class SculptorStatueSlot : UIElement
         }
     }
 
-    public float Scale = 0f;
-
-    public Item[] _itemArray;
-
-    public int _itemIndex;
-
-    public int _itemSlotContext;
-
-    public SculptorStatueSlot(Item[] itemArray, int itemIndex, int itemSlotContext)
+    public SculptorStatueSlot()
     {
-        _itemArray = itemArray;
-        _itemIndex = itemIndex;
-        _itemSlotContext = itemSlotContext;
+        _itemSlotContext = 0;
         Width = new StyleDimension(48f, 0f);
         Height = new StyleDimension(48f, 0f);
     }
@@ -246,12 +277,12 @@ public class SculptorStatueSlot : UIElement
         if (IsMouseHovering)
         {
             Main.LocalPlayer.mouseInterface = true;
-            Item inv = _itemArray[_itemIndex];
+            Item inv = _itemArray[0];
             ItemSlot.OverrideHover(ref inv, _itemSlotContext);
             ItemSlot.LeftClick(ref inv, _itemSlotContext);
             ItemSlot.RightClick(ref inv, _itemSlotContext);
             ItemSlot.MouseHover(ref inv, _itemSlotContext);
-            _itemArray[_itemIndex] = inv;
+            _itemArray[0] = inv;
         }
     }
 
@@ -273,7 +304,7 @@ public class SculptorStatueSlot : UIElement
     public void SetItemFinal()
     {
         DrawChiselAnim = false;
-        _itemArray[_itemIndex] = StatueToObtain;
+        _itemArray[0] = StatueToObtain;
     }
 
     public void StartChiseling(int statueToChiselTo)
@@ -286,14 +317,25 @@ public class SculptorStatueSlot : UIElement
     protected override void DrawSelf(SpriteBatch spriteBatch)
     {
         HandleItemSlotLogic();
-        Item inv = _itemArray[_itemIndex];
+
+        if (Scale < 0.9f)
+        {
+            float sc = MathHelper.Lerp(Scale, 1f, 0.2f);
+
+            Vector2 pos = GetDimensions().Center() + new Vector2(16, -15 - (sc * 10f));
+
+            var asset = Assets.Textures.Gallery.Sculptor.SculptorUIArrow.Asset;
+
+            spriteBatch.Draw(asset.Value, pos, asset.Frame(), Color.White, 0f, asset.Frame().Size() * new Vector2(0.8f, 0.5f), new Vector2(1f, MathHelper.Lerp(0.9f, sc, -1f)), SpriteEffects.None, 0f);
+        }
+
+        Item inv = _itemArray[0];
         Item inv2 = StatueToObtain;
         Vector2 position = GetDimensions().Center();
         Asset<Texture2D> tex = Assets.Textures.Gallery.Sculptor.SculptorStatueSlot.Asset;
-        Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, 1f + Scale, SpriteEffects.None);
-        if (inv != null)
+        Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, Scale, SpriteEffects.None);
+        if (inv2 != null && inv != null && inv.type != ItemID.None)
         {
-            /*
             var chiselTarget = ScreenspaceTargetPool.Shared.Rent(
                 Main.instance.GraphicsDevice,
                 (width, height) => (200, 200)
@@ -303,21 +345,20 @@ public class SculptorStatueSlot : UIElement
 
             float sc2 = 1f - ((float)Math.Clamp((fr.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
 
-            Main.spriteBatch.End(out var sb);
+            {
+                Main.spriteBatch.End(out var sb);
 
-            if (!DrawChiselAnim)
-            {
-                Main.spriteBatch.Begin(sb);
-                Main.EntitySpriteDraw(tx, position, fr, Color.White, 0f, fr.Size() / 2f, (1f + (Scale * 3f)) * sc2, SpriteEffects.None);
-            }
-            else
-            {
-                using (chiselTarget.Scope(clearColor: Color.Transparent))
+                if (!DrawChiselAnim)
                 {
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null);
-
-                    if (inv2 != null)
+                    Main.spriteBatch.Begin(sb);
+                    Main.EntitySpriteDraw(tx, position, fr, Color.White, 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
+                }
+                else
+                {
+                    using (chiselTarget.Scope(clearColor: Color.Transparent))
                     {
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null);
+
                         Vector2 cen = new(100, 100);
 
                         Main.instance.DrawItem_GetBasics(inv2, 0, out Texture2D newItemTx, out Rectangle fr2, out Rectangle gmFr2);
@@ -358,20 +399,19 @@ public class SculptorStatueSlot : UIElement
 
                         PrimitiveDrawing.DrawPrimitiveStrip2(v2s, cols, new(200, 200), tx, tcs);
                     }
+
                     Main.spriteBatch.End();
+                    Main.spriteBatch.Begin(sb with { SamplerState = Main.DefaultSamplerState });
+
+                    Main.EntitySpriteDraw(chiselTarget.Target, position, chiselTarget.Target.Bounds, Color.White, 0f, chiselTarget.Target.Bounds.Center(), Scale * 2f, SpriteEffects.None);
                 }
 
-                Main.spriteBatch.Begin(sb with { SamplerState = Main.DefaultSamplerState });
+                if (!DrawChiselAnim)
+                {
+                    Main.spriteBatch.End();
+                    Main.spriteBatch.Begin(sb);
+                }
             }
-
-            Main.EntitySpriteDraw(chiselTarget.Target, position, chiselTarget.Target.Bounds, Color.White, 0f, chiselTarget.Target.Bounds.Center(), (1f + (Scale * 3f)) * 2f, SpriteEffects.None);
-
-            if (!DrawChiselAnim)
-            {
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(sb);
-            }
-            */
         }
 
         SculptorTradeUIState.Layer.Draw();

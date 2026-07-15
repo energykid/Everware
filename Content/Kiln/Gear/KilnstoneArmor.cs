@@ -4,9 +4,8 @@ using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Core;
 using Everware.Utils;
-using Terraria.ID;
-using Microsoft.Xna.Framework;
 using System.IO;
+using Terraria.ID;
 
 namespace Everware.Content.Kiln.Gear;
 

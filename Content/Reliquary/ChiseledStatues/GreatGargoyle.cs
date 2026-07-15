@@ -41,7 +41,7 @@ public class GreatGargoyle : EverWeaponItem
     }
     public override void SetStaticDefaults()
     {
-        ChiselablesList.AllChiselables.Add(new(ItemID.ImpStatue, Type));
+        ChiselablesList.AllChiselables.Add(new(ItemID.ImpStatue, Type, ItemID.SoulofFright, 10));
     }
 
     public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)

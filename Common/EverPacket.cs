@@ -16,6 +16,11 @@ public abstract class EverPacket : ILoadable
         EverwarePacketHandler.CustomPacketNames.Add(GetType().Name);
     }
 
+    public void Send()
+    {
+        EverwarePacketHandler.SendPacket(this);
+    }
+
     public void Unload()
     { }
 

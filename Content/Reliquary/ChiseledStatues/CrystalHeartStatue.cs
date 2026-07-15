@@ -10,6 +10,7 @@ public class CrystalHeartStatueItem : EverStatueItem
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/CrystalHeartStatueItem";
     public override int PlacementID => ModContent.TileType<CrystalHeartStatue>();
     public override int BaseStatue => ItemID.HeartStatue;
+    public override int UpgradeMaterial => ItemID.LifeCrystal;
 }
 public class CrystalHeartStatue : EverStatueTile
 {
