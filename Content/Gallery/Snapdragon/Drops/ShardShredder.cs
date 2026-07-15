@@ -59,10 +59,6 @@ public class ShardShredder : EverWeaponItem
         }
         return base.CanUseItem(player);
     }
-    public override void UseAnimation(Player player)
-    {
-        player.SendRightClick();
-    }
 }
 public class ShardShredderProj : EverHoldoutProjectile
 {

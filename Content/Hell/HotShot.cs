@@ -61,10 +61,6 @@ public class HotShot : EverWeaponItem
         }
         return base.CanUseItem(player);
     }
-    public override void UseAnimation(Player player)
-    {
-        player.SendRightClick();
-    }
 }
 
 public class HotShotHoldout : EverHoldoutProjectile
@@ -92,11 +88,6 @@ public class HotShotHoldout : EverHoldoutProjectile
     public override void AI()
     {
         AutoDirection = true;
-
-        if (Projectile.ai[1] == 0)
-        {
-            Owner.SendRightClick();
-        }
 
         Projectile.velocity = Vector2.Zero;
 

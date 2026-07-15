@@ -3,7 +3,7 @@ using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Core;
 using Everware.Utils;
-using System;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Kiln.Gear;
@@ -166,28 +166,6 @@ public class KilnstoneSetBonus : ModPlayer
     }
     public override void Load()
     {
-        EverwarePacketHandler.AddPacket(
-            (mod, reader, whoAmI, identifier) =>
-            {
-                if (identifier == "IncreaseKilnstoneSetBonus")
-                {
-                    int plr = reader.ReadInt32();
-                    float amt = reader.ReadSingle();
-
-                    Main.player[plr].GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += amt;
-
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        ModPacket packet = Everware.Instance.GetPacket();
-                        packet.Write("IncreaseKilnstoneSetBonus");
-                        packet.Write(plr);
-                        packet.Write(amt);
-                        packet.Send(ignoreClient: plr);
-                    }
-                }
-            }
-        );
-
         On_Player.GetPickaxeDamage += On_Player_GetPickaxeDamage;
     }
     public override void Unload()
@@ -208,14 +186,30 @@ public class KilnstoneSetBonus : ModPlayer
 
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
-                    ModPacket packet = Everware.Instance.GetPacket();
-                    packet.Write("IncreaseKilnstoneSetBonus");
-                    packet.Write(self.whoAmI);
-                    packet.Write((float)power);
-                    packet.Send();
+                    EverwarePacketHandler.SendPacket(new IncreaseKilnstoneSetBonusPacket() { Player = self.whoAmI, Power = power });
                 }
             }
         }
         return orig(self, x, y, pickPower, hitBufferIndex, tileTarget);
+    }
+}
+
+public class IncreaseKilnstoneSetBonusPacket : EverPacket
+{
+    public int Player;
+    public float Power;
+    public override void Read(Mod mod, BinaryReader reader, int playerID)
+    {
+        Player = reader.ReadInt32();
+        Power = reader.ReadSingle();
+
+        Main.player[Player].GetModPlayer<KilnstoneSetBonus>().kilnstoneSetActive += Power;
+
+        RelayFromServer();
+    }
+    public override void Write(ModPacket packet)
+    {
+        packet.Write(Player);
+        packet.Write(Power);
     }
 }

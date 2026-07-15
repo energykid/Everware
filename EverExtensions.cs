@@ -1,11 +1,4 @@
 ﻿using Everware.Common.Players;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.GameInput;
-using Terraria.ID;
 
 namespace Everware;
 
@@ -14,21 +7,6 @@ public static class EverExtensions
     public static bool RightClicking(this Player plr)
     {
         return plr.GetModPlayer<NetworkPlayer>().RightClicking;
-    }
-    public static void SendRightClick(this Player plr, bool? result = null)
-    {
-        if (Main.netMode != NetmodeID.SinglePlayer)
-        {
-            if (plr == Main.LocalPlayer)
-            {
-                ModPacket p = Everware.Instance.GetPacket();
-                p.Write("RightClickNotifier");
-                p.Write(plr.whoAmI);
-                p.Write(result == null ? Main.mouseRight : result.Value);
-                p.Send();
-            }
-        }
-        plr.GetModPlayer<NetworkPlayer>().RightClicking = result == null ? Main.mouseRight : result.Value;
     }
 }
 

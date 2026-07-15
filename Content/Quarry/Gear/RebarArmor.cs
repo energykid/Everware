@@ -125,27 +125,29 @@ public class RebarSetBonus : ModPlayer
     }
 }
 
+public class RebarSparklePacket : EverPacket
+{
+    public Vector2 SpawnPos;
+
+    public override void Read(Mod mod, BinaryReader reader, int playerID)
+    {
+        SpawnPos = reader.ReadVector2();
+
+        SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, SpawnPos);
+        for (int k = 0; k < 5; k++)
+            Dust.NewDustPerfect(SpawnPos, ModContent.DustType<RebarOreSparkle>());
+
+        RelayFromServer();
+    }
+
+    public override void Write(ModPacket packet)
+    {
+        packet.WriteVector2(SpawnPos);
+    }
+}
+
 public class RebarGlobalTile : GlobalTile
 {
-    public override void Load()
-    {
-        EverwarePacketHandler.AddPacket(
-            (mod, reader, whoAmI, identifier) =>
-            {
-                if (identifier == "SendRebarParticles")
-                {
-                    int x = reader.ReadInt32();
-                    int y = reader.ReadInt32();
-
-                    Vector2 position = new Vector2(x, y);
-
-                    SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
-                    for (int k = 0; k < 5; k++)
-                        Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
-                }
-            }
-        );
-    }
     public void DropStuff(int i, int j, int type)
     {
         if (Main.tile[i, j].Get<LastPlayerMinedData>().WhichPlayerAmI != -1)
@@ -170,11 +172,10 @@ public class RebarGlobalTile : GlobalTile
                             {
                                 NetMessage.SendData(MessageID.SyncItem, number: ii);
 
-                                ModPacket p = Everware.Instance.GetPacket();
-                                p.Write("SendRebarParticles");
-                                p.Write((int)position.X);
-                                p.Write((int)position.Y);
-                                p.Send();
+                                EverwarePacketHandler.SendPacket(new RebarSparklePacket()
+                                {
+                                    SpawnPos = position
+                                });
                             }
                         }
                     }

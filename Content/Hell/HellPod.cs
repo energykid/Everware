@@ -1,10 +1,8 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.Tiles;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+using Everware.Utils;
 using System.Collections.Generic;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
@@ -419,42 +417,27 @@ public class HellPod : EverMultitile
     }
 }
 
+public class HellPodDamagePacket : EverPacket
+{
+    public int X;
+    public int Y;
+    public override void Read(Mod mod, BinaryReader reader, int playerID)
+    {
+        X = reader.ReadInt32();
+        Y = reader.ReadInt32();
+
+        HellPod.DamagePod(X, Y);
+
+        if (Main.netMode == NetmodeID.Server) EverwarePacketHandler.SendPacket(this);
+    }
+    public override void Write(ModPacket packet)
+    {
+        packet.Write(X);
+        packet.Write(Y);
+    }
+}
 public class HellPodGlobalProjectile : GlobalProjectile
 {
-    public override void Load()
-    {
-        EverwarePacketHandler.AddPacket(
-            (mod, reader, whoAmI, identifier) =>
-            {
-                if (identifier == "DamageHellPodFromServer")
-                {
-                    int x = reader.ReadInt32();
-                    int y = reader.ReadInt32();
-
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        HellPod.DamagePod(x, y);
-
-                        ModPacket p = Everware.Instance.GetPacket();
-                        p.Write("DamageHellPod");
-                        p.Write(x);
-                        p.Write(y);
-                        p.Send();
-                    }
-                }
-                if (identifier == "DamageHellPod")
-                {
-                    if (Main.netMode != NetmodeID.Server)
-                    {
-                        int x = reader.ReadInt32();
-                        int y = reader.ReadInt32();
-
-                        HellPod.DamagePod(x, y);
-                    }
-                }
-            }
-        );
-    }
     public override bool InstancePerEntity => true;
     public bool HasHitPod = false;
     public override void PostAI(Projectile projectile)
@@ -482,11 +465,9 @@ public class HellPodGlobalProjectile : GlobalProjectile
                             projectile.penetrate--;
                             Point p = (projectile.Center / 16).ToPoint();
 
-                            ModPacket packet = Everware.Instance.GetPacket();
-                            packet.Write("DamageHellPodFromServer");
-                            packet.Write((int)p.X);
-                            packet.Write((int)p.Y);
-                            packet.Send();
+                            EverwarePacketHandler.SendPacket(
+                                new HellPodDamagePacket() { X = p.X, Y = p.Y }
+                                );
                         }
                     }
                 }
