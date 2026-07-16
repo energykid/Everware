@@ -108,6 +108,17 @@ public abstract class EverHoldoutProjectile : EverProjectile
 
         if (!NetworkOwner.MouseDown && Started == false) HasMouseBeenReleased = true;
 
+
+        if (AnimActive)
+        {
+            Projectile.ai[0] = Owner.itemTime;
+        }
+        else
+        {
+            Projectile.ai[0]--;
+            DeleteIfAnimationOver();
+        }
+
         if (Main.LocalPlayer.whoAmI == Projectile.owner)
         {
             MousePosition = Main.MouseWorld;
@@ -123,16 +134,6 @@ public abstract class EverHoldoutProjectile : EverProjectile
         }
 
         HitFrames--;
-
-        if (AnimActive)
-        {
-            Projectile.ai[0] = Owner.itemTime;
-        }
-        else
-        {
-            Projectile.ai[0]--;
-            DeleteIfAnimationOver();
-        }
 
         Owner.heldProj = Projectile.whoAmI;
 
@@ -172,6 +173,8 @@ public abstract class EverHoldoutProjectile : EverProjectile
     }
     public virtual bool ShouldKill()
     {
+        if (Persist) return false;
+
         if (SinglePersistent) return !Owner.ItemAnimationActive;
         if (!Owner.HeldItem.autoReuse) return Owner.itemAnimation <= 1;
         return Projectile.ai[0] < -2 && !Persist;

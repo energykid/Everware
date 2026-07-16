@@ -6,7 +6,7 @@ public static class EverExtensions
 {
     public static bool RightClicking(this Player plr)
     {
-        return plr.GetModPlayer<NetworkPlayer>().RightClicking;
+        return plr.GetModPlayer<NetworkPlayer>().AltFunction == 2;
     }
 }
 

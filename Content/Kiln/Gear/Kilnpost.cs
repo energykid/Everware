@@ -5,12 +5,8 @@ using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Core.Projectiles;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 
@@ -91,6 +87,8 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public override void AI()
     {
+        if (!NetworkOwner.MouseDown) HasMouseBeenReleased = true;
+
         Timer++;
         TwoHanded = false;
         if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1 && Main.myPlayer == Projectile.owner)
@@ -167,9 +165,9 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public void BreakOffSpear()
     {
+        Persist = true;
         if (CollidingRightNow())
         {
-            Persist = true;
             if (Projectile.ai[0] < -10)
             {
                 SpawnBreakawaySpearIn(LastHitNPC);
@@ -193,6 +191,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public void BreakawayMotion()
     {
+        AnimActive = true;
         AutoDirection = false;
 
         Projectile.damage = 0;

@@ -71,6 +71,11 @@ public class GreatGargoyle : EverWeaponItem
 
         base.ModifyTooltips(tooltips);
     }
+
+    public override bool AltFunctionUse(Player player)
+    {
+        return player.GetEverWeaponItem().IsMeterFull();
+    }
 }
 
 public class GreatGargoyleHoldout : EverHoldoutProjectile
@@ -108,7 +113,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
         return true;
     }
     bool Flip = false;
-    public bool ShouldRunScare => Owner.GetEverWeaponItem().IsMeterFull();
+    public bool ShouldRunScare => NetworkOwner.AltFunction == 2;
     public bool Scare = false;
     public override void AI()
     {

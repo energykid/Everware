@@ -8,6 +8,7 @@ public class NetworkItem : GlobalItem
 {
     public override bool? UseItem(Item item, Player Player)
     {
+        Player.GetModPlayer<NetworkPlayer>().AltFunction = Player.altFunctionUse;
         if (Main.netMode != NetmodeID.SinglePlayer && Player.whoAmI == Main.myPlayer)
         {
             EverwarePacketHandler.SendPacket(new PlayerDataPacket() { plr = Player });
@@ -30,6 +31,10 @@ public class NetworkPlayer : ModPlayer
 
     public bool RightClicked = false;
 
+    public override void PreUpdate()
+    {
+
+    }
     public override void PostUpdate()
     {
         if (Main.myPlayer == Player.whoAmI)
@@ -37,7 +42,6 @@ public class NetworkPlayer : ModPlayer
             if (Main.netMode == NetmodeID.SinglePlayer || Main.netMode == NetmodeID.MultiplayerClient)
             {
                 MousePosition = Main.MouseWorld;
-                AltFunction = Player.altFunctionUse;
                 MouseDown = Player.controlUseItem;
                 AnimationTime = Player.itemAnimationMax;
                 RightClicking = Player.controlUseTile;
