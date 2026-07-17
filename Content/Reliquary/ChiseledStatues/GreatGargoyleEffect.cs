@@ -4,16 +4,17 @@ public class GreatGargoyleTagNPC : GlobalNPC
 {
     public override void Load()
     {
-        On_Main.DrawNPCs += On_Main_DrawNPCs;
-    }
-    public override void Unload()
-    {
-        On_Main.DrawNPCs -= On_Main_DrawNPCs;
+        On_Main.DrawTiles += On_Main_DrawTiles;
     }
 
-    private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
+    public override void Unload()
     {
-        if (behindTiles)
+        On_Main.DrawTiles -= On_Main_DrawTiles;
+    }
+
+    private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
+    {
+        if (!solidLayer)
         {
             foreach (NPC npc in Main.ActiveNPCs)
             {
@@ -42,7 +43,12 @@ public class GreatGargoyleTagNPC : GlobalNPC
                     eff.Apply();
 
                     Main.spriteBatch.End(out var sb);
-                    Main.spriteBatch.Begin(sb with { CustomEffect = eff.Shader, BlendState = BlendState.AlphaBlend, SamplerState = SamplerState.PointClamp });
+                    Main.spriteBatch.Begin(sb with
+                    {
+                        CustomEffect = eff.Shader,
+                        BlendState = BlendState.AlphaBlend,
+                        SamplerState = SamplerState.PointClamp
+                    });
 
                     Main.EntitySpriteDraw(asset.Value, npc.Center - Main.screenPosition, asset.Frame(), Color.White, 0f, asset.Size() / 2f, taggedNPC.Scale * (new Vector2(v, v) / new Vector2(60, 60)) * 1.15f, SpriteEffects.None);
 
@@ -51,7 +57,7 @@ public class GreatGargoyleTagNPC : GlobalNPC
                     eff.Parameters.Color = [
                             Color.Black.ToVector4(),
                     Color.DarkSlateBlue.ToVector4() * new Vector4(0.75f, 0.75f, 0.5f, 1f),
-                    GreatGargoyle.GreenYellow.ToVector4() * new Vector4(0.2f, 0.5f, 0.6f, 1f),
+                    GreatGargoyle.GreenYellow.ToVector4()* new Vector4(0.2f, 0.5f, 0.6f, 1f),
                     GreatGargoyle.GreenYellow.ToVector4()
                         ];
                     eff.Apply();
@@ -66,7 +72,7 @@ public class GreatGargoyleTagNPC : GlobalNPC
             }
         }
 
-        orig(self, behindTiles);
+        orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
     }
 
     public override bool InstancePerEntity => true;

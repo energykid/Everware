@@ -296,6 +296,16 @@ Items: {
 		DisplayName: Whetstone
 		Tooltip: ""
 	}
+
+	DichromaticSkull: {
+		DisplayName: Dichromatic Skull
+		Tooltip:
+			'''
+			Facing left will shoot lingering, defense-reducing water
+			Facing right will shoot a mid-range burst of fire
+			Enemies afflicted with both debuffs will take extra damage
+			'''
+	}
 }
 
 Biomes: {
@@ -338,6 +348,8 @@ Projectiles: {
 	SnapdragonIceSpike.DisplayName: Ice Spike
 	GreatGargoyleHoldout.DisplayName: Great Gargoyle
 	MagmaticExplosion.DisplayName: Magmatic Explosion
+	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
+	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
 }
 
 Buffs: {

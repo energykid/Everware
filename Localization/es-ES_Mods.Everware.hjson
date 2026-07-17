@@ -296,6 +296,15 @@ Items: {
 		// DisplayName: Whetstone
 		// Tooltip: ""
 	}
+
+	DichromaticSkull: {
+		// DisplayName: Dichromatic Skull
+		/* Tooltip:
+			'''
+			Deals a different debuff depending if you're facing left or right
+			Enemies afflicted with both debuffs will combust
+			''' */
+	}
 }
 
 Biomes: {
@@ -338,6 +347,8 @@ Projectiles: {
 	// SnapdragonIceSpike.DisplayName: Ice Spike
 	// GreatGargoyleHoldout.DisplayName: Great Gargoyle
 	// MagmaticExplosion.DisplayName: Magmatic Explosion
+	// DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
+	// DichromaticSkullWater.DisplayName: Dichromatic Skull Water
 }
 
 Buffs: {

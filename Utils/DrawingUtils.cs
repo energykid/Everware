@@ -49,7 +49,7 @@ public static class DrawingUtils
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
-        Main.EntitySpriteDraw(glowTarget.Target, position, fr, Color.White, rotation, origin + new Vector2(padding / 2, padding / 2), scale, eff);
+        Main.EntitySpriteDraw(glowTarget.Target, position, glowTarget.Target.Bounds, Color.White, rotation, origin + new Vector2(padding / 2, padding / 2), scale, eff);
 
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(sb);
