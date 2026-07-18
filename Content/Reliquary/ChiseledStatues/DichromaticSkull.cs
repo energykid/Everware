@@ -124,10 +124,14 @@ public class DichromaticSkull : EverWeaponItem
 
         float sin = (float)Math.Abs(Math.Sin(fr2));
 
+        Color c2 = Color.OrangeRed;
+        if (player.direction < 0) c2 = Color.DeepSkyBlue;
         Color color = Lighting.GetColor((player.Center / 16).ToPoint());
         Rectangle frameRect = asset.Frame(1, 4, 0, fr);
-        Main.EntitySpriteDraw(asset.Value, player.Center + new Vector2(18 * player.direction, -10 + (float)Math.Sin(GlobalTimer.Value / 22f) * 3f) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
-            (float)Math.Sin(GlobalTimer.Value / 25f) * 3f, sin * -player.direction * 2f), frameRect, color, rot, frameRect.Size() / 2f, 1f, SpriteEffects.None);
+        DrawingUtils.DrawGlowWithPadding(asset.Value, AttackOrigin(player) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
+            (float)Math.Sin(GlobalTimer.Value / 25f) * 3f, sin * -player.direction * 2f), frameRect, c2.MultiplyRGBA(new(0.4f, 0.4f, 0.4f, 0.4f)), rot, frameRect.Size() / 2f, Vector2.One, SpriteEffects.None, 0.05f);
+        Main.EntitySpriteDraw(asset.Value, AttackOrigin(player) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
+                (float)Math.Sin(GlobalTimer.Value / 25f) * 3f, sin * -player.direction * 2f), frameRect, color, rot, frameRect.Size() / 2f, 1f, SpriteEffects.None);
     }
     public Vector2 AttackOrigin(Player player)
     {
@@ -162,6 +166,9 @@ public class DichromaticSkull : EverWeaponItem
     public override bool UseCustomDraw => true;
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {
+        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, player.AngleTo(AttackOrigin(player)) + MathHelper.ToRadians(-90f));
+        player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters, player.AngleTo(AttackOrigin(player)) + MathHelper.ToRadians(-90f));
+
         player.direction = (player.GetModPlayer<NetworkPlayer>().MousePosition.X > player.Center.X) ? 1 : -1;
 
         if (player.itemAnimation % (player.itemAnimationMax / 2) == ((player.itemAnimationMax / 2) - 1))
