@@ -153,7 +153,7 @@ public class DichromaticSkull : EverWeaponItem
     public void AttackRight(Player player)
     {
         SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.SkullHA.Asset.WithVolumeScale(0.6f), player.Center);
-        SoundEngine.PlaySound(SoundID.Item34, player.Center);
+        SoundEngine.PlaySound(SoundID.Item116, player.Center);
 
         if (Main.LocalPlayer == player)
             Projectile.NewProjectileDirect(new EntitySource_ItemUse(player, Item, "Dichromatic Skull Attack Right"), AttackOrigin(player),
@@ -184,7 +184,50 @@ public class DichromaticSkull : EverWeaponItem
     }
 }
 
+public class DichromaticDebuffHandler : GlobalNPC
+{
+    public override bool InstancePerEntity => true;
+    public bool Fire = false;
+    public bool Water = false;
+    public override void ResetEffects(NPC npc)
+    {
+        Fire = false; Water = false;
+    }
+    public override void UpdateLifeRegen(NPC npc, ref int damage)
+    {
+        damage = 3;
+        if (Fire) npc.lifeRegen -= 24;
+        if (Fire && Water)
+        { npc.lifeRegen -= 24; damage += 2; }
+    }
+    public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
+    {
+        if (Water)
+            modifiers.ScalingArmorPenetration += 0.05f;
+        if (Water && Fire)
+            modifiers.ScalingArmorPenetration += 0.05f;
+    }
+}
+
 #region Flame Attack
+public class DichromaticFireDebuff : ModBuff
+{
+    public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/DichromaticFireDebuff";
+    public override void Update(NPC npc, ref int buffIndex)
+    {
+        npc.GetGlobalNPC<DichromaticDebuffHandler>().Fire = true;
+
+        DichromaticSkullFlame.FlameLashParticle part = new DichromaticSkullFlame.FlameLashParticle(new Vector2(
+            Main.rand.NextFloat(npc.Left.X, npc.Right.X),
+            Main.rand.NextFloat(npc.Top.Y, npc.Bottom.Y)), new Vector2(0, -3), new Vector2(0.2f, 0.4f));
+
+        if (Main.rand.NextBool(3)) part.Color = Color.Black;
+
+        part.Spawn(DichromaticSkullFlame.FireLayer);
+
+        base.Update(npc, ref buffIndex);
+    }
+}
 public class DichromaticSkullFlame : EverProjectile
 {
     public override void Load()
@@ -324,8 +367,11 @@ public class DichromaticSkullFlame : EverProjectile
     }
     public override void NetOnHitEnemy(NPC npc)
     {
-        base.NetOnHitEnemy(npc);
-        npc.AddBuff(BuffID.OnFire, 60);
+        npc.AddBuff(ModContent.BuffType<DichromaticFireDebuff>(), 240);
+    }
+    public override void OnHitPlayer(Player target, Player.HurtInfo info)
+    {
+        target.AddBuff(ModContent.BuffType<DichromaticFireDebuff>(), 240);
     }
     public override bool? CanHitNPC(NPC target)
     {
@@ -350,8 +396,38 @@ public class DichromaticSkullFlame : EverProjectile
 #endregion
 
 #region Water Attack
+public class DichromaticWaterDebuff : ModBuff
+{
+    public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/DichromaticFireDebuff";
+    public override void Update(NPC npc, ref int buffIndex)
+    {
+        npc.GetGlobalNPC<DichromaticDebuffHandler>().Water = true;
+
+        if (Main.rand.NextBool(10))
+            new DichromaticSkullWater.BubbleWaterDrip(new Vector2(
+                Main.rand.NextFloat(npc.Left.X, npc.Right.X),
+                Main.rand.NextFloat(npc.Top.Y, npc.Bottom.Y) - 20)).Spawn();
+
+        base.Update(npc, ref buffIndex);
+    }
+}
 public class DichromaticSkullWater : EverProjectile
 {
+    public class BubbleWaterDrip : Particle
+    {
+        public override Asset<Texture2D> Texture => Assets.Textures.Reliquary.ChiseledStatues.DichromaticBubbleDrip.Asset;
+        public BubbleWaterDrip(Vector2 pos) : base(pos, Vector2.Zero, Vector2.One, null, null) { }
+        public override void Update()
+        {
+            Scale.X = 1f;
+            Scale.Y = velocity.Y / 2;
+            velocity.Y += 0.1f;
+            if (velocity.Y > 2) Opacity -= 0.05f;
+            if (Opacity < 0) Kill();
+            base.Update();
+        }
+    }
+
     public bool Popped = false;
     public Vector2 Scale = Vector2.One;
     public void DrawBubble()
@@ -388,6 +464,8 @@ public class DichromaticSkullWater : EverProjectile
         Lighting.AddLight(Projectile.Center, Color.Blue.ToVector3() * 0.3f);
 
         Scale = Vector2.Lerp(Scale, Vector2.One, 0.2f);
+
+        if (Main.rand.NextBool(20)) new BubbleWaterDrip(Projectile.Center + new Vector2(Main.rand.NextFloat(-30, 30), Main.rand.NextFloat(-30, 30))).Spawn();
 
         Projectile.ai[1] = MathHelper.Lerp(Projectile.ai[1], 1f, 0.2f);
 
@@ -429,7 +507,11 @@ public class DichromaticSkullWater : EverProjectile
     }
     public override void NetOnHitEnemy(NPC npc)
     {
-        base.NetOnHitEnemy(npc);
+        npc.AddBuff(ModContent.BuffType<DichromaticWaterDebuff>(), 240);
+    }
+    public override void OnHitPlayer(Player target, Player.HurtInfo info)
+    {
+        target.AddBuff(ModContent.BuffType<DichromaticWaterDebuff>(), 240);
     }
     public override bool OnTileCollide(Vector2 oldVelocity)
     {

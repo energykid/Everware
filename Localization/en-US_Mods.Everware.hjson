@@ -301,7 +301,7 @@ Items: {
 		DisplayName: Dichromatic Skull
 		Tooltip:
 			'''
-			Facing left will shoot lingering, defense-reducing water
+			Facing left will shoot lingering, defense-reducing bubbles
 			Facing right will shoot a mid-range burst of fire
 			Enemies afflicted with both debuffs will take extra damage
 			'''
@@ -366,6 +366,16 @@ Buffs: {
 	PowerManaBuff: {
 		DisplayName: Power Magic
 		Description: Your magic attacks have accelerated rapidly
+	}
+
+	DichromaticFireDebuff: {
+		DisplayName: Dichromatic Fire Debuff
+		Description: Mods.Everware.Buffs.DichromaticFireDebuff.Description
+	}
+
+	DichromaticWaterDebuff: {
+		DisplayName: Dichromatic Water Debuff
+		Description: Mods.Everware.Buffs.DichromaticWaterDebuff.Description
 	}
 }
 
