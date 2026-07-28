@@ -9,6 +9,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
 
+#region Item
 public class DichromaticSkull : EverWeaponItem
 {
     public class SkullEmoteParticle : Particle
@@ -128,9 +129,9 @@ public class DichromaticSkull : EverWeaponItem
         if (player.direction < 0) c2 = Color.DeepSkyBlue;
         Color color = Lighting.GetColor((player.Center / 16).ToPoint());
         Rectangle frameRect = asset.Frame(1, 4, 0, fr);
-        DrawingUtils.DrawGlowWithPadding(asset.Value, AttackOrigin(player) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
+        DrawingUtils.DrawGlowWithPadding(asset.Value, AttackVisualOrigin(player) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
             (float)Math.Sin(GlobalTimer.Value / 25f) * 3f, sin * -player.direction * 2f), frameRect, c2.MultiplyRGBA(new(0.4f, 0.4f, 0.4f, 0.4f)), rot, frameRect.Size() / 2f, Vector2.One, SpriteEffects.None, 0.05f);
-        Main.EntitySpriteDraw(asset.Value, AttackOrigin(player) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
+        Main.EntitySpriteDraw(asset.Value, AttackVisualOrigin(player) + new Vector2(0f, player.gfxOffY) - Main.screenPosition + new Vector2(
                 (float)Math.Sin(GlobalTimer.Value / 25f) * 3f, sin * -player.direction * 2f), frameRect, color, rot, frameRect.Size() / 2f, 1f, SpriteEffects.None);
     }
     public Vector2 AttackOrigin(Player player)
@@ -138,6 +139,11 @@ public class DichromaticSkull : EverWeaponItem
         Vector2 v = player.Center + new Vector2(18 * player.direction, -10 + (float)Math.Sin(GlobalTimer.Value / 22f) * 3f) + new Vector2(10, 0).RotatedBy(player.AngleTo(player.NetworkHandler().MousePosition));
         if (Collision.CanHitLine(player.Center, 1, 1, v, 1, 1)) return v;
         return player.Center;
+    }
+    public Vector2 AttackVisualOrigin(Player player)
+    {
+        Vector2 v = player.Center + new Vector2(18 * player.direction, -10 + (float)Math.Sin(GlobalTimer.Value / 22f) * 3f) + new Vector2(10, 0).RotatedBy(player.AngleTo(player.NetworkHandler().MousePosition));
+        return v;
     }
     public void AttackLeft(Player player)
     {
@@ -166,8 +172,8 @@ public class DichromaticSkull : EverWeaponItem
     public override bool UseCustomDraw => true;
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {
-        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, player.AngleTo(AttackOrigin(player)) + MathHelper.ToRadians(-90f));
-        player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters, player.AngleTo(AttackOrigin(player)) + MathHelper.ToRadians(-90f));
+        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, player.AngleTo(AttackVisualOrigin(player)) + MathHelper.ToRadians(-90f));
+        player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters, player.AngleTo(AttackVisualOrigin(player)) + MathHelper.ToRadians(-90f));
 
         player.direction = (player.GetModPlayer<NetworkPlayer>().MousePosition.X > player.Center.X) ? 1 : -1;
 
@@ -176,21 +182,23 @@ public class DichromaticSkull : EverWeaponItem
             if (player.direction == 1)
             {
                 AttackRight(player);
-                new SkullEmoteParticle(AttackOrigin(player), player.whoAmI, player.direction).Spawn();
+                new SkullEmoteParticle(AttackVisualOrigin(player), player.whoAmI, player.direction).Spawn();
             }
             else
             {
                 AttackLeft(player);
-                new SkullEmoteParticle(AttackOrigin(player), player.whoAmI, player.direction).Spawn();
-                new SkullEmoteParticle(AttackOrigin(player), player.whoAmI, player.direction).Spawn();
-                new SkullEmoteParticle(AttackOrigin(player), player.whoAmI, player.direction).Spawn();
+                new SkullEmoteParticle(AttackVisualOrigin(player), player.whoAmI, player.direction).Spawn();
+                new SkullEmoteParticle(AttackVisualOrigin(player), player.whoAmI, player.direction).Spawn();
+                new SkullEmoteParticle(AttackVisualOrigin(player), player.whoAmI, player.direction).Spawn();
             }
         }
 
         base.UseStyle(player, heldItemFrame);
     }
 }
+#endregion
 
+#region Debuff Handler
 public class DichromaticDebuffHandler : GlobalNPC
 {
     public override bool InstancePerEntity => true;
@@ -215,6 +223,7 @@ public class DichromaticDebuffHandler : GlobalNPC
             modifiers.ScalingArmorPenetration += 0.05f;
     }
 }
+#endregion
 
 #region Flame Attack
 public class DichromaticFireDebuff : ModBuff
