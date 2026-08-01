@@ -5,6 +5,7 @@ using Everware.Content.Base.Items;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Core.Projectiles;
 using Everware.Utils;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
@@ -311,7 +312,8 @@ public class DichromaticSkullFlame : EverProjectile
     private void UpdateFireLayer(On_Main.orig_Update orig, Main self, GameTime gameTime)
     {
         orig(self, gameTime);
-        FireLayer.Update();
+        if (FireLayer != null)
+            FireLayer.Update();
     }
 
     public static readonly ParticleLayer FireLayer = new(0.5f);
@@ -375,7 +377,8 @@ public class DichromaticSkullFlame : EverProjectile
         Projectile.DamageType = DamageClass.Magic;
         Projectile.penetrate = -1;
         Projectile.timeLeft = 40;
-        Projectile.width = Projectile.height = 170;
+        Projectile.width = Projectile.height = 80;
+        Projectile.netUpdate = true;
     }
     public bool CanHit(Vector2 vec)
     {
@@ -397,15 +400,24 @@ public class DichromaticSkullFlame : EverProjectile
     {
         return base.CanHitPvp(target);
     }
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(Projectile.rotation);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Projectile.rotation = reader.ReadSingle();
+    }
     public override void AI()
     {
         if (Projectile.timeLeft < 20) Projectile.velocity *= 0.8f;
         base.AI();
-        Projectile.ai[0]++;
-        if (Projectile.ai[0] < 10)
+        if (Projectile.ai[0] <= 10 && Projectile.ai[0] != 0)
         {
-            new FlameLashParticle(Projectile.Center, new Vector2(Main.rand.NextFloat(2f, 10f), Main.rand.NextFloat(-1f, 1f)).RotatedBy(Projectile.rotation) * Main.rand.NextFloat(1.6f, 2f), new Vector2(Main.rand.NextFloat(0.4f, 1f), Main.rand.NextFloat(0.4f, 1f))).Spawn(FireLayer);
+            new FlameLashParticle(Projectile.Center,
+                new Vector2(Main.rand.NextFloat(2f, 10f), Main.rand.NextFloat(-1f, 1f)).RotatedBy(Projectile.rotation) * Main.rand.NextFloat(1.6f, 2f), new Vector2(Main.rand.NextFloat(0.4f, 1f), Main.rand.NextFloat(0.4f, 1f))).Spawn(FireLayer);
         }
+        Projectile.ai[0]++;
         if (Projectile.ai[0] > 56) Projectile.Kill();
     }
 }

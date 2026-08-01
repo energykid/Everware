@@ -11,7 +11,8 @@ public abstract class BaseParticleLayer
     {
         for (int i = 0; i < AllParticles.Count; i++)
         {
-            AllParticles[i].Draw();
+            if (AllParticles[i] != null)
+                AllParticles[i].Draw();
         }
     }
 
@@ -19,7 +20,8 @@ public abstract class BaseParticleLayer
     {
         for (int i = 0; i < AllParticles.Count; i++)
         {
-            AllParticles[i].Update();
+            if (AllParticles[i] != null)
+                AllParticles[i].Update();
         }
     }
 }

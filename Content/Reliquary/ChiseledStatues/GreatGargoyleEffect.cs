@@ -4,17 +4,18 @@ public class GreatGargoyleTagNPC : GlobalNPC
 {
     public override void Load()
     {
-        On_Main.DrawTiles += On_Main_DrawTiles;
+        On_Main.DrawNPCs += On_Main_DrawNPCs;
     }
-
     public override void Unload()
     {
-        On_Main.DrawTiles -= On_Main_DrawTiles;
+        On_Main.DrawNPCs -= On_Main_DrawNPCs;
     }
 
-    private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
+    private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
     {
-        if (!solidLayer)
+        orig(self, behindTiles);
+
+        if (behindTiles)
         {
             foreach (NPC npc in Main.ActiveNPCs)
             {
@@ -71,8 +72,6 @@ public class GreatGargoyleTagNPC : GlobalNPC
                 }
             }
         }
-
-        orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
     }
 
     public override bool InstancePerEntity => true;

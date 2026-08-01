@@ -205,12 +205,12 @@ public class HotShotHoldout : EverHoldoutProjectile
             {
                 Vector2 v = new Vector2(20, 0).RotatedBy(Rotation);
                 if (Collision.CanHitLine(Owner.Center, 2, 2, Owner.Center + v, 2, 2)) v = Vector2.Zero;
-                Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot fire"), Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
+                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot fire"), Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
             }
             if (GetChargeAmount() <= 2)
             {
                 ScreenEffects.AddScreenShake(Owner.Center, 5f, 0.5f);
-                Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
             }
             else
             {
@@ -219,7 +219,7 @@ public class HotShotHoldout : EverHoldoutProjectile
                 vel *= new Vector2(0.5f, 0.75f);
                 Owner.velocity += vel;
                 NetMessage.SendData(MessageID.PlayerControls, number: Owner.whoAmI);
-                Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
             }
 
             Lighting.AddLight(Projectile.Center, 0.6f, 0.4f, 0.1f);

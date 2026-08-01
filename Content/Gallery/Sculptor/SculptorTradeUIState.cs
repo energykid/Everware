@@ -66,6 +66,7 @@ public class SculptorTradeUIState : UIState
         MaterialSlot.HAlign = 1f;
         MaterialSlot.VAlign = 1f;
         MaterialSlot.Scale = 0.75f;
+        MaterialSlot.MaterialSlot = true;
 
         Append(BigPanel);
         BigPanel.Append(StatueSlot);
@@ -90,6 +91,19 @@ public class SculptorTradeUIState : UIState
                 {
                     foreach (Chiselable ch in ChiselablesList.AllChiselables)
                     {
+                        if (StatueSlot._itemArray[0].type == ch.BaseStatue
+                                && MaterialSlot._itemArray[0].type != ch.UpgradeMaterial)
+                        {
+                            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NoMaterial.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                        }
+
+                        if (StatueSlot._itemArray[0].type == ch.BaseStatue
+                                && MaterialSlot._itemArray[0].type == ch.UpgradeMaterial
+                                && MaterialSlot._itemArray[0].stack < ch.UpgradeStack)
+                        {
+                            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NotEnoughMaterial.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                        }
+
                         if (StatueSlot._itemArray[0].type == ch.BaseStatue
                             && MaterialSlot._itemArray[0].type == ch.UpgradeMaterial
                             && MaterialSlot._itemArray[0].stack >= ch.UpgradeStack)
@@ -190,6 +204,8 @@ public class SculptorTradeUIState : UIState
 public class SculptorStatueSlot : UIElement
 {
     public float Scale = 1f;
+
+    public bool MaterialSlot = false;
 
     public Item[] _itemArray = new Item[1] {
         new Item(ItemID.None)
@@ -334,6 +350,26 @@ public class SculptorStatueSlot : UIElement
         Vector2 position = GetDimensions().Center();
         Asset<Texture2D> tex = Assets.Textures.Gallery.Sculptor.SculptorStatueSlot.Asset;
         Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, Scale, SpriteEffects.None);
+        if (MaterialSlot)
+        {
+            Item it = ReliquaryUISystem.TradeState.StatueSlot._itemArray[0];
+            if (it != null && it.type != ItemID.None)
+            {
+                Chiselable? ch = ChiselablesList.AllChiselables.Find(a =>
+                {
+                    return a.BaseStatue.Equals(it.type);
+                });
+
+                if (ch != null)
+                {
+                    Main.instance.DrawItem_GetBasics(new Item(ch.UpgradeMaterial), 0, out Texture2D tx, out Rectangle fr, out Rectangle gmFr);
+                    float sc2 = 1f - ((float)Math.Clamp((fr.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
+
+                    Main.EntitySpriteDraw(tx, position, fr, Color.White.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.2f)), 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
+                }
+            }
+        }
+
         if (inv2 != null && inv != null && inv.type != ItemID.None)
         {
             var chiselTarget = ScreenspaceTargetPool.Shared.Rent(
@@ -352,6 +388,8 @@ public class SculptorStatueSlot : UIElement
                 {
                     Main.spriteBatch.Begin(sb);
                     Main.EntitySpriteDraw(tx, position, fr, Color.White, 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
+
+                    // draw text here idk
                 }
                 else
                 {

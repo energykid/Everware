@@ -15,6 +15,7 @@ public class PlayerDataPacket : EverPacket
         int animTime = reader.ReadInt32();
         int altFunc = reader.ReadInt32();
         bool rightClicking = reader.ReadBoolean();
+        float meter = reader.ReadSingle();
 
         plr = Main.player[whoAmI];
 
@@ -25,6 +26,7 @@ public class PlayerDataPacket : EverPacket
         nPlr.AnimationTime = animTime;
         nPlr.AltFunction = altFunc;
         nPlr.RightClicking = rightClicking;
+        nPlr.Meter = meter;
 
         if (Main.netMode == NetmodeID.Server)
         {
@@ -44,6 +46,7 @@ public class PlayerDataPacket : EverPacket
             packet.Write(nPlr.AnimationTime);
             packet.Write(nPlr.AltFunction);
             packet.Write(nPlr.RightClicking);
+            packet.Write(nPlr.Meter);
         }
     }
 }

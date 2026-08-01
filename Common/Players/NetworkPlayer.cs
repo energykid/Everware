@@ -1,5 +1,6 @@
 ﻿using Everware.Common.Packets;
 using Everware.Core.Projectiles;
+using Everware.Utils;
 using Terraria.ID;
 
 namespace Everware.Common.Players;
@@ -26,6 +27,7 @@ public class NetworkPlayer : ModPlayer
     public bool MouseDown = false;
     public bool RightClicking = false;
     public int AltFunction = 0;
+    public float Meter = 0f;
 
     public int AnimationTime = 0;
 
@@ -45,6 +47,8 @@ public class NetworkPlayer : ModPlayer
                 MouseDown = Player.controlUseItem;
                 AnimationTime = Player.itemAnimationMax;
                 RightClicking = Player.controlUseTile;
+                if (Player.GetEverWeaponItem() != null)
+                    Meter = Player.GetEverWeaponItem().MeterFill;
             }
             if (Main.netMode != NetmodeID.SinglePlayer)
             {

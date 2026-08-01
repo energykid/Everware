@@ -5,6 +5,7 @@ using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
@@ -74,13 +75,23 @@ public class GreatGargoyle : EverWeaponItem
 
     public override bool AltFunctionUse(Player player)
     {
-        return player.GetEverWeaponItem().IsMeterFull();
+        if (player != Main.LocalPlayer) return true;
+        return player.NetworkHandler().Meter >= 1f;
     }
 }
 
 public class GreatGargoyleHoldout : EverHoldoutProjectile
 {
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/GreatGargoyle";
+
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(Scare);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Scare = reader.ReadBoolean();
+    }
 
     public override void SetDefaults()
     {
@@ -122,7 +133,14 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
             Lighting.AddLight(Projectile.Center, new Vector3(0.2f, 0.9f, 0.4f) * Glow);
         }
 
-        if (!Started) Scare = ShouldRunScare;
+        if (!Started)
+        {
+            Scare = ShouldRunScare;
+            if (Owner == Main.LocalPlayer)
+            {
+                Projectile.netUpdate = true;
+            }
+        }
 
         float speed = Owner.GetAttackSpeed(DamageClass.Melee);
         if (!Scare)
@@ -246,7 +264,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
                         {
                             if (Timer.ValueAt(44, speed))
                             {
-                                if (!npc.GetGlobalNPC<GreatGargoyleTagNPC>().Tagged)
+                                if (!npc.GetGlobalNPC<GreatGargoyleTagNPC>().Tagged && npc.type != NPCID.TargetDummy)
                                     npc.GetGlobalNPC<GreatGargoyleTagNPC>().Tag(npc, 10);
                             }
                             npc.StrikeNPC(GreatGargoyle.SummonDamage + Main.rand.Next(-10, 10), 0f, 0);

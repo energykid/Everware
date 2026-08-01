@@ -31,12 +31,14 @@ public abstract class EverWeaponItem : EverItem
 
     public virtual void ChargeMeter(float amt)
     {
+        Item.NetStateChanged();
         ChargeMeters.LocalChargeMeterAnim = 1f;
         MeterFill = MathHelper.Clamp(MeterFill + amt, 0f, 1f);
         ChargeMeters.LocalChargeMeterVisibility = 3f;
     }
     public virtual void SetMeter(float amt)
     {
+        Item.NetStateChanged();
         MeterFill = MathHelper.Clamp(amt, 0f, 1f);
         ChargeMeters.LocalChargeMeterVisibility = 3f;
     }
