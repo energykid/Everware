@@ -1,5 +1,5 @@
 ﻿using Everware.Content.Base.Items;
-using Everware.Content.Kiln;
+using Everware.Content.Quarry;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -9,7 +9,7 @@ public class TestItem : EverItem
     public override string Texture => "Everware/Assets/Textures/Misc/TestItem";
     public override bool IsLoadingEnabled(Mod mod)
     {
-        return false;
+        return true;
     }
     public override void SetDefaults()
     {
@@ -17,12 +17,31 @@ public class TestItem : EverItem
         Item.useStyle = ItemUseStyleID.HoldUp;
         Item.useTime = Item.useAnimation = 20;
     }
+    public override bool AltFunctionUse(Player player)
+    {
+        return false;
+    }
     public override bool? UseItem(Player player)
     {
         if (player.ItemAnimationJustStarted)
         {
-            SoundEngine.PlaySound(SoundID.Grass);
-            KilnGenerator.GenerateKiln(KilnOrQuarryGeneration.GetPointFrom((Main.MouseWorld / 16).ToPoint(), 0, 100));
+            QuarryGenerator.GenerateQuarry(KilnOrQuarryGeneration.GetPointFrom(new Point(Main.spawnTileX, Main.spawnTileY)));
+
+            /*
+            if (player.altFunctionUse != 2)
+            {
+                NPC? npc = null;
+                if (NPC.CountNPCS(ModContent.NPCType<SculptorNPC>()) != 0) npc = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<SculptorNPC>())];
+                ReliquaryUISystem.OpenTrade(npc);
+                ReliquaryUISystem.TradeState.SetDialogue("Hey guys, it's me, the Sculptor! Thanks for watching my videeo's.");
+                ReliquaryUISystem.ReliquaryOpenedFromInventory = true;
+            }
+            else
+            {
+                ReliquaryUISystem.OpenUI();
+                ReliquaryUISystem.ReliquaryOpenedFromInventory = true;
+            }
+            */
         }
 
         return base.UseItem(player);

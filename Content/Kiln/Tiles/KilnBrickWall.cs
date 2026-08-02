@@ -6,11 +6,14 @@ namespace Everware.Content.Kiln.Tiles;
 public class KilnBrickWall : EverPlaceableItem
 {
     public override string Texture => "Everware/Assets/Textures/Kiln/KilnBrickWall";
+    public override int PlacementID => ModContent.WallType<KilnBrickWallPlaced>();
+    public override bool Wall => true;
+
     public override void SetDefaults()
     {
-        Item.DefaultToPlaceableWall(ModContent.WallType<KilnBrickWallPlaced>());
+        base.SetDefaults();
+        Item.value = Sell.Copper(10);
     }
-
     public override void AddRecipes()
     {
         Recipe recipe1 = CreateRecipe(4);

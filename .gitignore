@@ -5,3 +5,4 @@
 *.cache
 /Daybreak.dll
 /Daybreak.pdb
+.tml-build/TML.targets

@@ -9,6 +9,7 @@ public class RebarRod : EverPlaceableItem
     public override void SetDefaults()
     {
         Item.DefaultToPlaceableWall(ModContent.WallType<RebarRodPlaced>());
+        Item.value = Sell.Silver(1);
     }
 
     public override void AddRecipes()

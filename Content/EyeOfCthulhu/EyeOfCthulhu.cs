@@ -1,12 +1,9 @@
 ﻿using Everware.Common.Systems;
+using Everware.Config;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
@@ -69,7 +66,7 @@ public class EyeOfCthulhu : GlobalNPC
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        return ReworkEnabled && entity.type == NPCID.EyeofCthulhu;
+        return StyleSettings.EoCEnabled && entity.type == NPCID.EyeofCthulhu;
     }
     public override bool CanHitPlayer(NPC npc, Player target, ref int cooldownSlot)
     {
@@ -227,10 +224,13 @@ public class EyeOfCthulhu : GlobalNPC
 
                     int Time = 14;
 
-                    if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                    if (!Main.dedServ)
                     {
-                        calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), "");
-                        Time = 20;
+                        if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
+                        {
+                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.MusicText.MusicianENNWAY.GetTextValue(), Mods.Everware.MusicText.MusicHemolacriac.GetTextValue());
+                            Time = 20;
+                        }
                     }
 
                     if (TendrilsOut <= 3)
@@ -833,16 +833,17 @@ public class EyeOfCthulhu : GlobalNPC
 
                 if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
                 {
-                    bool spawn = true;
+                    bool NotSalt = true;
+
                     if (ModLoader.TryGetMod("SpiritReforged", out Mod spiritReforged))
                     {
                         var a = spiritReforged.Find<ModTile>("SaltBlockReflective");
                         if (t.TileType == a.Type)
                         {
-                            spawn = false;
+                            NotSalt = false;
                         }
                     }
-                    if (spawn)
+                    if (NotSalt)
                     {
                         StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
                         {

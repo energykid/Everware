@@ -1,10 +1,6 @@
 ﻿using Everware.Common.Players;
 using Everware.Content.Base.Items;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-using Terraria.DataStructures;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 
@@ -24,12 +20,22 @@ class UnwieldyStaffLootPool : GlobalNPC
 
 class UnwieldyStaff : EverWeaponItem
 {
+    public override int HitCount => 3;
     public override string Texture => "Everware/Assets/Textures/MiscWeapons/UnwieldyStaff";
     public override bool UseCustomDraw => true;
     float angle = 0f;
     float rotation = 0f;
     Vector2 flare = Vector2.Zero;
     float shake = 0f;
+    public override void SetDefaults()
+    {
+        Item.noMelee = true;
+        Item.noUseGraphic = true;
+        Item.DefaultToBasicWeapon(32, 120, DamageClass.Magic);
+        Item.rare = ItemRarityID.Green;
+        Item.mana = 10;
+        Item.value = Sell.Silver(30);
+    }
     public void ProcessAngle(Player player)
     {
         player.direction = (int)Math.Sign(player.GetModPlayer<NetworkPlayer>().MousePosition.X - player.Center.X);
@@ -95,13 +101,5 @@ class UnwieldyStaff : EverWeaponItem
         }
 
         Lighting.AddLight(player.Center, new Vector3(0.6f, 0.4f, 0.75f) * flare.Y);
-    }
-    public override void SetDefaults()
-    {
-        Item.noMelee = true;
-        Item.noUseGraphic = true;
-        Item.DefaultToBasicWeapon(32, 120, DamageClass.Magic);
-        Item.rare = ItemRarityID.Green;
-        Item.mana = 10;
     }
 }

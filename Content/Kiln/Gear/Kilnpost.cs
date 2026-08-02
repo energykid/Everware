@@ -5,12 +5,8 @@ using Everware.Content.Kiln.Tiles;
 using Everware.Content.Kiln.Visual;
 using Everware.Core.Projectiles;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 
@@ -27,6 +23,7 @@ public class Kilnpost : EverWeaponItem
         base.SetDefaults();
         Item.DefaultToBasicWeapon(8, 40, DamageClass.Melee);
         Item.knockBack = 1f;
+        Item.value = Sell.Silver(50);
     }
     public override void AddRecipes()
     {
@@ -90,10 +87,17 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public override void AI()
     {
+        if (!NetworkOwner.MouseDown) HasMouseBeenReleased = true;
+
         Timer++;
         TwoHanded = false;
-        if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1 && Main.myPlayer == Projectile.owner)
+        if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1)
         {
+            if (Main.myPlayer == Projectile.owner)
+            {
+
+            }
+
             Projectile.ai[1] = 0f;
             Projectile.ai[2] = 70f;
             Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
@@ -162,13 +166,13 @@ public class KilnpostHoldout : EverHoldoutProjectile
 
         Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Misc("Breakaway Spear"), npc.Center, Vector2.Zero, ModContent.ProjectileType<KilnpostBreakaway>(), 0, 0f, Projectile.owner, npcWhoAmI);
         proj.rotation = Projectile.rotation;
-        (proj.ModProjectile as KilnpostBreakaway).Pos = (Projectile.Center - npc.Center) / 1.2f;
+        ((KilnpostBreakaway)proj.ModProjectile).Pos = (Projectile.Center - npc.Center) / 1.2f;
     }
     public void BreakOffSpear()
     {
+        Persist = true;
         if (CollidingRightNow())
         {
-            Persist = true;
             if (Projectile.ai[0] < -10)
             {
                 SpawnBreakawaySpearIn(LastHitNPC);
@@ -192,6 +196,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public void BreakawayMotion()
     {
+        AnimActive = true;
         AutoDirection = false;
 
         Projectile.damage = 0;
@@ -275,6 +280,21 @@ public class KilnpostBreakaway : EverProjectile
     public Vector2 Pos = Vector2.Zero;
     float Shake = 3f;
     float Out = 3f;
+
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.WriteVector2(Pos);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Pos = reader.ReadVector2();
+    }
+
+    public override void OnSpawn(IEntitySource source)
+    {
+        base.OnSpawn(source);
+        Projectile.netUpdate = true;
+    }
 
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {

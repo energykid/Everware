@@ -1,3 +1,5 @@
+#include "../Utilities.fxh"
+
 sampler uImage0 : register(s0);
 sampler uImage1 : register(s1);
 float4 LightingColor;
@@ -16,15 +18,6 @@ sampler2D PupilGradientSampler = sampler_state
     Mipfilter = POINT;
 };
 
-float SkewLerp(float time, float start, float end, float pointA, float pointB, float defaultValue)
-{
-    if (time >= start && time <= end)
-    {
-        return lerp(pointA, pointB, (time - start) / (end - start));
-    }
-    return defaultValue;
-}
-
 float4 PupilEffect(float2 coords : TEXCOORD0) : COLOR0
 {
     float4 col = tex2D(uImage0, coords);
@@ -32,9 +25,9 @@ float4 PupilEffect(float2 coords : TEXCOORD0) : COLOR0
     {
         float baseValue = col.r;
     
-        float value = SkewLerp(baseValue, 0.0, 0.33, 0, IrisThreshold, baseValue);
-        value = SkewLerp(baseValue, 0.33, 0.66, IrisThreshold, PupilThreshold, value);
-        value = SkewLerp(baseValue, 0.66, 1.0, PupilThreshold, 1.0, value);
+        float value = skewLerp(baseValue, 0.0, 0.33, 0, IrisThreshold, baseValue);
+        value = skewLerp(baseValue, 0.33, 0.66, IrisThreshold, PupilThreshold, value);
+        value = skewLerp(baseValue, 0.66, 1.0, PupilThreshold, 1.0, value);
 
         float4 extraCol = tex2D(PupilGradientSampler, float2(value, 0));
         

@@ -9,15 +9,23 @@ public abstract class EverItem : ModItem
 
     public virtual int Rarity => ItemRarityID.White;
 
+    public static Asset<Texture2D> Asset = null;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.rare = Rarity;
+        if (Asset != null)
+        {
+            Item.height = Asset.Width();
+            Item.width = Asset.Height();
+        }
     }
 
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
+        Asset = ModContent.Request<Texture2D>(Texture);
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = DuplicationAmount;
     }
 }

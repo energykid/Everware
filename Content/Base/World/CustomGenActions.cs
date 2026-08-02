@@ -107,7 +107,7 @@ public class CustomGenActions
 
         public override bool Apply(Point origin, int x, int y, params object[] args)
         {
-            if (Main.rand.NextBool(10))
+            if (Main.rand.NextBool(16) && origin.Y > UndergroundHouseEdits.DeepCaveLayer)
                 WorldGen.PlaceTile(x, y, ModContent.TileType<BookOfBouldersTile>(), true);
             else
                 WorldGen.PlaceTile(x, y, ModContent.TileType<CaveBook>(), true);

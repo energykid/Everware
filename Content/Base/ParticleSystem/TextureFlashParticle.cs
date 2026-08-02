@@ -1,7 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-
-namespace Everware.Content.Base.ParticleSystem;
+﻿namespace Everware.Content.Base.ParticleSystem;
 
 public class TextureFlashParticle : Particle
 {
