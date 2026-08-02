@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using MonoMod.Cil;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 
@@ -24,71 +23,11 @@ public sealed class TileCluster : EverProjectile
         On_NPC.SpawnOnPlayer += SpawnOnPlayer_DisableFauxFraming;
 
         On_WorldGen.SpawnFallingBlockProjectile += SpawnFallingBlockProjectile_DisableFauxFraming;
-
-        IL_WorldGen.Check4x2 += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckOasisPlant += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckSuper += RecursiveTileFramePrevention;
-        IL_WorldGen.Check2x2 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check3x1 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check3x2 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check3x4 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check5x4 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check6x3 += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckCannon += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckMB += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckTrapDoor += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckTallGate += RecursiveTileFramePrevention;
-        IL_WorldGen.Check2x2Style += RecursiveTileFramePrevention;
-        IL_WorldGen.CheckChand += RecursiveTileFramePrevention;
-        IL_WorldGen.Check3x3 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check2x5 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check3x5 += RecursiveTileFramePrevention;
-        IL_WorldGen.Check3x6 += RecursiveTileFramePrevention;
-
-        On_WorldGen.CheckPot += (orig, i, j, type) => { if (skipKillTile) { return; } orig(i, j, type); };
-        On_WorldGen.Check3x3 += (orig, i, j, type) => { if (skipKillTile) { return; } orig(i, j, type); };
-        On_WorldGen.CheckCatTail += (orig, x, j) => { if (skipKillTile) { return; } orig(x, j); };
-        On_WorldGen.CheckLilyPad += (orig, i, i1) => { if (skipKillTile) { return; } orig(i, i1); };
-        On_WorldGen.CheckPile += (orig, i, y) => { if (skipKillTile) { return; } orig(i, y); };
-        On_WorldGen.CheckUnderwaterPlant += (orig, type, x, y) => { if (skipKillTile) { return; } orig(type, x, y); };
-        On_WorldGen.CheckBamboo += (orig, x, y) => { if (skipKillTile) { return; } orig(x, y); };
-    }
-
-    private static void RecursiveTileFramePrevention(ILContext il)
-    {
-        var c = new ILCursor(il);
-
-        while (c.TryGotoNext(
-                   MoveType.Before,
-                   i => i.MatchCall<WorldGen>(nameof(WorldGen.TileFrame))
-               ))
-        {
-            c.GotoPrev(
-                MoveType.After,
-                i => i.MatchBr(out _)
-            );
-
-            var endTarget = c.DefineLabel();
-
-            c.MoveAfterLabels();
-
-            c.EmitDelegate(
-                static () => skipKillTile
-            );
-            c.EmitBrtrue(endTarget);
-
-            c.GotoNext(
-                MoveType.After,
-                i => i.MatchCall<WorldGen>(nameof(WorldGen.TileFrame))
-            );
-
-            c.MarkLabel(endTarget);
-        }
     }
 
     private static bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)
     {
-        if (skipKillTile)
+        if (tileFrameCosmeticOnly)
         {
             return false;
         }
@@ -98,7 +37,7 @@ public sealed class TileCluster : EverProjectile
 
     private static void SpawnOnPlayer_DisableFauxFraming(On_NPC.orig_SpawnOnPlayer orig, int plr, int type)
     {
-        if (skipKillTile)
+        if (tileFrameCosmeticOnly)
         {
             return;
         }
@@ -108,7 +47,7 @@ public sealed class TileCluster : EverProjectile
 
     private static void KillTile_DisableFauxFraming(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
     {
-        if (skipKillTile)
+        if (tileFrameCosmeticOnly)
         {
             return;
         }
@@ -118,7 +57,7 @@ public sealed class TileCluster : EverProjectile
 
     private static int NewItem_Inner_DisableFauxFraming(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item itemToClone, int type, int stack, bool noBroadcast, int prefix, bool noGrabDelay, bool reverseLookup)
     {
-        if (skipKillTile)
+        if (tileFrameCosmeticOnly)
         {
             return -1;
         }
@@ -126,7 +65,26 @@ public sealed class TileCluster : EverProjectile
         return orig(source, x, y, width, height, itemToClone, type, stack, noBroadcast, prefix, noGrabDelay, reverseLookup);
     }
 
-    private static bool skipKillTile;
+    private static bool tileFrameCosmeticOnly;
+
+    private static int recursionCount;
+
+    [GlobalTileHooks.TileFrame]
+    private static bool TileFrame(int i, int j, int type, ref bool resetFrame, ref bool noBreak)
+    {
+        if (tileFrameCosmeticOnly)
+        {
+            if (recursionCount > 10)
+            {
+                noBreak = true;
+                return false;
+            }
+
+            recursionCount++;
+        }
+
+        return true;
+    }
 #endregion
 
     private record struct ClusterTileData(bool HasTile, int CoordinateWidth, int CoordinateHeight, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
@@ -182,14 +140,15 @@ public sealed class TileCluster : EverProjectile
             // Clear the edges around the cluster to have tiles inside frame nicely
             ClearEdges();
 
-            skipKillTile = true;
+            tileFrameCosmeticOnly = true;
             for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
             for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
             {
                 // TODO: 1.4.5 Move to TileFrameCosmetic
+                recursionCount = 0;
                 WorldGen.TileFrame(i, j, noBreak: true);
             }
-            skipKillTile = false;
+            tileFrameCosmeticOnly = false;
 
             var tileRenderer = Main.instance.TilesRenderer;
 
