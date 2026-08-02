@@ -449,20 +449,26 @@ NPCs: {
 
 			AngelStatue: {
 				One: Who even made this thing?
-				Two: I can be crass on occasion, but do you take me for a barbarian?
+				Two: I can be crass, but do you take me for a barbarian?
 				Three: Who do you think I am, a pastor?
 			}
 
 			NoMaterial: {
-				One: I've got an idea here, but I'm gonna need some more supplies.
-				Two: Ah! This statue will do nicely, if only we had an extra touch!
-				Three: This is great, but you know I don't like working in one color!
+				One: I've got an idea, but I'm gonna need some supplies.
+				Two: This will do nicely, if only we had an extra touch!
+				Three: You know I don't like working in one color!
+			}
+
+			WrongMaterial: {
+				One: No, no, that's not what I asked for.
+				Two: You've brought me the wrong supplies!
+				Three: What is this thing you've brought me?
 			}
 
 			NotEnoughMaterial: {
-				One: Ah, this is great, but I'm gonna need a little more of this material.
-				Two: So sorry, but I'd like to be sure I won't run out of my supplies before I'm done.
-				Three: This is a wonderful palette, but I'd like to have some more of our secondary color.
+				One: I'm gonna need a little more of this material.
+				Two: I'd like to be sure I won't run out of supplies before I'm done.
+				Three: Hmm, I'd like to have some more of our secondary color.
 			}
 
 			SculptAnimation: {

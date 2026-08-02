@@ -39,7 +39,7 @@ public class SculptorTradeUIState : UIState
 
         DialogueText.Left.Set(0, 0f);
         DialogueText.Top.Set(0, 0f);
-        DialogueText.Width.Set(300, 0f);
+        DialogueText.Width.Set(250, 0f);
         DialogueText.Height.Set(100, 0f);
         DialogueText.SetTextMaxLength(100);
         DialogueText.ShowInputTicker = false;
@@ -91,12 +91,21 @@ public class SculptorTradeUIState : UIState
                 {
                     foreach (Chiselable ch in ChiselablesList.AllChiselables)
                     {
+                        // if statue is correct, but material is not
                         if (StatueSlot._itemArray[0].type == ch.BaseStatue
                                 && MaterialSlot._itemArray[0].type != ch.UpgradeMaterial)
+                        {
+                            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.WrongMaterial.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                        }
+
+                        // if statue is correct, but there is no material
+                        if (StatueSlot._itemArray[0].type == ch.BaseStatue
+                                && MaterialSlot._itemArray[0].type == ItemID.None)
                         {
                             SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NoMaterial.GetChildText(key[Main.rand.Next(key.Count)]).Value);
                         }
 
+                        // if statue is correct, but there is not enough of the correct material
                         if (StatueSlot._itemArray[0].type == ch.BaseStatue
                                 && MaterialSlot._itemArray[0].type == ch.UpgradeMaterial
                                 && MaterialSlot._itemArray[0].stack < ch.UpgradeStack)
@@ -104,6 +113,7 @@ public class SculptorTradeUIState : UIState
                             SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NotEnoughMaterial.GetChildText(key[Main.rand.Next(key.Count)]).Value);
                         }
 
+                        // if everything is correct and the sculpt is ready
                         if (StatueSlot._itemArray[0].type == ch.BaseStatue
                             && MaterialSlot._itemArray[0].type == ch.UpgradeMaterial
                             && MaterialSlot._itemArray[0].stack >= ch.UpgradeStack)
@@ -122,6 +132,7 @@ public class SculptorTradeUIState : UIState
 
     public override void OnDeactivate()
     {
+        base.OnDeactivate();
         Layer.AllParticles.Clear();
     }
 
