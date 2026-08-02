@@ -87,7 +87,16 @@ public sealed class TileCluster : EverProjectile
     }
 #endregion
 
-    private record struct ClusterTileData(bool HasTile, int CoordinateWidth, int CoordinateHeight, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
+    private record struct ClusterTileData(
+        bool HasTile,
+        int CoordinateWidth,
+        int CoordinateHeight,
+        SlopeType Slope,
+        bool HalfTile,
+        bool InvisibleCoating,
+        bool FullBrightCoating,
+        TileDrawInfo DrawData
+    );
 
     // TODO
     public override string Texture => Assets.Textures.Reliquary.ChiseledStatues.CrystalHeartStatue.KEY;
@@ -192,7 +201,16 @@ public sealed class TileCluster : EverProjectile
                 var _frameY = (short)0;
                 TileLoader.SetDrawPositions(i, j, ref width, ref _offsetY, ref height, ref _frameX, ref _frameY);
 
-                cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(drawData.tileCache.HasTile, width, height, drawData.tileCache.Slope, drawData.tileCache.IsHalfBlock, drawData);
+                cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
+                    drawData.tileCache.HasTile,
+                    width,
+                    height,
+                    drawData.tileCache.Slope,
+                    drawData.tileCache.IsHalfBlock,
+                    drawData.tileCache.IsTileInvisible,
+                    drawData.tileCache.IsTileFullbright,
+                    drawData
+                );
             }
         }
         RestoreCluster();
@@ -291,9 +309,9 @@ public sealed class TileCluster : EverProjectile
 
         void DrawSlopedTile(int i, int j, bool useGlowMask)
         {
-            var (hasTile, frameWidth, frameHeight, slope, halfTile, drawData) = cluster![i, j];
+            var (hasTile, frameWidth, frameHeight, slope, halfTile, invisible, fullBright, drawData) = cluster![i, j];
 
-            if (!hasTile)
+            if (!hasTile || invisible)
             {
                 return;
             }
@@ -302,11 +320,12 @@ public sealed class TileCluster : EverProjectile
 
             var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, frameWidth, frameHeight);
 
-            drawData.tileLight = Lighting.GetColor(Projectile.Center.ToTileCoordinates());
+            drawData.tileLight = fullBright ? Color.White : Lighting.GetColor(Projectile.Center.ToTileCoordinates());
             drawData.colorTint = Color.White;
             drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
 
             var color = useGlowMask ? drawData.glowColor : drawData.finalColor;
+
             var texture = useGlowMask ? drawData.glowTexture : drawData.drawTexture;
 
             if (texture is null)
