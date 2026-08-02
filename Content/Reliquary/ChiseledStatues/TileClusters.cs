@@ -440,9 +440,9 @@ public sealed class TileDataHolder
     private Action<TileDataHolder, Tile, int>? OnCopyFrom;
     private Action<TileDataHolder, int, Tile>? OnCopyTo;
 
-    public TileDataHolder(int length)
+    [ModSystemHooks.PostSetupContent]
+    private static void PostSetupContent()
     {
-        Length = length;
         var types = TileData.OnSetLength.GetInvocationList().Select(x => x.Method.DeclaringType!.GenericTypeArguments[0]!).ToArray()!;
         foreach (var type in types)
         {
@@ -451,6 +451,13 @@ public sealed class TileDataHolder
                 type_sizes[type] = SizeOf(type);
             }
         }
+    }
+
+    public TileDataHolder(int length)
+    {
+        Length = length;
+
+        var types = type_sizes.Keys.ToArray();
 
         var totalBytes = 0;
         foreach (var type in types)
