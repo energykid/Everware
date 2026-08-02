@@ -113,10 +113,17 @@ public class SculptorTradeUIState : UIState
                             SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.NotEnoughMaterial.GetChildText(key[Main.rand.Next(key.Count)]).Value);
                         }
 
+                        // if you gave the sculptor more than one statue
+                        if (StatueSlot._itemArray[0].stack > 1)
+                        {
+                            SetDialogue(Mods.Everware.NPCs.SculptorNPC.Dialogue.TooManyStatues.GetChildText(key[Main.rand.Next(key.Count)]).Value);
+                        }
+
                         // if everything is correct and the sculpt is ready
                         if (StatueSlot._itemArray[0].type == ch.BaseStatue
                             && MaterialSlot._itemArray[0].type == ch.UpgradeMaterial
-                            && MaterialSlot._itemArray[0].stack >= ch.UpgradeStack)
+                            && MaterialSlot._itemArray[0].stack >= ch.UpgradeStack
+                            && StatueSlot._itemArray[0].stack == 1)
                         {
                             MaterialSlot._itemArray[0].stack -= ch.UpgradeStack;
                             if (MaterialSlot._itemArray[0].stack <= 0) MaterialSlot._itemArray[0] = new Item(ItemID.None);
@@ -133,6 +140,18 @@ public class SculptorTradeUIState : UIState
     public override void OnDeactivate()
     {
         base.OnDeactivate();
+
+        if (StatueSlot._itemArray[0] != null && StatueSlot._itemArray[0].type != ItemID.None)
+        {
+            Main.LocalPlayer.QuickSpawnItem(new EntitySource_Parent(Main.LocalPlayer, "Item Drop"), StatueSlot._itemArray[0], StatueSlot._itemArray[0].stack);
+            StatueSlot._itemArray[0] = new Item(ItemID.None);
+        }
+        if (MaterialSlot._itemArray[0] != null && MaterialSlot._itemArray[0].type != ItemID.None)
+        {
+            Main.LocalPlayer.QuickSpawnItem(new EntitySource_Parent(Main.LocalPlayer, "Item Drop"), MaterialSlot._itemArray[0], MaterialSlot._itemArray[0].stack);
+            MaterialSlot._itemArray[0] = new Item(ItemID.None);
+        }
+
         Layer.AllParticles.Clear();
     }
 
@@ -361,7 +380,7 @@ public class SculptorStatueSlot : UIElement
         Vector2 position = GetDimensions().Center();
         Asset<Texture2D> tex = Assets.Textures.Gallery.Sculptor.SculptorStatueSlot.Asset;
         Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, Scale, SpriteEffects.None);
-        if (MaterialSlot)
+        if (MaterialSlot && inv.type == ItemID.None)
         {
             Item it = ReliquaryUISystem.TradeState.StatueSlot._itemArray[0];
             if (it != null && it.type != ItemID.None)

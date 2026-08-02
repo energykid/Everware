@@ -482,6 +482,12 @@ NPCs: {
 				Two: Yes, this is better!
 				Three: That's more to my liking!
 			}
+
+			TooManyStatues: {
+				One: Slow your roll, I can't do multiple pieces at once!
+				Two: I can't multitask like that, friend!
+				Three: Too many statues there, give me just one please!
+			}
 		}
 	}
 }

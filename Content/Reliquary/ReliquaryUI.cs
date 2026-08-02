@@ -74,7 +74,7 @@ public class ReliquaryUISystem : ModSystem
     }
     public override void PostUpdateEverything()
     {
-        if (Sculptor != null)
+        if (Sculptor != null && Interface.CurrentState == TradeState)
         {
             TradeState.Position = Sculptor.Center + new Vector2(0, -120);
             if (Main.LocalPlayer.talkNPC != -1)
