@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using MonoMod.Cil;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 
@@ -11,38 +12,44 @@ namespace Everware.Content.Reliquary.ChiseledStatues;
 
 public sealed class TileCluster : EverProjectile
 {
+#region Framing Patches
     public override void Load()
     {
         On_WorldGen.KillTile += KillTile_DisableFauxFraming;
-        // Sometimes NewItem is called manually for drops?
-        On_Item.NewItem_Inner += NewItem_Inner_DisableFauxFraming;
+
         // Jungle plants
         On_NPC.SpawnOnPlayer += SpawnOnPlayer_DisableFauxFraming;
 
         On_WorldGen.SpawnFallingBlockProjectile += SpawnFallingBlockProjectile_DisableFauxFraming;
+
+        // Not taking any chances
+        IL_WorldGen.Check4x2 += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckOasisPlant += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckSuper += RecursiveTileFramePrevention;
+        IL_WorldGen.Check2x2 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check3x1 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check3x2 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check3x4 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check5x4 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check6x3 += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckCannon += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckMB += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckTrapDoor += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckTallGate += RecursiveTileFramePrevention;
+        IL_WorldGen.Check2x2Style += RecursiveTileFramePrevention;
+        IL_WorldGen.CheckChand += RecursiveTileFramePrevention;
+        IL_WorldGen.Check3x3 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check2x5 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check3x5 += RecursiveTileFramePrevention;
+        IL_WorldGen.Check3x6 += RecursiveTileFramePrevention;
+
+        On_WorldGen.CheckPot += CheckPot_DisableFauxFraming;
+        On_WorldGen.Check3x3 += Check3x3_DisableFauxFraming;
+
+        On_Item.NewItem_Inner += NewItem_Inner_DisableFauxFraming;
     }
 
-    private bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)
-    {
-        if (skipKillTile)
-        {
-            return false;
-        }
-
-        return orig(i, j, tileCache, tileTopCache, tileBottomCache, type);
-    }
-
-    private void SpawnOnPlayer_DisableFauxFraming(On_NPC.orig_SpawnOnPlayer orig, int plr, int type)
-    {
-        if (skipKillTile)
-        {
-            return;
-        }
-
-        orig(plr, type);
-    }
-
-    private int NewItem_Inner_DisableFauxFraming(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item itemToClone, int type, int stack, bool noBroadcast, int prefix, bool noGrabDelay, bool reverseLookup)
+    private static int NewItem_Inner_DisableFauxFraming(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item itemToClone, int type, int stack, bool noBroadcast, int prefix, bool noGrabDelay, bool reverseLookup)
     {
         if (skipKillTile)
         {
@@ -52,7 +59,77 @@ public sealed class TileCluster : EverProjectile
         return orig(source, x, y, width, height, itemToClone, type, stack, noBroadcast, prefix, noGrabDelay, reverseLookup);
     }
 
-    private static bool skipKillTile;
+    private static void Check3x3_DisableFauxFraming(On_WorldGen.orig_Check3x3 orig, int i, int j, int type)
+    {
+        if (skipKillTile)
+        {
+            return;
+        }
+
+        orig(i, j, type);
+    }
+
+    private static void CheckPot_DisableFauxFraming(On_WorldGen.orig_CheckPot orig, int i, int j, int type)
+    {
+        if (skipKillTile)
+        {
+            return;
+        }
+
+        orig(i, j, type);
+    }
+
+    private static void RecursiveTileFramePrevention(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        while (c.TryGotoNext(
+                   MoveType.Before,
+                   i => i.MatchCall<WorldGen>(nameof(WorldGen.TileFrame))
+               ))
+        {
+            c.GotoPrev(
+                MoveType.After,
+                i => i.MatchBr(out _)
+            );
+
+            var endTarget = c.DefineLabel();
+
+            c.MoveAfterLabels();
+
+            c.EmitDelegate(
+                static () => skipKillTile
+            );
+            c.EmitBrtrue(endTarget);
+
+            c.GotoNext(
+                MoveType.After,
+                i => i.MatchCall<WorldGen>(nameof(WorldGen.TileFrame))
+            );
+
+            c.MarkLabel(endTarget);
+        }
+    }
+
+    private static bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)
+    {
+        if (skipKillTile)
+        {
+            return false;
+        }
+
+        return orig(i, j, tileCache, tileTopCache, tileBottomCache, type);
+    }
+
+    private static void SpawnOnPlayer_DisableFauxFraming(On_NPC.orig_SpawnOnPlayer orig, int plr, int type)
+    {
+        if (skipKillTile)
+        {
+            return;
+        }
+
+        orig(plr, type);
+    }
 
     private static void KillTile_DisableFauxFraming(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
     {
@@ -63,6 +140,9 @@ public sealed class TileCluster : EverProjectile
 
         orig(i, j, fail, effectOnly, noItem);
     }
+
+    private static bool skipKillTile;
+#endregion
 
     private record struct ClusterTileData(bool HasTile, int CoordinateWidth, int CoordinateHeight, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
 
@@ -268,6 +348,10 @@ public sealed class TileCluster : EverProjectile
             var position = -origin + new Vector2(i * 16f, j * 16f);
 
             var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, frameWidth, frameHeight);
+
+            drawData.tileLight = Lighting.GetColor(Projectile.Center.ToTileCoordinates());
+            drawData.colorTint = Color.White;
+            drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
 
             var color = useGlowMask ? drawData.glowColor : drawData.finalColor;
             var texture = useGlowMask ? drawData.glowTexture : drawData.drawTexture;
