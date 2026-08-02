@@ -12,9 +12,12 @@ namespace Everware.Content.Reliquary.ChiseledStatues;
 
 public sealed class TileCluster : EverProjectile
 {
+    // If you somehow still get a stack overflow, so god help me
 #region Framing Patches
     public override void Load()
     {
+        On_Item.NewItem_Inner += NewItem_Inner_DisableFauxFraming;
+
         On_WorldGen.KillTile += KillTile_DisableFauxFraming;
 
         // Jungle plants
@@ -22,7 +25,6 @@ public sealed class TileCluster : EverProjectile
 
         On_WorldGen.SpawnFallingBlockProjectile += SpawnFallingBlockProjectile_DisableFauxFraming;
 
-        // Not taking any chances
         IL_WorldGen.Check4x2 += RecursiveTileFramePrevention;
         IL_WorldGen.CheckOasisPlant += RecursiveTileFramePrevention;
         IL_WorldGen.CheckSuper += RecursiveTileFramePrevention;
@@ -43,40 +45,13 @@ public sealed class TileCluster : EverProjectile
         IL_WorldGen.Check3x5 += RecursiveTileFramePrevention;
         IL_WorldGen.Check3x6 += RecursiveTileFramePrevention;
 
-        On_WorldGen.CheckPot += CheckPot_DisableFauxFraming;
-        On_WorldGen.Check3x3 += Check3x3_DisableFauxFraming;
-
-        On_Item.NewItem_Inner += NewItem_Inner_DisableFauxFraming;
-    }
-
-    private static int NewItem_Inner_DisableFauxFraming(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item itemToClone, int type, int stack, bool noBroadcast, int prefix, bool noGrabDelay, bool reverseLookup)
-    {
-        if (skipKillTile)
-        {
-            return -1;
-        }
-
-        return orig(source, x, y, width, height, itemToClone, type, stack, noBroadcast, prefix, noGrabDelay, reverseLookup);
-    }
-
-    private static void Check3x3_DisableFauxFraming(On_WorldGen.orig_Check3x3 orig, int i, int j, int type)
-    {
-        if (skipKillTile)
-        {
-            return;
-        }
-
-        orig(i, j, type);
-    }
-
-    private static void CheckPot_DisableFauxFraming(On_WorldGen.orig_CheckPot orig, int i, int j, int type)
-    {
-        if (skipKillTile)
-        {
-            return;
-        }
-
-        orig(i, j, type);
+        On_WorldGen.CheckPot += (orig, i, j, type) => { if (skipKillTile) { return; } orig(i, j, type); };
+        On_WorldGen.Check3x3 += (orig, i, j, type) => { if (skipKillTile) { return; } orig(i, j, type); };
+        On_WorldGen.CheckCatTail += (orig, x, j) => { if (skipKillTile) { return; } orig(x, j); };
+        On_WorldGen.CheckLilyPad += (orig, i, i1) => { if (skipKillTile) { return; } orig(i, i1); };
+        On_WorldGen.CheckPile += (orig, i, y) => { if (skipKillTile) { return; } orig(i, y); };
+        On_WorldGen.CheckUnderwaterPlant += (orig, type, x, y) => { if (skipKillTile) { return; } orig(type, x, y); };
+        On_WorldGen.CheckBamboo += (orig, x, y) => { if (skipKillTile) { return; } orig(x, y); };
     }
 
     private static void RecursiveTileFramePrevention(ILContext il)
@@ -139,6 +114,16 @@ public sealed class TileCluster : EverProjectile
         }
 
         orig(i, j, fail, effectOnly, noItem);
+    }
+
+    private static int NewItem_Inner_DisableFauxFraming(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item itemToClone, int type, int stack, bool noBroadcast, int prefix, bool noGrabDelay, bool reverseLookup)
+    {
+        if (skipKillTile)
+        {
+            return -1;
+        }
+
+        return orig(source, x, y, width, height, itemToClone, type, stack, noBroadcast, prefix, noGrabDelay, reverseLookup);
     }
 
     private static bool skipKillTile;
@@ -285,16 +270,25 @@ public sealed class TileCluster : EverProjectile
             for (var j = 0; j < 2; j++)
             {
                 var tile = Main.tile[outerTopLeft.X + i, outerTopLeft.Y + j * (backupSize - 1)];
-                tile.HasTile = false;
-                tile.WallType = WallID.None;
+
+                // Precaution as some non-solid tiles don't play nicely
+                if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
+                {
+                    tile.HasTile = false;
+                    tile.WallType = WallID.None;
+                }
             }
 
             for (var j = 0; j < backupSize; j++)
             for (var i = 0; i < 2; i++)
             {
                 var tile = Main.tile[outerTopLeft.X + i * (backupSize - 1), outerTopLeft.Y + j];
-                tile.HasTile = false;
-                tile.WallType = WallID.None;
+
+                if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
+                {
+                    tile.HasTile = false;
+                    tile.WallType = WallID.None;
+                }
             }
         }
     }
