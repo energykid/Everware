@@ -20,10 +20,12 @@ public sealed class TileCluster : EverProjectile
 
     private static void KillTile_DisableFauxFraming(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
     {
-        if (!skipKillTile)
+        if (skipKillTile)
         {
-            orig(i, j, fail, effectOnly, noItem);
+            return;
         }
+
+        orig(i, j, fail, effectOnly, noItem);
     }
 
     private record struct ClusterTileData(bool HasTile, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
@@ -46,6 +48,8 @@ public sealed class TileCluster : EverProjectile
         Projectile.ignoreWater = true;
 
         Projectile.manualDirectionChange = true;
+
+        Projectile.tileCollide = false;
     }
 
     public int TileCenterX => (int)Projectile.ai[0];
@@ -174,6 +178,7 @@ public sealed class TileCluster : EverProjectile
     {
         Projectile.velocity.Y = -4f;
         Projectile.timeLeft = 50;
+        Projectile.rotation += 0.1f;
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -187,7 +192,10 @@ public sealed class TileCluster : EverProjectile
 
         var origin = new Vector2((ClusterSize * 16) / 2f);
 
-        var transform = Main.GameViewMatrix.TransformationMatrix;
+        var transform =
+            Matrix.CreateRotationZ(Projectile.rotation)
+          * Matrix.CreateTranslation(new Vector3(Projectile.Center - Main.screenPosition, 0f))
+          * Main.GameViewMatrix.TransformationMatrix;
 
         sb.End(out var ss);
         sb.Begin(ss with { TransformMatrix = transform});
@@ -212,7 +220,7 @@ public sealed class TileCluster : EverProjectile
                 return;
             }
 
-            var position = -origin + new Vector2(i * 16f, j * 16f) + Main.ScreenSize.ToVector2() / 2f;
+            var position = -origin + new Vector2(i * 16f, j * 16f);
 
             var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, 16, 16);
 
@@ -244,12 +252,12 @@ public sealed class TileCluster : EverProjectile
                         if (slope == SlopeType.SlopeDownRight)
                         {
                             length = 16 - a - 2;
-                            height = 14 - a;
+                            height = 16 - a;
                         }
                         else
                         {
                             length = a;
-                            height = 14 - length;
+                            height = 16 - length;
                         }
 
                         sb.Draw(texture, position + new Vector2(length, a), new Rectangle(source.X + length, source.Y, 2, height), color);
@@ -283,7 +291,7 @@ public sealed class TileCluster : EverProjectile
     [ModSystemHooks.PostUpdateWorld]
     private static void PostUpdateWorld()
     {
-        if (Main.mouseRight)
+        if (Main.mouseRight && Main.mouseRightRelease)
         {
             var (i, j) = Main.MouseWorld.ToTileCoordinates();
 
