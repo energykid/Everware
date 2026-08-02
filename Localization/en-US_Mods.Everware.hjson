@@ -350,6 +350,7 @@ Projectiles: {
 	MagmaticExplosion.DisplayName: Magmatic Explosion
 	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
 	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
+	TileCluster.DisplayName: Tile Cluster
 }
 
 Buffs: {
@@ -489,3 +490,5 @@ Tiles: {
 		MapEntry1: Locked Steel Chest
 	}
 }
+
+ConfigCategory.StyleSettings.Description: StyleSettings

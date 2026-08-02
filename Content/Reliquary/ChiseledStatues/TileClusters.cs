@@ -1,12 +1,52 @@
-﻿using Everware.Core.Projectiles;
+﻿using Daybreak.Common.Features.Hooks;
+using Everware.Core.Projectiles;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Terraria.GameContent.Drawing;
+using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
 
 public sealed class TileCluster : EverProjectile
 {
+    public override void Load()
+    {
+        On_WorldGen.KillTile += KillTile_DisableFauxFraming;
+    }
+
+    private static bool skipKillTile;
+
+    private static void KillTile_DisableFauxFraming(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
+    {
+        if (!skipKillTile)
+        {
+            orig(i, j, fail, effectOnly, noItem);
+        }
+    }
+
+    private record struct ClusterTileData(bool HasTile, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
+
     // TODO
     public override string Texture => Assets.Textures.Reliquary.ChiseledStatues.CrystalHeartStatue.KEY;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = 24;
+        Projectile.height = 24;
+        Projectile.scale = 1f;
+
+        Projectile.penetrate = -1;
+
+        Projectile.friendly = true;
+        Projectile.hostile = false;
+
+        Projectile.tileCollide = true;
+        Projectile.ignoreWater = true;
+
+        Projectile.manualDirectionChange = true;
+    }
 
     public int TileCenterX => (int)Projectile.ai[0];
 
@@ -14,28 +54,73 @@ public sealed class TileCluster : EverProjectile
 
     public ushort ClusterSize => (ushort)Projectile.ai[2];
 
-    public Tilemap Cluster;
+    private ClusterTileData[,]? cluster;
 
     public override void NetOnSpawn()
     {
-        Cluster = new Tilemap(ClusterSize, ClusterSize);
+        if (Main.dedServ
+         || TileCenterX <= (ClusterSize / 2) + 1 || TileCenterX >= Main.maxTilesX - (ClusterSize / 2) + 1
+         || TileCenterY <= (ClusterSize / 2) + 1 || TileCenterY >= Main.maxTilesY - (ClusterSize / 2) + 1)
+        {
+            return;
+        }
+
+        cluster = new ClusterTileData[ClusterSize, ClusterSize];
         var topLeft = new Point(TileCenterX - (ClusterSize / 2), TileCenterY - (ClusterSize / 2));
 
-        var backup = new Tilemap((ushort)(ClusterSize + 2), (ushort)(ClusterSize + 2));
+        var backupSize = ClusterSize + 2;
         var outerTopLeft = topLeft - new Point(1, 1);
 
+        var holder = new TileDataHolder(backupSize * backupSize);
         BackupCluster();
         {
             // Clear the edges around the cluster to have tiles inside frame nicely
             ClearEdges();
 
-            for (var i = topLeft.X; i < topLeft.X + Cluster.Width; i++)
-            for (var j = topLeft.Y; j < topLeft.Y + Cluster.Height; j++)
+            skipKillTile = true;
+            for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
+            for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
             {
                 WorldGen.TileFrame(i, j, noBreak: true);
             }
+            skipKillTile = false;
 
-            CloneClusterToTilemap(topLeft, Cluster);
+            var tileRenderer = Main.instance.TilesRenderer;
+
+            for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
+            for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
+            {
+                var drawData = new TileDrawInfo();
+
+                drawData.tileCache = Main.tile[i, j];
+                drawData.typeCache = drawData.tileCache.type;
+                drawData.tileFrameX = drawData.tileCache.frameX;
+                drawData.tileFrameY = drawData.tileCache.frameY;
+                drawData.tileLight = Color.White;
+                drawData.colorTint = Color.White;
+                drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
+                tileRenderer.GetTileDrawData(
+                    i,
+                    j,
+                    drawData.tileCache,
+                    drawData.typeCache,
+                    ref drawData.tileFrameX,
+                    ref drawData.tileFrameY,
+                    out drawData.tileWidth,
+                    out drawData.tileHeight,
+                    out drawData.tileTop,
+                    out drawData.halfBrickHeight,
+                    out drawData.addFrX,
+                    out drawData.addFrY,
+                    out drawData.tileSpriteEffect,
+                    out drawData.glowTexture,
+                    out drawData.glowSourceRect,
+                    out drawData.glowColor
+                );
+                drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
+
+                cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(drawData.tileCache.HasTile, drawData.tileCache.Slope, drawData.tileCache.IsHalfBlock, drawData);
+            }
         }
         RestoreCluster();
 
@@ -43,67 +128,250 @@ public sealed class TileCluster : EverProjectile
 
         void BackupCluster()
         {
-            CloneClusterToTilemap(outerTopLeft, backup);
+            var index = 0;
+
+            for (var i = outerTopLeft.X; i < outerTopLeft.X + backupSize; i++)
+            for (var j = outerTopLeft.Y; j < outerTopLeft.Y + backupSize; j++)
+            {
+                holder.CopyFrom(Main.tile[i, j], index);
+                index++;
+            }
         }
 
         void RestoreCluster()
         {
-            for (var i = 0; i < backup.Width; i++)
-            for (var j = 0; j < backup.Height; j++)
+            var index = 0;
+
+            for (var i = outerTopLeft.X; i < outerTopLeft.X + backupSize; i++)
+            for (var j = outerTopLeft.Y; j < outerTopLeft.Y + backupSize; j++)
             {
-                var tile = backup[i, j];
-                Main.tile[outerTopLeft.X + i, outerTopLeft.Y + j] = tile;
+                holder.CopyTo(index, Main.tile[i, j]);
+                index++;
             }
         }
 
         void ClearEdges()
         {
-            for (var i = 0; i < backup.Width; i++)
+            for (var i = 0; i < backupSize; i++)
             for (var j = 0; j < 2; j++)
             {
-                Main.tile[outerTopLeft.X + i, outerTopLeft.Y + j * backup.Height].HasTile = false;
+                var tile = Main.tile[outerTopLeft.X + i, outerTopLeft.Y + j * (backupSize - 1)];
+                tile.HasTile = false;
+                tile.WallType = WallID.None;
             }
 
-            for (var j = 0; j < backup.Height; j++)
+            for (var j = 0; j < backupSize; j++)
             for (var i = 0; i < 2; i++)
             {
-                Main.tile[outerTopLeft.X + i * backup.Height, outerTopLeft.Y + j].HasTile = false;
-            }
-        }
-
-        static void CloneClusterToTilemap(Point topLeft, Tilemap map)
-        {
-            for (var i = 0; i < map.Width; i++)
-            for (var j = 0; j < map.Height; j++)
-            {
-                var tile = Framing.GetTileSafely(topLeft.X + i, topLeft.Y + j);
-                map[i, j] = tile;
+                var tile = Main.tile[outerTopLeft.X + i * (backupSize - 1), outerTopLeft.Y + j];
+                tile.HasTile = false;
+                tile.WallType = WallID.None;
             }
         }
     }
 
+    public override void AI()
+    {
+        Projectile.velocity.Y = -4f;
+        Projectile.timeLeft = 50;
+    }
+
     public override bool PreDraw(ref Color lightColor)
     {
-        var origin = (ClusterSize * 16) / 2f;
+        var sb = Main.spriteBatch;
 
-        var transform = Matrix.CreateTranslation();
-
-        Main.tileBatch.Begin();
-
-        var prior = Main.tile;
-        var priorMenu = Main.gameMenu;
-        Main.tile = Cluster;
-        Main.gameMenu = true;
+        if (cluster is null)
         {
-            for (var i = 0; i < Cluster.Width; i++)
-            for (var j = 0; j < Cluster.Height; j++)
+            return false;
+        }
+
+        var origin = new Vector2((ClusterSize * 16) / 2f);
+
+        var transform = Main.GameViewMatrix.TransformationMatrix;
+
+        sb.End(out var ss);
+        sb.Begin(ss with { TransformMatrix = transform});
+        {
+            for (var i = 0; i < ClusterSize; i++)
+            for (var j = 0; j < ClusterSize; j++)
             {
-                Main.instance.TilesRenderer.DrawSingleTile(new TileDrawInfo(), true, Main.waterStyle, Vector2.Zero, -origin, i, j);
+                DrawSlopedTile(i, j, false);
+                DrawSlopedTile(i, j, true);
             }
         }
-        Main.gameMenu = priorMenu;
-        Main.tile = prior;
+        sb.Restart(in ss);
 
         return false;
+
+        void DrawSlopedTile(int i, int j, bool useGlowMask)
+        {
+            var (hasTile, slope, halfTile, drawData) = cluster![i, j];
+
+            if (!hasTile)
+            {
+                return;
+            }
+
+            var position = -origin + new Vector2(i * 16f, j * 16f) + Main.ScreenSize.ToVector2() / 2f;
+
+            var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, 16, 16);
+
+            var color = useGlowMask ? drawData.glowColor : drawData.finalColor;
+            var texture = useGlowMask ? drawData.glowTexture : drawData.drawTexture;
+
+            if (texture is null)
+            {
+                return;
+            }
+
+            if (slope == SlopeType.Solid && !halfTile)
+            {
+                sb.Draw(texture, position, source, color);
+            }
+            else if (halfTile)
+            {
+                sb.Draw(texture, new Vector2(position.X, position.Y + 8), new Rectangle(source.X, source.Y, 16, 8), color);
+            }
+            else
+            {
+                if (slope is SlopeType.SlopeDownLeft or SlopeType.SlopeDownRight)
+                {
+                    for (var a = 0; a < 16; a += 2)
+                    {
+                        int length;
+                        int height;
+
+                        if (slope == SlopeType.SlopeDownRight)
+                        {
+                            length = 16 - a - 2;
+                            height = 14 - a;
+                        }
+                        else
+                        {
+                            length = a;
+                            height = 14 - length;
+                        }
+
+                        sb.Draw(texture, position + new Vector2(length, a), new Rectangle(source.X + length, source.Y, 2, height), color);
+                    }
+                }
+                else
+                {
+                    for (var a = 0; a < 16; a += 2)
+                    {
+                        int length;
+                        int height;
+
+                        if (slope == SlopeType.SlopeUpLeft)
+                        {
+                            length = a;
+                            height = 16 - length;
+                        }
+                        else
+                        {
+                            length = 16 - a - 2;
+                            height = 16 - a;
+                        }
+
+                        sb.Draw(texture, position + new Vector2(length, 0), new Rectangle(source.X + length, source.Y + 16 - height, 2, height), color);
+                    }
+                }
+            }
+        }
+    }
+
+    [ModSystemHooks.PostUpdateWorld]
+    private static void PostUpdateWorld()
+    {
+        if (Main.mouseRight)
+        {
+            var (i, j) = Main.MouseWorld.ToTileCoordinates();
+
+            Projectile.NewProjectile(new EntitySource_Misc(""), Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 5);
+        }
+    }
+}
+
+public sealed class TileDataHolder
+{
+    private static readonly Dictionary<Type, int> type_sizes = [];
+    private static readonly MethodInfo sizeOfMethod = typeof(Unsafe).GetMethod(nameof(Unsafe.SizeOf))!;
+    private static readonly FieldInfo onCopyFromField = typeof(TileDataHolder).GetField(nameof(OnCopyFrom), BindingFlags.NonPublic | BindingFlags.Instance)!;
+    private static readonly FieldInfo onCopyToField = typeof(TileDataHolder).GetField(nameof(OnCopyTo), BindingFlags.NonPublic | BindingFlags.Instance)!;
+    private static readonly MethodInfo copyFromGenericMethod = typeof(TileDataHolder).GetMethod(nameof(CopyFromGeneric), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static readonly MethodInfo copyToGenericMethod = typeof(TileDataHolder).GetMethod(nameof(CopyToGeneric), BindingFlags.NonPublic | BindingFlags.Static)!;
+
+    public int Length { get; }
+    private readonly Dictionary<Type, int> dataOffsets = [];
+
+    private readonly byte[] data;
+
+    private Action<TileDataHolder, Tile, int>? OnCopyFrom;
+    private Action<TileDataHolder, int, Tile>? OnCopyTo;
+
+    public TileDataHolder(int length)
+    {
+        Length = length;
+        var types = TileData.OnSetLength.GetInvocationList().Select(x => x.Method.DeclaringType!.GenericTypeArguments[0]!).ToArray()!;
+        foreach (var type in types)
+        {
+            if (!type_sizes.ContainsKey(type))
+            {
+                type_sizes[type] = SizeOf(type);
+            }
+        }
+
+        var totalBytes = 0;
+        foreach (var type in types)
+        {
+            dataOffsets[type] = totalBytes;
+            totalBytes += type_sizes[type] * length;
+        }
+
+        data = new byte[totalBytes];
+
+        var fromDelegates = new Delegate[types.Length];
+        var toDelegates = new Delegate[types.Length];
+        for (var i = 0; i < types.Length; i++)
+        {
+            fromDelegates[i] = Delegate.CreateDelegate(onCopyFromField.FieldType, copyFromGenericMethod.MakeGenericMethod(types[i]));
+            toDelegates[i] = Delegate.CreateDelegate(onCopyToField.FieldType, copyToGenericMethod.MakeGenericMethod(types[i]));
+        }
+
+        OnCopyFrom = (Action<TileDataHolder, Tile, int>?)Delegate.Combine(fromDelegates);
+        OnCopyTo = (Action<TileDataHolder, int, Tile>?)Delegate.Combine(toDelegates);
+    }
+
+    public void CopyFrom(Tile tile, int index)
+    {
+        OnCopyFrom?.Invoke(this, tile, index);
+    }
+
+    public void CopyTo(int index, Tile tile)
+    {
+        OnCopyTo?.Invoke(this, index, tile);
+    }
+
+    private static int SizeOf(Type t)
+    {
+        return (int)sizeOfMethod.MakeGenericMethod(t).Invoke(null, null)!;
+    }
+
+    private static unsafe void CopyFromGeneric<T>(TileDataHolder holder, Tile tile, int index) where T : unmanaged, ITileData
+    {
+        fixed (byte* data = &holder.data[holder.dataOffsets[typeof(T)]])
+        {
+            T* arr = (T*)data;
+            arr[index] = TileData<T>.ptr[tile.TileId];
+        }
+    }
+
+    private static unsafe void CopyToGeneric<T>(TileDataHolder holder, int index, Tile tile) where T : unmanaged, ITileData
+    {
+        fixed (byte* data = &holder.data[holder.dataOffsets[typeof(T)]])
+        {
+            T* arr = (T*)data;
+            TileData<T>.ptr[tile.TileId] = arr[index];
+        }
     }
 }
