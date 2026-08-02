@@ -23,6 +23,9 @@ public sealed class TileCluster : EverProjectile
         On_NPC.SpawnOnPlayer += SpawnOnPlayer_DisableFauxFraming;
 
         On_WorldGen.SpawnFallingBlockProjectile += SpawnFallingBlockProjectile_DisableFauxFraming;
+        
+        On_WorldGen.CheckPot += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
+        On_WorldGen.CheckJunglePlant += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
     }
 
     private static bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)
@@ -150,12 +153,22 @@ public sealed class TileCluster : EverProjectile
             ClearEdges();
 
             tileFrameCosmeticOnly = true;
-            for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
-            for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
             {
-                // TODO: 1.4.5 Move to TileFrameCosmetic
-                recursionCount = 0;
-                WorldGen.TileFrame(i, j, noBreak: true);
+                for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
+                for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
+                {
+                    // TODO: 1.4.5 Move to TileFrameCosmetic
+                    recursionCount = 0;
+
+                    var priorGen = WorldGen.gen;
+                    WorldGen.gen = true;
+                    {
+                        WorldGen.TileFrame(i, j, noBreak: true);
+                    }
+                    WorldGen.gen = priorGen;
+
+                    WorldGen.KillTile_MakeTileDust(i, j, Main.tile[i, j]);
+                }
             }
             tileFrameCosmeticOnly = false;
 
@@ -274,7 +287,7 @@ public sealed class TileCluster : EverProjectile
     {
         Projectile.velocity.Y = -4f;
         Projectile.timeLeft = 50;
-        Projectile.rotation += 0.1f;
+        Projectile.rotation += 0.01f;
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -396,7 +409,9 @@ public sealed class TileCluster : EverProjectile
         {
             var (i, j) = Main.MouseWorld.ToTileCoordinates();
 
-            Projectile.NewProjectile(new EntitySource_Misc(""), Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 5);
+            var spawnPosition = Main.MouseWorld.ToTileCoordinates().ToWorldCoordinates();
+
+            Projectile.NewProjectile(new EntitySource_Misc(""), spawnPosition, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 5);
         }
     }
 }
