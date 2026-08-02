@@ -14,6 +14,42 @@ public sealed class TileCluster : EverProjectile
     public override void Load()
     {
         On_WorldGen.KillTile += KillTile_DisableFauxFraming;
+        // Sometimes NewItem is called manually for drops?
+        On_Item.NewItem_Inner += NewItem_Inner_DisableFauxFraming;
+        // Jungle plants
+        On_NPC.SpawnOnPlayer += SpawnOnPlayer_DisableFauxFraming;
+
+        On_WorldGen.SpawnFallingBlockProjectile += SpawnFallingBlockProjectile_DisableFauxFraming;
+    }
+
+    private bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)
+    {
+        if (skipKillTile)
+        {
+            return false;
+        }
+
+        return orig(i, j, tileCache, tileTopCache, tileBottomCache, type);
+    }
+
+    private void SpawnOnPlayer_DisableFauxFraming(On_NPC.orig_SpawnOnPlayer orig, int plr, int type)
+    {
+        if (skipKillTile)
+        {
+            return;
+        }
+
+        orig(plr, type);
+    }
+
+    private int NewItem_Inner_DisableFauxFraming(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item itemToClone, int type, int stack, bool noBroadcast, int prefix, bool noGrabDelay, bool reverseLookup)
+    {
+        if (skipKillTile)
+        {
+            return -1;
+        }
+
+        return orig(source, x, y, width, height, itemToClone, type, stack, noBroadcast, prefix, noGrabDelay, reverseLookup);
     }
 
     private static bool skipKillTile;
@@ -28,7 +64,7 @@ public sealed class TileCluster : EverProjectile
         orig(i, j, fail, effectOnly, noItem);
     }
 
-    private record struct ClusterTileData(bool HasTile, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
+    private record struct ClusterTileData(bool HasTile, int CoordinateWidth, int CoordinateHeight, SlopeType Slope, bool HalfTile, TileDrawInfo DrawData);
 
     // TODO
     public override string Texture => Assets.Textures.Reliquary.ChiseledStatues.CrystalHeartStatue.KEY;
@@ -85,6 +121,7 @@ public sealed class TileCluster : EverProjectile
             for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
             for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
             {
+                // TODO: 1.4.5 Move to TileFrameCosmetic
                 WorldGen.TileFrame(i, j, noBreak: true);
             }
             skipKillTile = false;
@@ -123,7 +160,15 @@ public sealed class TileCluster : EverProjectile
                 );
                 drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
 
-                cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(drawData.tileCache.HasTile, drawData.tileCache.Slope, drawData.tileCache.IsHalfBlock, drawData);
+                var width = 16;
+                var height = 16;
+
+                var _offsetY = 0;
+                var _frameX = (short)0;
+                var _frameY = (short)0;
+                TileLoader.SetDrawPositions(i, j, ref width, ref _offsetY, ref height, ref _frameX, ref _frameY);
+
+                cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(drawData.tileCache.HasTile, width, height, drawData.tileCache.Slope, drawData.tileCache.IsHalfBlock, drawData);
             }
         }
         RestoreCluster();
@@ -213,7 +258,7 @@ public sealed class TileCluster : EverProjectile
 
         void DrawSlopedTile(int i, int j, bool useGlowMask)
         {
-            var (hasTile, slope, halfTile, drawData) = cluster![i, j];
+            var (hasTile, frameWidth, frameHeight, slope, halfTile, drawData) = cluster![i, j];
 
             if (!hasTile)
             {
@@ -222,7 +267,7 @@ public sealed class TileCluster : EverProjectile
 
             var position = -origin + new Vector2(i * 16f, j * 16f);
 
-            var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, 16, 16);
+            var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, frameWidth, frameHeight);
 
             var color = useGlowMask ? drawData.glowColor : drawData.finalColor;
             var texture = useGlowMask ? drawData.glowTexture : drawData.drawTexture;
