@@ -92,8 +92,6 @@ public sealed class TileCluster : EverProjectile
 
     private record struct ClusterTileData(
         bool HasTile,
-        int CoordinateWidth,
-        int CoordinateHeight,
         SlopeType Slope,
         bool HalfTile,
         bool InvisibleCoating,
@@ -211,18 +209,10 @@ public sealed class TileCluster : EverProjectile
                 );
                 drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
 
-                var width = 16;
-                var height = 16;
-
-                var _offsetY = 0;
-                var _frameX = (short)0;
-                var _frameY = (short)0;
-                TileLoader.SetDrawPositions(i, j, ref width, ref _offsetY, ref height, ref _frameX, ref _frameY);
+                Main.NewText($"{drawData.tileHeight} {drawData.typeCache}");
 
                 cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
                     drawData.tileCache.HasTile,
-                    width,
-                    height,
                     drawData.tileCache.Slope,
                     drawData.tileCache.IsHalfBlock,
                     drawData.tileCache.IsTileInvisible,
@@ -327,16 +317,16 @@ public sealed class TileCluster : EverProjectile
 
         void DrawSlopedTile(int i, int j, bool useGlowMask)
         {
-            var (hasTile, frameWidth, frameHeight, slope, halfTile, invisible, fullBright, drawData) = cluster![i, j];
+            var (hasTile, slope, halfTile, invisible, fullBright, drawData) = cluster![i, j];
 
             if (!hasTile || invisible)
             {
                 return;
             }
 
-            var position = -origin + new Vector2(i * 16f, j * 16f);
+            var position = -origin + new Vector2(i * 16f, j * 16f + drawData.tileTop);
 
-            var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, frameWidth, frameHeight);
+            var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
 
             drawData.tileLight = fullBright ? Color.White : Lighting.GetColor(Projectile.Center.ToTileCoordinates());
             drawData.colorTint = Color.White;
@@ -353,7 +343,7 @@ public sealed class TileCluster : EverProjectile
 
             if (slope == SlopeType.Solid && !halfTile)
             {
-                sb.Draw(texture, position, source, color);
+                sb.Draw(texture, position, source, color, 0f, Vector2.Zero, 1f, drawData.tileSpriteEffect, 0f);
             }
             else if (halfTile)
             {
@@ -416,7 +406,7 @@ public sealed class TileCluster : EverProjectile
 
             var spawnPosition = Main.MouseWorld.ToTileCoordinates().ToWorldCoordinates();
 
-            Projectile.NewProjectile(new EntitySource_Misc(""), spawnPosition, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 5);
+            Projectile.NewProjectile(new EntitySource_Misc(""), spawnPosition, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 3);
         }
     }
 }
