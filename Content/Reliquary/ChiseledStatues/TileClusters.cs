@@ -167,7 +167,12 @@ public sealed class TileCluster : EverProjectile
                     }
                     WorldGen.gen = priorGen;
 
-                    WorldGen.KillTile_MakeTileDust(i, j, Main.tile[i, j]);
+                    var tile = Main.tile[i, j];
+
+                    if (tile.HasTile)
+                    {
+                        WorldGen.KillTile_MakeTileDust(i, j, tile);
+                    }
                 }
             }
             tileFrameCosmeticOnly = false;
