@@ -209,8 +209,6 @@ public sealed class TileCluster : EverProjectile
                 );
                 drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
 
-                Main.NewText($"{drawData.tileHeight} {drawData.typeCache}");
-
                 cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
                     drawData.tileCache.HasTile,
                     drawData.tileCache.Slope,
