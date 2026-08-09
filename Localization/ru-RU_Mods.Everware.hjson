@@ -199,6 +199,17 @@ Projectiles: {
 	ManaSpike.DisplayName: Магический шип
 	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Валун
+	SnapdragonFrostBreathHitbox.DisplayName: Frost Breath
+	SnapdragonFrostBreath.DisplayName: Frost Breath
+	SnapFreezeProjectile.DisplayName: Snap Freeze
+	ShardShredderProj.DisplayName: Shard Shredder
+	ShardShredderIcicle.DisplayName: Icicle
+	SnapdragonIceSpike.DisplayName: Ice Spike
+	GreatGargoyleHoldout.DisplayName: Great Gargoyle
+	MagmaticExplosion.DisplayName: Magmatic Explosion
+	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
+	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
+	TileCluster.DisplayName: Tile Cluster
 }
 
 Buffs: {
@@ -212,3 +223,5 @@ BossIntroText: {
 	MusicianENNWAY: ENNWAY!
 	EyeOfCthulhu: Ночной наблюдатель
 }
+
+ConfigCategory.StyleSettings.Description: StyleSettings
