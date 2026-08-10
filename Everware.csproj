@@ -1,1 +1,18 @@
-<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1"/>
+<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1">
+
+	<!-- Import tModLoader mod properties -->
+	<Import Project="..\tModLoader.targets" />
+
+	<!-- General -->
+	<PropertyGroup>
+
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="Daybreak">
+			<HintPath>Daybreak.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<!-- References -->
+
+</Project>

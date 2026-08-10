@@ -294,7 +294,12 @@ Items: {
 
 	Whetstone: {
 		DisplayName: Whetstone
-		Tooltip: ""
+		Tooltip:
+			'''
+			Allows parrying projectiles using melee weapons
+			Upon successfully parrying a projectile, gain +20% melee speed
+			10 second cooldown
+			'''
 	}
 
 	DichromaticSkull: {
@@ -370,13 +375,23 @@ Buffs: {
 	}
 
 	DichromaticFireDebuff: {
-		DisplayName: Dichromatic Fire Debuff
-		Description: Mods.Everware.Buffs.DichromaticFireDebuff.Description
+		DisplayName: Pyromania
+		Description: You are manic! And on fire!
 	}
 
 	DichromaticWaterDebuff: {
-		DisplayName: Dichromatic Water Debuff
-		Description: Mods.Everware.Buffs.DichromaticWaterDebuff.Description
+		DisplayName: Depression
+		Description: You are really depressed! And soaked!
+	}
+
+	RazorsEdgeBuff: {
+		DisplayName: Razor's Edge
+		Description: Your swords swing faster!
+	}
+
+	RazorsEdgeCooldownBuff: {
+		DisplayName: Parry Cooldown
+		Description: You cannot parry again for a short period of time
 	}
 }
 
