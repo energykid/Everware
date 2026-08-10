@@ -32,6 +32,10 @@ public class RazorsEdgeBuff : ModBuff
 }
 public class RazorsEdgeCooldownBuff : ModBuff
 {
+    public override bool RightClick(int buffIndex)
+    {
+        return false;
+    }
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/RazorsEdgeCooldownBuff";
 }
 
@@ -86,7 +90,7 @@ public class WhetstonePlayer : ModPlayer
                             for (int j = 0; j < Main.projectile.Length; j++)
                             {
                                 Projectile parried = Main.projectile[j];
-                                if (parried.Hitbox.Contains(proj.Hitbox.Center))
+                                if (proj.Hitbox.Contains(parried.Hitbox.Center))
                                     ParryProjectile(parried);
                             }
                         }

@@ -316,6 +316,11 @@ Items: {
 			Enemies afflicted with both debuffs will take extra damage
 			''' */
 	}
+
+	GravelItem: {
+		// DisplayName: Gravel
+		// Tooltip: ""
+	}
 }
 
 Biomes: {

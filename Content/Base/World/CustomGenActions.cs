@@ -1,4 +1,5 @@
-﻿using Everware.Content.Underground;
+﻿using Everware.Content.Misc.Tiles;
+using Everware.Content.Underground;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria.ID;
@@ -52,10 +53,10 @@ public class CustomGenActions
             if (Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType] && !KilnOrQuarryGeneration.IrreplaceableTiles.Contains(Main.tile[x, y].TileType))
             {
                 type = Main.tile[x, y].TileType;
-                Main.tile[x, y].ResetToType(TileID.Silt);
+                Main.tile[x, y].ResetToType((ushort)ModContent.TileType<GravelTile>());
             }
 
-            if (!Main.tile[x, y + 1].HasTile && Main.tile[x, y].TileType == TileID.Silt)
+            if (!Main.tile[x, y + 1].HasTile && Main.tile[x, y].TileType == ModContent.TileType<GravelTile>())
             {
                 Main.tile[x - 1, y + 1].ResetToType(TileID.Stone);
                 Main.tile[x + 1, y + 1].ResetToType(TileID.Stone);
@@ -78,10 +79,10 @@ public class CustomGenActions
 
             if (WorldGen.SolidOrSlopedTile(Main.tile[x, y]) && Main.tile[x, y].TileType != type)
             {
-                Main.tile[x, y].ResetToType(TileID.Silt);
+                Main.tile[x, y].ResetToType((ushort)ModContent.TileType<GravelTile>());
             }
 
-            if (!Main.tile[x, y + 1].HasTile && Main.tile[x, y].TileType == TileID.Silt)
+            if (!Main.tile[x, y + 1].HasTile && Main.tile[x, y].TileType == ModContent.TileType<GravelTile>())
             {
                 Main.tile[x, y + 1].ResetToType(TileID.Stone);
                 Main.tile[x, y + 2].ResetToType(TileID.Stone);
