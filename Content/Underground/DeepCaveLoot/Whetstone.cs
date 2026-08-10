@@ -97,8 +97,8 @@ public class WhetstonePlayer : ModPlayer
     }
     public void ParryProjectile(Projectile parried)
     {
-        // parried projectile needs to be small to work
-        if (parried.Size.Length() < 70 && parried.hostile && !parried.reflected && parried.active)
+        // parried projectile needs to be at least 20% smaller than your held item to work
+        if (parried.Size.Length() < Player.HeldItem.Size.Length() * 0.8f && parried.hostile && !parried.reflected && parried.active)
         {
             SoundEngine.PlaySound(SoundID.Tink.WithPitchOffset(-0.6f), parried.Center);
             SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.WhetstoneParry.Asset, parried.Center);
