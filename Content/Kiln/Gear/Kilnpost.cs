@@ -87,17 +87,14 @@ public class KilnpostHoldout : EverHoldoutProjectile
     }
     public override void AI()
     {
+        if (State == "Breakaway") Persist = true;
+
         if (!NetworkOwner.MouseDown) HasMouseBeenReleased = true;
 
         Timer++;
         TwoHanded = false;
         if (Timer == (int)(NetworkOwner.AnimationTime / 3 * 2) || Timer == 1)
         {
-            if (Main.myPlayer == Projectile.owner)
-            {
-
-            }
-
             Projectile.ai[1] = 0f;
             Projectile.ai[2] = 70f;
             Rotation = Owner.AngleTo(NetworkOwner.MousePosition);
@@ -149,6 +146,8 @@ public class KilnpostHoldout : EverHoldoutProjectile
         RecoveryAmount = 0f;
         State = "Breakaway";
 
+        Projectile.ai[2] = 27f;
+
         for (int i = 0; i < 10; i++)
         {
             Dust.NewDustPerfect(Projectile.Center + new Vector2(10, 0).RotatedBy(Projectile.rotation), ModContent.DustType<RawKilnPowderDust>(), new Vector2(Main.rand.NextFloat(2), 0).RotatedByRandom(MathHelper.TwoPi));
@@ -182,7 +181,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
         {
             if (LastHitNPC != -1 && Main.npc[LastHitNPC].active)
             {
-                if (Projectile.Colliding(new Rectangle(Projectile.Hitbox.X - 20, Projectile.Hitbox.Y - 20, Projectile.Hitbox.Width + 40, Projectile.Hitbox.Height + 40), Main.npc[LastHitNPC].Hitbox))
+                if (!Projectile.Colliding(new Rectangle(Projectile.Hitbox.X + 20, Projectile.Hitbox.Y + 20, Projectile.Hitbox.Width - 40, Projectile.Hitbox.Height - 40), Main.npc[LastHitNPC].Hitbox))
                 {
                     SpawnBreakawaySpearIn(LastHitNPC);
                     return;
