@@ -80,7 +80,7 @@ public class GallerySystem : ModSystem
 
     public override void Load()
     {
-        On_TileLightScanner.GetTileLight += On_TileLightScanner_GetTileLight; ;
+        On_TileLightScanner.GetTileLight += On_TileLightScanner_GetTileLight;
     }
 
     private void On_TileLightScanner_GetTileLight(On_TileLightScanner.orig_GetTileLight orig, TileLightScanner self, int x, int y, out Vector3 outputColor)
