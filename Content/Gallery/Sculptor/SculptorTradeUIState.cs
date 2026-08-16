@@ -12,6 +12,12 @@ namespace Everware.Content.Gallery.Sculptor;
 
 public class SculptorTradeUIState : UIState
 {
+    [GlobalItemHooks.ModifyTooltips]
+    public static void AddTooltips()
+    {
+
+    }
+
     public static ParticleLayer Layer;
     public UIPanel BigPanel;
     public UITextBox DialogueText;

@@ -1,11 +1,14 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+﻿using Everware.Content.Gallery.Snapdragon;
 using Terraria.ID;
 
 namespace Everware.Content.Underground.Glowcoat;
 
 public class AuroralGlowcoat : BaseGlowcoatItem
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return Snapdragon.ShouldLoadForTesting;
+    }
     public override int MossBlock => TileID.IceBlock;
     public override int MossItem => ItemID.IceTorch;
     public override Color Color => new Color(31, 221, 213);

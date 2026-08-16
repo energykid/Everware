@@ -9,3 +9,5 @@ global using Terraria.GameContent;
 global using Terraria.ModLoader;
 global using Everware;
 global using System;
+global using Daybreak.Core.Hooks;
+global using Daybreak.Common.Features.Hooks;

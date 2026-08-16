@@ -7,6 +7,7 @@ using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Gallery.Sculptor;
 
+[AutoloadHead]
 public class SculptorNPC : ModNPC
 {
     private static Profiles.StackedNPCProfile Profile;
@@ -104,8 +105,11 @@ public class SculptorNPC : ModNPC
                 new Profiles.DefaultNPCProfile(Texture, -1),
                 new Profiles.DefaultNPCProfile(Texture/* + "_Shimmer"*/, -1)
             );
+
+        base.SetStaticDefaults();
     }
     public override string Texture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC";
+    public override string HeadTexture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC_Head";
     public override ITownNPCProfile TownNPCProfile()
     {
         return Profile;

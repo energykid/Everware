@@ -13,6 +13,17 @@ public class ChiselablesList : ModSystem
     {
         AllChiselables.Clear();
     }
+    public override void PostAddRecipes()
+    {
+        foreach (Chiselable chiselable in AllChiselables)
+        {
+            Recipe recipe = Recipe.Create(chiselable.UpgradedStatue);
+            recipe.AddIngredient(chiselable.BaseStatue);
+            recipe.AddIngredient(chiselable.UpgradeMaterial, chiselable.UpgradeStack);
+            recipe.AddCondition(Mods.Everware.Items.ChiselRecipeCondition.GetText(), () => false);
+            recipe.Register();
+        }
+    }
 }
 public class Chiselable
 {

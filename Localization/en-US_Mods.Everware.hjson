@@ -266,9 +266,6 @@ Items: {
 		SummonDamage: summon damage when awakened
 	}
 
-	Hits: Hits
-	Times: times
-
 	MasterLockpick: {
 		DisplayName: Master Lockpick
 		Tooltip:
@@ -312,10 +309,19 @@ Items: {
 			'''
 	}
 
+	AtlasCrown: {
+		DisplayName: Atlas' Crown
+		Tooltip: ""
+	}
+
 	GravelItem: {
 		DisplayName: Gravel
 		Tooltip: ""
 	}
+
+	ChiselRecipeCondition: Chiseled by the Sculptor
+	Hits: Hits
+	Times: times
 }
 
 Biomes: {
@@ -361,6 +367,7 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
 	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
 	TileCluster.DisplayName: Tile Cluster
+	AtlasCrownTileCluster.DisplayName: Atlas Crown Tile Cluster
 }
 
 Buffs: {

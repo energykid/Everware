@@ -34,14 +34,17 @@ public class MagmaticAmmokitPlayer : ModPlayer
     }
     public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (proj.DamageType == DamageClass.Ranged && hit.Crit)
+        if (Enabled)
         {
-            SoundEngine.PlaySound(SoundID.NPCDeath14.WithPitchOffset(1f).WithVolumeScale(0.2f), proj.Center);
-            SoundEngine.PlaySound(SoundID.Item99.WithPitchOffset(0.5f), proj.Center);
+            if (proj.DamageType == DamageClass.Ranged && hit.Crit)
+            {
+                SoundEngine.PlaySound(SoundID.NPCDeath14.WithPitchOffset(1f).WithVolumeScale(0.2f), proj.Center);
+                SoundEngine.PlaySound(SoundID.Item99.WithPitchOffset(0.5f), proj.Center);
 
-            Projectile proj2 = Projectile.NewProjectileDirect(new EntitySource_Parent(target, "Magmatic Ammokit"), proj.Center, Vector2.Zero, ModContent.ProjectileType<MagmaticExplosion>(),
-                hit.Damage * 2 / 3, 2f, proj.owner, 0, target.whoAmI);
-            proj2.rotation = proj.velocity.ToRotation();
+                Projectile proj2 = Projectile.NewProjectileDirect(new EntitySource_Parent(target, "Magmatic Ammokit"), proj.Center, Vector2.Zero, ModContent.ProjectileType<MagmaticExplosion>(),
+                    hit.Damage * 2 / 3, 2f, proj.owner, 0, target.whoAmI);
+                proj2.rotation = proj.velocity.ToRotation();
+            }
         }
     }
 }

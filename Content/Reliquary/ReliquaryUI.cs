@@ -72,13 +72,15 @@ public class ReliquaryUISystem : ModSystem
                 InterfaceScaleType.UI));
         }
     }
-    public override void PostUpdateEverything()
+    public override void PostUpdateNPCs()
     {
         if (Sculptor != null && Interface.CurrentState == TradeState)
         {
             TradeState.Position = Sculptor.Center + new Vector2(0, -120);
             if (Main.LocalPlayer.talkNPC != -1)
                 Main.CloseNPCChatOrSign();
+
+            if (!Main.playerInventory) CloseUI();
         }
     }
 
