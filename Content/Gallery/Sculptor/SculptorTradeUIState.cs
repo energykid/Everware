@@ -6,6 +6,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace Everware.Content.Gallery.Sculptor;
 
@@ -30,6 +31,8 @@ public class SculptorTradeUIState : UIState
         BigPanel = new UIPanel();
         BigPanel.Width.Set(600, 0f);
         BigPanel.Height.Set(100, 0f);
+        BigPanel.BackgroundColor = Color.CornflowerBlue.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.1f));
+        BigPanel.BorderColor = Color.LightSkyBlue;
 
         DialogueText = new UITextBox("")
         {
@@ -52,6 +55,8 @@ public class SculptorTradeUIState : UIState
         ChiselButton.Width.Set(70, 0f);
         ChiselButton.Top.Set(-25, 1f);
         ChiselButton.Height.Set(30, 0f);
+        ChiselButton.BackgroundColor = Color.CornflowerBlue.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.1f));
+        ChiselButton.BorderColor = Color.LightSkyBlue;
         ChiselButton.OnLeftClick += Trade;
 
         StatueSlot = new SculptorStatueSlot();
@@ -170,6 +175,15 @@ public class SculptorTradeUIState : UIState
 
     public override void Update(GameTime gameTime)
     {
+        ChiselButton.BackgroundColor = Color.Transparent;
+        ChiselButton.BorderColor = Color.CornflowerBlue.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.1f));
+
+        if (ChiselButton.ContainsPoint(Main.MouseScreen))
+        {
+            ChiselButton.BackgroundColor = Color.CornflowerBlue.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.1f));
+            ChiselButton.BorderColor = new Color(0f, 0f, 0f, 0.2f);
+        }
+
         Layer.Update();
 
         ChiselButton.ClickSound = SoundID.MenuTick;
@@ -325,8 +339,59 @@ public class SculptorStatueSlot : UIElement
             Main.LocalPlayer.mouseInterface = true;
             Item inv = _itemArray[0];
             ItemSlot.OverrideHover(ref inv, _itemSlotContext);
-            ItemSlot.LeftClick(ref inv, _itemSlotContext);
-            ItemSlot.RightClick(ref inv, _itemSlotContext);
+
+            if (!MaterialSlot)
+            {
+                bool leftClickDown = Main.mouseLeftRelease && Main.mouseLeft;
+
+                if (leftClickDown)
+                {
+                    if (Main.mouseItem.type != ItemID.None)
+                    {
+                        if (inv.type == ItemID.None)
+                        {
+                            inv = new Item(Main.mouseItem.type, 1);
+                            Main.mouseItem.stack--;
+
+                            SoundEngine.PlaySound(7);
+                        }
+                        else
+                        {
+                            if (Main.mouseItem.type == inv.type)
+                            {
+                                Main.mouseItem.stack++;
+                                inv = new Item(ItemID.None);
+
+                                SoundEngine.PlaySound(7);
+                            }
+                            else
+                            {
+                                if (Main.mouseItem.stack == 1)
+                                {
+                                    Terraria.Utils.Swap(ref inv, ref Main.mouseItem);
+
+                                    SoundEngine.PlaySound(7);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Terraria.Utils.Swap(ref inv, ref Main.mouseItem);
+
+                        SoundEngine.PlaySound(7);
+                    }
+                }
+
+                if (inv.type != 0)
+                    ItemSlot.RightClick(ref inv, _itemSlotContext);
+            }
+            else
+            {
+                ItemSlot.LeftClick(ref inv, _itemSlotContext);
+                ItemSlot.RightClick(ref inv, _itemSlotContext);
+            }
+
             ItemSlot.MouseHover(ref inv, _itemSlotContext);
             _itemArray[0] = inv;
         }
@@ -362,6 +427,8 @@ public class SculptorStatueSlot : UIElement
 
     protected override void DrawSelf(SpriteBatch spriteBatch)
     {
+        var font = FontAssets.MouseText;
+
         HandleItemSlotLogic();
 
         if (Scale < 0.9f)
@@ -380,23 +447,46 @@ public class SculptorStatueSlot : UIElement
         Vector2 position = GetDimensions().Center();
         Asset<Texture2D> tex = Assets.Textures.Gallery.Sculptor.SculptorStatueSlot.Asset;
         Main.EntitySpriteDraw(tex.Value, position, tex.Frame(), Color.White, 0f, tex.Frame().Size() / 2f, Scale, SpriteEffects.None);
-        if (MaterialSlot && inv.type == ItemID.None)
+
+        string str = "";
+        if (MaterialSlot)
         {
-            Item it = ReliquaryUISystem.TradeState.StatueSlot._itemArray[0];
-            if (it != null && it.type != ItemID.None)
+
+            if (inv.type == ItemID.None)
             {
-                Chiselable? ch = ChiselablesList.AllChiselables.Find(a =>
+                Item it = ReliquaryUISystem.TradeState.StatueSlot._itemArray[0];
+                if (it != null && it.type != ItemID.None)
                 {
-                    return a.BaseStatue.Equals(it.type);
-                });
+                    Chiselable? ch = ChiselablesList.AllChiselables.Find(a =>
+                    {
+                        return a.BaseStatue.Equals(it.type);
+                    });
 
-                if (ch != null)
-                {
-                    Main.instance.DrawItem_GetBasics(new Item(ch.UpgradeMaterial), 0, out Texture2D tx, out Rectangle fr, out Rectangle gmFr);
-                    float sc2 = 1f - ((float)Math.Clamp((fr.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
+                    if (ch != null)
+                    {
+                        Main.instance.DrawItem_GetBasics(new Item(ch.UpgradeMaterial), 0, out Texture2D tx, out Rectangle fr, out Rectangle gmFr);
+                        float sc2 = 1f - ((float)Math.Clamp((fr.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
 
-                    Main.EntitySpriteDraw(tx, position, fr, Color.White.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.2f)), 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
+                        Main.EntitySpriteDraw(tx, position, fr, Color.White.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.2f)), 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
+
+                        str = ch.UpgradeStack.ToString();
+                    }
                 }
+            }
+            else
+            {
+                Item it = ReliquaryUISystem.TradeState.StatueSlot._itemArray[0];
+                if (it != null && it.type != ItemID.None)
+                {
+                    Chiselable? ch = ChiselablesList.AllChiselables.Find(a =>
+                    {
+                        return a.BaseStatue.Equals(it.type);
+                    });
+
+                    if (ch != null)
+                        str = "/" + ch.UpgradeStack.ToString();
+                }
+                str = inv.stack.ToString() + str;
             }
         }
 
@@ -483,5 +573,11 @@ public class SculptorStatueSlot : UIElement
         }
 
         SculptorTradeUIState.Layer.Draw();
+
+        Vector2 p = new Vector2(Scale * 5);
+        if (str.Contains("/")) p.X -= 10;
+
+        ChatManager.DrawColorCodedStringShadow(Main.spriteBatch, font.Value, str, position + p, new Color(0.1f, 0.1f, 0.2f, 0f), 0f, Vector2.Zero, Vector2.One);
+        ChatManager.DrawColorCodedString(Main.spriteBatch, font.Value, str, position + p, Color.White, 0f, Vector2.Zero, Vector2.One);
     }
 }

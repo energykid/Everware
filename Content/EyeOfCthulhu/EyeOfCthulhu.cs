@@ -224,13 +224,11 @@ public class EyeOfCthulhu : GlobalNPC
 
                     int Time = 14;
 
-                    if (!Main.dedServ)
+                    if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
                     {
-                        if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
-                        {
+                        if (!Main.dedServ)
                             calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.MusicText.MusicianENNWAY.GetTextValue(), Mods.Everware.MusicText.MusicHemolacriac.GetTextValue());
-                            Time = 20;
-                        }
+                        Time = 20;
                     }
 
                     if (TendrilsOut <= 3)

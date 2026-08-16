@@ -12,7 +12,7 @@ namespace Everware.Content.Reliquary.ChiseledStatues;
 public sealed class TileCluster : EverProjectile
 {
     // If you somehow still get a stack overflow, so god help me
-#region Framing Patches
+    #region Framing Patches
     public override void Load()
     {
         On_Item.NewItem_Inner += NewItem_Inner_DisableFauxFraming;
@@ -23,7 +23,7 @@ public sealed class TileCluster : EverProjectile
         On_NPC.SpawnOnPlayer += SpawnOnPlayer_DisableFauxFraming;
 
         On_WorldGen.SpawnFallingBlockProjectile += SpawnFallingBlockProjectile_DisableFauxFraming;
-        
+
         On_WorldGen.CheckPot += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
         On_WorldGen.CheckJunglePlant += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
     }
@@ -88,7 +88,7 @@ public sealed class TileCluster : EverProjectile
 
         return true;
     }
-#endregion
+    #endregion
 
     private record struct ClusterTileData(
         bool HasTile,
@@ -153,71 +153,72 @@ public sealed class TileCluster : EverProjectile
             tileFrameCosmeticOnly = true;
             {
                 for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
-                for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
-                {
-                    // TODO: 1.4.5 Move to TileFrameCosmetic
-                    recursionCount = 0;
-
-                    var priorGen = WorldGen.gen;
-                    WorldGen.gen = true;
+                    for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
                     {
-                        WorldGen.TileFrame(i, j, noBreak: true);
-                    }
-                    WorldGen.gen = priorGen;
+                        // TODO: 1.4.5 Move to TileFrameCosmetic
+                        recursionCount = 0;
 
-                    var tile = Main.tile[i, j];
+                        var priorGen = WorldGen.gen;
+                        WorldGen.gen = true;
+                        {
+                            WorldGen.TileFrame(i, j, noBreak: true);
+                        }
+                        WorldGen.gen = priorGen;
 
-                    if (tile.HasTile)
-                    {
-                        WorldGen.KillTile_MakeTileDust(i, j, tile);
+                        var tile = Main.tile[i, j];
+
+                        if (tile.HasTile)
+                        {
+                            WorldGen.KillTile_MakeTileDust(i, j, tile);
+                        }
                     }
-                }
             }
             tileFrameCosmeticOnly = false;
 
             var tileRenderer = Main.instance.TilesRenderer;
 
             for (var i = topLeft.X; i < topLeft.X + ClusterSize; i++)
-            for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
-            {
-                var drawData = new TileDrawInfo();
+                for (var j = topLeft.Y; j < topLeft.Y + ClusterSize; j++)
+                {
+                    var drawData = new TileDrawInfo
+                    {
+                        tileCache = Main.tile[i, j]
+                    };
+                    drawData.typeCache = drawData.tileCache.type;
+                    drawData.tileFrameX = drawData.tileCache.frameX;
+                    drawData.tileFrameY = drawData.tileCache.frameY;
+                    drawData.tileLight = Color.White;
+                    drawData.colorTint = Color.White;
+                    drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
+                    tileRenderer.GetTileDrawData(
+                        i,
+                        j,
+                        drawData.tileCache,
+                        drawData.typeCache,
+                        ref drawData.tileFrameX,
+                        ref drawData.tileFrameY,
+                        out drawData.tileWidth,
+                        out drawData.tileHeight,
+                        out drawData.tileTop,
+                        out drawData.halfBrickHeight,
+                        out drawData.addFrX,
+                        out drawData.addFrY,
+                        out drawData.tileSpriteEffect,
+                        out drawData.glowTexture,
+                        out drawData.glowSourceRect,
+                        out drawData.glowColor
+                    );
+                    drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
 
-                drawData.tileCache = Main.tile[i, j];
-                drawData.typeCache = drawData.tileCache.type;
-                drawData.tileFrameX = drawData.tileCache.frameX;
-                drawData.tileFrameY = drawData.tileCache.frameY;
-                drawData.tileLight = Color.White;
-                drawData.colorTint = Color.White;
-                drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
-                tileRenderer.GetTileDrawData(
-                    i,
-                    j,
-                    drawData.tileCache,
-                    drawData.typeCache,
-                    ref drawData.tileFrameX,
-                    ref drawData.tileFrameY,
-                    out drawData.tileWidth,
-                    out drawData.tileHeight,
-                    out drawData.tileTop,
-                    out drawData.halfBrickHeight,
-                    out drawData.addFrX,
-                    out drawData.addFrY,
-                    out drawData.tileSpriteEffect,
-                    out drawData.glowTexture,
-                    out drawData.glowSourceRect,
-                    out drawData.glowColor
-                );
-                drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
-
-                cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
-                    drawData.tileCache.HasTile,
-                    drawData.tileCache.Slope,
-                    drawData.tileCache.IsHalfBlock,
-                    drawData.tileCache.IsTileInvisible,
-                    drawData.tileCache.IsTileFullbright,
-                    drawData
-                );
-            }
+                    cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
+                        drawData.tileCache.HasTile,
+                        drawData.tileCache.Slope,
+                        drawData.tileCache.IsHalfBlock,
+                        drawData.tileCache.IsTileInvisible,
+                        drawData.tileCache.IsTileFullbright,
+                        drawData
+                    );
+                }
         }
         RestoreCluster();
 
@@ -228,11 +229,11 @@ public sealed class TileCluster : EverProjectile
             var index = 0;
 
             for (var i = outerTopLeft.X; i < outerTopLeft.X + backupSize; i++)
-            for (var j = outerTopLeft.Y; j < outerTopLeft.Y + backupSize; j++)
-            {
-                holder.CopyFrom(Main.tile[i, j], index);
-                index++;
-            }
+                for (var j = outerTopLeft.Y; j < outerTopLeft.Y + backupSize; j++)
+                {
+                    holder.CopyFrom(Main.tile[i, j], index);
+                    index++;
+                }
         }
 
         void RestoreCluster()
@@ -240,39 +241,39 @@ public sealed class TileCluster : EverProjectile
             var index = 0;
 
             for (var i = outerTopLeft.X; i < outerTopLeft.X + backupSize; i++)
-            for (var j = outerTopLeft.Y; j < outerTopLeft.Y + backupSize; j++)
-            {
-                holder.CopyTo(index, Main.tile[i, j]);
-                index++;
-            }
+                for (var j = outerTopLeft.Y; j < outerTopLeft.Y + backupSize; j++)
+                {
+                    holder.CopyTo(index, Main.tile[i, j]);
+                    index++;
+                }
         }
 
         void ClearEdges()
         {
             for (var i = 0; i < backupSize; i++)
-            for (var j = 0; j < 2; j++)
-            {
-                var tile = Main.tile[outerTopLeft.X + i, outerTopLeft.Y + j * (backupSize - 1)];
-
-                // Precaution as some non-solid tiles don't play nicely
-                if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
+                for (var j = 0; j < 2; j++)
                 {
-                    tile.HasTile = false;
-                    tile.WallType = WallID.None;
+                    var tile = Main.tile[outerTopLeft.X + i, outerTopLeft.Y + j * (backupSize - 1)];
+
+                    // Precaution as some non-solid tiles don't play nicely
+                    if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
+                    {
+                        tile.HasTile = false;
+                        tile.WallType = WallID.None;
+                    }
                 }
-            }
 
             for (var j = 0; j < backupSize; j++)
-            for (var i = 0; i < 2; i++)
-            {
-                var tile = Main.tile[outerTopLeft.X + i * (backupSize - 1), outerTopLeft.Y + j];
-
-                if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
+                for (var i = 0; i < 2; i++)
                 {
-                    tile.HasTile = false;
-                    tile.WallType = WallID.None;
+                    var tile = Main.tile[outerTopLeft.X + i * (backupSize - 1), outerTopLeft.Y + j];
+
+                    if (tile.HasTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]))
+                    {
+                        tile.HasTile = false;
+                        tile.WallType = WallID.None;
+                    }
                 }
-            }
         }
     }
 
@@ -300,14 +301,14 @@ public sealed class TileCluster : EverProjectile
           * Main.GameViewMatrix.TransformationMatrix;
 
         sb.End(out var ss);
-        sb.Begin(ss with { TransformMatrix = transform});
+        sb.Begin(ss with { TransformMatrix = transform });
         {
             for (var i = 0; i < ClusterSize; i++)
-            for (var j = 0; j < ClusterSize; j++)
-            {
-                DrawSlopedTile(i, j, false);
-                DrawSlopedTile(i, j, true);
-            }
+                for (var j = 0; j < ClusterSize; j++)
+                {
+                    DrawSlopedTile(i, j, false);
+                    DrawSlopedTile(i, j, true);
+                }
         }
         sb.Restart(in ss);
 
@@ -398,6 +399,7 @@ public sealed class TileCluster : EverProjectile
     [ModSystemHooks.PostUpdateWorld]
     private static void PostUpdateWorld()
     {
+        /*
         if (Main.mouseRight && Main.mouseRightRelease)
         {
             var (i, j) = Main.MouseWorld.ToTileCoordinates();
@@ -406,6 +408,7 @@ public sealed class TileCluster : EverProjectile
 
             Projectile.NewProjectile(new EntitySource_Misc(""), spawnPosition, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 3);
         }
+        */
     }
 }
 

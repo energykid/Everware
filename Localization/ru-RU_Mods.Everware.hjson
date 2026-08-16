@@ -493,8 +493,8 @@ NPCs: {
 
 			NotEnoughMaterial: {
 				// One: I'm gonna need a little more of this material.
-				// Two: I'd like to be sure I won't run out of supplies before I'm done.
-				// Three: Hmm, I'd like to have some more of our secondary color.
+				// Two: I'd like to be sure I won't run out of supplies.
+				// Three: Hmm, I'll need some more of our secondary color.
 			}
 
 			SculptAnimation: {

@@ -476,7 +476,7 @@ NPCs: {
 
 			NoMaterial: {
 				One: I've got an idea, but I'm gonna need some supplies.
-				Two: This will do nicely, if only we had an extra touch!
+				Two: A nice base, but I'm going to need an extra touch!
 				Three: You know I don't like working in one color!
 			}
 
@@ -488,8 +488,8 @@ NPCs: {
 
 			NotEnoughMaterial: {
 				One: I'm gonna need a little more of this material.
-				Two: I'd like to be sure I won't run out of supplies before I'm done.
-				Three: Hmm, I'd like to have some more of our secondary color.
+				Two: I'd like to be sure I won't run out of supplies.
+				Three: Hmm, I'll need some more of our secondary color.
 			}
 
 			SculptAnimation: {
