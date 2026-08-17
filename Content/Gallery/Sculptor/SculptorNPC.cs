@@ -30,6 +30,7 @@ public class SculptorNPC : ModNPC
     }
     public override void SetDefaults()
     {
+        NPC.townNPC = true;
         NPC.friendly = true;
         NPC.width = 18;
         NPC.height = 40;

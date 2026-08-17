@@ -1,5 +1,7 @@
-﻿using Everware.Content.Base;
+﻿using Everware.Common.Systems;
+using Everware.Content.Base;
 using Everware.Core.Projectiles;
+using Everware.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -49,7 +51,7 @@ public sealed class TileCluster : EverProjectile
 
         projs.Sort((a, b) => { return a.scale > b.scale ? 1 : -1; });
 
-        Main.spriteBatch.Begin(SpriteSortMode.BackToFront, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
 
         foreach (Projectile projectile in projs)
             if (projectile.ModProjectile is TileCluster cluster)
@@ -177,6 +179,12 @@ public sealed class TileCluster : EverProjectile
         {
             return;
         }
+
+        BehaviorUtils.ThrowTileReplicants(Projectile.velocity, (Projectile.Center / 16f).ToPoint(), 2);
+
+        ScreenEffects.AddScreenShake(Projectile.Center, 5f, 0.6f);
+        SoundEngine.PlaySound(SoundID.Dig.WithPitchOffset(-0.3f), Projectile.Center);
+        SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.AtlasCrownEmerge.Asset.WithPitchVariance(0.2f), Projectile.Center);
 
         cluster = new ClusterTileData[ClusterSize, ClusterSize];
         var topLeft = new Point(TileCenterX - (ClusterSize / 2), TileCenterY - (ClusterSize / 2));
@@ -321,9 +329,14 @@ public sealed class TileCluster : EverProjectile
         }
     }
 
+    public override bool? CanCutTiles()
+    {
+        return false;
+    }
+
     public int ClusterIndex = 0;
     public int MaxClusterIndex = 6;
-    float TimerOffset = Main.rand.NextFloat(10f);
+    float TimerOffset = Main.rand.NextFloat(20f);
     float Timer = 0f;
     bool Sent = false;
     float VelocityMod = 0f;
@@ -335,6 +348,7 @@ public sealed class TileCluster : EverProjectile
         float t = ((float)((float)ClusterIndex / (float)MaxClusterIndex)) * MathHelper.TwoPi;
 
         Timer++;
+
         if (!Fall)
         {
             if (!Sent)
@@ -358,7 +372,7 @@ public sealed class TileCluster : EverProjectile
                     Sent = true;
                     VelocityTarget = Owner.DirectionTo(NetworkOwner.MousePosition) * 10f;
                     Projectile.owner = Main.player.Length - 1;
-                    Timer = -TimerOffset;
+                    Timer = (float)Math.Floor(-TimerOffset);
                 }
                 Projectile.timeLeft = 140;
             }
@@ -368,18 +382,24 @@ public sealed class TileCluster : EverProjectile
 
                 Projectile.rotation += MathHelper.ToRadians(Projectile.velocity.X * 0.5f);
 
+                if (Timer == 5)
+                {
+                    Projectile.velocity = VelocityTarget * 2.5f;
+                    SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing.WithPitchOffset(1f - (TimerOffset / 20f)), Projectile.Center);
+                }
+
                 if (Timer > 0)
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, VelocityTarget, 0.1f);
+                    if (Timer < 5) Projectile.velocity *= 0.6f;
+                    else Projectile.velocity *= 1.05f;
                 }
                 else
                 {
-                    Projectile.velocity *= 0.9f;
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, -VelocityTarget, 0.05f);
                 }
 
                 if (Timer > 20) KillIfColliding();
 
-                Projectile.velocity *= 1.1f;
             }
         }
         else
@@ -396,6 +416,7 @@ public sealed class TileCluster : EverProjectile
 
         if (tle.HasTile && Main.tileSolid[tle.TileType])
         {
+            SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.AtlasCrownImpact.Asset.WithPitchVariance(0.5f) with { MaxInstances = 2 }, Projectile.Center);
             Projectile.Kill();
         }
     }
@@ -427,18 +448,29 @@ public sealed class TileCluster : EverProjectile
         sb.End(out var ss);
         using (rt.Scope(clearColor: Color.Transparent))
         {
-            sb.Begin(ss with { TransformMatrix = transform });
             for (var i = 0; i < ClusterSize; i++)
                 for (var j = 0; j < ClusterSize; j++)
                 {
+                    sb.Begin(ss with { TransformMatrix = transform });
                     DrawSlopedTile(i, j, false);
                     DrawSlopedTile(i, j, true);
+                    sb.End();
                 }
-            sb.End();
         }
         sb.Begin(ss with { });
 
-        Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale), Projectile.rotation, new Vector2(200), Projectile.scale, SpriteEffects.None, Projectile.scale);
+        float xx = (float)((Projectile.Center.X / 16) % 1f);
+        float yy = (float)((Projectile.Center.Y / 16) % 1f);
+
+        Color col = Lighting.GetColor((new Vector2((float)Math.Floor(Projectile.Center.X / 16), (float)Math.Floor(Projectile.Center.Y / 16))).ToPoint());
+        Color col2 = Lighting.GetColor((new Vector2((float)Math.Ceiling(Projectile.Center.X / 16), (float)Math.Floor(Projectile.Center.Y / 16))).ToPoint());
+
+        Color col3 = Lighting.GetColor((new Vector2((float)Math.Floor(Projectile.Center.X / 16), (float)Math.Ceiling(Projectile.Center.Y / 16))).ToPoint());
+        Color col4 = Lighting.GetColor((new Vector2((float)Math.Ceiling(Projectile.Center.X / 16), (float)Math.Ceiling(Projectile.Center.Y / 16))).ToPoint());
+
+        Color finalColor = Color.Lerp(Color.Lerp(col, col2, xx), Color.Lerp(col3, col4, xx), yy);
+
+        Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), Projectile.scale, SpriteEffects.None, Projectile.scale);
 
         sb.Restart(in ss);
 
@@ -459,7 +491,7 @@ public sealed class TileCluster : EverProjectile
 
             var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
 
-            drawData.tileLight = fullBright ? Color.White : Lighting.GetColor((Projectile.Center + position).ToTileCoordinates());
+            drawData.tileLight = Color.White;
             drawData.colorTint = Color.White;
             drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
 

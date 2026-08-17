@@ -37,7 +37,10 @@ public class AtlasCrownEffects : ModPlayer
     }
     public override void PostUpdate()
     {
-        if (Active && Player.HeldItem.DamageType != DamageClass.Default)
+        if (Active && Player.HeldItem.DamageType != DamageClass.Default
+            && Player.HeldItem.pick != 0
+            && Player.HeldItem.axe != 0
+            && Player.HeldItem.hammer != 0)
         {
             if (Player.HeldItem.useAnimation != HeldItemSpeed || Player.HeldItem.OriginalDamage != HeldItemDamage)
             {
