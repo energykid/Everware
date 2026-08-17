@@ -235,8 +235,10 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             Origin = new Vector2(70 / 2, 64 / 2);
 
-            if (Owner.GetEverWeaponItem() != null)
+            if (Owner.GetEverWeaponItem() != null && Owner == Main.LocalPlayer)
+            {
                 Owner.GetEverWeaponItem().SetMeter(0f);
+            }
 
             Scale *= Easing.KeyFloat(Timer, 70, 91, 1f, 0f, Easing.InExpo, 1f);
 

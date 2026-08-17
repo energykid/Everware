@@ -1,5 +1,7 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Common;
+using Everware.Content.Base.Items;
 using Everware.Utils;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
@@ -24,13 +26,42 @@ public class AtlasCrown : EverItem
     }
 }
 
+public class AtlasCrownHeldItemPacket : EverPacket
+{
+    public int ItemSpeed = 0;
+    public int ItemDamage = 0;
+    public int Player = 0;
+    public override void Read(Mod mod, BinaryReader reader, int playerID)
+    {
+        Player = reader.ReadInt32();
+        ItemSpeed = reader.ReadInt32();
+        ItemDamage = reader.ReadInt32();
+
+        AtlasCrownEffects plr = Main.player[Player].GetModPlayer<AtlasCrownEffects>();
+
+        plr.HeldItemSpeed = ItemSpeed;
+        plr.HeldItemDamage = ItemDamage;
+
+        Main.NewText(plr.HeldItemDamage.ToString() + " damage, " + plr.HeldItemSpeed.ToString() + " speed");
+
+        if (Main.netMode == NetmodeID.Server) EverwarePacketHandler.SendPacket(this);
+    }
+    public override void Write(ModPacket packet)
+    {
+        packet.Write(Player);
+        packet.Write(ItemSpeed);
+        packet.Write(ItemDamage);
+    }
+}
+
 public class AtlasCrownEffects : ModPlayer
 {
     public bool Active = false;
 
     int Timer = 0;
-    int HeldItemSpeed = 0;
-    int HeldItemDamage = 0;
+    public int HeldItemSpeed = 0;
+    public int HeldItemDamage = 0;
+
     public override void ResetEffects()
     {
         Active = false;
@@ -38,9 +69,9 @@ public class AtlasCrownEffects : ModPlayer
     public override void PostUpdate()
     {
         if (Active && Player.HeldItem.DamageType != DamageClass.Default
-            && Player.HeldItem.pick != 0
-            && Player.HeldItem.axe != 0
-            && Player.HeldItem.hammer != 0)
+            && Player.HeldItem.pick == 0
+            && Player.HeldItem.axe == 0
+            && Player.HeldItem.hammer == 0)
         {
             if (Player.HeldItem.useAnimation != HeldItemSpeed || Player.HeldItem.OriginalDamage != HeldItemDamage)
             {
@@ -49,6 +80,9 @@ public class AtlasCrownEffects : ModPlayer
 
                 HeldItemDamage = Player.HeldItem.OriginalDamage;
                 HeldItemSpeed = Player.HeldItem.useAnimation;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                    EverwarePacketHandler.SendPacket(new AtlasCrownHeldItemPacket() { Player = Player.whoAmI, ItemSpeed = HeldItemSpeed, ItemDamage = HeldItemDamage });
             }
             Timer++;
             if (Timer % (Math.Max(HeldItemSpeed, 2)) == 0 && !Player.ItemAnimationActive)
@@ -56,7 +90,7 @@ public class AtlasCrownEffects : ModPlayer
                 int MaxClusters = (int)MathHelper.Lerp(10f, 3f, (float)HeldItemSpeed / 60f);
                 int ClusterSize = 1 + (int)Math.Ceiling((float)HeldItemSpeed / 12f);
 
-                if (Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] < MaxClusters)
+                if (Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] < MaxClusters && !Main.dedServ)
                 {
                     Vector2 pos = (Player.Center + new Vector2(Main.rand.NextFloat(-250, 250), 0)).Grounded() + new Vector2(0, 20);
                     Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(Player, "Atlas' Crown cluster"), pos, new Vector2((pos.X - Player.Center.X) / 20f, -25), ModContent.ProjectileType<TileCluster>(),
@@ -83,6 +117,7 @@ public class AtlasCrownEffects : ModPlayer
             {
                 if (Main.projectile[i].ModProjectile is TileCluster cluster)
                 {
+                    Main.projectile[i].velocity.Y = -3;
                     cluster.Fall = true;
                     Main.projectile[i].owner = Main.player.Length - 1;
                 }

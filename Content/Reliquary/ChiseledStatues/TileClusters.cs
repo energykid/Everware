@@ -3,6 +3,7 @@ using Everware.Content.Base;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -146,6 +147,8 @@ public sealed class TileCluster : EverProjectile
 
     public override void SetDefaults()
     {
+        Projectile.netImportant = true;
+
         Projectile.width = 100;
         Projectile.height = 100;
         Projectile.scale = 1f;
@@ -328,6 +331,18 @@ public sealed class TileCluster : EverProjectile
                 }
         }
     }
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(ClusterIndex);
+        writer.Write(MaxClusterIndex);
+        writer.Write(TimerOffset);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        ClusterIndex = reader.ReadInt32();
+        MaxClusterIndex = reader.ReadInt32();
+        TimerOffset = reader.ReadSingle();
+    }
 
     public override bool? CanCutTiles()
     {
@@ -343,14 +358,26 @@ public sealed class TileCluster : EverProjectile
     float VelocityMod2 = Main.rand.NextFloat(0.8f, 1.2f);
     public bool Fall = false;
     public Vector2 VelocityTarget = Vector2.Zero;
+    public override bool? CanDamage()
+    {
+        if (Sent) return true;
+        return base.CanDamage();
+    }
     public override void AI()
     {
+        Lighting.AddLight(Projectile.Center, Color.Blue.ToVector3() * 0.5f * (1f - CrumbleAmount));
+
         float t = ((float)((float)ClusterIndex / (float)MaxClusterIndex)) * MathHelper.TwoPi;
 
         Timer++;
 
         if (!Fall)
         {
+            if (Timer == 1)
+            {
+                Projectile.netUpdate = true;
+            }
+
             if (!Sent)
             {
                 if (Timer < 15)
@@ -368,6 +395,7 @@ public sealed class TileCluster : EverProjectile
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Lerp(Projectile.Center, Owner.Center + off + new Vector2(0, 12), 0.3f * VelocityMod) - Projectile.Center, 0.3f * VelocityMod * VelocityMod2);
                 if (NetworkOwner.MouseDown)
                 {
+                    Projectile.netUpdate = true;
                     Projectile.velocity -= Owner.DirectionTo(NetworkOwner.MousePosition) * 5f;
                     Sent = true;
                     VelocityTarget = Owner.DirectionTo(NetworkOwner.MousePosition) * 10f;
@@ -399,14 +427,18 @@ public sealed class TileCluster : EverProjectile
                 }
 
                 if (Timer > 20) KillIfColliding();
-
             }
         }
         else
         {
-            Projectile.rotation += MathHelper.ToRadians(Projectile.velocity.Y * 0.5f);
-            Projectile.velocity.Y += 1f;
-            KillIfColliding();
+            Projectile.rotation *= 0.9f;
+            Projectile.velocity.Y += 0.3f;
+            Projectile.velocity.X *= 0.9f;
+            CrumbleAmount = MathHelper.Lerp(CrumbleAmount, 1.2f, 0.03f);
+            if (CrumbleAmount > 1f)
+            {
+                Projectile.Kill();
+            }
         }
     }
 
@@ -425,6 +457,8 @@ public sealed class TileCluster : EverProjectile
     {
         return false;
     }
+
+    float CrumbleAmount = 0f;
 
     public void DrawSelf(ref Color lightColor, float scalerange1, float scalerange2)
     {
@@ -457,7 +491,6 @@ public sealed class TileCluster : EverProjectile
                     sb.End();
                 }
         }
-        sb.Begin(ss with { });
 
         float xx = (float)((Projectile.Center.X / 16) % 1f);
         float yy = (float)((Projectile.Center.Y / 16) % 1f);
@@ -470,7 +503,42 @@ public sealed class TileCluster : EverProjectile
 
         Color finalColor = Color.Lerp(Color.Lerp(col, col2, xx), Color.Lerp(col3, col4, xx), yy);
 
-        Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), Projectile.scale, SpriteEffects.None, Projectile.scale);
+        float Crumble = (float)Math.Floor(CrumbleAmount * 20f) / 20f;
+
+        var eff = Assets.Effects.Reliquary.ChiseledStatues.TileClusterCrumbleEffect.CreateEffect();
+        eff.Parameters.FillTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
+        eff.Parameters.Resolution = rt.Target.Bounds.Size();
+        eff.Parameters.Amount = Crumble;
+        eff.Parameters.NoiseOffset = new Vector2(TimerOffset, 0);
+        eff.Parameters.NoiseScale = new Vector2(200f, 100f);
+        eff.Parameters.OutlineColor = new Color(10, 20, 15).ToVector4();
+        eff.Parameters.ExtraColor = Color.SkyBlue.ToVector4();
+        eff.Parameters.FillColor = finalColor.ToVector4();
+        eff.Parameters.Outline = true;
+        eff.Apply();
+
+        Vector2 scale = new Vector2(Projectile.scale - (CrumbleAmount / 5f), Projectile.scale + (CrumbleAmount / 5f));
+
+        sb.Begin(ss with { CustomEffect = eff.Shader });
+
+        for (int i = 0; i < 4; i++)
+            Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition + new Vector2(0, 2).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver2)), rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
+
+        sb.End();
+        var eff2 = Assets.Effects.Reliquary.ChiseledStatues.TileClusterCrumbleEffect.CreateEffect();
+        eff2.Parameters.FillTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
+        eff2.Parameters.Resolution = rt.Target.Bounds.Size();
+        eff2.Parameters.Amount = Crumble;
+        eff2.Parameters.NoiseOffset = new Vector2(TimerOffset, 0);
+        eff2.Parameters.NoiseScale = new Vector2(200f, 100f);
+        eff2.Parameters.OutlineColor = Color.White.ToVector4();
+        eff2.Parameters.ExtraColor = Color.Blue.ToVector4();
+        eff2.Parameters.FillColor = finalColor.ToVector4();
+        eff2.Parameters.Outline = false;
+        eff2.Apply();
+        sb.Begin(ss with { CustomEffect = eff2.Shader });
+
+        Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
 
         sb.Restart(in ss);
 
@@ -558,21 +626,6 @@ public sealed class TileCluster : EverProjectile
                 }
             }
         }
-    }
-
-    [ModSystemHooks.PostUpdateWorld]
-    private static void PostUpdateWorld()
-    {
-        /*
-        if (Main.mouseRight && Main.mouseRightRelease)
-        {
-            var (i, j) = Main.MouseWorld.ToTileCoordinates();
-
-            var spawnPosition = Main.MouseWorld.ToTileCoordinates().ToWorldCoordinates();
-
-            Projectile.NewProjectile(new EntitySource_Misc(""), spawnPosition, Vector2.Zero, ModContent.ProjectileType<TileCluster>(), 1, 1, Main.myPlayer, i, j, 3);
-        }
-        */
     }
 }
 

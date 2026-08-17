@@ -26,7 +26,6 @@ public abstract class EverWeaponItem : EverItem
     {
         base.NetReceive(reader);
         MeterFill = reader.ReadSingle();
-        Main.NewText(MeterFill);
     }
 
     public virtual void ChargeMeter(float amt)
