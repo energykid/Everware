@@ -311,7 +311,7 @@ Items: {
 
 	AtlasCrown: {
 		DisplayName: Atlas' Crown
-		Tooltip: ""
+		Tooltip: "Drinking a health potion creates "
 	}
 
 	GravelItem: {

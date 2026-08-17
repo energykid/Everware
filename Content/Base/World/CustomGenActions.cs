@@ -157,6 +157,27 @@ public class CustomGenActions
         }
     }
 
+    public class SetTileFromNone : GenAction
+    {
+        private ushort id;
+        public SetTileFromNone(ushort ID)
+        {
+            id = ID;
+        }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (!Main.tile[x, y].HasTile || !Main.tileSolid[Main.tile[x, y].TileType])
+            {
+                WorldGen.KillTile(x, y, false, false, true);
+                WorldGen.PlaceTile(x, y, id, true);
+            }
+
+            WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
     public class SetTileFromOtherSafe : GenAction
     {
         private ushort id;

@@ -316,7 +316,7 @@ Items: {
 
 	AtlasCrown: {
 		// DisplayName: Atlas' Crown
-		// Tooltip: ""
+		// Tooltip: "Drinking a health potion creates "
 	}
 
 	GravelItem: {
@@ -324,7 +324,6 @@ Items: {
 		// Tooltip: ""
 	}
 
-	// Chiselable: "[c/6AA7FF:Can be chiseled by the Sculptor]"
 	// ChiselRecipeCondition: Chiseled by the Sculptor
 	// Hits: Hits
 	// Times: times

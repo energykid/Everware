@@ -10,6 +10,7 @@ namespace Everware.Content.Gallery.Sculptor;
 [AutoloadHead]
 public class SculptorNPC : ModNPC
 {
+    public override string Texture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC";
     private static Profiles.StackedNPCProfile Profile;
     public bool Focused = false;
     public int FocusedPlayer = -1;
@@ -63,6 +64,8 @@ public class SculptorNPC : ModNPC
     }
     public override void SetStaticDefaults()
     {
+        base.SetStaticDefaults();
+
         Main.npcFrameCount[Type] = 25; // The amount of frames the NPC has
 
         NPCID.Sets.ExtraFramesCount[Type] = 9; // Generally for Town NPCs, but this is how the NPC does extra things such as sitting in a chair and talking to other NPCs.
@@ -105,11 +108,7 @@ public class SculptorNPC : ModNPC
                 new Profiles.DefaultNPCProfile(Texture, -1),
                 new Profiles.DefaultNPCProfile(Texture/* + "_Shimmer"*/, -1)
             );
-
-        base.SetStaticDefaults();
     }
-    public override string Texture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC";
-    public override string HeadTexture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC_Head";
     public override ITownNPCProfile TownNPCProfile()
     {
         return Profile;
@@ -206,6 +205,12 @@ public class SculptorTownNPCArrivalSystem : ModSystem
             SculptorPosition = Vector2.Zero;
             SculptorName = "";
         }
+    }
+    public override void PostWorldGen()
+    {
+        SculptorAvailable = false;
+        SculptorPosition = Vector2.Zero;
+        SculptorName = "";
     }
     public override void SaveWorldData(TagCompound tag)
     {

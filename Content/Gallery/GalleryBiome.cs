@@ -29,58 +29,62 @@ public class GallerySystem : ModSystem
     }
     public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
     {
-        tasks.Add(new PassLegacy("Generating a frozen gallery", delegate (GenerationProgress progress, GameConfiguration configuration)
+        if (Snapdragon.Snapdragon.ShouldLoadForTesting)
         {
-            int snowDirection = 0;
-
-            bool success = false;
-
-            Point pos = new Point(Main.spawnTileX, (int)Main.worldSurface + Main.rand.Next(100, 300));
-
-            for (int i = 0; i < Main.maxTilesX / 2; i++)
+            tasks.Add(new PassLegacy("Generating a frozen gallery", delegate (GenerationProgress progress, GameConfiguration configuration)
             {
-                Point p1 = pos + new Point(i, 0);
-                Point p2 = pos + new Point(-i, 0);
+                int snowDirection = 0;
 
-                if (p1.X > 100 && p1.X < Main.maxTilesX - 100)
+                bool success = false;
+
+                Point pos = new Point(Main.spawnTileX, (int)Main.worldSurface + Main.rand.Next(100, 300));
+
+                for (int i = 0; i < Main.maxTilesX / 2; i++)
                 {
-                    if (Main.tile[p1].TileType == TileID.SnowBlock || Main.tile[p1].TileType == TileID.IceBlock)
+                    Point p1 = pos + new Point(i, 0);
+                    Point p2 = pos + new Point(-i, 0);
+
+                    if (p1.X > 100 && p1.X < Main.maxTilesX - 100)
                     {
-                        pos = p1;
-                        snowDirection = 1;
-                        success = true;
-                        break;
+                        if (Main.tile[p1].TileType == TileID.SnowBlock || Main.tile[p1].TileType == TileID.IceBlock)
+                        {
+                            pos = p1;
+                            snowDirection = 1;
+                            success = true;
+                            break;
+                        }
+                    }
+
+                    if (p2.X > 100 && p2.X < Main.maxTilesX - 100)
+                    {
+                        if (Main.tile[p2].TileType == TileID.SnowBlock || Main.tile[p2].TileType == TileID.IceBlock)
+                        {
+                            pos = p2;
+                            snowDirection = -1;
+                            success = true;
+                            break;
+                        }
                     }
                 }
 
-                if (p2.X > 100 && p2.X < Main.maxTilesX - 100)
+                if (success)
                 {
-                    if (Main.tile[p2].TileType == TileID.SnowBlock || Main.tile[p2].TileType == TileID.IceBlock)
-                    {
-                        pos = p2;
-                        snowDirection = -1;
-                        success = true;
-                        break;
-                    }
+                    pos.X += snowDirection * 300;
                 }
-            }
+                else
+                {
+                    HasGalleryFailed = true;
+                }
 
-            if (success)
-            {
-                pos.X += snowDirection * 300;
-            }
-            else
-            {
-                HasGalleryFailed = true;
-            }
-
-            GalleryGeneration.GenerateGallery(pos);
-        }));
+                GalleryGeneration.GenerateGallery(pos);
+            }));
+        }
     }
 
     public override void Load()
     {
-        On_TileLightScanner.GetTileLight += On_TileLightScanner_GetTileLight;
+        if (Snapdragon.Snapdragon.ShouldLoadForTesting)
+            On_TileLightScanner.GetTileLight += On_TileLightScanner_GetTileLight;
     }
 
     private void On_TileLightScanner_GetTileLight(On_TileLightScanner.orig_GetTileLight orig, TileLightScanner self, int x, int y, out Vector3 outputColor)
@@ -100,7 +104,8 @@ public class GallerySystem : ModSystem
 
     public override void Unload()
     {
-        On_TileLightScanner.GetTileLight -= On_TileLightScanner_GetTileLight;
+        if (Snapdragon.Snapdragon.ShouldLoadForTesting)
+            On_TileLightScanner.GetTileLight -= On_TileLightScanner_GetTileLight;
     }
     public static Point GalleryPosition = Point.Zero;
     public override void SaveWorldData(TagCompound tag)
@@ -117,7 +122,8 @@ public class GalleryBiome : ModBiome
     public override SceneEffectPriority Priority => SceneEffectPriority.Environment;
     public override void Load()
     {
-        On_Main.DoDraw_WallsAndBlacks += DoDraw_WallsAndBlacks;
+        if (Snapdragon.Snapdragon.ShouldLoadForTesting)
+            On_Main.DoDraw_WallsAndBlacks += DoDraw_WallsAndBlacks;
     }
 
     private void DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
@@ -241,7 +247,8 @@ public class GalleryBiome : ModBiome
 
     public override void Unload()
     {
-        On_Main.DoDraw_WallsAndBlacks -= DoDraw_WallsAndBlacks;
+        if (Snapdragon.Snapdragon.ShouldLoadForTesting)
+            On_Main.DoDraw_WallsAndBlacks -= DoDraw_WallsAndBlacks;
     }
 
     public override string Name => "TheGallery";

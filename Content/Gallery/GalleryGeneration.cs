@@ -1,5 +1,6 @@
 ﻿using Everware.Content.Base.World;
 using Everware.Content.Gallery.Sculptor;
+using Everware.Utils;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 
@@ -7,6 +8,24 @@ namespace Everware.Content.Gallery;
 
 public class GalleryGeneration
 {
+    public static void Everware025_SpawnFrozenSculptor(Point center)
+    {
+        Point surfPoint = (new Point(center.X, (int)Main.worldSurface - 200)).Grounded();
+        Point tipPoint = (new Point(center.X, (int)Main.worldSurface - 200)).Grounded() + new Point(0, -6);
+
+        new CustomGenShapes.Triangle(new Point(-7, 20),
+            new Point(9, 20),
+            new Point(0, -15)).Perform(surfPoint, Actions.Chain(new CustomGenActions.SetTileFromNone(TileID.IceBlock), new Actions.Smooth(true)));
+
+        new Shapes.Rectangle(new Rectangle(-3, -10, 6, 10)).Perform(tipPoint, Actions.Chain(new Actions.Clear(), new Actions.SetFrames(true)));
+
+        WorldGen.PlaceObject(tipPoint.X - 1, tipPoint.Y - 3, ModContent.TileType<FrozenSculptor>());
+    }
+
+    /// <summary>
+    /// Unused until 0.3.
+    /// </summary>
+    /// <param name="center"></param>
     public static void GenerateGallery(Point center)
     {
         GallerySystem.GalleryPosition = center;

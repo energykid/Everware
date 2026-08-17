@@ -473,7 +473,7 @@ public class SculptorStatueSlot : UIElement
                         Main.instance.DrawItem_GetBasics(new Item(ch.UpgradeMaterial), 0, out Texture2D tx, out Rectangle fr, out Rectangle gmFr);
                         float sc2 = 1f - ((float)Math.Clamp((fr.Size().Length() / 2f) - 40, 0, 1) * 0.3f);
 
-                        Main.EntitySpriteDraw(tx, position, fr, Color.White.MultiplyRGBA(new(0.2f, 0.2f, 0.2f, 0.2f)), 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
+                        Main.EntitySpriteDraw(tx, position, fr, Color.White.MultiplyRGBA(new(0.5f, 0.5f, 0.5f, 0.5f)), 0f, fr.Size() / 2f, Scale * sc2, SpriteEffects.None);
 
                         str = ch.UpgradeStack.ToString();
                     }

@@ -17,6 +17,11 @@ public class FrozenSculptor : EverMultitile
         DustType = DustID.Ice;
         Main.tileNoAttach[Type] = true;
 
+        TileID.Sets.PreventsSandfall[Type] = true;
+        TileID.Sets.PreventsTileReplaceIfOnTopOfIt[Type] = true;
+        TileID.Sets.PreventsTileHammeringIfOnTopOfIt[Type] = true;
+        TileID.Sets.PreventsTileRemovalIfOnTopOfIt[Type] = true;
+
         MinPick = 100000000;
 
         TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<FrozenSculptorTileEntity>().Generic_HookPostPlaceMyPlayer;
