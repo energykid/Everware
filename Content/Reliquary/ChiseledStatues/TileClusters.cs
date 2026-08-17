@@ -1,4 +1,4 @@
-﻿using Daybreak.Common.Features.Hooks;
+﻿using Everware.Content.Base;
 using Everware.Core.Projectiles;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +26,46 @@ public sealed class TileCluster : EverProjectile
 
         On_WorldGen.CheckPot += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
         On_WorldGen.CheckJunglePlant += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
+
+        On_Main.DrawPlayers_AfterProjectiles += DrawAllBlocks;
+    }
+
+    public override void Unload()
+    {
+        On_Main.DrawPlayers_AfterProjectiles -= DrawAllBlocks;
+    }
+
+    private void DrawAllBlocks(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
+    {
+        List<Projectile> projs = [];
+
+        Color c = Color.White;
+
+        foreach (Projectile projectile in Main.ActiveProjectiles)
+            if (projectile.ModProjectile is TileCluster cluster)
+            {
+                projs.Add(projectile);
+            }
+
+        projs.Sort((a, b) => { return a.scale > b.scale ? 1 : -1; });
+
+        Main.spriteBatch.Begin(SpriteSortMode.BackToFront, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+
+        foreach (Projectile projectile in projs)
+            if (projectile.ModProjectile is TileCluster cluster)
+                cluster.DrawSelf(ref c, 0f, 0.85f);
+
+        Main.spriteBatch.End(out var sb);
+
+        orig(self);
+
+        Main.spriteBatch.Begin(sb);
+
+        foreach (Projectile projectile in projs)
+            if (projectile.ModProjectile is TileCluster cluster)
+                cluster.DrawSelf(ref c, 0.85f, 2f);
+
+        Main.spriteBatch.End();
     }
 
     private static bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)
@@ -104,8 +144,8 @@ public sealed class TileCluster : EverProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = 24;
-        Projectile.height = 24;
+        Projectile.width = 100;
+        Projectile.height = 100;
         Projectile.scale = 1f;
 
         Projectile.penetrate = -1;
@@ -210,7 +250,9 @@ public sealed class TileCluster : EverProjectile
                     );
                     drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
 
-                    cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
+                    if (Main.tileSolid[drawData.typeCache])
+                    {
+                        cluster[i - topLeft.X, j - topLeft.Y] = new ClusterTileData(
                         drawData.tileCache.HasTile,
                         drawData.tileCache.Slope,
                         drawData.tileCache.IsHalfBlock,
@@ -218,6 +260,8 @@ public sealed class TileCluster : EverProjectile
                         drawData.tileCache.IsTileFullbright,
                         drawData
                     );
+                    }
+
                 }
         }
         RestoreCluster();
@@ -277,42 +321,130 @@ public sealed class TileCluster : EverProjectile
         }
     }
 
+    public int ClusterIndex = 0;
+    public int MaxClusterIndex = 6;
+    float TimerOffset = Main.rand.NextFloat(10f);
+    float Timer = 0f;
+    bool Sent = false;
+    float VelocityMod = 0f;
+    float VelocityMod2 = Main.rand.NextFloat(0.8f, 1.2f);
+    public bool Fall = false;
+    public Vector2 VelocityTarget = Vector2.Zero;
     public override void AI()
     {
-        Projectile.velocity.Y = -4f;
-        Projectile.timeLeft = 50;
-        Projectile.rotation += 0.01f;
+        float t = ((float)((float)ClusterIndex / (float)MaxClusterIndex)) * MathHelper.TwoPi;
+
+        Timer++;
+        if (!Fall)
+        {
+            if (!Sent)
+            {
+                if (Timer < 15)
+                {
+                    Projectile.velocity *= 0.9f;
+                }
+
+                VelocityMod = MathHelper.Lerp(VelocityMod, 0.5f, 0.1f);
+                Vector2 off = new Vector2((float)Math.Sin((GlobalTimer.Value / 30f) + t) * 60f, ((float)Math.Sin((GlobalTimer.Value / 30f) + t + MathHelper.PiOver2) * 20f));
+                Projectile.scale = MathHelper.Lerp(Projectile.scale, 0.8f + (off.Y / 70f * 0.6f), 0.2f);
+                Projectile.rotation = MathHelper.Lerp(Projectile.rotation, (float)Math.Sin(Timer / 45f) * 0.3f, 0.1f);
+
+                off.Y += (float)Math.Sin(Timer / 15f) * 6f;
+
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Lerp(Projectile.Center, Owner.Center + off + new Vector2(0, 12), 0.3f * VelocityMod) - Projectile.Center, 0.3f * VelocityMod * VelocityMod2);
+                if (NetworkOwner.MouseDown)
+                {
+                    Projectile.velocity -= Owner.DirectionTo(NetworkOwner.MousePosition) * 5f;
+                    Sent = true;
+                    VelocityTarget = Owner.DirectionTo(NetworkOwner.MousePosition) * 10f;
+                    Projectile.owner = Main.player.Length - 1;
+                    Timer = -TimerOffset;
+                }
+                Projectile.timeLeft = 140;
+            }
+            else
+            {
+                Projectile.scale = MathHelper.Lerp(Projectile.scale, 0.8f, 0.2f);
+
+                Projectile.rotation += MathHelper.ToRadians(Projectile.velocity.X * 0.5f);
+
+                if (Timer > 0)
+                {
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, VelocityTarget, 0.1f);
+                }
+                else
+                {
+                    Projectile.velocity *= 0.9f;
+                }
+
+                if (Timer > 20) KillIfColliding();
+
+                Projectile.velocity *= 1.1f;
+            }
+        }
+        else
+        {
+            Projectile.rotation += MathHelper.ToRadians(Projectile.velocity.Y * 0.5f);
+            Projectile.velocity.Y += 1f;
+            KillIfColliding();
+        }
+    }
+
+    public void KillIfColliding()
+    {
+        Tile tle = Main.tile[(Projectile.Center / 16 + new Vector2(0.5f, 0.5f)).ToPoint()];
+
+        if (tle.HasTile && Main.tileSolid[tle.TileType])
+        {
+            Projectile.Kill();
+        }
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
+        return false;
+    }
+
+    public void DrawSelf(ref Color lightColor, float scalerange1, float scalerange2)
+    {
+        if (Projectile.scale > scalerange2 || Projectile.scale < scalerange1) return;
+
         var sb = Main.spriteBatch;
 
         if (cluster is null)
         {
-            return false;
+            return;
         }
 
         var origin = new Vector2((ClusterSize * 16) / 2f);
 
         var transform =
-            Matrix.CreateRotationZ(Projectile.rotation)
-          * Matrix.CreateTranslation(new Vector3(Projectile.Center - Main.screenPosition, 0f))
+            Matrix.CreateTranslation(new Vector3(new Vector2(200), 0f))
           * Main.GameViewMatrix.TransformationMatrix;
 
+        var rt = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, 400, 400);
+
         sb.End(out var ss);
-        sb.Begin(ss with { TransformMatrix = transform });
+        using (rt.Scope(clearColor: Color.Transparent))
         {
+            sb.Begin(ss with { TransformMatrix = transform });
             for (var i = 0; i < ClusterSize; i++)
                 for (var j = 0; j < ClusterSize; j++)
                 {
                     DrawSlopedTile(i, j, false);
                     DrawSlopedTile(i, j, true);
                 }
+            sb.End();
         }
+        sb.Begin(ss with { });
+
+        Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale), Projectile.rotation, new Vector2(200), Projectile.scale, SpriteEffects.None, Projectile.scale);
+
         sb.Restart(in ss);
 
-        return false;
+        rt.Dispose();
+
+        return;
 
         void DrawSlopedTile(int i, int j, bool useGlowMask)
         {
@@ -327,7 +459,7 @@ public sealed class TileCluster : EverProjectile
 
             var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
 
-            drawData.tileLight = fullBright ? Color.White : Lighting.GetColor(Projectile.Center.ToTileCoordinates());
+            drawData.tileLight = fullBright ? Color.White : Lighting.GetColor((Projectile.Center + position).ToTileCoordinates());
             drawData.colorTint = Color.White;
             drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
 
