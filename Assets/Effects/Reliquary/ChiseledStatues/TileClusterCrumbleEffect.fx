@@ -27,7 +27,7 @@ float4 ExtraColor;
 bool Outline;
 
 float4 Effect(float2 coords : TEXCOORD0) : COLOR0
-{    
+{
     float4 col = tex2D(uImage0, coords);
     
     float4 col2 = tex2D(FillSampler, pixelateCoords(coords + NoiseOffset * NoiseScale, Resolution / 2));
@@ -55,7 +55,7 @@ float4 Effect(float2 coords : TEXCOORD0) : COLOR0
         return float4(0.0, 0.0, 0.0, 0.0);
     
     if (Outline)
-        return lerp(OutlineColor * FillColor, ExtraColor, skewLerp(coords.y, 0.5, 0.75, 0.0, 1.0, 0.0));
+        return (OutlineColor * FillColor) + lerp(float4(0.0, 0.0, 0.0, 0.0), ExtraColor, skewLerp(coords.y, 0.5, 0.75, 0.0, 1.0, 0.0));
     else
         return (col * FillColor) + lerp(float4(0.0, 0.0, 0.0, 0.0), ExtraColor, skewLerp(coords.y, 0.5, 0.75, 0.0, 0.25, 0.0));
 }

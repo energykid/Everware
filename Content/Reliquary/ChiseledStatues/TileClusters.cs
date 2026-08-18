@@ -186,8 +186,8 @@ public sealed class TileCluster : EverProjectile
         BehaviorUtils.ThrowTileReplicants(Projectile.velocity, (Projectile.Center / 16f).ToPoint(), 2);
 
         ScreenEffects.AddScreenShake(Projectile.Center, 5f, 0.6f);
-        SoundEngine.PlaySound(SoundID.Dig.WithPitchOffset(-0.3f), Projectile.Center);
-        SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.AtlasCrownEmerge.Asset.WithPitchVariance(0.2f), Projectile.Center);
+        SoundEngine.PlaySound(SoundID.Dig.WithPitchOffset(0.3f), Projectile.Center);
+        SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.AtlasCrownEmerge.Asset.WithPitchVariance(0.2f).WithVolumeScale(0.5f), Projectile.Center);
 
         cluster = new ClusterTileData[ClusterSize, ClusterSize];
         var topLeft = new Point(TileCenterX - (ClusterSize / 2), TileCenterY - (ClusterSize / 2));
@@ -360,11 +360,16 @@ public sealed class TileCluster : EverProjectile
     public Vector2 VelocityTarget = Vector2.Zero;
     public override bool? CanDamage()
     {
-        if (!Sent) return false;
-        return base.CanDamage();
+        if (TileCollide) return null;
+        return false;
     }
+    public override int? TrailSeparation => 4;
+    public bool TileCollide = false;
+
     public override void AI()
     {
+        base.AI();
+
         Lighting.AddLight(Projectile.Center, Color.Blue.ToVector3() * 0.5f * (1f - CrumbleAmount));
 
         float t = ((float)((float)ClusterIndex / (float)MaxClusterIndex)) * MathHelper.TwoPi;
@@ -412,8 +417,17 @@ public sealed class TileCluster : EverProjectile
 
                 if (Timer == 5)
                 {
+                    Glowing = true;
                     Projectile.velocity = VelocityTarget * 2.5f;
                     SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing.WithPitchOffset(1f - (TimerOffset / 20f)), Projectile.Center);
+                }
+                if (Timer < 5)
+                {
+                    GlowAmount = MathHelper.Lerp(GlowAmount, 1f, 0.05f);
+                }
+                else
+                {
+                    GlowAmount = MathHelper.Lerp(GlowAmount, 1f, 0.2f);
                 }
 
                 if (Timer > 0)
@@ -426,7 +440,13 @@ public sealed class TileCluster : EverProjectile
                     Projectile.velocity = Vector2.Lerp(Projectile.velocity, -VelocityTarget, 0.05f);
                 }
 
-                if (Timer > 20) KillIfColliding();
+                if (Timer > 0)
+                {
+                    Tile tle = Main.tile[(Projectile.Center / 16 + new Vector2(0.5f, 0.5f)).ToPoint()];
+                    if (!tle.HasTile || !Main.tileSolid[tle.TileType]) TileCollide = true;
+                }
+
+                if (TileCollide) KillIfColliding();
             }
         }
         else
@@ -459,6 +479,8 @@ public sealed class TileCluster : EverProjectile
     }
 
     float CrumbleAmount = 0f;
+    float GlowAmount = 0f;
+    bool Glowing = false;
 
     public void DrawSelf(ref Color lightColor, float scalerange1, float scalerange2)
     {
@@ -511,15 +533,23 @@ public sealed class TileCluster : EverProjectile
         eff.Parameters.Amount = Crumble;
         eff.Parameters.NoiseOffset = new Vector2(TimerOffset, 0);
         eff.Parameters.NoiseScale = new Vector2(200f, 100f);
-        eff.Parameters.OutlineColor = new Color(10, 20, 15).ToVector4();
-        eff.Parameters.ExtraColor = Color.SkyBlue.ToVector4();
-        eff.Parameters.FillColor = finalColor.ToVector4();
         eff.Parameters.Outline = true;
+
+        eff.Parameters.OutlineColor = Color.Lerp(new Color(10, 20, 15), Color.SkyBlue, GlowAmount).ToVector4();
+        eff.Parameters.FillColor = Color.Lerp(finalColor, Color.White, GlowAmount).ToVector4();
+        eff.Parameters.ExtraColor = Color.Lerp(Color.SkyBlue, Color.Black, GlowAmount).ToVector4();
+
         eff.Apply();
 
         Vector2 scale = new Vector2(Projectile.scale - (CrumbleAmount / 5f), Projectile.scale + (CrumbleAmount / 5f));
 
-        sb.Begin(ss with { CustomEffect = eff.Shader });
+        sb.Begin(ss);
+
+        if (GlowAmount > 0.2f)
+            for (int i = 0; i < TrailLength; i++)
+                Main.EntitySpriteDraw(rt.Target, Projectile.oldPos[i] + new Vector2(Projectile.width / 2, Projectile.height / 2) - Main.screenPosition + new Vector2(0, 4).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4)), rt.Target.Bounds, new Color(0f, 0f, 0f, GlowAmount * 0.05f), Projectile.oldRot[i], new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
+
+        sb.Restart(ss with { CustomEffect = eff.Shader });
 
         for (int i = 0; i < 4; i++)
             Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition + new Vector2(0, 2).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver2)), rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
@@ -535,7 +565,12 @@ public sealed class TileCluster : EverProjectile
         eff2.Parameters.ExtraColor = Color.Blue.ToVector4();
         eff2.Parameters.FillColor = finalColor.ToVector4();
         eff2.Parameters.Outline = false;
+
+        eff.Parameters.FillColor = Color.Lerp(finalColor, Color.White, GlowAmount).ToVector4();
+        eff.Parameters.ExtraColor = Color.Lerp(Color.Blue, Color.Black, GlowAmount).ToVector4();
+
         eff2.Apply();
+
         sb.Begin(ss with { CustomEffect = eff2.Shader });
 
         Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
