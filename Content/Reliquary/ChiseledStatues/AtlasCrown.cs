@@ -42,8 +42,6 @@ public class AtlasCrownHeldItemPacket : EverPacket
         plr.HeldItemSpeed = ItemSpeed;
         plr.HeldItemDamage = ItemDamage;
 
-        Main.NewText(plr.HeldItemDamage.ToString() + " damage, " + plr.HeldItemSpeed.ToString() + " speed");
-
         if (Main.netMode == NetmodeID.Server) EverwarePacketHandler.SendPacket(this);
     }
     public override void Write(ModPacket packet)
