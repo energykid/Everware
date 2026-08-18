@@ -318,7 +318,7 @@ Items: {
 		// DisplayName: Atlas' Crown
 		/* Tooltip:
 			'''
-			While not attacking, gradually summon clusters from the ground
+			While not attacking, hold UP to gradually summon clusters from the ground
 			Attacking will unleash them towards your cursor
 			The size, damage and frequency of summoned clusters depend on your held weapon's attack speed
 			''' */

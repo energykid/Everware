@@ -6,6 +6,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
 
+[AutoloadEquip(EquipType.Head)]
 public class AtlasCrown : EverItem
 {
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/AtlasCrown";
@@ -84,7 +85,6 @@ public class AtlasCrownEffects : ModPlayer
             }
             if (Player.controlUp)
             {
-                Timer++;
                 if (Timer % (Math.Max(HeldItemSpeed, 2)) == 0 && !Player.ItemAnimationActive)
                 {
                     int MaxClusters = (int)MathHelper.Lerp(10f, 3f, (float)HeldItemSpeed / 60f);
@@ -103,6 +103,10 @@ public class AtlasCrownEffects : ModPlayer
                         }
                     }
                 }
+            }
+            if (Player.controlUp || Timer % (Math.Max(HeldItemSpeed, 2)) != 0)
+            {
+                Timer++;
             }
         }
         else

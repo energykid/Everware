@@ -1,6 +1,5 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base;
-using Everware.Content.Base.ParticleSystem;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
@@ -148,6 +147,8 @@ public sealed class TileCluster : EverProjectile
 
     public override void SetDefaults()
     {
+        base.SetDefaults();
+
         Projectile.netImportant = true;
 
         Projectile.width = 100;
@@ -156,15 +157,24 @@ public sealed class TileCluster : EverProjectile
 
         Projectile.penetrate = -1;
 
+        Projectile.DamageType = DamageClass.Generic;
+
         Projectile.friendly = true;
         Projectile.hostile = false;
 
-        Projectile.tileCollide = true;
+        Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
 
-        Projectile.manualDirectionChange = true;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 10;
 
-        Projectile.tileCollide = false;
+        Projectile.ContinuouslyUpdateDamageStats = true;
+    }
+
+    public override bool? CanDamage()
+    {
+        if (!Sent) return false;
+        return base.CanDamage();
     }
 
     public int TileCenterX => (int)Projectile.ai[0];
@@ -174,14 +184,6 @@ public sealed class TileCluster : EverProjectile
     public ushort ClusterSize => (ushort)Projectile.ai[2];
 
     private ClusterTileData[,]? cluster;
-
-    public override void OnKill(int timeLeft)
-    {
-        if (Sent && !Fall)
-        {
-
-        }
-    }
 
     public override void NetOnSpawn()
     {
@@ -358,6 +360,7 @@ public sealed class TileCluster : EverProjectile
         return false;
     }
 
+    int Damage = 0;
     public int ClusterIndex = 0;
     public int MaxClusterIndex = 6;
     float TimerOffset = Main.rand.NextFloat(20f);
@@ -367,11 +370,6 @@ public sealed class TileCluster : EverProjectile
     float VelocityMod2 = Main.rand.NextFloat(0.8f, 1.2f);
     public bool Fall = false;
     public Vector2 VelocityTarget = Vector2.Zero;
-    public override bool? CanDamage()
-    {
-        if (TileCollide) return null;
-        return false;
-    }
     public override int? TrailSeparation => 4;
     public bool TileCollide = false;
     public bool Killed = false;
@@ -383,6 +381,7 @@ public sealed class TileCluster : EverProjectile
 
         if (Killed)
         {
+            Projectile.damage = 0;
             Glowing = true;
             GlowAmount = 1f;
             CrumbleAmount = MathHelper.Lerp(CrumbleAmount, 1.2f, 0.15f);
@@ -426,7 +425,6 @@ public sealed class TileCluster : EverProjectile
                         Projectile.velocity -= Owner.DirectionTo(NetworkOwner.MousePosition) * 5f;
                         Sent = true;
                         VelocityTarget = Owner.DirectionTo(NetworkOwner.MousePosition) * 10f;
-                        Projectile.owner = Main.player.Length - 1;
                         Timer = (float)Math.Floor(-TimerOffset);
                     }
                     Projectile.timeLeft = 140;
@@ -440,7 +438,7 @@ public sealed class TileCluster : EverProjectile
                     if (Timer == 5)
                     {
                         Glowing = true;
-                        Projectile.velocity = VelocityTarget * 2.5f;
+                        Projectile.velocity = VelocityTarget * 2f;
                         SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing.WithPitchOffset(1f - (TimerOffset / 20f)), Projectile.Center);
                     }
                     if (Timer < 5)
@@ -601,22 +599,6 @@ public sealed class TileCluster : EverProjectile
         sb.Begin(ss with { CustomEffect = eff2.Shader });
 
         Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.Lerp(Color.DarkGray, Color.White, Projectile.scale).MultiplyRGBA(finalColor), Projectile.rotation, new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
-
-        if (Killed)
-        {
-            sb.End();
-
-            var eff3 = Assets.Effects.Reliquary.ChiseledStatues.TileClusterOutlineEffect.CreateEffect();
-            eff3.Parameters.OutlineColor = Color.Lerp(Color.SkyBlue, Color.Transparent, ShockwaveAmount).ToVector4();
-            eff3.Parameters.Outset = (float)Math.Floor(ShockwaveAmount * 6f) * 2f;
-            eff3.Parameters.Resolution = rt.Target.Bounds.Size();
-
-            eff3.Apply();
-
-            sb.Begin(ss with { CustomEffect = eff3.Shader });
-
-            Main.EntitySpriteDraw(rt.Target, Projectile.Center - Main.screenPosition, rt.Target.Bounds, Color.White, Projectile.rotation, new Vector2(200), Projectile.scale * (1f + (ShockwaveAmount * 0.4f)), SpriteEffects.None, Projectile.scale);
-        }
 
         sb.Restart(in ss);
 
