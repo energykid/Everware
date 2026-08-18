@@ -177,8 +177,8 @@ public sealed class TileCluster : EverProjectile
     public override void NetOnSpawn()
     {
         if (Main.dedServ
-         || TileCenterX <= (ClusterSize / 2) + 1 || TileCenterX >= Main.maxTilesX - (ClusterSize / 2) + 1
-         || TileCenterY <= (ClusterSize / 2) + 1 || TileCenterY >= Main.maxTilesY - (ClusterSize / 2) + 1)
+         || TileCenterX <= (ClusterSize / 2) + 1 || TileCenterX >= Main.maxTilesX - ((ClusterSize / 2) + 1)
+         || TileCenterY <= (ClusterSize / 2) + 1 || TileCenterY >= Main.maxTilesY - ((ClusterSize / 2) + 1))
         {
             return;
         }
@@ -360,7 +360,7 @@ public sealed class TileCluster : EverProjectile
     public Vector2 VelocityTarget = Vector2.Zero;
     public override bool? CanDamage()
     {
-        if (Sent) return true;
+        if (!Sent) return false;
         return base.CanDamage();
     }
     public override void AI()

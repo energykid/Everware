@@ -90,13 +90,13 @@ public class AtlasCrownEffects : ModPlayer
                 int MaxClusters = (int)MathHelper.Lerp(10f, 3f, (float)HeldItemSpeed / 60f);
                 int ClusterSize = 1 + (int)Math.Ceiling((float)HeldItemSpeed / 12f);
 
-                if (Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] < MaxClusters && !Main.dedServ)
+                if (Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] < MaxClusters && Main.myPlayer == Player.whoAmI)
                 {
                     Vector2 pos = (Player.Center + new Vector2(Main.rand.NextFloat(-250, 250), 0)).Grounded() + new Vector2(0, 20);
-                    Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(Player, "Atlas' Crown cluster"), pos, new Vector2((pos.X - Player.Center.X) / 20f, -25), ModContent.ProjectileType<TileCluster>(),
+                    int proj = Projectile.NewProjectile(new EntitySource_Parent(Player, "Atlas' Crown cluster"), pos, new Vector2((pos.X - Player.Center.X) / 20f, -25), ModContent.ProjectileType<TileCluster>(),
                         Player.HeldItem.OriginalDamage, 5f, Player.whoAmI, (int)pos.X / 16, (int)pos.Y / 16, ClusterSize);
 
-                    if (proj.ModProjectile is TileCluster cluster)
+                    if (Main.projectile[proj].ModProjectile is TileCluster cluster)
                     {
                         cluster.MaxClusterIndex = MaxClusters;
                         cluster.ClusterIndex = Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()];
