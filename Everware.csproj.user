@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Terraria Client (D3D11)</ActiveDebugProfile>
+    <ActiveDebugProfile>Terraria Client (Standard)</ActiveDebugProfile>
   </PropertyGroup>
 </Project>

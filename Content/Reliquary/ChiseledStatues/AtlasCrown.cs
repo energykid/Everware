@@ -82,22 +82,25 @@ public class AtlasCrownEffects : ModPlayer
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                     EverwarePacketHandler.SendPacket(new AtlasCrownHeldItemPacket() { Player = Player.whoAmI, ItemSpeed = HeldItemSpeed, ItemDamage = HeldItemDamage });
             }
-            Timer++;
-            if (Timer % (Math.Max(HeldItemSpeed, 2)) == 0 && !Player.ItemAnimationActive)
+            if (Player.controlUp)
             {
-                int MaxClusters = (int)MathHelper.Lerp(10f, 3f, (float)HeldItemSpeed / 60f);
-                int ClusterSize = 1 + (int)Math.Ceiling((float)HeldItemSpeed / 12f);
-
-                if (Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] < MaxClusters && Main.myPlayer == Player.whoAmI)
+                Timer++;
+                if (Timer % (Math.Max(HeldItemSpeed, 2)) == 0 && !Player.ItemAnimationActive)
                 {
-                    Vector2 pos = (Player.Center + new Vector2(Main.rand.NextFloat(-250, 250), 0)).Grounded() + new Vector2(0, 20);
-                    int proj = Projectile.NewProjectile(new EntitySource_Parent(Player, "Atlas' Crown cluster"), pos, new Vector2((pos.X - Player.Center.X) / 20f, -25), ModContent.ProjectileType<TileCluster>(),
-                        Player.HeldItem.OriginalDamage, 5f, Player.whoAmI, (int)pos.X / 16, (int)pos.Y / 16, ClusterSize);
+                    int MaxClusters = (int)MathHelper.Lerp(10f, 3f, (float)HeldItemSpeed / 60f);
+                    int ClusterSize = 1 + (int)Math.Ceiling((float)HeldItemSpeed / 12f);
 
-                    if (Main.projectile[proj].ModProjectile is TileCluster cluster)
+                    if (Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] < MaxClusters && Main.myPlayer == Player.whoAmI)
                     {
-                        cluster.MaxClusterIndex = MaxClusters;
-                        cluster.ClusterIndex = Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()];
+                        Vector2 pos = (Player.Center + new Vector2(Main.rand.NextFloat(-250, 250), 0)).Grounded() + new Vector2(0, 20);
+                        int proj = Projectile.NewProjectile(new EntitySource_Parent(Player, "Atlas' Crown cluster"), pos, new Vector2((pos.X - Player.Center.X) / 20f, -25), ModContent.ProjectileType<TileCluster>(),
+                            Player.HeldItem.OriginalDamage, 5f, Player.whoAmI, (int)pos.X / 16, (int)pos.Y / 16, ClusterSize + Main.rand.NextFloat(1.5f));
+
+                        if (Main.projectile[proj].ModProjectile is TileCluster cluster)
+                        {
+                            cluster.MaxClusterIndex = MaxClusters;
+                            cluster.ClusterIndex = Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()];
+                        }
                     }
                 }
             }
