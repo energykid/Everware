@@ -570,7 +570,7 @@ public sealed class TileCluster : EverProjectile
 
         sb.Begin(ss);
 
-        if (GlowAmount > 0.2f)
+        if (GlowAmount > 0.2f && !Killed)
             for (int i = 0; i < TrailLength; i++)
                 Main.EntitySpriteDraw(rt.Target, Projectile.oldPos[i] + new Vector2(Projectile.width / 2, Projectile.height / 2) - Main.screenPosition + new Vector2(0, 4).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4)), rt.Target.Bounds, new Color(0f, 0f, 0f, GlowAmount * 0.05f), Projectile.oldRot[i], new Vector2(200), scale, SpriteEffects.None, Projectile.scale);
 

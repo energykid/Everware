@@ -14,7 +14,7 @@ public class ForgingKilnItem : EverPlaceableItem
         rc.AddTile(TileID.Anvils);
         rc.AddIngredient(ModContent.ItemType<Kilnstone>(), 15);
         rc.AddIngredient(ItemID.Torch, 5);
-        rc.AddIngredient(RecipeGroupID.IronBar, 10);
+        rc.AddRecipeGroup(RecipeGroupID.IronBar, 10);
         rc.Register();
     }
 }

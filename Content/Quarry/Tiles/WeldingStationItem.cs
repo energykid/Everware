@@ -12,12 +12,13 @@ public class WeldingStationItem : EverPlaceableItem
     public override void AddRecipes()
     {
         RecipeGroup rg = new RecipeGroup(() => Mods.Everware.Items.AnyCopperBar.GetTextValue(), ItemID.CopperBar, ItemID.TinBar);
+        RecipeGroup.RegisterGroup("AnyCopperBar", rg);
 
         Recipe rc = Recipe.Create(Type);
         rc.AddTile(TileID.Anvils);
         rc.AddIngredient(ModContent.ItemType<RebarRod>(), 15);
-        rc.AddIngredient(rg.RegisteredId, 5);
-        rc.AddIngredient(RecipeGroupID.IronBar, 10);
+        rc.AddRecipeGroup("AnyCopperBar", 5);
+        rc.AddRecipeGroup(RecipeGroupID.IronBar, 10);
         rc.Register();
     }
 }
