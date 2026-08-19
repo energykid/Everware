@@ -6,7 +6,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
 
-[AutoloadEquip(EquipType.Head)]
+[AutoloadEquip(EquipType.Face)]
 public class AtlasCrown : EverItem
 {
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/AtlasCrown";
@@ -32,16 +32,19 @@ public class AtlasCrownHeldItemPacket : EverPacket
     public int ItemSpeed = 0;
     public int ItemDamage = 0;
     public int Player = 0;
+    public bool Cooldown = false;
     public override void Read(Mod mod, BinaryReader reader, int playerID)
     {
         Player = reader.ReadInt32();
         ItemSpeed = reader.ReadInt32();
         ItemDamage = reader.ReadInt32();
+        Cooldown = reader.ReadBoolean();
 
         AtlasCrownEffects plr = Main.player[Player].GetModPlayer<AtlasCrownEffects>();
 
         plr.HeldItemSpeed = ItemSpeed;
         plr.HeldItemDamage = ItemDamage;
+        plr.Cooldown = Cooldown;
 
         if (Main.netMode == NetmodeID.Server) EverwarePacketHandler.SendPacket(this);
     }
@@ -50,12 +53,14 @@ public class AtlasCrownHeldItemPacket : EverPacket
         packet.Write(Player);
         packet.Write(ItemSpeed);
         packet.Write(ItemDamage);
+        packet.Write(Cooldown);
     }
 }
 
 public class AtlasCrownEffects : ModPlayer
 {
     public bool Active = false;
+    public bool Cooldown = false;
 
     int Timer = 0;
     public int HeldItemSpeed = 0;
@@ -67,6 +72,12 @@ public class AtlasCrownEffects : ModPlayer
     }
     public override void PostUpdate()
     {
+        if (Cooldown)
+        {
+            Cooldown = Player.ownedProjectileCounts[ModContent.ProjectileType<TileCluster>()] != 0;
+            return;
+        }
+
         if (Active && Player.HeldItem.DamageType != DamageClass.Default
             && Player.HeldItem.pick == 0
             && Player.HeldItem.axe == 0
@@ -74,7 +85,7 @@ public class AtlasCrownEffects : ModPlayer
         {
             if (Player.HeldItem.useAnimation != HeldItemSpeed || Player.HeldItem.OriginalDamage != HeldItemDamage)
             {
-                Timer = 0;
+                Timer = 1;
                 RemovePreviousTileClusters();
 
                 HeldItemDamage = Player.HeldItem.OriginalDamage;
@@ -83,7 +94,7 @@ public class AtlasCrownEffects : ModPlayer
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                     EverwarePacketHandler.SendPacket(new AtlasCrownHeldItemPacket() { Player = Player.whoAmI, ItemSpeed = HeldItemSpeed, ItemDamage = HeldItemDamage });
             }
-            if (Player.controlUp)
+            if (Player.controlUp && !Cooldown)
             {
                 if (Timer % (Math.Max(HeldItemSpeed, 2)) == 0 && !Player.ItemAnimationActive)
                 {

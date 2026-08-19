@@ -421,6 +421,7 @@ public sealed class TileCluster : EverProjectile
                     Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Lerp(Projectile.Center, Owner.Center + off + new Vector2(0, 12), 0.3f * VelocityMod) - Projectile.Center, 0.3f * VelocityMod * VelocityMod2);
                     if (NetworkOwner.MouseDown)
                     {
+                        Owner.GetModPlayer<AtlasCrownEffects>().Cooldown = true;
                         Projectile.netUpdate = true;
                         Projectile.velocity -= Owner.DirectionTo(NetworkOwner.MousePosition) * 5f;
                         Sent = true;

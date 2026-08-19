@@ -12,12 +12,13 @@ namespace Everware.Content.EyeOfCthulhuRework;
 
 public class EyeOfCthulhu : GlobalNPC
 {
-    public static int BloodProjectileDamage => Main.expertMode ? 9 : 16;
-    public static int BashDamage => Main.expertMode ? 38 : 28;
-    public static int Phase2BashDamage => Main.expertMode ? 48 : 38;
-    public static int TendrilDamage => Main.expertMode ? 32 : 25;
-    public static int Phase2TendrilDamage => Main.expertMode ? 43 : 32;
-    public static int DesperationThreshold => Main.expertMode ? Main.masterMode ? 700 : 400 : 250;
+    public static int BloodProjectileDamage => Main.expertMode ? 12 : 16;
+    public static int BashDamage => Main.expertMode ? 58 : 28;
+    public static int Phase2BashDamage => Main.expertMode ? 61 : 38;
+    public static int TendrilDamage => Main.expertMode ? 37 : 25;
+    public static int Phase2TendrilDamage => Main.expertMode ? 53 : 32;
+    public static float DesperationPercentage => Main.expertMode ? (Main.masterMode ? 0.2f : 0.1f) : 0.075f;
+    public static int DesperationThreshold(NPC npc) => (int)((float)npc.lifeMax * DesperationPercentage);
     public int Phase2Threshold = 0;
     public int Phase = 0;
 
@@ -125,9 +126,9 @@ public class EyeOfCthulhu : GlobalNPC
 
         if (Main.netMode != NetmodeID.Server)
         {
-            if (npc.life < DesperationThreshold)
+            if (npc.life < DesperationThreshold(npc))
             {
-                MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold), 0.1f);
+                MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold(npc)), 0.1f);
             }
             else
             {
@@ -321,22 +322,22 @@ public class EyeOfCthulhu : GlobalNPC
                     npc.ai[0]++;
                     if (Phase > 0)
                     {
-                        if (npc.life < DesperationThreshold)
+                        if (npc.life < DesperationThreshold(npc))
                         {
                             ChangeState(npc, AttackState.Bash);
                             npc.ai[0] = -40;
-                            if (npc.life < DesperationThreshold / 2)
+                            if (npc.life < DesperationThreshold(npc) / 2)
                             {
                                 npc.ai[0] = -20;
                             }
-                            if (npc.life < DesperationThreshold / 3)
+                            if (npc.life < DesperationThreshold(npc) / 3)
                             {
                                 npc.ai[0] = -10;
                             }
                         }
                         else
                         {
-                            if (npc.ai[0] > Easing.KeyFloat(npc.life, DesperationThreshold, npc.lifeMax, 4, 1, Easing.Linear))
+                            if (npc.ai[0] > Easing.KeyFloat(npc.life, DesperationThreshold(npc), npc.lifeMax, 4, 1, Easing.Linear))
                             {
                                 Shake = 7;
                                 npc.velocity *= 0.4f;
@@ -625,7 +626,7 @@ public class EyeOfCthulhu : GlobalNPC
     {
         npc.ai[0] = 0;
         npc.ai[2] = (int)state;
-        if (npc.life < DesperationThreshold)
+        if (npc.life < DesperationThreshold(npc))
             npc.ai[2] = (int)AttackState.Bash;
         npc.netUpdate = true;
     }

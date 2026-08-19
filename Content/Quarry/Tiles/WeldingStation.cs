@@ -2,9 +2,6 @@
 using Everware.Content.Base.Tiles;
 using Everware.Content.Quarry.Visual;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Terraria.DataStructures;
 using Terraria.GameContent.Drawing;
 using Terraria.Localization;
 using Terraria.ObjectData;

@@ -332,6 +332,7 @@ Items: {
 	// ChiselRecipeCondition: Chiseled by the Sculptor
 	// Hits: Hits
 	// Times: times
+	// AnyCopperBar: Any Copper Bar
 }
 
 Biomes: {
