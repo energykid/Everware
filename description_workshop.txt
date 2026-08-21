@@ -4,12 +4,13 @@
 
 -+=+-
 
-Everware is a work-in-progress mod which, at large, adds general content, improvements to vanilla, and reworks for some content!
+Everware is a work-in-progress mod which adds general content and reworks parts of vanilla!
 
 i try my best to make sure attention is given to details and take care to make content feel at home in Terraria, while still giving it my own spin.
 
 currently, this mod adds two interchangeable world structures of which you get one per world: the Kiln and the Quarry.
 i have also reworked the Eye of Cthulhu, and added extra loot to the Underworld.
+you can also find the Sculptor, a new town NPC, frozen solid in the snow biome - and collaborate with him to create new items out of statues!
 
 extra care has been taken to hone as many details as possible!
 
@@ -21,7 +22,7 @@ extra care has been taken to hone as many details as possible!
 [img]https://i.postimg.cc/fSXKqcM6/Quarry-Preview.gif[/img]
 [i]pictured above: the Quarry[/i]
 
-[url=https://discord.gg/invite/nUQHaW55bv]click here to join the Everware discord![/url]
+[url=https://discord.gg/nUQHaW55bv]click here to join the Everware discord![/url]
 
 -+=+-
 

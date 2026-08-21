@@ -17,7 +17,7 @@ public class SculptorNPC : ModNPC
     public int FocusedPlayer = -1;
     public override bool CanTownNPCSpawn(int numTownNPCs)
     {
-        return numTownNPCs >= 2 && SculptorTownNPCArrivalSystem.SculptorAvailable;
+        return SculptorTownNPCArrivalSystem.SculptorAvailable;
     }
     public override void SendExtraAI(BinaryWriter writer)
     {
