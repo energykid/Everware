@@ -162,29 +162,12 @@ public class SculptorNPC : ModNPC
 
         for (int k = 0; k < num; k++)
         {
-            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.SnowflakeIce);
+            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Blood);
         }
 
-        /*
-        // Create gore when the NPC is killed.
-        if (Main.netMode != NetmodeID.Server && NPC.life <= 0)
-        {
-            // Retrieve the gore types. This NPC only has shimmer variants. (6 total gores)
-            string variant = "";
-            if (NPC.IsShimmerVariant)
-                variant += "_Shimmer";
-            int headGore = Mod.Find<ModGore>($"{Name}_Gore{variant}_Head").Type;
-            int armGore = Mod.Find<ModGore>($"{Name}_Gore{variant}_Arm").Type;
-            int legGore = Mod.Find<ModGore>($"{Name}_Gore{variant}_Leg").Type;
-
-            // Spawn the gores. The positions of the arms and legs are lowered for a more natural look.
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, headGore, 1f);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 20), NPC.velocity, armGore);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 20), NPC.velocity, armGore);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 34), NPC.velocity, legGore);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 34), NPC.velocity, legGore);
-        }
-        */
+        if (NPC.life <= 0)
+            for (int i = 0; i < 5; i++)
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 20), NPC.velocity, ModContent.GoreType<SculptorGore>());
     }
     public override void TownNPCAttackSwing(ref int itemWidth, ref int itemHeight)
     {
@@ -257,5 +240,21 @@ public class SculptorTownNPCArrivalSystem : ModSystem
                 }
             }
         }
+    }
+}
+
+public class SculptorGore : ModGore
+{
+    public static byte Row = 0;
+    public override string Texture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC_Gore";
+    public override void OnSpawn(Gore gore, IEntitySource source)
+    {
+        base.OnSpawn(gore, source);
+        gore.Frame = new SpriteFrame(1, 5)
+        {
+            CurrentRow = Row
+        };
+        Row++;
+        if (Row >= 5) Row = 0;
     }
 }
