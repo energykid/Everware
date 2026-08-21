@@ -456,7 +456,7 @@ NPCs: {
 		// DisplayName: Sculptor
 		// Reliquary: Reliquary
 		// Chisel: Chisel
-		// BestiaryEntry: This lonesome master artist has made his home in an underground gallery of ice sculptures, where he's explored and searched for inspiration for decades.
+		// BestiaryEntry: An old, wisened artist from a time long before yours. Years of cryostasis have made his skin pale as marble, but not even the coldest ice can dull his passion for his craft!
 
 		Dialogue: {
 			Greeting: {
@@ -530,19 +530,26 @@ NPCs: {
 		}
 
 		TownNPCMood: {
-			// Content: I am content.
-			// NoHome: I hate not having a home.
-			// FarFromHome: I am too far from home.
-			// LoveSpace: I love having so much space.
-			// DislikeCrowded: I dislike how crowded I am.
-			// HateCrowded: I hate how crowded I am.
-			// LikeNPC_Princess: I like {NPCName}.
-			// Princess_LovesNPC: I like {NPCName}.
+			// Content: Hopefully you won't mind if I work here a little.
+			// NoHome: There's nowhere to set my tools down!
+			// FarFromHome: I love exploration, but I'm a little homesick, I'll admit.
+			// LoveSpace: This is a beautiful working space!
+			// DislikeCrowded: There's a little too much noise to concentrate on my work here.
+			// HateCrowded: No, no, no! There's no way I can get anything done here! There's too much noise!
+			// LikeNPC_Princess: I like {NPCName}. Seems to appreciate my work, too!
+			// Princess_LovesNPC: I wonder if {NPCName} may be up for collaboration?
+			// LoveBiome: I love {BiomeName}.
+			// LikeBiome: I like {BiomeName}.
+			// DislikeBiome: I dislike {BiomeName}.
+			// HateBiome: I hate {BiomeName}.
+			// LoveNPC: I love {NPCName}.
+			// LikeNPC: I like {NPCName}.
+			// DislikeNPC: I dislike {NPCName}.
+			// HateNPC: I hate {NPCName}.
 		}
 	}
 }
 
-// Bestiary.Sculptor: An old, wisened artist from times before yours. Despite being trapped in a mysterious icy gallery, he seems not to have lost his passion for his craft!
 // DeathReason.SnapdragonIce: experienced absolute zero.
 
 Tiles: {

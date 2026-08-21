@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.Personalities;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -67,6 +68,20 @@ public class SculptorNPC : ModNPC
     {
         base.SetStaticDefaults();
 
+        NPC.Happiness
+            .SetBiomeAffection<SnowBiome>(AffectionLevel.Love)
+            .SetBiomeAffection<HallowBiome>(AffectionLevel.Like)
+            .SetBiomeAffection<ForestBiome>(AffectionLevel.Like)
+            .SetBiomeAffection<DesertBiome>(AffectionLevel.Dislike)
+            .SetBiomeAffection<JungleBiome>(AffectionLevel.Hate)
+
+            .SetNPCAffection(NPCID.Painter, AffectionLevel.Love)
+            .SetNPCAffection(NPCID.DyeTrader, AffectionLevel.Like)
+            .SetNPCAffection(NPCID.Mechanic, AffectionLevel.Like)
+            .SetNPCAffection(NPCID.Angler, AffectionLevel.Dislike)
+            .SetNPCAffection(NPCID.GoblinTinkerer, AffectionLevel.Dislike)
+            .SetNPCAffection(NPCID.Pirate, AffectionLevel.Hate);
+
         Main.npcFrameCount[Type] = 25; // The amount of frames the NPC has
 
         NPCID.Sets.ExtraFramesCount[Type] = 9; // Generally for Town NPCs, but this is how the NPC does extra things such as sitting in a chair and talking to other NPCs.
@@ -106,8 +121,8 @@ public class SculptorNPC : ModNPC
         NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
 
         Profile = new Profiles.StackedNPCProfile(
-                new Profiles.DefaultNPCProfile(Texture, -1),
-                new Profiles.DefaultNPCProfile(Texture/* + "_Shimmer"*/, -1)
+                new Profiles.DefaultNPCProfile(Texture, NPCHeadLoader.GetHeadSlot(HeadTexture), Texture + "_Party"),
+                new Profiles.DefaultNPCProfile(Texture, NPCHeadLoader.GetHeadSlot(HeadTexture), Texture + "_Party")
             );
     }
     public override ITownNPCProfile TownNPCProfile()
@@ -135,7 +150,7 @@ public class SculptorNPC : ModNPC
         bestiaryEntry.Info.AddRange([
             // Sets the preferred biomes of this town NPC listed in the bestiary.
             // With Town NPCs, you usually set this to what biome it likes the most in regards to NPC happiness.
-            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundSnow,
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
 
 				// Sets your NPC's flavor text in the bestiary. (use localization keys)
 				new FlavorTextBestiaryInfoElement("Mods.Everware.Bestiary.Sculptor")
