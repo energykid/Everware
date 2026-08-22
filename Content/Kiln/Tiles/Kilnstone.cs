@@ -7,7 +7,11 @@ public class Kilnstone : EverPlaceableItem
 {
     public override string Texture => "Everware/Assets/Textures/Kiln/Kilnstone";
     public override int PlacementID => ModContent.TileType<KilnstonePlaced>();
-
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        Item.value = Sell.Copper(25);
+    }
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe(2);

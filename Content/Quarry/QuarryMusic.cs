@@ -1,6 +1,5 @@
-﻿using Everware.Content.Quarry.Tiles;
-using System;
-using Terraria.ID;
+﻿using Everware.Content.Misc.Tiles;
+using Everware.Content.Quarry.Tiles;
 
 namespace Everware.Content.Quarry;
 
@@ -16,7 +15,7 @@ public class QuarryMusicSystem : ModSystem
 {
     public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts)
     {
-        Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().siltTiles += tileCounts[TileID.Silt];
+        Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().siltTiles += tileCounts[ModContent.TileType<GravelTile>()];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().quarryTiles += tileCounts[ModContent.TileType<SturdyBricksPlaced>()];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().quarryTiles += tileCounts[ModContent.TileType<WeldingStation>()];
     }

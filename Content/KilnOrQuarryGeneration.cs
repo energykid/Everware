@@ -1,7 +1,6 @@
 ﻿using Everware.Content.Kiln;
 using Everware.Content.Quarry;
 using Everware.Utils;
-using System;
 using System.Collections.Generic;
 using Terraria.GameContent.Generation;
 using Terraria.ID;
@@ -43,8 +42,8 @@ public class KilnOrQuarryGeneration : ModSystem
         {
             p = refP;
             if (d == 0) d = Main.rand.NextBool() ? 1 : -1;
-            int MinDistance = 200;
-            int MaxDistance = 300;
+            int MinDistance = 100;
+            int MaxDistance = 200;
             if (dist == 0)
                 p.X += d * Main.rand.Next(MinDistance, MaxDistance);
             else

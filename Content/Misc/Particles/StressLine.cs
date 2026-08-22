@@ -9,10 +9,12 @@ public class StressLine : Particle
 {
     float T = 0f;
     public override Asset<Texture2D> Texture => Assets.Textures.Misc.StressLine.Asset;
-    public StressLine(Vector2 pos, Vector2 vel) : base(pos, vel, Vector2.One, null, null)
+    public StressLine(Vector2 pos, Vector2 vel, Color c) : base(pos, vel, Vector2.One, null, null)
     {
         FrameCount = new(7, 1);
         FrameNum = new(0, 0);
+        Color = c;
+        Pixelated = true;
     }
     public override void Update()
     {

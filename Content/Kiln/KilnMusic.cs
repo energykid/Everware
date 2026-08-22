@@ -1,6 +1,5 @@
 ﻿using Everware.Content.Kiln.Tiles;
-using System;
-using Terraria.ID;
+using Everware.Content.Misc.Tiles;
 
 namespace Everware.Content.Kiln;
 
@@ -16,7 +15,7 @@ public class KilnMusicSystem : ModSystem
 {
     public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts)
     {
-        Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().siltTiles += tileCounts[TileID.Silt];
+        Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().siltTiles += tileCounts[ModContent.TileType<GravelTile>()];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().kilnTiles += tileCounts[ModContent.TileType<ForgingKiln>()];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().kilnTiles += tileCounts[ModContent.TileType<KilnBrickPlaced>()];
         Main.LocalPlayer.GetModPlayer<KilnQuarryMusicStats>().kilnTiles += tileCounts[ModContent.TileType<KilnstonePlaced>()];

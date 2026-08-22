@@ -1,22 +1,16 @@
-<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.9">
+﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
 
 	<!-- General -->
 	<PropertyGroup>
-		
+
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Include="Content\Base\Tiles\EverMultitile.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Assets\Effects\Hell\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Reference Include="Daybreak">
-	    <HintPath>Daybreak.dll</HintPath>
-	  </Reference>
+		<Reference Include="Daybreak">
+			<HintPath>Daybreak.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<!-- References -->

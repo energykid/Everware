@@ -36,9 +36,31 @@ added Book of Boulders, found occasionally in ruined underground houses with new
 added text keys for Kiln/Quarry crafting stations, Eye of Cthulhu fables boss text, and armor set bonuses for localizers
 
 .....
-Everware 0.2.4 - small fixes and Russian localization
+Everware 0.2.4 - small fixed and Russian localization
 
 added Russian localization by Nexora & Kraken
 made the Eye of Cthulhu temporarily not spawn tile ripples when hitting reflective salt from Spirit Reforged
 caused Kiln and Quarry music to stop playing underground, and slightly improved the way the area is detected for music
-(Everware 0.2.4.1 - fixes bug with eye of cthulhu title card in multiplayer with calamity fables)
+
+.....
+Everware 0.2.5 - beneath the crust update
+
+Everware now depends on Daybreak
+added Steel Chests in deep cavern ruins
+added Groundshakers
+added Magmatic Ammo Kit
+added Master Lockpick
+added Whetstone
+added the Sculptor town NPC
+added Crystal Heart Statue & Power Heart pickups
+added Crystal Star Statue & Power Star pickups
+added Great Gargoyle
+added Dichromatic Skull
+added Atlas' Crown
+added Gravel to the Kiln and Quarry structures, which can be extractinated to obtain kilnstone or rebar
+added crafting recipes for Forging Kiln and Welding Station
+made underground Gold Chests sometimes contain Gold Keys
+buffed the Eye of Cthulhu's damage in expert and above
+changed the workshop icon
+made certain Everware weapons display how many times they hit per attack animation
+added a custom mod panel for Everware

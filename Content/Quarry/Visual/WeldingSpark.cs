@@ -1,6 +1,4 @@
 ﻿using Everware.Content.Base.ParticleSystem;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 
 namespace Everware.Content.Quarry.Visual;
 
@@ -12,6 +10,7 @@ public class WeldingSpark : Particle
         position = pos;
         velocity = vel;
         AffectedByLight = false;
+        Pixelated = true;
         Rotation = velocity.AngleFrom(Vector2.Zero);
     }
     public override void Update()

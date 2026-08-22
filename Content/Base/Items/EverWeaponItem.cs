@@ -1,15 +1,50 @@
 ﻿using Everware.Common.Players;
 using Everware.Content.Base.Projectiles;
+using Everware.Content.Misc;
 using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.Collections.Generic;
-using Terraria.DataStructures;
+using System.IO;
 using Terraria.ID;
 
 namespace Everware.Content.Base.Items;
 
 public abstract class EverWeaponItem : EverItem
 {
+    public float MeterFill = 0f;
+    public virtual Vector4[] MeterColors() => [Color.DarkGray.ToVector4(), Color.LightSlateGray.ToVector4(), Color.White.ToVector4()];
+    public virtual Vector4[] MeterColors2() => [Color.Black.ToVector4(), Color.SlateGray.ToVector4(), Color.White.ToVector4()];
+
+    public virtual int HitCount => 1;
+
+    public override void NetSend(BinaryWriter writer)
+    {
+        base.NetSend(writer);
+        writer.Write(MeterFill);
+    }
+    public override void NetReceive(BinaryReader reader)
+    {
+        base.NetReceive(reader);
+        MeterFill = reader.ReadSingle();
+    }
+
+    public virtual void ChargeMeter(float amt)
+    {
+        Item.NetStateChanged();
+        ChargeMeters.LocalChargeMeterAnim = 1f;
+        MeterFill = MathHelper.Clamp(MeterFill + amt, 0f, 1f);
+        ChargeMeters.LocalChargeMeterVisibility = 3f;
+    }
+    public virtual void SetMeter(float amt)
+    {
+        Item.NetStateChanged();
+        MeterFill = MathHelper.Clamp(amt, 0f, 1f);
+        ChargeMeters.LocalChargeMeterVisibility = 3f;
+    }
+    public virtual bool IsMeterFull()
+    {
+        return MeterFill >= 1f;
+    }
 
     public override void Load()
     {
@@ -46,6 +81,23 @@ public abstract class EverWeaponItem : EverItem
     {
         tooltips.RemoveAll(TT => { return TT.Name == "BuffTime"; });
 
+        if (HitCount != 1)
+        {
+            for (int i = 0; i < tooltips.Count; i++)
+            {
+                if (tooltips[i].Name == "Damage")
+                {
+                    TooltipLine line1 = new TooltipLine("Hits 2 Times", Mods.Everware.Items.Hits.GetText().Value + " " + HitCount.ToString() + " " + Mods.Everware.Items.Times.GetText().Value)
+                    {
+                        OverrideColor = new Color(0.75f, 0.75f, 0.75f)
+                    };
+
+                    tooltips.Insert(i + 1, line1);
+                    break;
+                }
+            }
+        }
+
         base.ModifyTooltips(tooltips);
     }
     public static int ItemTime(Player player)
@@ -55,6 +107,7 @@ public abstract class EverWeaponItem : EverItem
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Item.value = Item.rare * 5000;
     }
     public override bool? UseItem(Player player)
     {

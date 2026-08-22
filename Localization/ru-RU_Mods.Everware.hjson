@@ -171,6 +171,168 @@ Items: {
 		DisplayName: Книга валунов
 		Tooltip: Призывает над курсором раздавливающий врагов валун
 	}
+
+	ArgonGlowcoat: {
+		// DisplayName: Argon Glowcoat
+		// Tooltip: Apply to a tile to give it a deep pink glow
+	}
+
+	KryptonGlowcoat: {
+		// DisplayName: Krypton Glowcoat
+		// Tooltip: Apply to a tile to give it a flashy green glow
+	}
+
+	NeonGlowcoat: {
+		// DisplayName: Neon Glowcoat
+		// Tooltip: Apply to a tile to give it a bold purple glow
+	}
+
+	XenonGlowcoat: {
+		// DisplayName: Xenon Glowcoat
+		// Tooltip: Apply to a tile to give it a rich blue glow
+	}
+
+	OganessonGlowcoat: {
+		// DisplayName: Oganesson Glowcoat
+		// Tooltip: Apply to a tile to give it a sleek white glow
+	}
+
+	RadonGlowcoat: {
+		// DisplayName: Radon Glowcoat
+		// Tooltip: Apply to a tile to give it a bright yellow glow
+	}
+
+	ChromaticGlowcoat: {
+		// DisplayName: Chromatic Glowcoat
+		// Tooltip: Apply to a tile to give it an illustrious multicolored glow
+	}
+
+	MagmaticGlowcoat: {
+		// DisplayName: Magmatic Glowcoat
+		// Tooltip: Apply to a tile to give it a tense fiery glow
+	}
+
+	AuroralGlowcoat: {
+		// DisplayName: Auroral Glowcoat
+		// Tooltip: Apply to a tile to give it a calming icy glow
+	}
+
+	Groundshakers: {
+		// DisplayName: Groundshakers
+		/* Tooltip:
+			'''
+			Double-tap DOWN to perform a ground pound
+			Hitting enemies with this move deals damage and bounces you upward
+			''' */
+	}
+
+	WeatheredWood: {
+		// DisplayName: Weathered Wood
+		// Tooltip: ""
+	}
+
+	KilnstoneWall: {
+		// DisplayName: Kilnstone Wall
+		// Tooltip: ""
+	}
+
+	ShardShredder: {
+		// DisplayName: Shard Shredder
+		/* Tooltip:
+			'''
+			Right click to insert ice into the minigun
+			When firing, the minigun will rapidly chill and convert small chunks of ice into large shards for extra damage
+			After a while, however, it will still run out of ice
+			''' */
+	}
+
+	CrystalHeartStatueItem: {
+		// DisplayName: Crystal Heart Statue
+		// Tooltip: When wired, spawns a [c/E295B7:Power Heart] which restores 60 HP over 5 seconds
+	}
+
+	// PowerHeart.DisplayName: Power Heart
+
+	CrystalStarStatueItem: {
+		// DisplayName: Crystal Star Statue
+		// Tooltip: When wired, spawns a [c/AA95E1:Power Star] which increases your magic attack speed greatly but decreases magic damage
+	}
+
+	// PowerStar.DisplayName: Power Star
+
+	GreatGargoyle: {
+		// DisplayName: Great Gargoyle
+		/* Tooltip:
+			'''
+			Hitting enemies builds up your [c/A3FF33:Charge Meter]
+			At full meter buildup, right click to awaken the Gargoyle
+			This harms and tags nearby enemies for increased melee and summon damage
+			''' */
+		// SummonDamage: summon damage when awakened
+	}
+
+	MasterLockpick: {
+		// DisplayName: Master Lockpick
+		/* Tooltip:
+			'''
+			Unlocks gold and steel chests when swung
+			'Great for picking master locks!'
+			''' */
+	}
+
+	SteelChestItem: {
+		// DisplayName: Steel Chest
+		// Tooltip: ""
+	}
+
+	MagmaticAmmokit: {
+		// DisplayName: Magmatic Ammokit
+		/* Tooltip:
+			'''
+			+5% increased ranged critical strike chance
+			Ranged critical strikes create an explosion which hits behind the enemy
+			''' */
+	}
+
+	Whetstone: {
+		// DisplayName: Whetstone
+		/* Tooltip:
+			'''
+			Allows parrying projectiles using melee weapons
+			Upon successfully parrying a projectile, gain +20% melee speed
+			10 second cooldown
+			''' */
+	}
+
+	DichromaticSkull: {
+		// DisplayName: Dichromatic Skull
+		/* Tooltip:
+			'''
+			Facing left will shoot lingering, defense-reducing bubbles
+			Facing right will shoot a mid-range burst of fire
+			Enemies afflicted with both debuffs will take extra damage
+			''' */
+	}
+
+	AtlasCrown: {
+		// DisplayName: Atlas' Crown
+		/* Tooltip:
+			'''
+			While not attacking, hold UP to gradually summon clusters from the ground
+			Attacking will unleash them towards your cursor
+			The size, damage and frequency of summoned clusters depend on your held weapon's attack speed
+			''' */
+	}
+
+	GravelItem: {
+		// DisplayName: Gravel
+		// Tooltip: ""
+	}
+
+	// ChiselRecipeCondition: Chiseled by the Sculptor
+	// Hits: Hits
+	// Times: times
+	// AnyCopperBar: Any Copper Bar
 }
 
 Biomes: {
@@ -182,6 +344,11 @@ Biomes: {
 	QuarryMusic: {
 		DisplayName: Карьер
 		TownNPCDialogueName: Карьер
+	}
+
+	TheGallery: {
+		// DisplayName: Gallery
+		// TownNPCDialogueName: the Gallery
 	}
 }
 
@@ -196,9 +363,22 @@ Projectiles: {
 	SkullMinionExplosion.DisplayName: Взрыв
 	HotShotBurst.DisplayName: Вспышка дула
 	HotShotBurstLarge.DisplayName: Вспышка дула
+	// CustomItemDrawProjectile.DisplayName: Projectile
 	ManaSpike.DisplayName: Магический шип
 	EverCustomDrawProjectile.DisplayName: Custom Draw Projectile
 	ConjuredBoulder.DisplayName: Валун
+	SnapdragonFrostBreathHitbox.DisplayName: Frost Breath
+	SnapdragonFrostBreath.DisplayName: Frost Breath
+	SnapFreezeProjectile.DisplayName: Snap Freeze
+	ShardShredderProj.DisplayName: Shard Shredder
+	ShardShredderIcicle.DisplayName: Icicle
+	SnapdragonIceSpike.DisplayName: Ice Spike
+	GreatGargoyleHoldout.DisplayName: Great Gargoyle
+	MagmaticExplosion.DisplayName: Magmatic Explosion
+	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
+	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
+	TileCluster.DisplayName: Tile Cluster
+	// AtlasCrownTileCluster.DisplayName: Atlas Crown Tile Cluster
 }
 
 Buffs: {
@@ -206,9 +386,177 @@ Buffs: {
 		DisplayName: Ужасающий, смеющийся, кричащий обсидиановый череп
 		Description: За вас сражается ужасающий, смеющийся, кричащий обсидиановый череп
 	}
+
+	PowerHealingBuff: {
+		// DisplayName: Power Healing
+		// Description: Your healing has accelerated rapidly
+	}
+
+	PowerManaBuff: {
+		// DisplayName: Power Magic
+		// Description: Your magic attacks have accelerated rapidly
+	}
+
+	DichromaticFireDebuff: {
+		// DisplayName: Pyromania
+		// Description: You are manic! And on fire!
+	}
+
+	DichromaticWaterDebuff: {
+		// DisplayName: Depression
+		// Description: You are really depressed! And soaked!
+	}
+
+	RazorsEdgeBuff: {
+		// DisplayName: Razor's Edge
+		// Description: Your swords swing faster!
+	}
+
+	RazorsEdgeCooldownBuff: {
+		// DisplayName: Parry Cooldown
+		// Description: You cannot parry again for a short period of time
+	}
+}
+
+MusicText: {
+	// MusicianENNWAY: ENNWAY!
+	// MusicKiln: Wildfire
+	// MusicQuarry: Stonecutter
+	// MusicHemolacriac: Hemolacriac Hunt
+	// MusicGallery: House Of Glass
+	// MusicCenterpiece: Centerpiece
+	// MusicOptimist: Chromium and Positivity
 }
 
 BossIntroText: {
-	MusicianENNWAY: ENNWAY!
 	EyeOfCthulhu: Ночной наблюдатель
+	// Snapdragon: Sculptor's Masterwork
 }
+
+ConfigKeys: {
+	StyleSettings: {
+		// DisplayName: Style Settings
+		// Unchanged: Unchanged
+	}
+}
+
+Configs: {
+	StyleSettings: {
+		eocEnabled: {
+			// Label: Eye of Cthulhu Behavior
+			// Tooltip: Choose between Vanilla or Everware behavior styles for the Eye of Cthulhu.
+		}
+	}
+}
+
+NPCs: {
+	// Snapdragon.DisplayName: Snapdragon
+
+	SculptorNPC: {
+		// DisplayName: Sculptor
+		// Reliquary: Reliquary
+		// Chisel: Chisel
+		// BestiaryEntry: An old, wisened artist from a time long before yours. Years of cryostasis have made his skin pale as marble, but not even the coldest ice can dull his passion for his craft!
+
+		Dialogue: {
+			Greeting: {
+				// One: Who keeps leaving those bat statues everywhere anyways? Mighty strange thing to sculpt fifteen different times.
+				// Two: I've dropped my chisel somewhere and I can't seem to find it. Have you seen it in the ice anywhere?
+				// Three: I used to make stone sculptures in the jungle, but they kept getting stolen every time I looked away!
+				// Four: I know you've been finding statues everywhere, but please take care with that pickaxe. You'll damage them!
+				// Five: You know, some of the pieces people keep showing me are a tad... simplistic. I could add my own touch, if you wanted.
+				// Six: Oh, the skeleton one? That wasn't me. Really, it wasn't. Why do you ask?
+			}
+
+			TradeGreeting: {
+				// One: Just show me a statue and I'll see what I can do!
+				// Two: Alright, let me grab my tools...
+				// Three: Another collaboration? Splendid!
+			}
+
+			NoStatue: {
+				// One: There's no statue to chisel up, friend.
+				// Two: You don't seem to have any statue ready.
+				// Three: Are you gonna bring a statue?
+			}
+
+			InvalidStatue: {
+				// One: Unfortunately I can't do anything with this one.
+				// Two: Hmm, coming up short on how to save this one.
+				// Three: I can't really improve this design.
+			}
+
+			AngelStatue: {
+				// One: Who even made this thing?
+				// Two: I can be crass, but do you take me for a barbarian?
+				// Three: Who do you think I am, a pastor?
+			}
+
+			NoMaterial: {
+				// One: I've got an idea, but I'm gonna need some supplies.
+				// Two: A nice base, but I'm going to need an extra touch!
+				// Three: You know I don't like working in one color!
+			}
+
+			WrongMaterial: {
+				// One: No, no, that's not what I asked for.
+				// Two: You've brought me the wrong supplies!
+				// Three: What is this thing you've brought me?
+			}
+
+			NotEnoughMaterial: {
+				// One: I'm gonna need a little more of this material.
+				// Two: I'd like to be sure I won't run out of supplies.
+				// Three: Hmm, I'll need some more of our secondary color.
+			}
+
+			SculptAnimation: {
+				// One: Hmm, here goes...
+				// Two: Let's see...
+				// Three: A little here, a little there...
+			}
+
+			SculptAnimationFinished: {
+				// One: And... done! Enjoy!
+				// Two: Yes, this is better!
+				// Three: That's more to my liking!
+			}
+
+			TooManyStatues: {
+				// One: Slow your roll, I can't do multiple pieces at once!
+				// Two: I can't multitask like that, friend!
+				// Three: Too many statues there, give me just one please!
+			}
+		}
+
+		TownNPCMood: {
+			// Content: Hopefully you won't mind if I work here a little.
+			// NoHome: There's nowhere to set my tools down!
+			// FarFromHome: I love exploration, but I'm a little homesick, I'll admit.
+			// LoveSpace: This is a beautiful working space!
+			// DislikeCrowded: There's a little too much noise to concentrate on my work here.
+			// HateCrowded: No, no, no! There's no way I can get anything done here! There's too much noise!
+			// LoveBiome: Ah, {BiomeName}! Great place to be!
+			// LikeBiome: I'm a fan of {BiomeName}. Nice place to work.
+			// DislikeBiome: ...{BiomeName}... Bad climate for masonry.
+			// HateBiome: I can't stay in {BiomeName}. My work keeps getting stolen there!
+			// LoveNPC: I love working with {NPCName}! Perhaps he may be up for collaboration again soon?
+			// LikeNPC: You know, {NPCName} isn't so bad. Seems to appreciate my work, too!
+			// DislikeNPC: Ergh... {NPCName}. I'd prefer not to work around them.
+			// HateNPC: For having such an exquisite beard, {NPCName} has NO taste in art!
+			// LikeNPC_Princess: I like {NPCName}.
+			// Princess_LovesNPC: I like {NPCName}.
+		}
+	}
+}
+
+// DeathReason.SnapdragonIce: experienced absolute zero.
+
+Tiles: {
+	SteelChestTile: {
+		// MapEntry0: Steel Chest
+		// MapEntry1: Locked Steel Chest
+	}
+}
+
+ConfigCategory.StyleSettings.Description: StyleSettings

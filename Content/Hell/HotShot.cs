@@ -3,10 +3,7 @@ using Everware.Content.Base.Items;
 using Everware.Content.Misc.Particles;
 using Everware.Core.Projectiles;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-using Terraria.DataStructures;
+using System.IO;
 using Terraria.ID;
 using Terraria.Localization;
 
@@ -24,13 +21,22 @@ public class HotShot : EverWeaponItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.DefaultToBasicWeapon(24, 60, DamageClass.Ranged);
+        Item.DefaultToBasicWeapon(30, 60, DamageClass.Ranged);
         Item.autoReuse = true;
         Item.useAmmo = AmmoID.Bullet;
         Item.width = Assets.Textures.Hell.HotShot.Asset.Width();
         Item.height = Assets.Textures.Hell.HotShot.Asset.Height();
+        Item.value = Sell.Gold(1) + Sell.Silver(50);
     }
     public int ChargeLevel = 0;
+    public override void NetSend(BinaryWriter writer)
+    {
+        writer.Write(ChargeLevel);
+    }
+    public override void NetReceive(BinaryReader reader)
+    {
+        ChargeLevel = reader.ReadInt32();
+    }
     public override bool AltFunctionUse(Player player)
     {
         return true;
@@ -81,6 +87,8 @@ public class HotShotHoldout : EverHoldoutProjectile
     float ChargeFrame = 0f;
     public override void AI()
     {
+        AutoDirection = true;
+
         Projectile.velocity = Vector2.Zero;
 
         AmmoType = AmmoID.Bullet;
@@ -99,7 +107,7 @@ public class HotShotHoldout : EverHoldoutProjectile
             ChargeFrame = shot.ChargeLevel;
         }
 
-        if (Owner.altFunctionUse == 2 || AltF)
+        if (Owner.RightClicking() || AltF)
         {
             AltF = true;
             if (GetChargeAmount() > 0)
@@ -107,10 +115,10 @@ public class HotShotHoldout : EverHoldoutProjectile
                 Lighting.AddLight(Projectile.Center, 0.4f, 0.2f, 0.025f);
             }
 
-            if (Projectile.ai[1] == 1)
+            if (Projectile.ai[1] == 2)
             {
                 Rotation = Owner.AngleTo(NetworkOwner.MousePosition).AngleLerp(Vector2.Zero.AngleTo(new Vector2(0, 2)), 0.5f);
-                RotationOffset = MathHelper.ToRadians(30 * Owner.direction);
+                //RotationOffset = MathHelper.ToRadians(30 * Owner.direction);
                 Pump();
             }
 
@@ -131,19 +139,15 @@ public class HotShotHoldout : EverHoldoutProjectile
         }
         else
         {
-            if (Projectile.ai[1] == 1)
+            if (Projectile.ai[1] == 2)
             {
                 Fire();
-            }
-            float ItemAnim = Owner.itemAnimationMax;
-
-            if (Projectile.ai[1] == 3)
-            {
                 if (Owner.HeldItem.ModItem is HotShot sh)
                 {
                     sh.ChargeLevel = 0;
                 }
             }
+            float ItemAnim = Owner.itemAnimationMax;
 
             if (GetChargeAmount() > 0)
             {
@@ -191,40 +195,38 @@ public class HotShotHoldout : EverHoldoutProjectile
 
         if (it != null)
         {
+            float charge = GetChargeAmount() / 3f;
+            charge = Math.Clamp(charge, 0f, 1f);
+            Vector2 blastlocation = new Vector2(40, 0).RotatedBy(Rotation);
+            float spread = MathHelper.Lerp(20, 4, charge);
+            float amt = MathHelper.Lerp(3, 6, charge);
+            float speed = MathHelper.Lerp(12, 25, charge);
+            for (int i = 0; i < amt; i++)
             {
-                float charge = GetChargeAmount() / 3f;
-                charge = Math.Clamp(charge, 0f, 1f);
-                Vector2 blastlocation = new Vector2(40, 0).RotatedBy(Rotation);
-                float spread = MathHelper.Lerp(20, 4, charge);
-                float amt = MathHelper.Lerp(3, 6, charge);
-                float speed = MathHelper.Lerp(12, 25, charge);
-                for (int i = 0; i < amt; i++)
-                {
-                    Vector2 v = new Vector2(20, 0).RotatedBy(Rotation);
-                    if (Collision.CanHitLine(Owner.Center, 2, 2, Owner.Center + v, 2, 2)) v = Vector2.Zero;
-                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot fire"), Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
-                }
-                if (GetChargeAmount() <= 2)
-                {
-                    ScreenEffects.AddScreenShake(Owner.Center, 5f, 0.5f);
-                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
-                }
-                else
-                {
-                    ScreenEffects.AddScreenShake(Owner.Center, 10f, 0.5f);
-                    Vector2 vel = Owner.DirectionFrom(NetworkOwner.MousePosition) * 10;
-                    vel *= new Vector2(0.5f, 0.75f);
-                    Owner.velocity += vel;
-                    NetMessage.SendData(MessageID.PlayerControls, number: Owner.whoAmI);
-                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
-                }
+                Vector2 v = new Vector2(20, 0).RotatedBy(Rotation);
+                if (Collision.CanHitLine(Owner.Center, 2, 2, Owner.Center + v, 2, 2)) v = Vector2.Zero;
+                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot fire"), Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
+            }
+            if (GetChargeAmount() <= 2)
+            {
+                ScreenEffects.AddScreenShake(Owner.Center, 5f, 0.5f);
+                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+            }
+            else
+            {
+                ScreenEffects.AddScreenShake(Owner.Center, 10f, 0.5f);
+                Vector2 vel = Owner.DirectionFrom(NetworkOwner.MousePosition) * 10;
+                vel *= new Vector2(0.5f, 0.75f);
+                Owner.velocity += vel;
+                NetMessage.SendData(MessageID.PlayerControls, number: Owner.whoAmI);
+                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+            }
 
-                Lighting.AddLight(Projectile.Center, 0.6f, 0.4f, 0.1f);
+            Lighting.AddLight(Projectile.Center, 0.6f, 0.4f, 0.1f);
 
-                for (int i = 0; i < 10; i++)
-                {
-                    new SmallSmoke(Owner.Center + (new Vector2(40, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition))), new Vector2(Main.rand.Next(10), 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(20f)), new Color(0f, 0f, 0f, 0.2f)).Spawn();
-                }
+            for (int i = 0; i < 10; i++)
+            {
+                new SmallSmoke(Owner.Center + (new Vector2(40, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition))), new Vector2(Main.rand.Next(10), 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(20f)), new Color(0f, 0f, 0f, 0.2f)).Spawn();
             }
         }
     }

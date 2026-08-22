@@ -1,27 +1,39 @@
-﻿using Everware.Common.Players;
+﻿using Everware.Common;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Terraria.ID;
 
 namespace Everware;
 
 public static class EverwarePacketHandler
 {
-    public delegate void PacketBehavior(Mod mod, BinaryReader reader, int whoAmI, string identifier);
-    public static List<PacketBehavior> CustomPackets = [];
-    public static void AddPacket(PacketBehavior behavior)
+    public delegate void ReadFunction(Mod mod, BinaryReader reader, int playerID);
+    public static List<ReadFunction> CustomPacketReaders = [];
+    public static List<string> CustomPacketNames = [];
+    public static void SendPacket(EverPacket packet)
     {
-        CustomPackets.Add(behavior);
+        ModPacket p = Everware.Instance.GetPacket();
+
+        int ind = CustomPacketNames.FindIndex(A =>
+        {
+            return A == packet.GetType().Name;
+        });
+
+        p.Write(ind);
+
+        packet.Write(p);
+
+        p.Send();
     }
     public static void HandleAllPackets(Mod mod, BinaryReader reader, int whoAmI)
     {
-        string str = reader.ReadString();
+        int id = reader.ReadInt32();
 
-        bool shouldRunNewPacketBehavior = true;
+        CustomPacketReaders[id](mod, reader, whoAmI);
+
+        /*bool shouldRunNewPacketBehavior = true;
 
         // packets ripped from varia, which do not follow the new system
-        switch (str)
+        switch (id)
         {
             case "MouseWorld": // Mouse world sending
 
@@ -158,6 +170,6 @@ public static class EverwarePacketHandler
             {
                 behavior(mod, reader, whoAmI, str);
             }
-        }
+        }*/
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Everware.Core.Projectiles;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Everware.Content.EyeOfCthulhuRework;
 

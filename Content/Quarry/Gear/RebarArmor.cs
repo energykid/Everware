@@ -1,15 +1,12 @@
-﻿using Everware.Content.Base.Items;
+﻿using Everware.Common;
+using Everware.Content.Base.Items;
 using Everware.Content.Base.Tiles.TileData;
 using Everware.Content.Quarry.Tiles;
 using Everware.Content.Quarry.Visual;
 using Everware.Core;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
-using Terraria.Localization;
 
 namespace Everware.Content.Quarry.Gear;
 
@@ -25,6 +22,7 @@ public class RebarCrest : EverItem
     {
         base.SetDefaults();
         Item.DefaultToArmor(1);
+        Item.value = Sell.Silver(30);
     }
 
     public override void AddRecipes()
@@ -41,10 +39,8 @@ public class RebarCrest : EverItem
     }
     public override void UpdateArmorSet(Player player)
     {
-        {
-            player.GetModPlayer<RebarSetBonus>().rebarSetBonus = true;
-            player.setBonus = Language.GetTextValue("Mods.Everware.Items.RebarCrest.SetBonus");
-        }
+        player.GetModPlayer<RebarSetBonus>().rebarSetBonus = true;
+        player.setBonus = LocalizationReferences.Mods.Everware.Items.RebarCrest.SetBonus.GetTextValue();
     }
 
     public override void SetStaticDefaults()
@@ -67,6 +63,7 @@ public class RebarGridmail : EverItem
     {
         base.SetDefaults();
         Item.DefaultToArmor(2);
+        Item.value = Sell.Silver(40);
     }
 
     public override void AddRecipes()
@@ -95,6 +92,7 @@ public class RebarSandals : EverItem
     {
         base.SetDefaults();
         Item.DefaultToArmor(2);
+        Item.value = Sell.Silver(30);
     }
 
     public override void AddRecipes()
@@ -128,27 +126,29 @@ public class RebarSetBonus : ModPlayer
     }
 }
 
+public class RebarSparklePacket : EverPacket
+{
+    public Vector2 SpawnPos;
+
+    public override void Read(Mod mod, BinaryReader reader, int playerID)
+    {
+        SpawnPos = reader.ReadVector2();
+
+        SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, SpawnPos);
+        for (int k = 0; k < 5; k++)
+            Dust.NewDustPerfect(SpawnPos, ModContent.DustType<RebarOreSparkle>());
+
+        RelayFromServer();
+    }
+
+    public override void Write(ModPacket packet)
+    {
+        packet.WriteVector2(SpawnPos);
+    }
+}
+
 public class RebarGlobalTile : GlobalTile
 {
-    public override void Load()
-    {
-        EverwarePacketHandler.AddPacket(
-            (mod, reader, whoAmI, identifier) =>
-            {
-                if (identifier == "SendRebarParticles")
-                {
-                    int x = reader.ReadInt32();
-                    int y = reader.ReadInt32();
-
-                    Vector2 position = new Vector2(x, y);
-
-                    SoundEngine.PlaySound(RebarSetBonus.ScavengeSound, position);
-                    for (int k = 0; k < 5; k++)
-                        Dust.NewDustPerfect(position, ModContent.DustType<RebarOreSparkle>());
-                }
-            }
-        );
-    }
     public void DropStuff(int i, int j, int type)
     {
         if (Main.tile[i, j].Get<LastPlayerMinedData>().WhichPlayerAmI != -1)
@@ -173,11 +173,10 @@ public class RebarGlobalTile : GlobalTile
                             {
                                 NetMessage.SendData(MessageID.SyncItem, number: ii);
 
-                                ModPacket p = Everware.Instance.GetPacket();
-                                p.Write("SendRebarParticles");
-                                p.Write((int)position.X);
-                                p.Write((int)position.Y);
-                                p.Send();
+                                EverwarePacketHandler.SendPacket(new RebarSparklePacket()
+                                {
+                                    SpawnPos = position
+                                });
                             }
                         }
                     }

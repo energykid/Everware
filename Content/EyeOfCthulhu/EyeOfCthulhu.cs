@@ -1,12 +1,9 @@
 ﻿using Everware.Common.Systems;
+using Everware.Config;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
 using System.IO;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
@@ -15,12 +12,13 @@ namespace Everware.Content.EyeOfCthulhuRework;
 
 public class EyeOfCthulhu : GlobalNPC
 {
-    public static int BloodProjectileDamage => Main.expertMode ? 9 : 16;
-    public static int BashDamage => Main.expertMode ? 38 : 28;
-    public static int Phase2BashDamage => Main.expertMode ? 48 : 38;
-    public static int TendrilDamage => Main.expertMode ? 32 : 25;
-    public static int Phase2TendrilDamage => Main.expertMode ? 43 : 32;
-    public static int DesperationThreshold => Main.expertMode ? Main.masterMode ? 700 : 400 : 250;
+    public static int BloodProjectileDamage => Main.expertMode ? 12 : 16;
+    public static int BashDamage => Main.expertMode ? 58 : 28;
+    public static int Phase2BashDamage => Main.expertMode ? 61 : 38;
+    public static int TendrilDamage => Main.expertMode ? 37 : 25;
+    public static int Phase2TendrilDamage => Main.expertMode ? 53 : 32;
+    public static float DesperationPercentage => Main.expertMode ? (Main.masterMode ? 0.2f : 0.1f) : 0.075f;
+    public static int DesperationThreshold(NPC npc) => (int)((float)npc.lifeMax * DesperationPercentage);
     public int Phase2Threshold = 0;
     public int Phase = 0;
 
@@ -69,7 +67,7 @@ public class EyeOfCthulhu : GlobalNPC
     public override bool InstancePerEntity => true;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        return ReworkEnabled && entity.type == NPCID.EyeofCthulhu;
+        return StyleSettings.EoCEnabled && entity.type == NPCID.EyeofCthulhu;
     }
     public override bool CanHitPlayer(NPC npc, Player target, ref int cooldownSlot)
     {
@@ -128,9 +126,9 @@ public class EyeOfCthulhu : GlobalNPC
 
         if (Main.netMode != NetmodeID.Server)
         {
-            if (npc.life < DesperationThreshold)
+            if (npc.life < DesperationThreshold(npc))
             {
-                MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold), 0.1f);
+                MusicPitch = MathHelper.Lerp(MusicPitch, MathHelper.Lerp(0.3f, 0f, npc.life / (float)DesperationThreshold(npc)), 0.1f);
             }
             else
             {
@@ -229,8 +227,8 @@ public class EyeOfCthulhu : GlobalNPC
 
                     if (ModLoader.TryGetMod("CalamityFables", out Mod calFables))
                     {
-                        if (Main.netMode != NetmodeID.Server)
-                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.BossIntroText.MusicianENNWAY.GetTextValue(), "");
+                        if (!Main.dedServ)
+                            calFables.Call("vfx.displayBossIntroCard", npc.TypeName, Mods.Everware.BossIntroText.EyeOfCthulhu.GetTextValue(), 100, false, Color.Red, Color.White, Color.DarkBlue, Color.DarkGreen, Mods.Everware.MusicText.MusicianENNWAY.GetTextValue(), Mods.Everware.MusicText.MusicHemolacriac.GetTextValue());
                         Time = 20;
                     }
 
@@ -324,22 +322,22 @@ public class EyeOfCthulhu : GlobalNPC
                     npc.ai[0]++;
                     if (Phase > 0)
                     {
-                        if (npc.life < DesperationThreshold)
+                        if (npc.life < DesperationThreshold(npc))
                         {
                             ChangeState(npc, AttackState.Bash);
                             npc.ai[0] = -40;
-                            if (npc.life < DesperationThreshold / 2)
+                            if (npc.life < DesperationThreshold(npc) / 2)
                             {
                                 npc.ai[0] = -20;
                             }
-                            if (npc.life < DesperationThreshold / 3)
+                            if (npc.life < DesperationThreshold(npc) / 3)
                             {
                                 npc.ai[0] = -10;
                             }
                         }
                         else
                         {
-                            if (npc.ai[0] > Easing.KeyFloat(npc.life, DesperationThreshold, npc.lifeMax, 4, 1, Easing.Linear))
+                            if (npc.ai[0] > Easing.KeyFloat(npc.life, DesperationThreshold(npc), npc.lifeMax, 4, 1, Easing.Linear))
                             {
                                 Shake = 7;
                                 npc.velocity *= 0.4f;
@@ -628,7 +626,7 @@ public class EyeOfCthulhu : GlobalNPC
     {
         npc.ai[0] = 0;
         npc.ai[2] = (int)state;
-        if (npc.life < DesperationThreshold)
+        if (npc.life < DesperationThreshold(npc))
             npc.ai[2] = (int)AttackState.Bash;
         npc.netUpdate = true;
     }
@@ -834,16 +832,17 @@ public class EyeOfCthulhu : GlobalNPC
 
                 if (WorldGen.SolidOrSlopedTile(t) && !t.IsActuated)
                 {
-                    bool spawn = true;
+                    bool NotSalt = true;
+
                     if (ModLoader.TryGetMod("SpiritReforged", out Mod spiritReforged))
                     {
                         var a = spiritReforged.Find<ModTile>("SaltBlockReflective");
                         if (t.TileType == a.Type)
                         {
-                            spawn = false;
+                            NotSalt = false;
                         }
                     }
-                    if (spawn)
+                    if (NotSalt)
                     {
                         StillTileReplicantParticle tile0 = new StillTileReplicantParticle(t.TileType, new Rectangle(t.TileFrameX, t.TileFrameY, 16, 16), position + new Vector2(8, 8), Vector2.Zero, Vector2.One)
                         {
