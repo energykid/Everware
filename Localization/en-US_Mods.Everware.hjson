@@ -533,11 +533,14 @@ NPCs: {
 			HateCrowded: No, no, no! There's no way I can get anything done here! There's too much noise!
 			LoveBiome: Ah, {BiomeName}! Great place to be!
 			LikeBiome: I'm a fan of {BiomeName}. Nice place to work.
-			DislikeBiome: I dislike {BiomeName}. My work keeps getting stolen there!
+			DislikeBiome: ...{BiomeName}... Bad climate for masonry.
+			HateBiome: I can't stay in {BiomeName}. My work keeps getting stolen there!
 			LoveNPC: I love working with {NPCName}! Perhaps he may be up for collaboration again soon?
 			LikeNPC: You know, {NPCName} isn't so bad. Seems to appreciate my work, too!
 			DislikeNPC: Ergh... {NPCName}. I'd prefer not to work around them.
 			HateNPC: For having such an exquisite beard, {NPCName} has NO taste in art!
+			LikeNPC_Princess: I like {NPCName}.
+			Princess_LovesNPC: I like {NPCName}.
 		}
 	}
 }

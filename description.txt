@@ -45,6 +45,7 @@ caused Kiln and Quarry music to stop playing underground, and slightly improved 
 .....
 Everware 0.2.5 - beneath the crust update
 
+Everware now depends on Daybreak
 added Steel Chests in deep cavern ruins
 added Groundshakers
 added Magmatic Ammo Kit
@@ -61,4 +62,5 @@ added crafting recipes for Forging Kiln and Welding Station
 made underground Gold Chests sometimes contain Gold Keys
 buffed the Eye of Cthulhu's damage in expert and above
 changed the workshop icon
-made certain Everware weapons display how many times they attack per animation
+made certain Everware weapons display how many times they hit per attack animation
+added a custom mod panel for Everware

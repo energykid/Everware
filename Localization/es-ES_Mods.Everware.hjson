@@ -531,16 +531,16 @@ NPCs: {
 			LoveSpace: Me encanta tener tanto espacio.
 			DislikeCrowded: No me gusta este gentío.
 			HateCrowded: Odio este gentío.
+			// LoveBiome: Ah, {BiomeName}! Great place to be!
+			// LikeBiome: I'm a fan of {BiomeName}. Nice place to work.
+			// DislikeBiome: ...{BiomeName}... Bad climate for masonry.
+			// HateBiome: I can't stay in {BiomeName}. My work keeps getting stolen there!
+			// LoveNPC: I love working with {NPCName}! Perhaps he may be up for collaboration again soon?
+			// LikeNPC: You know, {NPCName} isn't so bad. Seems to appreciate my work, too!
+			// DislikeNPC: Ergh... {NPCName}. I'd prefer not to work around them.
+			// HateNPC: For having such an exquisite beard, {NPCName} has NO taste in art!
 			LikeNPC_Princess: Me agrada {NPCName}.
 			Princess_LovesNPC: Me agrada {NPCName}.
-			// LoveBiome: I love {BiomeName}.
-			// LikeBiome: I like {BiomeName}.
-			// DislikeBiome: I dislike {BiomeName}.
-			// HateBiome: I hate {BiomeName}.
-			// LoveNPC: I love {NPCName}.
-			// LikeNPC: I like {NPCName}.
-			// DislikeNPC: I dislike {NPCName}.
-			// HateNPC: I hate {NPCName}.
 		}
 	}
 }
