@@ -1,5 +1,4 @@
 ﻿using Everware.Utils;
-using System.Collections.Concurrent;
 using System.Threading;
 using Terraria.ID;
 
@@ -7,7 +6,6 @@ namespace Everware.Content.Meteor;
 
 public class MeteorGeneration
 {
-    private static ConcurrentQueue<Action> MeteorThreadActions = new ConcurrentQueue<Action>();
     public static void GenerateWholeSite(Point pt)
     {
         Thread thread = new Thread(() =>
@@ -111,7 +109,8 @@ public class MeteorGeneration
 
         Vector2 v = to.ToVector2();
         v.Y = MathHelper.Lerp(v.Y, center.ToVector2().Y, -0.75f);
-        if (v.Distance(center.ToVector2()) < SizeX)
+        float k = 1f + (float)(Math.Sin(v.AngleTo(center.ToVector2()) * MathHelper.TwoPi) * 0.1f);
+        if (v.Distance(center.ToVector2()) < SizeX * k)
         {
             if (tt != -1)
             {
@@ -119,8 +118,7 @@ public class MeteorGeneration
                 if (TileID.Sets.Grass[tt]) tt = TileID.AshGrass;
                 if (tt == TileID.Plants || tt == TileID.Plants2) tt = MeteoricGrassFoliage;
                 if (tt == TileID.Stone) tt = CharredStone;
-                if (tt == TileID.Trees || tt == TileID.VanityTreeSakura || tt == TileID.VanityTreeYellowWillow
-                     || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles) tt = -1;
+                if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;
             }
         }
 
