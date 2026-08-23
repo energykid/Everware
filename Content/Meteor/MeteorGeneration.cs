@@ -29,7 +29,6 @@ public class MeteorGeneration
     }
     public static void GenerateCrater(Point pt)
     {
-
         float impression1 = 0.05f;
         float impression2 = 0.15f;
 
@@ -86,6 +85,29 @@ public class MeteorGeneration
     }
     public static void GeneratePointZero(Point pt)
     {
+        new Shapes.Circle(30).Perform(pt, Actions.Chain(
+            new Actions.SwapSolidTile((ushort)CharredStone),
+            new Actions.Smooth(true)
+        ));
+
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(15, 0)).Grounded(), Actions.Chain(
+            new CustomGenActions.SetMeteorFromGrass(),
+            new Actions.Smooth(true)
+        ));
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(22, 0)).Grounded(), Actions.Chain(
+            new CustomGenActions.SetMeteorFromGrass(),
+            new Actions.Smooth(true)
+        ));
+
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(-15, 0)).Grounded(), Actions.Chain(
+            new CustomGenActions.SetMeteorFromGrass(),
+            new Actions.Smooth(true)
+        ));
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(-22, 0)).Grounded(), Actions.Chain(
+            new CustomGenActions.SetMeteorFromGrass(),
+            new Actions.Smooth(true)
+        ));
+
         GenerateMeteor(pt);
     }
     public static void GenerateMeteor(Point pt)

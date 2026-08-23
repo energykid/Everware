@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Terraria.GameContent.Drawing;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
@@ -30,48 +31,42 @@ public sealed class TileCluster : EverProjectile
         On_WorldGen.CheckPot += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
         On_WorldGen.CheckJunglePlant += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
 
-        On_Main.DrawPlayers_AfterProjectiles += DrawAllBlocks;
+        On_LegacyPlayerRenderer.DrawPlayer += DrawAllBlocksUpdated;
         // Re-JIT calling methods
         IL_Main.DoDraw += _ => { };
         IL_Main.DrawCapture += _ => { };
     }
 
-    public override void Unload()
+    private void DrawAllBlocksUpdated(On_LegacyPlayerRenderer.orig_DrawPlayer orig, LegacyPlayerRenderer self, Terraria.Graphics.Camera camera, Player drawPlayer, Vector2 position, float rotation, Vector2 rotationOrigin, float shadow, float scale)
     {
-        On_Main.DrawPlayers_AfterProjectiles -= DrawAllBlocks;
-    }
+        if (!Main.gameMenu)
+        {
+            List<Projectile> projs = [];
 
-    private void DrawAllBlocks(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
-    {
-        List<Projectile> projs = [];
+            Color c = Color.White;
 
-        Color c = Color.White;
+            foreach (Projectile projectile in Main.ActiveProjectiles)
+                if (projectile.ModProjectile is TileCluster cluster)
+                {
+                    projs.Add(projectile);
+                }
 
-        foreach (Projectile projectile in Main.ActiveProjectiles)
-            if (projectile.ModProjectile is TileCluster cluster)
-            {
-                projs.Add(projectile);
-            }
+            projs.Sort((a, b) => { return a.scale > b.scale ? 1 : -1; });
 
-        projs.Sort((a, b) => { return a.scale > b.scale ? 1 : -1; });
+            foreach (Projectile projectile in projs)
+                if (projectile.ModProjectile is TileCluster cluster)
+                    cluster.DrawSelf(ref c, 0f, 0.85f);
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            orig(self, camera, drawPlayer, position, rotation, rotationOrigin, shadow, scale);
 
-        foreach (Projectile projectile in projs)
-            if (projectile.ModProjectile is TileCluster cluster)
-                cluster.DrawSelf(ref c, 0f, 0.85f);
-
-        Main.spriteBatch.End(out var sb);
-
-        orig(self);
-
-        Main.spriteBatch.Begin(sb);
-
-        foreach (Projectile projectile in projs)
-            if (projectile.ModProjectile is TileCluster cluster)
-                cluster.DrawSelf(ref c, 0.85f, 2f);
-
-        Main.spriteBatch.End();
+            foreach (Projectile projectile in projs)
+                if (projectile.ModProjectile is TileCluster cluster)
+                    cluster.DrawSelf(ref c, 0.85f, 2f);
+        }
+        else
+        {
+            orig(self, camera, drawPlayer, position, rotation, rotationOrigin, shadow, scale);
+        }
     }
 
     private static bool SpawnFallingBlockProjectile_DisableFauxFraming(On_WorldGen.orig_SpawnFallingBlockProjectile orig, int i, int j, Tile tileCache, Tile tileTopCache, Tile tileBottomCache, int type)

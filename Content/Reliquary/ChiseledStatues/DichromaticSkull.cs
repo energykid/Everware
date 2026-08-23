@@ -257,7 +257,7 @@ public class DichromaticSkullFlame : EverProjectile
 
         using (flameTarget.Scope(clearColor: Color.Transparent))
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
 
             for (int i = 0; i < FireLayer.AllParticles.Count; i++)
             {

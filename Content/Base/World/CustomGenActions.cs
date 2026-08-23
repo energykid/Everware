@@ -1,4 +1,5 @@
-﻿using Everware.Content.Misc.Tiles;
+﻿using Everware.Content.Meteor;
+using Everware.Content.Misc.Tiles;
 using Everware.Content.Underground;
 using System.Collections.Generic;
 using System.Linq;
@@ -150,6 +151,24 @@ public class CustomGenActions
             {
                 WorldGen.KillTile(x, y, false, false, true);
                 WorldGen.PlaceTile(x, y, id, true);
+            }
+
+            WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+
+    public class SetMeteorFromGrass : GenAction
+    {
+        public SetMeteorFromGrass() { }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (!Main.tile[x, y].HasTile)
+                WorldGen.PlaceTile(x, y, MeteorGeneration.MeteoriteOre, true);
+            if (!Main.tile[x, y].HasTile || Main.tile[x, y].TileType == MeteorGeneration.MeteoricGrass)
+            {
+                Main.tile[x, y].TileType = (ushort)MeteorGeneration.MeteoriteOre;
             }
 
             WorldUtils.TileFrame(x, y, true);
