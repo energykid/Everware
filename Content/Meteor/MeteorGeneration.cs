@@ -1,25 +1,31 @@
-﻿using Everware.Utils;
+﻿using Everware.Content.Base.World;
+using Everware.Utils;
 using System.Threading;
 using Terraria.ID;
+using Terraria.WorldBuilding;
 
 namespace Everware.Content.Meteor;
 
 public class MeteorGeneration
 {
+    public static readonly int SizeX = 125;
+    public static readonly int SizeY = 60;
+    public static readonly int CharredSoil = TileID.Ash;
+    public static readonly int MeteoricGrass = TileID.AshGrass;
+    public static readonly int MeteoricGrassFoliage = TileID.AshPlants;
+    public static readonly int CharredStone = TileID.Asphalt;
+    public static readonly int MeteoriteOre = TileID.Meteorite;
     public static void GenerateWholeSite(Point pt)
     {
         Thread thread = new Thread(() =>
         {
             GenerateCrater(pt);
+            GeneratePointZero(pt);
         })
         {
             IsBackground = true,
         };
         thread.Start();
-    }
-    public static void GenerateMeteor(Point pt)
-    {
-
     }
     public static void GenerateCrater(Point pt)
     {
@@ -78,11 +84,19 @@ public class MeteorGeneration
             }
         }
     }
-    public static void GenerateStar(Point pt)
-    {
-
-    }
     public static void GeneratePointZero(Point pt)
+    {
+        GenerateMeteor(pt);
+    }
+    public static void GenerateMeteor(Point pt)
+    {
+        pt = pt.Grounded();
+        new Shapes.Slime(15, 1, 1.2).Perform(pt, Actions.Chain(
+            new CustomGenActions.SetTileFromNone((ushort)MeteoriteOre),
+            new Actions.Smooth(true)
+        ));
+    }
+    public static void GenerateStar(Point pt)
     {
 
     }
@@ -97,12 +111,6 @@ public class MeteorGeneration
         public SlopeType Slope = slope;
         public bool HalfTile = hT;
     }
-    public static readonly int SizeX = 125;
-    public static readonly int SizeY = 60;
-    public static readonly int CharredSoil = TileID.Ash;
-    public static readonly int MeteoricGrass = TileID.AshGrass;
-    public static readonly int MeteoricGrassFoliage = TileID.AshPlants;
-    public static readonly int CharredStone = TileID.Asphalt;
     public static void ReplaceTile(TileDataBuffer buffer, Point to, Point center)
     {
         int tt = buffer.TileType;
