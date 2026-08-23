@@ -247,21 +247,9 @@ public class DichromaticFireDebuff : ModBuff
 }
 public class DichromaticSkullFlame : EverProjectile
 {
-    public override void Load()
+    [ModSystemHooks.PostDrawTiles]
+    public void DrawFireLayer()
     {
-        On_Main.Update += UpdateFireLayer;
-        On_Main.DrawProjectiles += DrawFlames;
-    }
-
-    public override void Unload()
-    {
-        On_Main.Update -= UpdateFireLayer;
-        On_Main.DrawProjectiles -= DrawFlames;
-    }
-
-    private void DrawFlames(On_Main.orig_DrawProjectiles orig, Main self)
-    {
-        orig(self);
         var flameTarget = ScreenspaceTargetPool.Shared.Rent(
             Main.instance.GraphicsDevice,
             (Width, Height) => (Width / 2, Height / 2)
@@ -269,7 +257,7 @@ public class DichromaticSkullFlame : EverProjectile
 
         using (flameTarget.Scope(clearColor: Color.Transparent))
         {
-            Main.spriteBatch.Begin();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
 
             for (int i = 0; i < FireLayer.AllParticles.Count; i++)
             {
@@ -309,9 +297,9 @@ public class DichromaticSkullFlame : EverProjectile
 
         flameTarget.Dispose();
     }
-    private void UpdateFireLayer(On_Main.orig_Update orig, Main self, GameTime gameTime)
+    [ModSystemHooks.PostUpdateEverything]
+    public void UpdateFireLayer()
     {
-        orig(self, gameTime);
         if (FireLayer != null)
             FireLayer.Update();
     }
@@ -343,7 +331,7 @@ public class DichromaticSkullFlame : EverProjectile
             if (Color == Color.Black || ai[0] > 2)
             {
                 FrameNum.Y = MathHelper.Lerp(FrameNum.Y, 12, ai[1]);
-                if (FrameNum.Y >= 11) Kill();
+                if (this.FrameNum.Y >= 11) Kill();
             }
             if (Color != Color.Black && FrameNum.Y > 2f)
             {

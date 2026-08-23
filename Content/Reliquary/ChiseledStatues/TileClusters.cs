@@ -31,6 +31,9 @@ public sealed class TileCluster : EverProjectile
         On_WorldGen.CheckJunglePlant += (orig, i, j, type) => { if (tileFrameCosmeticOnly) { return; } orig(i, j, type); };
 
         On_Main.DrawPlayers_AfterProjectiles += DrawAllBlocks;
+        // Re-JIT calling methods
+        IL_Main.DoDraw += _ => { };
+        IL_Main.DrawCapture += _ => { };
     }
 
     public override void Unload()
