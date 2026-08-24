@@ -8,6 +8,11 @@ public class MeteorBiome : ModBiome
     {
         return Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles > 100 && (player.Center.Y / 16f) < Main.worldSurface;
     }
+    [ModSystemHooks.PostUpdateEverything]
+    public void SpawnParticles()
+    {
+
+    }
 }
 public class MeteorMusicSystem : ModSystem
 {
