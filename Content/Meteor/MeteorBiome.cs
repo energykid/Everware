@@ -11,16 +11,24 @@ public class MeteorBiome : ModBiome
 }
 public class MeteorMusicSystem : ModSystem
 {
+    // this override just removes vanilla meteor logic completely
+    // if WorldGen.spawnMeteor is false, none of the logic in Main.HandleMeteorFall will run
+    // i could detour without an orig which would be more "thorough" but  nuh uh
+    public override void PreUpdateTime()
+    {
+        WorldGen.spawnMeteor = false;
+    }
+
     float Intensity = 0f;
     public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
     {
         if (Main.LocalPlayer.InModBiome<MeteorBiome>())
         {
-            Intensity = MathHelper.Lerp(Intensity, 1f, 0.025f);
+            Intensity = MathHelper.Lerp(Intensity, 1f, 0.0075f);
         }
         else
         {
-            Intensity = MathHelper.Lerp(Intensity, 0f, 0.05f);
+            Intensity = MathHelper.Lerp(Intensity, 0f, 0.0075f);
         }
 
         tileColor *= (1f - (Intensity * 0.6f));

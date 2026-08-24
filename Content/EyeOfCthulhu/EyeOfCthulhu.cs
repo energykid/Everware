@@ -22,6 +22,11 @@ public class EyeOfCthulhu : GlobalNPC
     public int Phase2Threshold = 0;
     public int Phase = 0;
 
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        return StyleSettings.EoCEnabled;
+    }
+
     // Tendril 0: front left
     // Tendril 1: front right
     // Tendril 2: back left

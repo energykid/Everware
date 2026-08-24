@@ -345,6 +345,11 @@ Biomes: {
 		DisplayName: Galería
 		TownNPCDialogueName: la Galería
 	}
+
+	MeteorBiome: {
+		// DisplayName: Meteor
+		// TownNPCDialogueName: the Meteor
+	}
 }
 
 Projectiles: {

@@ -350,6 +350,11 @@ Biomes: {
 		// DisplayName: Gallery
 		// TownNPCDialogueName: the Gallery
 	}
+
+	MeteorBiome: {
+		// DisplayName: Meteor
+		// TownNPCDialogueName: the Meteor
+	}
 }
 
 Projectiles: {
