@@ -279,41 +279,11 @@ public class DichromaticSkullFlame : EverProjectile
             Main.spriteBatch.End();
         }
 
-        using (smokeTarget.Scope(clearColor: Color.Transparent))
-        {
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
-
-            SmokeLayer.Draw();
-
-            Main.spriteBatch.End();
-        }
-
-
-        var effect2 = Assets.Effects.Misc.ColorGradientEffect.CreateEffect();
-        effect2.Parameters.Color = [
-            Color.Transparent.ToVector4(),
-            Color.DarkSlateGray.ToVector4() * new Vector4(0.2f, 0.2f, 0.6f, 1f),
-            Color.DarkSlateGray.ToVector4() * 0.8f,
-            Color.DarkSlateGray.ToVector4(),
-            Color.DimGray.ToVector4(),
-            Color.DimGray.ToVector4() * 1.5f,
-            Color.LightSlateGray.ToVector4(),
-            Color.LightSlateGray.ToVector4(),
-            ];
-        effect2.Parameters.ColorNumber = 7;
-        effect2.Apply();
-
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, effect2.Shader, Main.GameViewMatrix.ZoomMatrix);
-
-        Main.EntitySpriteDraw(smokeTarget.Target, Vector2.Zero, smokeTarget.Target.Bounds, new Color(1f, 0.2f, 0.2f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), SpriteEffects.None);
-
-        Main.spriteBatch.End(out var sb);
-
         var effect = Assets.Effects.Misc.ColorGradientEffect.CreateEffect();
         effect.Parameters.Color = [
             Color.Transparent.ToVector4(),
             Color.Black.ToVector4(),
-            Color.DarkGray.ToVector4() * new Vector4(0.4f, 0.4f, 0.4f, 1f),
+            Color.DarkGray.ToVector4() * new Vector4(0.2f, 0.2f, 0.2f, 1f),
             Color.DarkGray.ToVector4() * new Vector4(0.4f, 0.4f, 0.4f, 1f),
             Color.OrangeRed.ToVector4(),
             Color.Orange.ToVector4(),
@@ -323,9 +293,9 @@ public class DichromaticSkullFlame : EverProjectile
         effect.Parameters.ColorNumber = 7;
         effect.Apply();
 
-        Main.spriteBatch.Begin(sb with { CustomEffect = effect.Shader });
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, effect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
-        DrawingUtils.DrawGlowWithPadding(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(0.2f, 0.0f, 0.0f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), SpriteEffects.None, radius: 0.01f);
+        DrawingUtils.DrawGlowWithPadding(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(0.3f, 0.0f, 0.0f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), SpriteEffects.None, radius: 0.01f);
 
         Main.EntitySpriteDraw(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(1f, 0.2f, 0.2f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), SpriteEffects.None);
 
@@ -358,12 +328,12 @@ public class DichromaticSkullFlame : EverProjectile
         public override void Update()
         {
             Scale = Vector2.Lerp(Scale, new Vector2(1.5f), 0.05f);
-            velocity *= 0.9f;
+            velocity *= 0.95f;
             base.Update();
-            FrameNum.Y = MathHelper.Lerp(FrameNum.Y, 6f, 0.15f);
+            FrameNum.Y = MathHelper.Lerp(FrameNum.Y, 6f, 0.01f);
             if (FrameNum.Y >= 5.5f) Kill();
             Rotation -= MathHelper.ToRadians(1f);
-            Color = Color.Lerp(Color, Color.Transparent, 0.1f);
+            Color = Color.Lerp(Color, Color.Transparent, 0.05f);
         }
     }
     public class FlameLashParticle : Particle
@@ -463,8 +433,6 @@ public class DichromaticSkullFlame : EverProjectile
         base.AI();
         if (Projectile.ai[0] <= 10 && Projectile.ai[0] != 0)
         {
-            new SwirlingSmokeParticle(Projectile.Center, Projectile.velocity, new Vector2(0f)).Spawn(SmokeLayer);
-
             new FlameLashParticle(Projectile.Center,
                 new Vector2(Main.rand.NextFloat(2f, 10f), Main.rand.NextFloat(-1f, 1f)).RotatedBy(Projectile.rotation) * Main.rand.NextFloat(1.6f, 2f), new Vector2(Main.rand.NextFloat(0.4f, 1f), Main.rand.NextFloat(0.4f, 1f))).Spawn(FireLayer);
         }
