@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base.Items;
+using Everware.Content.Meteor;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -22,12 +23,10 @@ public class TestItem : EverItem
     }
     public override bool? UseItem(Player player)
     {
-        /*
-            if (player.ItemAnimationJustStarted)
-            {
-                MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
-            }
-            */
+        if (player.ItemAnimationJustStarted)
+        {
+            MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
+        }
         return base.UseItem(player);
     }
 }

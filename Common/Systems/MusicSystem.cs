@@ -15,35 +15,38 @@ public class EverMusicSystem : ModSystem
     {
         orig(self);
 
-        if (!Main.gameMenu && EyeOfCthulhu.ReworkEnabled)
+        if (!Main.gameMenu)
         {
-            if (NPC.CountNPCS(NPCID.EyeofCthulhu) > 0)
+            if (EyeOfCthulhu.ReworkEnabled)
             {
-                if (Main.npc[NPC.FindFirstNPC(NPCID.EyeofCthulhu)].GetGlobalNPC<EyeOfCthulhu>().MusicEnabled)
+                if (NPC.CountNPCS(NPCID.EyeofCthulhu) > 0)
                 {
-                    Main.newMusic = Assets.Sounds.Music.EyeOfCthulhu.Slot;
-                    Main.musicFade[Main.newMusic] = 1;
+                    if (Main.npc[NPC.FindFirstNPC(NPCID.EyeofCthulhu)].GetGlobalNPC<EyeOfCthulhu>().MusicEnabled)
+                    {
+                        Main.newMusic = Assets.Sounds.Music.EyeOfCthulhu.Slot;
+                        Main.musicFade[Main.newMusic] = 1;
+                    }
+                    else
+                    {
+                        Main.newMusic = Assets.Sounds.Music.Silence.Slot;
+                    }
                 }
                 else
                 {
-                    Main.newMusic = Assets.Sounds.Music.Silence.Slot;
+                    MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", 0f);
                 }
-            }
-            else
-            {
-                MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", 0f);
-            }
-            if (NPC.CountNPCS(ModContent.NPCType<Snapdragon>()) > 0)
-            {
-                if ((Main.npc[NPC.FindFirstNPC(ModContent.NPCType<Snapdragon>())].ModNPC as Snapdragon).NumSpineSegmentsActive >= 22)
+                if (NPC.CountNPCS(ModContent.NPCType<Snapdragon>()) > 0)
                 {
-                    Main.newMusic = Assets.Sounds.Music.Snapdragon.Slot;
-                    Main.musicFade[Main.newMusic] = 1;
-                }
-                else
-                {
-                    Main.newMusic = Assets.Sounds.Music.Silence.Slot;
-                    Main.musicFade[Main.newMusic] = 1;
+                    if ((Main.npc[NPC.FindFirstNPC(ModContent.NPCType<Snapdragon>())].ModNPC as Snapdragon).NumSpineSegmentsActive >= 22)
+                    {
+                        Main.newMusic = Assets.Sounds.Music.Snapdragon.Slot;
+                        Main.musicFade[Main.newMusic] = 1;
+                    }
+                    else
+                    {
+                        Main.newMusic = Assets.Sounds.Music.Silence.Slot;
+                        Main.musicFade[Main.newMusic] = 1;
+                    }
                 }
             }
         }
