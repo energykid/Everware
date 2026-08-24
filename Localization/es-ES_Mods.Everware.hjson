@@ -373,7 +373,6 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Llamas de la Calavera Dicromática
 	DichromaticSkullWater.DisplayName: Agua de la Calavera Dicromática
 	TileCluster.DisplayName: Trozo de Bloques
-	AtlasCrownTileCluster.DisplayName: Trozo de Bloques de la Corona de Atlas
 }
 
 Buffs: {

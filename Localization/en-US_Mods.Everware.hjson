@@ -369,11 +369,10 @@ Projectiles: {
 	ShardShredderIcicle.DisplayName: Icicle
 	SnapdragonIceSpike.DisplayName: Ice Spike
 	GreatGargoyleHoldout.DisplayName: Great Gargoyle
-	MagmaticExplosion.DisplayName: Magmatic Explosion
-	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
-	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
-	TileCluster.DisplayName: Tile Cluster
-	AtlasCrownTileCluster.DisplayName: Atlas Crown Tile Cluster
+	MagmaticExplosion.DisplayName: Magmatic Blast
+	DichromaticSkullFlame.DisplayName: Mania
+	DichromaticSkullWater.DisplayName: Bubble
+	TileCluster.DisplayName: Cluster
 }
 
 Buffs: {

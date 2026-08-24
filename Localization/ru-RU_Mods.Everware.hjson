@@ -378,7 +378,6 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Dichromatic Skull Flame
 	DichromaticSkullWater.DisplayName: Dichromatic Skull Water
 	TileCluster.DisplayName: Tile Cluster
-	// AtlasCrownTileCluster.DisplayName: Atlas Crown Tile Cluster
 }
 
 Buffs: {

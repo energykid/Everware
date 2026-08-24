@@ -1,6 +1,4 @@
-﻿using ReLogic.Content;
-using System;
-using Terraria.ID;
+﻿using Terraria.ID;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
@@ -16,7 +14,6 @@ public class StyleSettings : ModConfig
     // Boss Style
     [BackgroundColor(98, 155, 255)]
     [CustomModConfigItem(typeof(StyleElement))]
-    [ReloadRequired]
     public bool eocEnabled = true;
     public static bool EoCEnabled = true;
 
