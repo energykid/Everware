@@ -523,9 +523,7 @@ public sealed class TileCluster : EverProjectile
 
         var origin = new Vector2((ClusterSize * 16) / 2f);
 
-        var transform =
-            Matrix.CreateTranslation(new Vector3(new Vector2(200), 0f))
-          * Main.GameViewMatrix.TransformationMatrix;
+        var transform = Matrix.CreateTranslation(new Vector3(new Vector2(200), 0f));
 
         var rt = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, 400, 400);
 
