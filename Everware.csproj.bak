@@ -14,7 +14,7 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Assets\Effects\Meteor\" />
+	  <Folder Include="Assets\Effects\Meteor\" />
 	</ItemGroup>
 
 	<!-- References -->

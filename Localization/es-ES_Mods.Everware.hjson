@@ -328,6 +328,11 @@ Items: {
 	Hits: Golpeado
 	Times: veces
 	AnyCopperBar: Cualquier Lingote de cobre
+
+	CharredSoilItem: {
+		// DisplayName: Charred Soil
+		// Tooltip: ""
+	}
 }
 
 Biomes: {

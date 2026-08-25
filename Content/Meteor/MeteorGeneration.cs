@@ -1,4 +1,5 @@
 ﻿using Everware.Content.Base.World;
+using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
 using System.Threading;
 using Terraria.ID;
@@ -13,7 +14,7 @@ public class MeteorGeneration
     public static readonly int CharredSoil = TileID.Ash;
     public static readonly int MeteoricGrass = TileID.AshGrass;
     public static readonly int MeteoricGrassFoliage = TileID.AshPlants;
-    public static readonly int CharredStone = TileID.Asphalt;
+    public static readonly int CharredStone = ModContent.TileType<CharredSoilTile>();
     public static readonly int MeteoriteOre = TileID.Meteorite;
     public static void GenerateWholeSite(Point pt)
     {
@@ -145,7 +146,7 @@ public class MeteorGeneration
             if (tt != -1)
             {
                 if (tt == TileID.Dirt || tt == TileID.ClayBlock) tt = CharredSoil;
-                if (TileID.Sets.Grass[tt]) tt = TileID.AshGrass;
+                if (TileID.Sets.Grass[tt]) tt = MeteoricGrass;
                 if (tt == TileID.Plants || tt == TileID.Plants2) tt = MeteoricGrassFoliage;
                 if (tt == TileID.Stone) tt = CharredStone;
                 if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;

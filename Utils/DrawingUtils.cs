@@ -3,6 +3,40 @@
 [Autoload]
 public static class DrawingUtils
 {
+    public static void DrawTile(SpriteBatch spriteBatch, Asset<Texture2D> asset, int i, int j)
+    {
+        if (Main.tile[i, j].Slope == Terraria.ID.SlopeType.Solid)
+            spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + (Main.tile[i, j].IsHalfBlock ? new Vector2(0, 8) : Vector2.Zero),
+            new Rectangle(Main.tile[i, j].TileFrameX, Main.tile[i, j].TileFrameY, 16, Main.tile[i, j].IsHalfBlock ? 8 : 16), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        else
+        {
+            Vector2 bounds = new Vector2(0, 16);
+
+            for (int k = 0; k < 8; k++)
+            {
+                switch (Main.tile[i, j].Slope)
+                {
+                    case Terraria.ID.SlopeType.SlopeDownRight:
+                        if (k == 0) bounds = new Vector2(14, 16);
+                        else bounds.X -= 2;
+                        break;
+                    case Terraria.ID.SlopeType.SlopeUpRight:
+                        if (k == 0) bounds = new Vector2(0, 2);
+                        else bounds.Y += 2;
+                        break;
+                    case Terraria.ID.SlopeType.SlopeDownLeft:
+                        if (k != 0) bounds.X += 2;
+                        break;
+                    case Terraria.ID.SlopeType.SlopeUpLeft:
+                        if (k != 0) bounds.Y -= 2;
+                        break;
+                }
+
+                spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + new Vector2(k * 2, bounds.X),
+                new Rectangle(Main.tile[i, j].TileFrameX + (k * 2), Main.tile[i, j].TileFrameY, 2, (int)bounds.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            }
+        }
+    }
     public static void EverEntitySpriteDraw(Asset<Texture2D> texture, Vector2 position, Vector2 origin, float rotation = 0f, int framesV = 1, int frameNumV = 0)
     {
         Main.EntitySpriteDraw(texture.Value, position, texture.Frame(1, framesV, 0, frameNumV), Color.White, rotation, origin, Vector2.One, 0);

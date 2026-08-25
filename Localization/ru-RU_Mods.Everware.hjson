@@ -333,6 +333,11 @@ Items: {
 	// Hits: Hits
 	// Times: times
 	// AnyCopperBar: Any Copper Bar
+
+	CharredSoilItem: {
+		// DisplayName: Charred Soil
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
