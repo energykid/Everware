@@ -450,7 +450,7 @@ NPCs: {
 		DisplayName: Sculptor
 		Reliquary: Reliquary
 		Chisel: Chisel
-		BestiaryEntry: An old, wisened artist from a time long before yours. Years of cryostasis have made his skin pale as marble, but not even the coldest ice can dull his passion for his craft!
+		BestiaryEntry: An old, wisened artist from a time long before yours. Years of cryostasis made his skin pale, but no cold can dull his passion for his craft!
 
 		Dialogue: {
 			Greeting: {
@@ -554,3 +554,5 @@ Tiles: {
 }
 
 ConfigCategory.StyleSettings.Description: Style Settings
+
+Bestiary.Sculptor: An old, wisened artist from a time long before yours. Years of cryostasis made his skin pale, but no cold can dull his passion for his craft!
