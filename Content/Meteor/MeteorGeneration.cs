@@ -11,8 +11,8 @@ public class MeteorGeneration
 {
     public static readonly int SizeX = 125;
     public static readonly int SizeY = 60;
-    public static readonly int CharredSoil = TileID.Ash;
-    public static readonly int MeteoricGrass = TileID.AshGrass;
+    public static readonly int CharredSoil = ModContent.TileType<CharredSoilTile>();
+    public static readonly int MeteoricGrass = ModContent.TileType<SpiritGrassTile>();
     public static readonly int MeteoricGrassFoliage = TileID.AshPlants;
     public static readonly int CharredStone = ModContent.TileType<CharredSoilTile>();
     public static readonly int MeteoriteOre = TileID.Meteorite;
@@ -63,6 +63,19 @@ public class MeteorGeneration
             x = Easing.KeyFloat(i, -10, 10, 20, 20, Easing.InOutExpo, x);
             x = Easing.KeyFloat(i, 10, 30, 20, 10, Easing.OutExpo, x);
             x = Easing.KeyFloat(i, 30, SizeX + 1, 10, 0, Easing.InOutExpo, x);
+
+            Point ptT = new(pt.X + i, pt.Y - SizeY - 1);
+
+            if (TileID.Sets.IsATreeTrunk[Main.tile[ptT].TileType])
+            {
+                ushort t = Main.tile[ptT].TileType;
+                while (Main.tile[ptT].TileType == t && Main.tile[ptT].HasTile && ptT.Y > 200)
+                {
+                    ptT.Y--;
+                    Main.tile[ptT + new Point(0, 1)].ClearTile();
+                }
+            }
+
             for (float j = -SizeY; j <= SizeY + x; j++)
             {
                 float l = (float)Math.Sin(i / 20f);

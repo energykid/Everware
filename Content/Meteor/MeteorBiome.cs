@@ -6,7 +6,7 @@ public class MeteorBiome : ModBiome
     public override SceneEffectPriority Priority => SceneEffectPriority.Environment;
     public override bool IsBiomeActive(Player player)
     {
-        return Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles > 100 && (player.Center.Y / 16f) < Main.worldSurface;
+        return Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles > 1500 && (player.Center.Y / 16f) < Main.worldSurface;
     }
     [ModSystemHooks.PostUpdateEverything]
     public void SpawnParticles()
@@ -37,7 +37,7 @@ public class MeteorMusicSystem : ModSystem
         }
 
         tileColor *= (1f - (Intensity * 0.6f));
-        backgroundColor = backgroundColor.MultiplyRGBA(new Color((1f - (Intensity * 0.6f)), (1f - (Intensity * 0.75f)), (1f - (Intensity * 0.85f))));
+        backgroundColor = backgroundColor.MultiplyRGBA(new Color((1f - (Intensity * 0.65f)), (1f - (Intensity * 0.75f)), (1f - (Intensity * 0.55f))));
 
         base.ModifySunLightColor(ref tileColor, ref backgroundColor);
     }

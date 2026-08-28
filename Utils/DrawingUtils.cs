@@ -1,12 +1,128 @@
-﻿namespace Everware.Utils;
+﻿using Terraria.GameContent.Drawing;
+using Terraria.ID;
+
+namespace Everware.Utils;
 
 [Autoload]
 public static class DrawingUtils
 {
+    public static void DrawSlopedTile(SpriteBatch sb, Asset<Texture2D> asset, int i, int j, Color color, Vector2 offset)
+    {
+        var hasTile = Main.tile[i, j].HasTile;
+        var slope = Main.tile[i, j].Slope;
+        var halfTile = Main.tile[i, j].IsHalfBlock;
+        var invisible = Main.tile[i, j].IsTileInvisible;
+        var fullBright = Main.tile[i, j].IsTileFullbright;
+
+        var tileRenderer = Main.instance.TilesRenderer;
+
+        var drawData = new TileDrawInfo
+        {
+            tileCache = Main.tile[i, j]
+        };
+        drawData.typeCache = drawData.tileCache.type;
+        drawData.tileFrameX = drawData.tileCache.frameX;
+        drawData.tileFrameY = drawData.tileCache.frameY;
+        drawData.tileLight = Color.White;
+        drawData.colorTint = Color.White;
+        drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
+        tileRenderer.GetTileDrawData(
+            i,
+            j,
+            drawData.tileCache,
+            drawData.typeCache,
+            ref drawData.tileFrameX,
+            ref drawData.tileFrameY,
+            out drawData.tileWidth,
+            out drawData.tileHeight,
+            out drawData.tileTop,
+            out drawData.halfBrickHeight,
+            out drawData.addFrX,
+            out drawData.addFrY,
+            out drawData.tileSpriteEffect,
+            out drawData.glowTexture,
+            out drawData.glowSourceRect,
+            out drawData.glowColor
+        );
+        drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
+
+        if (!hasTile || invisible)
+        {
+            return;
+        }
+
+        var position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition;
+
+        var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
+
+        drawData.tileLight = Color.White;
+        drawData.colorTint = Color.White;
+        drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
+
+        if (asset is null)
+        {
+            return;
+        }
+
+        if (slope == SlopeType.Solid && !halfTile)
+        {
+            sb.Draw(asset.Value, position, source, color, 0f, Vector2.Zero, 1f, drawData.tileSpriteEffect, 0f);
+        }
+        else if (halfTile)
+        {
+            sb.Draw(asset.Value, new Vector2(position.X, position.Y + 8), new Rectangle(source.X, source.Y, 16, 8), color);
+        }
+        else
+        {
+            if (slope is SlopeType.SlopeDownLeft or SlopeType.SlopeDownRight)
+            {
+                for (var a = 0; a < 16; a += 2)
+                {
+                    int length;
+                    int height;
+
+                    if (slope == SlopeType.SlopeDownRight)
+                    {
+                        length = 16 - a - 2;
+                        height = 16 - a;
+                    }
+                    else
+                    {
+                        length = a;
+                        height = 16 - length;
+                    }
+
+                    sb.Draw(asset.Value, position + new Vector2(length, a), new Rectangle(source.X + length, source.Y, 2, height), color);
+                }
+            }
+            else
+            {
+                for (var a = 0; a < 16; a += 2)
+                {
+                    int length;
+                    int height;
+
+                    if (slope == SlopeType.SlopeUpLeft)
+                    {
+                        length = a;
+                        height = 16 - length;
+                    }
+                    else
+                    {
+                        length = 16 - a - 2;
+                        height = 16 - a;
+                    }
+
+                    sb.Draw(asset.Value, position + new Vector2(length, 0), new Rectangle(source.X + length, source.Y + 16 - height, 2, height), color);
+                }
+            }
+        }
+    }
+
     public static void DrawTile(SpriteBatch spriteBatch, Asset<Texture2D> asset, int i, int j)
     {
         if (Main.tile[i, j].Slope == Terraria.ID.SlopeType.Solid)
-            spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + (Main.tile[i, j].IsHalfBlock ? new Vector2(0, 8) : Vector2.Zero),
+            spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + ((Main.tile[i, j].IsHalfBlock ? new Vector2(0, 10) : Vector2.Zero) + new Vector2(0, -2)),
             new Rectangle(Main.tile[i, j].TileFrameX, Main.tile[i, j].TileFrameY, 16, Main.tile[i, j].IsHalfBlock ? 8 : 16), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         else
         {
@@ -32,8 +148,42 @@ public static class DrawingUtils
                         break;
                 }
 
-                spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + new Vector2(k * 2, bounds.X),
+                spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + new Vector2(k * 2, bounds.X - 2),
                 new Rectangle(Main.tile[i, j].TileFrameX + (k * 2), Main.tile[i, j].TileFrameY, 2, (int)bounds.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            }
+        }
+    }
+    public static void DrawTile(SpriteBatch spriteBatch, Asset<Texture2D> asset, int i, int j, Color c)
+    {
+        if (Main.tile[i, j].Slope == Terraria.ID.SlopeType.Solid)
+            spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + (Main.tile[i, j].IsHalfBlock ? new Vector2(0, 8) : Vector2.Zero),
+            new Rectangle(Main.tile[i, j].TileFrameX, Main.tile[i, j].TileFrameY, 16, Main.tile[i, j].IsHalfBlock ? 8 : 16), c, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        else
+        {
+            Vector2 bounds = new Vector2(0, 16);
+
+            for (int k = 0; k < 8; k++)
+            {
+                switch (Main.tile[i, j].Slope)
+                {
+                    case Terraria.ID.SlopeType.SlopeDownRight:
+                        if (k == 0) bounds = new Vector2(14, 16);
+                        else bounds.X -= 2;
+                        break;
+                    case Terraria.ID.SlopeType.SlopeUpRight:
+                        if (k == 0) bounds = new Vector2(0, 2);
+                        else bounds.Y += 2;
+                        break;
+                    case Terraria.ID.SlopeType.SlopeDownLeft:
+                        if (k != 0) bounds.X += 2;
+                        break;
+                    case Terraria.ID.SlopeType.SlopeUpLeft:
+                        if (k != 0) bounds.Y -= 2;
+                        break;
+                }
+
+                spriteBatch.Draw(asset.Value, new Vector2(i * 16, j * 16) - Main.screenPosition + new Vector2(k * 2, bounds.X),
+                new Rectangle(Main.tile[i, j].TileFrameX + (k * 2), Main.tile[i, j].TileFrameY, 2, (int)bounds.Y), c, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
         }
     }

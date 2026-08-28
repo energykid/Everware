@@ -38,7 +38,7 @@ public class CharredSoilTile : EverTile
         spriteBatch.End(out var ss);
         spriteBatch.Begin(ss with { CustomEffect = effect.Shader, SortMode = SpriteSortMode.Deferred });
 
-        DrawingUtils.DrawTile(spriteBatch, asset, i, j);
+        DrawingUtils.DrawSlopedTile(spriteBatch, asset, i, j, Color.White, Vector2.Zero);
 
         spriteBatch.Restart(ss);
     }
