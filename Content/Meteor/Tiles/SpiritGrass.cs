@@ -41,7 +41,7 @@ public class SpiritGrassTile : EverTile
     {
         var asset = Assets.Textures.Meteor.Tiles.SpiritGrassGlow.Asset;
 
-        var effect = Assets.Effects.Meteor.CharredSoilGlow.CreateGlow();
+        var effect = Assets.Effects.Meteor.MeteorTileStreaks.CreateGlow();
 
         float a = Lighting.GetColor(i, j).R + Lighting.GetColor(i, j).G + Lighting.GetColor(i, j).B / 3f;
 

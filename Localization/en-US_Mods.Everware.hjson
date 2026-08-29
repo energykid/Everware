@@ -333,6 +333,11 @@ Items: {
 		DisplayName: Charred Soil
 		Tooltip: ""
 	}
+
+	CharredStoneItem: {
+		DisplayName: Charred Stone Item
+		Tooltip: ""
+	}
 }
 
 Biomes: {

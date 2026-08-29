@@ -13,9 +13,6 @@
 			<HintPath>Daybreak.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Assets\Effects\Meteor\" />
-	</ItemGroup>
 
 	<!-- References -->
 
