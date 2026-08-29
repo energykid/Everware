@@ -1,5 +1,4 @@
 ﻿using Everware.Utils;
-using System;
 using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -67,6 +66,9 @@ public class GlowcoatSystem : ModSystem
             GlowEffect.Parameters.Color = Color.Blue.ToVector4();
             GlowEffect.Apply();
 
+            Main.spriteBatch.End(out var ss);
+            Main.spriteBatch.Begin(ss with { CustomEffect = GlowEffect.Shader });
+
             for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
             {
                 for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
@@ -77,9 +79,6 @@ public class GlowcoatSystem : ModSystem
 
                     if (t.HasTile)
                     {
-                        Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.EffectMatrix);
-
                         Color c = t.Get<GlowcoatTileData>().color;
                         if (c != Color.Transparent)
                         {
@@ -97,8 +96,7 @@ public class GlowcoatSystem : ModSystem
                 }
             }
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null);
+            Main.spriteBatch.Restart(ss);
         }
 
         orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);

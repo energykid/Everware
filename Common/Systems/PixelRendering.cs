@@ -1,7 +1,4 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using System.Collections.Generic;
-using Terraria.Graphics.Light;
+﻿using System.Collections.Generic;
 
 namespace Everware.Common.Systems
 {
@@ -82,186 +79,210 @@ namespace Everware.Common.Systems
 
     public class PixelRendering : ModSystem
     {
-        public static RenderTarget2D PixelatedRenderTarget;
-        public static RenderTarget2D AdditivePixelatedRenderTarget;
         public static List<DeferredSprite> Draws = [];
         public static List<DeferredPrim> Prims = [];
+
         public override void Load()
         {
-            IL_Main.DoDraw += il =>
-            {
-                var c = new ILCursor(il);
-
-                if (!c.TryGotoNext(MoveType.After, i => i.MatchCall(typeof(TimeLogger), "DetailedDrawReset"), i => i.MatchLdsfld(typeof(Main), "gameMenu"), i => i.MatchBrtrue(out _)))
-                {
-                    return;
-                }
-
-                c.Emit(OpCodes.Call, typeof(PixelRendering).GetMethod("DrawAllPixelatedSprites"));
-            };
+            On_Main.DoDraw_Tiles_Solid += DrawPixelation;
         }
 
-        public void DrawPixelationTargets()
+        private void DrawPixelation(On_Main.orig_DoDraw_Tiles_Solid orig, Main self)
         {
-            Vector2 targetPosition = new Vector2(2 - (float)Math.Floor((Main.LocalPlayer.Center.X % 2) / 2), 2 - (float)Math.Floor((Main.LocalPlayer.Center.Y % 2) / 2));
+            orig(self);
 
-            if (!Main.gameMenu)
+            var pixTarget = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+                Main.screenWidth / 2, Main.screenHeight / 2);
+            var addPixTarget = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+                Main.screenWidth / 2, Main.screenHeight / 2);
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+
+            using (pixTarget.Scope(clearColor: Color.Transparent))
             {
-                if (PixelatedRenderTarget != null)
+                foreach (DeferredSprite draw in Draws)
                 {
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
-                    Main.EntitySpriteDraw(PixelatedRenderTarget, targetPosition, new Rectangle(0, 0, Main.screenWidth / 2, Main.screenHeight / 2), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
-                    Main.spriteBatch.End();
-                    PixelatedRenderTarget.Dispose();
-                }
-                if (AdditivePixelatedRenderTarget != null)
-                {
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
-                    Main.EntitySpriteDraw(AdditivePixelatedRenderTarget, targetPosition, new Rectangle(0, 0, Main.screenWidth / 2, Main.screenHeight / 2), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
-                    Main.spriteBatch.End();
-                    AdditivePixelatedRenderTarget.Dispose();
-                }
-            }
-            if (PixelatedRenderTarget != null)
-            {
-                PixelatedRenderTarget = null;
-            }
-            if (AdditivePixelatedRenderTarget != null)
-            {
-                AdditivePixelatedRenderTarget = null;
-            }
-        }
+                    Vector2 drawPosition = new Vector2((float)Math.Floor(draw.position.X / 2), (float)Math.Floor(draw.position.Y / 2));
 
-        public override void PostDrawTiles()
-        {
-            DrawPixelationTargets();
-        }
+                    if (!draw.additive)
+                    {
+                        Main.spriteBatch.End(out var sb);
 
-        public static void DrawAllPixelatedSprites()
-        {
-            bool b = true; // this bool should be made to represent whether the lighting mode is Color/White or Retro/Trippy
+                        Main.spriteBatch.Begin(sb with { CustomEffect = draw.shaderEffect });
 
-            if (Lighting.Mode == LightMode.Retro || Lighting.Mode == LightMode.Trippy) b = false;
+                        draw.setParams?.Invoke();
 
-            Vector2 pos = Main.screenLastPosition - Main.screenPosition;
-
-            if (b)
-            {
-                if (PixelatedRenderTarget == null)
-                    PixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-
-                if (PixelatedRenderTarget.Width != Main.screenWidth || PixelatedRenderTarget.Height != Main.screenHeight)
-                {
-                    PixelatedRenderTarget.Dispose();
-                    PixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-                }
-
-                if (AdditivePixelatedRenderTarget == null)
-                    AdditivePixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-
-                if (AdditivePixelatedRenderTarget.Width != Main.screenWidth || AdditivePixelatedRenderTarget.Height != Main.screenHeight)
-                {
-                    AdditivePixelatedRenderTarget.Dispose();
-                    AdditivePixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-                }
-
-                Main.graphics.GraphicsDevice.SetRenderTarget(PixelatedRenderTarget);
-
-                Main.graphics.GraphicsDevice.Clear(Color.Transparent);
-            }
-
-
-            //Main.spriteBatch.End();
-            Effect eff = null;
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
-            foreach (DeferredSprite draw in Draws)
-            {
-                if (eff != draw.shaderEffect)
-                {
-                    Main.spriteBatch.End();
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.TransformationMatrix);
-                    eff = draw.shaderEffect;
-                }
-
-                Vector2 drawPosition = new Vector2((float)Math.Floor(draw.position.X / 2), (float)Math.Floor(draw.position.Y / 2)) + (pos / 2);
-                if (!b) drawPosition = new Vector2((float)Math.Floor(draw.position.X), (float)Math.Floor(draw.position.Y)) + (pos);
-
-                if (!draw.additive)
-                {
-                    if (draw.setParams != null)
-                        draw.setParams();
-
-                    Main.spriteBatch.Draw(draw.sprite, drawPosition, draw.sourceRectangle, draw.color, draw.rotation, draw.origin, b ? draw.scale / 2 : draw.scale, draw.spriteEffects, 0);
+                        Main.spriteBatch.Draw(draw.sprite, drawPosition, draw.sourceRectangle, draw.color, draw.rotation, draw.origin, draw.scale / 2, draw.spriteEffects, 0);
+                    }
                 }
             }
 
-            foreach (DeferredPrim prim in Prims)
+            using (addPixTarget.Scope(clearColor: Color.Transparent))
             {
-                if (!prim.additive)
+                foreach (DeferredSprite draw in Draws)
                 {
-                    if (prim.setParams != null)
-                        prim.setParams();
+                    Vector2 drawPosition = new Vector2((float)Math.Floor(draw.position.X / 2), (float)Math.Floor(draw.position.Y / 2));
 
-                    prim.Draw(b);
-                }
-            }
+                    if (draw.additive)
+                    {
+                        Main.spriteBatch.End(out var sb);
 
-            if (b)
-            {
-                Main.graphics.GraphicsDevice.SetRenderTarget(AdditivePixelatedRenderTarget);
-            }
+                        Main.spriteBatch.Begin(sb with { CustomEffect = draw.shaderEffect });
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                        draw.setParams?.Invoke();
 
-            eff = null;
-
-            foreach (DeferredSprite draw in Draws)
-            {
-                if (eff != draw.shaderEffect)
-                {
-                    Main.spriteBatch.End();
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.TransformationMatrix);
-                    eff = draw.shaderEffect;
-                }
-
-                Vector2 drawPosition = new Vector2((float)Math.Floor(draw.position.X / 2), (float)Math.Floor(draw.position.Y / 2)) + (pos / 2);
-                if (!b) drawPosition = new Vector2((float)Math.Floor(draw.position.X), (float)Math.Floor(draw.position.Y)) + (pos);
-
-                if (draw.additive)
-                {
-                    if (draw.setParams != null)
-                        draw.setParams();
-
-                    Main.spriteBatch.Draw(draw.sprite, drawPosition, draw.sourceRectangle, draw.color, draw.rotation, draw.origin, b ? draw.scale / 2 : draw.scale, draw.spriteEffects, 0);
-                }
-            }
-
-            foreach (DeferredPrim prim in Prims)
-            {
-                if (prim.additive)
-                {
-                    if (prim.setParams != null)
-                        prim.setParams();
-
-                    prim.Draw(b);
+                        Main.spriteBatch.Draw(draw.sprite, drawPosition, draw.sourceRectangle, draw.color, draw.rotation, draw.origin, draw.scale / 2, draw.spriteEffects, 0);
+                    }
                 }
             }
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
 
-            if (b)
-            {
-                Main.graphics.GraphicsDevice.SetRenderTarget(Main.gameInactive ? null : Main.screenTarget);
-            }
+            Main.spriteBatch.Draw(pixTarget.Target, Vector2.Zero, pixTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
+
+            Main.spriteBatch.End(out var ss);
+            Main.spriteBatch.Begin(ss with { BlendState = BlendState.Additive });
+
+            Main.spriteBatch.Draw(addPixTarget.Target, Vector2.Zero, pixTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
 
+            pixTarget.Dispose();
+            addPixTarget.Dispose();
+
             Draws.Clear();
             Prims.Clear();
-            //Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+        }
+
+        public static void DrawAllPixelatedSprites()
+        {
+            /*
+                bool b = true; // this bool should be made to represent whether the lighting mode is Color/White or Retro/Trippy
+
+                if (Lighting.Mode == LightMode.Retro || Lighting.Mode == LightMode.Trippy) b = false;
+
+                Vector2 pos = Main.screenLastPosition - Main.screenPosition;
+
+                if (b)
+                {
+                    if (PixelatedRenderTarget == null)
+                        PixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+
+                    if (PixelatedRenderTarget.Width != Main.screenWidth || PixelatedRenderTarget.Height != Main.screenHeight)
+                    {
+                        PixelatedRenderTarget.Dispose();
+                        PixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                    }
+
+                    if (AdditivePixelatedRenderTarget == null)
+                        AdditivePixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+
+                    if (AdditivePixelatedRenderTarget.Width != Main.screenWidth || AdditivePixelatedRenderTarget.Height != Main.screenHeight)
+                    {
+                        AdditivePixelatedRenderTarget.Dispose();
+                        AdditivePixelatedRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                    }
+
+                    Main.graphics.GraphicsDevice.SetRenderTarget(PixelatedRenderTarget);
+
+                    Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+                }
+
+
+                //Main.spriteBatch.End();
+                Effect eff = null;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+
+                foreach (DeferredSprite draw in Draws)
+                {
+                    if (eff != draw.shaderEffect)
+                    {
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.ZoomMatrix);
+                        eff = draw.shaderEffect;
+                    }
+
+                    Vector2 drawPosition = new Vector2((float)Math.Floor(draw.position.X / 2), (float)Math.Floor(draw.position.Y / 2)) + (pos / 2);
+                    if (!b) drawPosition = new Vector2((float)Math.Floor(draw.position.X), (float)Math.Floor(draw.position.Y)) + (pos);
+
+                    if (!draw.additive)
+                    {
+                        if (draw.setParams != null)
+                            draw.setParams();
+
+                        Main.spriteBatch.Draw(draw.sprite, drawPosition, draw.sourceRectangle, draw.color, draw.rotation, draw.origin, b ? draw.scale / 2 : draw.scale, draw.spriteEffects, 0);
+                    }
+                }
+
+                foreach (DeferredPrim prim in Prims)
+                {
+                    if (!prim.additive)
+                    {
+                        if (prim.setParams != null)
+                            prim.setParams();
+
+                        prim.Draw(b);
+                    }
+                }
+
+                if (b)
+                {
+                    Main.graphics.GraphicsDevice.SetRenderTarget(AdditivePixelatedRenderTarget);
+                }
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+
+                eff = null;
+
+                foreach (DeferredSprite draw in Draws)
+                {
+                    if (eff != draw.shaderEffect)
+                    {
+                        Main.spriteBatch.End();
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.ZoomMatrix);
+                        eff = draw.shaderEffect;
+                    }
+
+                    Vector2 drawPosition = new Vector2((float)Math.Floor(draw.position.X / 2), (float)Math.Floor(draw.position.Y / 2)) + (pos / 2);
+                    if (!b) drawPosition = new Vector2((float)Math.Floor(draw.position.X), (float)Math.Floor(draw.position.Y)) + (pos);
+
+                    if (draw.additive)
+                    {
+                        if (draw.setParams != null)
+                            draw.setParams();
+
+                        Main.spriteBatch.Draw(draw.sprite, drawPosition, draw.sourceRectangle, draw.color, draw.rotation, draw.origin, b ? draw.scale / 2 : draw.scale, draw.spriteEffects, 0);
+                    }
+                }
+
+                foreach (DeferredPrim prim in Prims)
+                {
+                    if (prim.additive)
+                    {
+                        if (prim.setParams != null)
+                            prim.setParams();
+
+                        prim.Draw(b);
+                    }
+                }
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+
+                if (b)
+                {
+                    Main.graphics.GraphicsDevice.SetRenderTarget(Main.gameInactive ? null : Main.screenTarget);
+                }
+
+                Main.spriteBatch.End();
+
+                Draws.Clear();
+                Prims.Clear();
+                //Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+
+                */
         }
 
         public static void DrawPixelatedSprite(Texture2D sprite, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect = SpriteEffects.None, bool additive = false, Effect effect = null, Action setparams = null)
@@ -357,25 +378,25 @@ namespace Everware.Common.Systems
         {
             if (hasAlreadyBegun) Main.spriteBatch.End();
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.ZoomMatrix);
 
             Main.EntitySpriteDraw(sprite, position, sourceRectangle, color, rotation, origin, scale, spriteEffect);
 
             Main.spriteBatch.End();
 
-            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
         }
         public static void DrawSprite(Texture2D sprite, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect = SpriteEffects.None, bool hasAlreadyBegun = true, Effect effect = null)
         {
             if (hasAlreadyBegun) Main.spriteBatch.End();
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.ZoomMatrix);
 
             Main.EntitySpriteDraw(sprite, position, sourceRectangle, color, rotation, origin, scale, spriteEffect);
 
             Main.spriteBatch.End();
 
-            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
         }
     }
 }
