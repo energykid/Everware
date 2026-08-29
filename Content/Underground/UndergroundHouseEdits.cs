@@ -30,28 +30,31 @@ public class UndergroundHouseEdits : ModSystem
             if (Main.chest[i] != null)
             {
                 Tile chestTile = Main.tile[Main.chest[i].x, Main.chest[i].y];
-                if ((int)((float)chestTile.TileFrameX / 36f) == 1) // Gold Chest
+                if (chestTile.TileType == TileID.Containers)
                 {
-                    if (Main.chest[i].y > DeepCaveLayer)
+                    if ((int)((float)chestTile.TileFrameX / 36f) == 1) // Gold Chest
                     {
-                        for (int k = 0; k < 2; k++)
+                        if (Main.chest[i].y > DeepCaveLayer)
                         {
-                            for (int l = 0; l < 2; l++)
+                            for (int k = 0; k < 2; k++)
                             {
-                                Tile t = Main.tile[Main.chest[i].x + k, Main.chest[i].y + l];
-                                t.TileType = (ushort)ModContent.TileType<SteelChestTile>();
-                                t.TileFrameX -= 36;
+                                for (int l = 0; l < 2; l++)
+                                {
+                                    Tile t = Main.tile[Main.chest[i].x + k, Main.chest[i].y + l];
+                                    t.TileType = (ushort)ModContent.TileType<SteelChestTile>();
+                                    t.TileFrameX -= 36;
+                                }
                             }
+                            Chest.Lock(Main.chest[i].x, Main.chest[i].y);
+                            Chest chest = Main.chest[i];
+                            chest.item[0] = new Item(DeepCaveLoot[Main.rand.Next(DeepCaveLoot.Count)]);
                         }
-                        Chest.Lock(Main.chest[i].x, Main.chest[i].y);
-                        Chest chest = Main.chest[i];
-                        chest.item[0] = new Item(DeepCaveLoot[Main.rand.Next(DeepCaveLoot.Count)]);
-                    }
-                    else
-                    {
-                        Chest chest = Main.chest[i];
-                        if (Main.rand.NextBool(2))
-                            chest.AddItemToShop(new Item(ItemID.GoldenKey));
+                        else
+                        {
+                            Chest chest = Main.chest[i];
+                            if (Main.rand.NextBool(2))
+                                chest.AddItemToShop(new Item(ItemID.GoldenKey));
+                        }
                     }
                 }
             }
