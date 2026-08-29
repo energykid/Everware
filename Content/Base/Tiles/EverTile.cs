@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ModLoader;
-
-namespace Everware.Content.Base.Tiles;
+﻿namespace Everware.Content.Base.Tiles;
 
 public abstract class EverTile : ModTile
 {

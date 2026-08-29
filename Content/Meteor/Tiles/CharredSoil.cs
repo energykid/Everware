@@ -24,7 +24,7 @@ public class CharredSoilTile : EverTile
     {
         var asset = Assets.Textures.Meteor.Tiles.CharredSoilGlow.Asset;
 
-        var effect = Assets.Effects.Meteor.CharredSoilGlow.CreateGlow();
+        var effect = Assets.Effects.Meteor.MeteorTileStreaks.CreateGlow();
 
         effect.Parameters.NoiseTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
         effect.Parameters.Color = Lighting.GetColor(i, j).ToVector4();
