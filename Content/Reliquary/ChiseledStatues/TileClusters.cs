@@ -58,12 +58,15 @@ public sealed class TileCluster : EverProjectile
                     cluster.DrawSelf(ref c, 0f, 0.85f);
 
             orig(self, camera, drawPlayer, position, rotation, rotationOrigin, shadow, scale);
-			
-			Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Main.spriteBatch.End(out var ss);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             foreach (Projectile projectile in projs)
                 if (projectile.ModProjectile is TileCluster cluster)
                     cluster.DrawSelf(ref c, 0.85f, 2f);
+
+            Main.spriteBatch.Restart(ss);
         }
         else
         {

@@ -4,6 +4,7 @@ sampler uImage0 : register(s0);
 sampler uImage1 : register(s1);
 
 float4 Color[5];
+float Progress;
 
 texture BlueGlow;
 sampler2D BlueGlowSampler = sampler_state
@@ -34,7 +35,10 @@ float4 GlowEffect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
     else
         return float4(0.0, 0.0, 0.0, 0.0);
 
-    return lerp(tex2D(uImage0, coords) * color, c2, lrp);
+    float vv = 0.5 + (sin(((lrp * 15.0) + Progress) / 2.0) * 0.5);
+        
+    if (lrp > vv) return c2;
+    else return tex2D(uImage0, coords) * color;
 }
 
 technique GlowShader

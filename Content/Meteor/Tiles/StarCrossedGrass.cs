@@ -53,7 +53,7 @@ public class StarCrossedGrassTile : EverTile
     {
         base.SetStaticDefaults();
         DustType = DustID.CrystalSerpent_Pink;
-        AddMapEntry(new Color(250, 200, 219));
+        AddMapEntry(new Color(245, 242, 150));
         Main.tileLighted[Type] = true;
         TileID.Sets.NeedsGrassFraming[Type] = true;
         TileID.Sets.NeedsGrassFramingDirt[Type] = ModContent.TileType<CharredSoilTile>();
@@ -94,7 +94,7 @@ public class StarCrossedGrassTile : EverTile
                     if (Main.tile[a].TileType == ModContent.TileType<MagicStoneTile>())
                     {
                         var asset = Assets.Textures.Misc.SmallGlow.Asset;
-                        Main.EntitySpriteDraw(asset.Value, (a.ToVector2() * 16) + new Vector2(8, 8) - Main.screenPosition, asset.Frame(), new Color(1f, 1f, 1f, 0f), 0f, asset.Frame().Size() / 2f, 2f, SpriteEffects.None);
+                        Main.EntitySpriteDraw(asset.Value, (a.ToVector2() * 16) + new Vector2(8, 8) - Main.screenPosition, asset.Frame(), new Color(1f, 1f, 1f, 0f), 0f, asset.Frame().Size() / 2f, 1.5f, SpriteEffects.None);
                     }
                 }
             }
@@ -104,6 +104,7 @@ public class StarCrossedGrassTile : EverTile
         var eff = Assets.Effects.Meteor.StarCrossedGlow.CreateGlow();
 
         eff.Parameters.BlueGlow = BlueGlow.Target;
+        eff.Parameters.Progress = GlobalTimer.Value / 20f;
         eff.Parameters.Color = [
             Color.Blue.ToVector4(),
             Color.Blue.ToVector4(),

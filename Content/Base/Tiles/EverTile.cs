@@ -45,7 +45,7 @@ public abstract class EverTile : ModTile
     /// <param name="spriteBatch"></param>
     public virtual void ExtraDrawEverything()
     {
-        Main.spriteBatch.Draw(ExtraTarget.Target, new(8), ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(ExtraTarget.Target, new(8), ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, Main.GameViewMatrix.Effects, 0f);
     }
 
     public override void Load()
@@ -67,7 +67,7 @@ public abstract class EverTile : ModTile
         {
             using (ExtraTarget.Scope(clearColor: Color.Transparent))
             {
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
                 for (int i = -8; i < (Main.screenWidth / 16) + 8; i++)
                 {
                     for (int j = -8; j < (Main.screenHeight / 16) + 8; j++)
@@ -86,7 +86,7 @@ public abstract class EverTile : ModTile
                 Main.spriteBatch.End();
             }
 
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             ExtraDrawEverything();
             Main.spriteBatch.End();
         }
