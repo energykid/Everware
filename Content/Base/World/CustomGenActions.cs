@@ -166,9 +166,24 @@ public class CustomGenActions
         {
             if (!Main.tile[x, y].HasTile)
                 WorldGen.PlaceTile(x, y, MeteorGeneration.MeteoriteOre, true);
-            if (!Main.tile[x, y].HasTile || Main.tile[x, y].TileType == MeteorGeneration.MeteoricGrass)
+            if (!Main.tile[x, y].HasTile || Main.tile[x, y].TileType == MeteorGeneration.StarCrossedGrass)
             {
                 Main.tile[x, y].TileType = (ushort)MeteorGeneration.MeteoriteOre;
+            }
+
+            WorldUtils.TileFrame(x, y, true);
+            return UnitApply(origin, x, y, args);
+        }
+    }
+    public class SetCharredSoil : GenAction
+    {
+        public SetCharredSoil() { }
+
+        public override bool Apply(Point origin, int x, int y, params object[] args)
+        {
+            if (Main.tile[x, y].HasTile)
+            {
+                Main.tile[x, y].TileType = (ushort)MeteorGeneration.CharredSoil;
             }
 
             WorldUtils.TileFrame(x, y, true);

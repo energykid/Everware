@@ -37,7 +37,7 @@ public class MeteorMusicSystem : ModSystem
         }
 
         tileColor *= (1f - (Intensity * 0.6f));
-        backgroundColor = backgroundColor.MultiplyRGBA(new Color((1f - (Intensity * 0.65f)), (1f - (Intensity * 0.75f)), (1f - (Intensity * 0.55f))));
+        backgroundColor = backgroundColor.MultiplyRGBA(new Color((1f - (Intensity * 0.45f)), (1f - (Intensity * 0.55f)), (1f - (Intensity * 0.85f))));
 
         base.ModifySunLightColor(ref tileColor, ref backgroundColor);
     }
@@ -45,8 +45,8 @@ public class MeteorMusicSystem : ModSystem
     public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts)
     {
         Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles += tileCounts[MeteorGeneration.CharredSoil];
-        Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles += tileCounts[MeteorGeneration.CharredStone];
-        Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles += tileCounts[MeteorGeneration.MeteoricGrass];
+        Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles += tileCounts[MeteorGeneration.MagicStone];
+        Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles += tileCounts[MeteorGeneration.StarCrossedGrass];
         Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles += tileCounts[MeteorGeneration.MeteoriteOre];
     }
 

@@ -12,9 +12,9 @@ public class MeteorGeneration
     public static readonly int SizeX = 125;
     public static readonly int SizeY = 60;
     public static readonly int CharredSoil = ModContent.TileType<CharredSoilTile>();
-    public static readonly int MeteoricGrass = ModContent.TileType<SpiritGrassTile>();
-    public static readonly int MeteoricGrassFoliage = TileID.AshPlants;
-    public static readonly int CharredStone = ModContent.TileType<CharredSoilTile>();
+    public static readonly int StarCrossedGrass = ModContent.TileType<StarCrossedGrassTile>();
+    public static readonly int StarCrossedGrassFoliage = TileID.AshPlants;
+    public static readonly int MagicStone = ModContent.TileType<MagicStoneTile>();
     public static readonly int MeteoriteOre = TileID.Meteorite;
     public static void GenerateWholeSite(Point pt)
     {
@@ -99,8 +99,8 @@ public class MeteorGeneration
     }
     public static void GeneratePointZero(Point pt)
     {
-        new Shapes.Circle(30).Perform(pt, Actions.Chain(
-            new Actions.SwapSolidTile((ushort)CharredStone),
+        new Shapes.Circle(35).Perform(pt, Actions.Chain(
+            new CustomGenActions.SetCharredSoil(),
             new Actions.Smooth(true)
         ));
 
@@ -121,6 +121,15 @@ public class MeteorGeneration
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
+
+        for (int i = -6; i <= 6; i++)
+        {
+            if (Math.Abs(i) >= 3)
+                new Shapes.Slime(20, Main.rand.NextFloat(0.06f, 0.1f), Main.rand.NextFloat(0.12f, 0.4f)).Perform((pt + new Point(i * 10, 0) + new Point(Main.rand.Next(-6, 6), 0)).Grounded(), Actions.Chain(
+                    new Actions.SetTile((ushort)MagicStone, true),
+                    new Actions.Smooth(true)
+                ));
+        }
 
         GenerateMeteor(pt);
     }
@@ -147,11 +156,14 @@ public class MeteorGeneration
         {
             if (tt != -1)
             {
-                if (tt == TileID.Dirt || tt == TileID.ClayBlock) tt = CharredSoil;
-                if (TileID.Sets.Grass[tt]) tt = MeteoricGrass;
-                if (tt == TileID.Plants || tt == TileID.Plants2) tt = MeteoricGrassFoliage;
-                if (tt == TileID.Stone) tt = CharredStone;
-                if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;
+                if (tt == TileID.Dirt || tt == TileID.ClayBlock || tt == TileID.Mud) tt = CharredSoil;
+                if (TileID.Sets.Grass[tt]) tt = StarCrossedGrass;
+                if (TileID.Sets.Stone[tt]) tt = CharredSoil;
+
+                if (tt == TileID.Plants || tt == TileID.Plants2)
+                    tt = -1;
+                else
+                    if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;
             }
         }
 

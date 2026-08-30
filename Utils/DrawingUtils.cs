@@ -70,8 +70,8 @@ public static class DrawingUtils
         }
         else if (halfTile)
         {
-            position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition + (new Vector2(-8, -4) * sc);
-            sb.Draw(asset.Value, new Vector2(position.X, position.Y + 8), new Rectangle(source.X, source.Y, (int)(16f * sc), (int)(8f * sc)), color);
+            position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition + (new Vector2(-8, -4));
+            sb.Draw(asset.Value, new Vector2(position.X, position.Y + 4), new Rectangle(source.X, source.Y, 16, 8), color);
         }
         else
         {

@@ -339,8 +339,8 @@ Items: {
 		// Tooltip: ""
 	}
 
-	CharredStoneItem: {
-		// DisplayName: Charred Stone Item
+	MagicStoneItem: {
+		// DisplayName: Magic Stone
 		// Tooltip: ""
 	}
 }

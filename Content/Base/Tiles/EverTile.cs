@@ -31,6 +31,10 @@ public abstract class EverTile : ModTile
         DrawingUtils.DrawSlopedTile(Main.spriteBatch, Asset, i, j, Color.White, Vector2.Zero);
     }
 
+    public virtual void ExtraDrawPreEverything()
+    {
+
+    }
     /// <summary>
     /// Calls once per type when UsesExtraDrawing is enabled.
     /// Used to draw full-screen shaders on tiles.
@@ -78,6 +82,7 @@ public abstract class EverTile : ModTile
                         }
                     }
                 }
+                ExtraDrawPreEverything();
                 Main.spriteBatch.End();
             }
 
