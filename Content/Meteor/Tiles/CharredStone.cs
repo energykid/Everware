@@ -27,8 +27,6 @@ public class CharredStoneTile : EverTile
         var effect = Assets.Effects.Meteor.MeteorTileStreaks.CreateGlow();
 
         effect.Parameters.NoiseTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
-        effect.Parameters.Color = Lighting.GetColor(i, j).ToVector4();
-        effect.Parameters.Progress = (i / 5f) + GlobalTimer.Value / MathHelper.Lerp(1000, 1500, (i % 3f) / 3f);
         effect.Parameters.NoiseScale = new Vector2(10f, 1f);
         effect.Parameters.Resolution = asset.Size() / 2f;
         effect.Parameters.Resolution2 = Assets.Textures.Misc.PerlinNoise.Asset.Size() / 2f;
@@ -38,7 +36,7 @@ public class CharredStoneTile : EverTile
         spriteBatch.End(out var ss);
         spriteBatch.Begin(ss with { CustomEffect = effect.Shader, SortMode = SpriteSortMode.Deferred });
 
-        DrawingUtils.DrawSlopedTile(spriteBatch, asset, i, j, Color.White, Vector2.Zero);
+        DrawingUtils.DrawSlopedTile(spriteBatch, asset, i, j, Lighting.GetColor(i, j).MultiplyRGBA(new(1f, 1f, 1f, (i / 5f) + GlobalTimer.Value / MathHelper.Lerp(1000, 1500, (i % 3f) / 3f))), Vector2.Zero);
 
         spriteBatch.Restart(ss);
     }

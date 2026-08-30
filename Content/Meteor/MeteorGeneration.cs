@@ -37,14 +37,14 @@ public class MeteorGeneration
 
         int Border = 5;
 
-        TileDataBuffer[,] tiles = new TileDataBuffer[Main.maxTilesX, Main.maxTilesY];
+        TileUtils.Buffer[,] tiles = new TileUtils.Buffer[Main.maxTilesX, Main.maxTilesY];
 
         for (int i = -SizeX - Border; i <= SizeX + Border; i++)
         {
             for (int j = -SizeY - Border; j <= SizeY + Border; j++)
             {
                 Tile t = Main.tile[pt.X + i, pt.Y + j];
-                tiles[pt.X + i, pt.Y + j] = new TileDataBuffer(
+                tiles[pt.X + i, pt.Y + j] = new TileUtils.Buffer(
                     t.HasTile ? t.TileType : -1,
                     t.WallType,
                     t.TileFrameX, t.TileFrameY,
@@ -136,18 +136,7 @@ public class MeteorGeneration
     {
 
     }
-    public struct TileDataBuffer(int t, int w, int fX, int fY, int fX2, int fY2, SlopeType slope, bool hT = false)
-    {
-        public int TileType = t;
-        public int WallType = w;
-        public int FrameX = fX;
-        public int FrameY = fY;
-        public int WallFrameX = fX2;
-        public int WallFrameY = fY2;
-        public SlopeType Slope = slope;
-        public bool HalfTile = hT;
-    }
-    public static void ReplaceTile(TileDataBuffer buffer, Point to, Point center)
+    public static void ReplaceTile(TileUtils.Buffer buffer, Point to, Point center)
     {
         int tt = buffer.TileType;
 

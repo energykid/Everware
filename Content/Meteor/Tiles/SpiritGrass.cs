@@ -40,29 +40,6 @@ public class SpiritGrassTile : EverTile
     public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
     {
         var asset = Assets.Textures.Meteor.Tiles.SpiritGrassGlow.Asset;
-
-        var effect = Assets.Effects.Meteor.MeteorTileStreaks.CreateGlow();
-
-        float a = Lighting.GetColor(i, j).R + Lighting.GetColor(i, j).G + Lighting.GetColor(i, j).B / 3f;
-
-        Color c = Color.Lerp(Lighting.GetColor(i, j), Color.White, a);
-
-        effect.Parameters.NoiseTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
-        effect.Parameters.Color = c.ToVector4() * new Vector4(0.2f, 0.2f, 0.2f, 0.2f) * new Vector4(0.8f, 1f, 2.61f, 0f);
-        effect.Parameters.Progress = (i / 5f) + GlobalTimer.Value / MathHelper.Lerp(1000, 1500, (i % 3f) / 3f);
-        effect.Parameters.NoiseScale = new Vector2(0.01f, 0.5f);
-        effect.Parameters.Resolution = asset.Size() / 2f;
-        effect.Parameters.Resolution2 = Assets.Textures.Misc.PerlinNoise.Asset.Size() / 2f;
-
-        effect.Apply();
-
-        DrawingUtils.DrawSlopedTile(spriteBatch, asset, i, j, c, Vector2.Zero);
-
-        spriteBatch.End(out var ss);
-        spriteBatch.Begin(ss with { CustomEffect = effect.Shader, SortMode = SpriteSortMode.Deferred });
-
         DrawingUtils.DrawSlopedTile(spriteBatch, asset, i, j, Color.White, Vector2.Zero);
-
-        spriteBatch.Restart(ss);
     }
 }

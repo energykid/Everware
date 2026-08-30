@@ -1,46 +1,53 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.Items;
 using Everware.Content.Base.Tiles;
+using Everware.Core;
 using Everware.Utils;
-using Terraria.GameContent.Drawing;
 using Terraria.ID;
 
 namespace Everware.Content.Meteor.Tiles;
 
 public class CharredSoilTile : EverTile
 {
+    public override bool UsesExtraTarget => true;
     public override string Texture => "Everware/Assets/Textures/Meteor/Tiles/CharredSoilTile";
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
         DustType = DustID.Silt;
         AddMapEntry(new Color(28, 29, 29));
+        Main.tileMergeDirt[Type] = true;
     }
     public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
     {
-        Main.instance.TilesRenderer.AddSpecialPoint(i, j, TileDrawing.TileCounterType.CustomSolid);
-    }
-    public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
-    {
-        var asset = Assets.Textures.Meteor.Tiles.CharredSoilGlow.Asset;
 
+    }
+    SpriteBatchSnapshot ss;
+    WrapperShaderData<Assets.Effects.Meteor.MeteorTileStreaks.Parameters>? effect;
+    public override void ExtraDrawSingleTile(int i, int j)
+    {
+        DrawingUtils.DrawSlopedTile(Main.spriteBatch, Assets.Textures.Meteor.Tiles.CharredSoilGlow.Asset, i, j, Color.White, Vector2.Zero);
+    }
+    public override void ExtraDrawEverything()
+    {
         var effect = Assets.Effects.Meteor.MeteorTileStreaks.CreateGlow();
 
         effect.Parameters.NoiseTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
-        effect.Parameters.Color = Lighting.GetColor(i, j).ToVector4();
-        effect.Parameters.Progress = (i / 5f) + GlobalTimer.Value / MathHelper.Lerp(1000, 1500, (i % 3f) / 3f);
-        effect.Parameters.NoiseScale = new Vector2(0.2f, 1f);
-        effect.Parameters.Resolution = asset.Size() / 2f;
+        effect.Parameters.ScreenPosition = new Vector2(Main.screenPosition.X / ExtraTarget.Target.Width, Main.screenPosition.Y / ExtraTarget.Target.Height);
+        effect.Parameters.Progress = GlobalTimer.Value / 10;
+        effect.Parameters.NoiseScale = new Vector2(20f, 5f) * 0.6f;
+        effect.Parameters.Resolution = ExtraTarget.Target.Size() / 2f;
         effect.Parameters.Resolution2 = Assets.Textures.Misc.PerlinNoise.Asset.Size() / 2f;
 
         effect.Apply();
 
-        spriteBatch.End(out var ss);
-        spriteBatch.Begin(ss with { CustomEffect = effect.Shader, SortMode = SpriteSortMode.Deferred });
+        Main.spriteBatch.End(out var sb);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, effect.Shader, Main.GameViewMatrix.ZoomMatrix);
 
-        DrawingUtils.DrawSlopedTile(spriteBatch, asset, i, j, Color.White, Vector2.Zero);
+        base.ExtraDrawEverything();
 
-        spriteBatch.Restart(ss);
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(sb);
     }
 }
 public class CharredSoilItem : EverPlaceableItem
