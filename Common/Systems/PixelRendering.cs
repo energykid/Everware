@@ -91,12 +91,12 @@ namespace Everware.Common.Systems
         {
             orig(self);
 
-            var pixTarget = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+            var pixTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
                 Main.screenWidth / 2, Main.screenHeight / 2);
-            var addPixTarget = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+            var addPixTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
                 Main.screenWidth / 2, Main.screenHeight / 2);
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             using (pixTarget.Scope(clearColor: Color.Transparent))
             {
@@ -137,7 +137,7 @@ namespace Everware.Common.Systems
             }
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             Main.spriteBatch.Draw(pixTarget.Target, Vector2.Zero, pixTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
 
@@ -192,14 +192,14 @@ namespace Everware.Common.Systems
 
                 //Main.spriteBatch.End();
                 Effect eff = null;
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
                 foreach (DeferredSprite draw in Draws)
                 {
                     if (eff != draw.shaderEffect)
                     {
                         Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.ZoomMatrix);
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.TransformationMatrix);
                         eff = draw.shaderEffect;
                     }
 
@@ -232,7 +232,7 @@ namespace Everware.Common.Systems
                 }
 
                 Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
                 eff = null;
 
@@ -241,7 +241,7 @@ namespace Everware.Common.Systems
                     if (eff != draw.shaderEffect)
                     {
                         Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.ZoomMatrix);
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, draw.shaderEffect, Main.GameViewMatrix.TransformationMatrix);
                         eff = draw.shaderEffect;
                     }
 
@@ -269,7 +269,7 @@ namespace Everware.Common.Systems
                 }
 
                 Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
                 if (b)
                 {
@@ -280,7 +280,7 @@ namespace Everware.Common.Systems
 
                 Draws.Clear();
                 Prims.Clear();
-                //Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+                //Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
                 */
         }
@@ -378,25 +378,25 @@ namespace Everware.Common.Systems
         {
             if (hasAlreadyBegun) Main.spriteBatch.End();
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
 
             Main.EntitySpriteDraw(sprite, position, sourceRectangle, color, rotation, origin, scale, spriteEffect);
 
             Main.spriteBatch.End();
 
-            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
         public static void DrawSprite(Texture2D sprite, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect = SpriteEffects.None, bool hasAlreadyBegun = true, Effect effect = null)
         {
             if (hasAlreadyBegun) Main.spriteBatch.End();
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
 
             Main.EntitySpriteDraw(sprite, position, sourceRectangle, color, rotation, origin, scale, spriteEffect);
 
             Main.spriteBatch.End();
 
-            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            if (hasAlreadyBegun) Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
     }
 }

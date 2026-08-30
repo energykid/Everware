@@ -112,7 +112,7 @@ public class SnapdragonIceSpikeSystem : ModSystem
 
         using (spikeTarget.Scope(clearColor: Color.Transparent))
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.TransformationMatrix);
 
             if (AllTriangles.Count > 1)
             {
@@ -180,12 +180,12 @@ public class SnapdragonIceSpikeSystem : ModSystem
         IceSpikeEffect.Apply();
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, IceSpikeEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, IceSpikeEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
         Main.spriteBatch.Draw(spikeTarget.Target, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, spikeTarget.Target.Frame(), Color.White, 0f, spikeTarget.Target.Size() / 2f, 2f, SpriteEffects.None, 0f);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.TransformationMatrix);
 
         spikeTarget.Dispose();
 

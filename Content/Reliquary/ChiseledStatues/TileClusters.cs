@@ -58,6 +58,8 @@ public sealed class TileCluster : EverProjectile
                     cluster.DrawSelf(ref c, 0f, 0.85f);
 
             orig(self, camera, drawPlayer, position, rotation, rotationOrigin, shadow, scale);
+			
+			Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, DepthStencilState.DepthRead, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             foreach (Projectile projectile in projs)
                 if (projectile.ModProjectile is TileCluster cluster)
@@ -530,7 +532,7 @@ public sealed class TileCluster : EverProjectile
             for (var i = 0; i < ClusterSize; i++)
                 for (var j = 0; j < ClusterSize; j++)
                 {
-                    sb.Begin(ss with { TransformMatrix = transform });
+                    sb.Begin();
                     DrawSlopedTile(i, j, false);
                     DrawSlopedTile(i, j, true);
                     sb.End();
@@ -614,7 +616,7 @@ public sealed class TileCluster : EverProjectile
                 return;
             }
 
-            var position = -origin + new Vector2(i * 16f, j * 16f + drawData.tileTop);
+            var position = new Vector2(200, 200) - origin + new Vector2(i * 16f, j * 16f + drawData.tileTop);
 
             var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
 

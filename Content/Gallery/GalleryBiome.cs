@@ -166,19 +166,19 @@ public class GalleryBiome : ModBiome
             Vector2 midOffset = new Vector2(parallaxOrigin, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, ParallaxEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, ParallaxEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
             // Looping background texture in the very back
             Main.spriteBatch.Draw(BGMask.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0.25f, 0.25f, 0.5f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.GameViewMatrix.TransformationMatrix);
 
             // Middle background
             Main.spriteBatch.Draw(BGMiddle.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0.5f, 0.5f, 1f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GalleryClipColor.Shader, Main.GameViewMatrix.TransformationMatrix);
 
             GalleryClipColor.Parameters.MultColor = new Color(0f, 0f, 0f, 0.2f).ToVector4();
             GalleryClipColor.Apply();
@@ -187,13 +187,13 @@ public class GalleryBiome : ModBiome
             Main.spriteBatch.Draw(BGMiddleGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0f, 0f, 0f, 0.2f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
             // Middle background etchings (glows)
             Main.spriteBatch.Draw(BGMiddleGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), Color.White, 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.TransformationMatrix);
 
             // Front background etchings (shadows)
             Main.spriteBatch.Draw(BGFront.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), new Color(0.5f, 0.5f, 1f), 0f, ORIGIN, 1f, SpriteEffects.None, 0);
@@ -205,13 +205,13 @@ public class GalleryBiome : ModBiome
             ShineEffect.Apply();
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, null, null, ShineEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
             // Front background etchings (glows)
             Main.spriteBatch.Draw(BGFrontGlow.Value, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, BGMask.Frame(), Color.White, 0f, ORIGIN, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             DrawBlack();
         }
