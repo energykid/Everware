@@ -19,6 +19,11 @@ float vignetteMult(float2 coords)
     return lr * lr2;
 }
 
+float avg(float3 base)
+{
+    return (base.r + base.g + base.b) / 3.0;
+}
+
 float2 rotated(float2 base, float rotation)
 {
     float x = cos(rotation * base.x) - sin(rotation * base.y);

@@ -1,7 +1,6 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.Items;
 using Everware.Content.Base.Tiles;
-using Everware.Core;
 using Everware.Utils;
 using Terraria.ID;
 
@@ -18,12 +17,6 @@ public class CharredSoilTile : EverTile
         AddMapEntry(new Color(28, 29, 29));
         Main.tileMergeDirt[Type] = true;
     }
-    public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
-    {
-
-    }
-    SpriteBatchSnapshot ss;
-    WrapperShaderData<Assets.Effects.Meteor.MeteorTileStreaks.Parameters>? effect;
     public override void ExtraDrawSingleTile(int i, int j)
     {
         DrawingUtils.DrawSlopedTile(Main.spriteBatch, Assets.Textures.Meteor.Tiles.CharredSoilGlow.Asset, i, j, Color.White, Vector2.Zero);
@@ -46,8 +39,7 @@ public class CharredSoilTile : EverTile
 
         base.ExtraDrawEverything();
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(sb);
+        Main.spriteBatch.Restart(sb);
     }
 }
 public class CharredSoilItem : EverPlaceableItem

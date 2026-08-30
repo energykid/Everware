@@ -29,10 +29,11 @@ float4 GlowEffect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
     float4 c = float4(color.r, color.g, color.b, 0.0);
 
     float4 col = tex2D(uImage0, coords);
-    float2 a = ((pixelateCoords(coords * NoiseScale, Resolution)) + float2(0.0, p));
-    float2 a2 = ((pixelateCoords(coords * NoiseScale2, Resolution)) + float2(0.0, p));
-    float4 col1 = tex2D(NoiseSampler, pixelateCoords(a + (ScreenPosition * NoiseScale), Resolution));
-    float4 col2 = tex2D(NoiseSampler, pixelateCoords(a2 + (ScreenPosition * NoiseScale2), Resolution));
+    float2 a = pixelateCoords(coords * NoiseScale, Resolution * NoiseScale) + float2(0.0, p);
+    float2 a2 = pixelateCoords(coords * NoiseScale2, Resolution2 * NoiseScale2) + float2(0.0, p);
+    
+    float4 col1 = tex2D(NoiseSampler, pixelateCoords(a, Resolution2) + pixelateCoords(ScreenPosition * NoiseScale, Resolution2));
+    float4 col2 = tex2D(NoiseSampler, pixelateCoords(a2, Resolution2) + pixelateCoords(ScreenPosition * NoiseScale2, Resolution2));
     
     col1.r *= 1.25;
     

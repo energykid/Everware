@@ -6,7 +6,7 @@ namespace Everware.Utils;
 [Autoload]
 public static class DrawingUtils
 {
-    public static void DrawSlopedTile(SpriteBatch sb, Asset<Texture2D> asset, int i, int j, Color color, Vector2 offset)
+    public static void DrawSlopedTile(SpriteBatch sb, Asset<Texture2D> asset, int i, int j, Color color, Vector2 offset, float sc = 1f)
     {
         var hasTile = Main.tile[i, j].HasTile;
         var slope = Main.tile[i, j].Slope;
@@ -51,7 +51,7 @@ public static class DrawingUtils
             return;
         }
 
-        var position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition;
+        var position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition + (new Vector2(-8, -8) * sc);
 
         var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
 
@@ -66,11 +66,12 @@ public static class DrawingUtils
 
         if (slope == SlopeType.Solid && !halfTile)
         {
-            sb.Draw(asset.Value, position, source, color, 0f, Vector2.Zero, 1f, drawData.tileSpriteEffect, 0f);
+            sb.Draw(asset.Value, position, source, color, 0f, Vector2.Zero, sc, drawData.tileSpriteEffect, 0f);
         }
         else if (halfTile)
         {
-            sb.Draw(asset.Value, new Vector2(position.X, position.Y + 8), new Rectangle(source.X, source.Y, 16, 8), color);
+            position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition + (new Vector2(-8, -4) * sc);
+            sb.Draw(asset.Value, new Vector2(position.X, position.Y + 8), new Rectangle(source.X, source.Y, (int)(16f * sc), (int)(8f * sc)), color);
         }
         else
         {
@@ -92,7 +93,7 @@ public static class DrawingUtils
                         height = 16 - length;
                     }
 
-                    sb.Draw(asset.Value, position + new Vector2(length, a), new Rectangle(source.X + length, source.Y, 2, height), color);
+                    sb.Draw(asset.Value, position + new Vector2(length * sc, a), new Rectangle(source.X + length, source.Y, 2, height), color);
                 }
             }
             else
@@ -113,7 +114,7 @@ public static class DrawingUtils
                         height = 16 - a;
                     }
 
-                    sb.Draw(asset.Value, position + new Vector2(length, 0), new Rectangle(source.X + length, source.Y + 16 - height, 2, height), color);
+                    sb.Draw(asset.Value, position + new Vector2(length * sc, 0), new Rectangle(source.X + length, source.Y + 16 - height, 2, height), color);
                 }
             }
         }

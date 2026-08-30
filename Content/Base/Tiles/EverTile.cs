@@ -41,7 +41,7 @@ public abstract class EverTile : ModTile
     /// <param name="spriteBatch"></param>
     public virtual void ExtraDrawEverything()
     {
-        Main.spriteBatch.Draw(ExtraTarget.Target, Vector2.Zero, ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(ExtraTarget.Target, new(8), ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
     }
 
     public override void Load()
@@ -59,28 +59,31 @@ public abstract class EverTile : ModTile
     [ModSystemHooks.PostDrawTiles]
     public void A()
     {
-        using (ExtraTarget.Scope(clearColor: Color.Transparent))
+        if (UsesExtraTarget)
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
-            for (int i = -8; i < (Main.screenWidth / 16) + 8; i++)
+            using (ExtraTarget.Scope(clearColor: Color.Transparent))
             {
-                for (int j = -8; j < (Main.screenHeight / 16) + 8; j++)
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
+                for (int i = -8; i < (Main.screenWidth / 16) + 8; i++)
                 {
-                    Point topLeft = (Main.screenPosition / 16).ToPoint();
-
-                    Point a = new Point(topLeft.X + i, topLeft.Y + j);
-
-                    if (Main.tile[a].TileType == Type)
+                    for (int j = -8; j < (Main.screenHeight / 16) + 8; j++)
                     {
-                        ExtraDrawSingleTile(a.X, a.Y);
+                        Point topLeft = (Main.screenPosition / 16).ToPoint();
+
+                        Point a = new Point(topLeft.X + i, topLeft.Y + j);
+
+                        if (Main.tile[a].TileType == Type)
+                        {
+                            ExtraDrawSingleTile(a.X, a.Y);
+                        }
                     }
                 }
+                Main.spriteBatch.End();
             }
+
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+            ExtraDrawEverything();
             Main.spriteBatch.End();
         }
-
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
-        ExtraDrawEverything();
-        Main.spriteBatch.End();
     }
 }
