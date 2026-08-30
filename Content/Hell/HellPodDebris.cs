@@ -154,7 +154,7 @@ public class HellPodPopShockwave : Particle
         HellPodEffect.Apply();
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, HellPodEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, Main.Rasterizer, HellPodEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
         for (int i = 0; i < 4; i++)
         {
@@ -167,6 +167,6 @@ public class HellPodPopShockwave : Particle
         Main.spriteBatch.Draw(A2.Value, position - Main.screenPosition, A2.Frame(), Color.White, 0f, A2.Size() / 2f, Scale, SpriteEffects.None, 0);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
     }
 }

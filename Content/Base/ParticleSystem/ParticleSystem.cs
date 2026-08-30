@@ -9,7 +9,7 @@ public class ParticleSystem : ModSystem
 
     public override void PostDrawTiles()
     {
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, null, Main.GameViewMatrix.TransformationMatrix);
         MainParticleLayer.Draw();
         Main.spriteBatch.End();
     }

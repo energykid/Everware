@@ -62,12 +62,12 @@ public class CthulhuBloodProjectile : EverProjectile
         BloodEffect.Apply();
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, BloodEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, BloodEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
         Main.spriteBatch.Draw(asset.Value, Projectile.Center - Main.screenPosition, asset.Frame(), Color.White, Projectile.rotation, new Vector2(10, 102), new Vector2(1f, 1f + Projectile.velocity.Length() / 20f), SpriteEffects.None, 0f);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.TransformationMatrix);
 
         return false;
     }

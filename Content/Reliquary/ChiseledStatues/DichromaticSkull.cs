@@ -257,7 +257,7 @@ public class DichromaticSkullFlame : EverProjectile
 
         using (flameTarget.Scope(clearColor: Color.Transparent))
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
 
             for (int i = 0; i < FireLayer.AllParticles.Count; i++)
             {
@@ -287,11 +287,11 @@ public class DichromaticSkullFlame : EverProjectile
         effect.Parameters.ColorNumber = 7;
         effect.Apply();
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, effect.Shader, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, effect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
-        DrawingUtils.DrawGlowWithPadding(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(0.2f, 0.0f, 0.0f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), SpriteEffects.None, radius: 0.01f);
+        DrawingUtils.DrawGlowWithPadding(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(0.2f, 0.0f, 0.0f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), Main.GameViewMatrix.Effects, radius: 0.01f);
 
-        Main.EntitySpriteDraw(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(1f, 0.2f, 0.2f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), SpriteEffects.None);
+        Main.EntitySpriteDraw(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(1f, 0.2f, 0.2f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), Main.GameViewMatrix.Effects);
 
         Main.spriteBatch.End();
 

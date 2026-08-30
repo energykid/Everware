@@ -35,7 +35,7 @@ public static class DrawingUtils
         Main.spriteBatch.End(out var sb);
         using (glowTarget.Scope(clearColor: Color.Transparent))
         {
-            Main.spriteBatch.Begin();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.EffectMatrix);
             Main.spriteBatch.Draw(texture, new Vector2(padding / 2, padding / 2), frame, Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
             Main.spriteBatch.End();
         }
@@ -47,7 +47,7 @@ public static class DrawingUtils
         GlowEffect.Apply();
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
         Main.EntitySpriteDraw(glowTarget.Target, position, glowTarget.Target.Bounds, Color.White, rotation, origin + new Vector2(padding / 2, padding / 2), scale, eff);
 

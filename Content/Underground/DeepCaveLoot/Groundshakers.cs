@@ -35,7 +35,7 @@ public class GroundshakersPlayer : ModPlayer
     public override void ResetEffects()
     {
         ParryCooldown -= 1;
-        if (Enabled && Player.velocity.Y != 0 && ParryCooldown < 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
+        if (Enabled && Player.gravDir == 1 && Player.velocity.Y != 0 && ParryCooldown < 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
         {
             if (Player.controlDown && Player.releaseDown && Player.doubleTapCardinalTimer[0] < 15 && Player.doubleTapCardinalTimer[1] == 0)
             {
@@ -68,13 +68,13 @@ public class GroundshakersPlayer : ModPlayer
                 GlowEffect.Apply();
 
                 Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, StreakEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, StreakEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
                 Asset<Texture2D> tex = Assets.Textures.Misc.PerlinNoise.Asset;
                 Main.EntitySpriteDraw(tex.Value, Player.Center + new Vector2(0, -30) - Main.screenPosition, tex.Frame(), Color.White, 0f, tex.Size() / 2f, new Vector2(0.3f, 0.6f), SpriteEffects.None);
 
                 Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.ZoomMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, GlowEffect.Shader, Main.GameViewMatrix.TransformationMatrix);
 
                 for (int i = 0; i < drawInfo.DrawDataCache.Count; i++)
                 {
@@ -89,7 +89,7 @@ public class GroundshakersPlayer : ModPlayer
                 }
 
                 Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.ZoomMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.TransformationMatrix);
             }
         }
         base.DrawEffects(drawInfo, ref r, ref g, ref b, ref a, ref fullBright);
