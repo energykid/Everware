@@ -8,13 +8,31 @@ public class MeteorBiome : ModBiome
     {
         return Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles > 1500 && (player.Center.Y / 16f) < Main.worldSurface;
     }
-    [ModSystemHooks.PostUpdateEverything]
-    public void SpawnParticles()
+    public override void Load()
     {
+        On_Main.DoDraw_WallsAndBlacks += DrawStuff;
+    }
+    private void DrawStuff(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+    {
+        var asset = Assets.Textures.Misc.SinglePixel.Asset;
 
+        var eff = Assets.Effects.Meteor.MeteorBackground.CreateEffect();
+        eff.Apply();
+
+        Main.spriteBatch.End(out var sb);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, eff.Shader);
+        Main.EntitySpriteDraw(asset.Value, Vector2.Zero, asset.Frame(), Color.White.MultiplyRGBA(new(MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity)), 0f, Vector2.Zero, new Vector2(Main.screenWidth * 5f, Main.screenHeight), Main.GameViewMatrix.Effects);
+        Main.spriteBatch.Restart(sb);
+
+        orig(self);
+    }
+
+    public override void Unload()
+    {
+        On_Main.DoDraw_WallsAndBlacks -= DrawStuff;
     }
 }
-public class MeteorMusicSystem : ModSystem
+public class MeteorEffectSystem : ModSystem
 {
     // this override just removes vanilla meteor logic completely
     // if WorldGen.spawnMeteor is false, none of the logic in Main.HandleMeteorFall will run
@@ -24,7 +42,7 @@ public class MeteorMusicSystem : ModSystem
         WorldGen.spawnMeteor = false;
     }
 
-    float Intensity = 0f;
+    public static float Intensity = 0f;
     public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
     {
         if (Main.LocalPlayer.InModBiome<MeteorBiome>())
@@ -37,7 +55,7 @@ public class MeteorMusicSystem : ModSystem
         }
 
         tileColor *= (1f - (Intensity * 0.6f));
-        backgroundColor = backgroundColor.MultiplyRGBA(new Color((1f - (Intensity * 0.45f)), (1f - (Intensity * 0.55f)), (1f - (Intensity * 0.85f))));
+        backgroundColor = backgroundColor.MultiplyRGBA(new Color((1f - (Intensity * 0.5f)), (1f - (Intensity * 0.68f)), (1f - (Intensity * 0.45f))));
 
         base.ModifySunLightColor(ref tileColor, ref backgroundColor);
     }

@@ -28,7 +28,7 @@ public class CharredSoilTile : EverTile
         effect.Parameters.NoiseTexture = Assets.Textures.Misc.PerlinNoise.Asset.Value;
         effect.Parameters.ScreenPosition = new Vector2(Main.screenPosition.X / ExtraTarget.Target.Width, Main.screenPosition.Y / ExtraTarget.Target.Height * Main.LocalPlayer.gravDir);
         effect.Parameters.Progress = Main.LocalPlayer.gravDir == 1 ? GlobalTimer.Value / 10 : GlobalTimer.Value / -10;
-        effect.Parameters.NoiseScale = new Vector2(20f, 5f) * 0.6f;
+        effect.Parameters.NoiseScale = new Vector2(40f, 10f) * 0.6f;
         effect.Parameters.Resolution = ExtraTarget.Target.Size() / 2f;
         effect.Parameters.Resolution2 = Assets.Textures.Misc.PerlinNoise.Asset.Size() / 2f;
 

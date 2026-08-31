@@ -34,7 +34,7 @@ float4 GlowEffect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
     
     float2 a = pixelateCoords(coords * NoiseScale, Resolution / NoiseScale) + float2(0.0, p);
     
-    float2 aa1 = pixelateCoords(ScreenPosition * NoiseScale, Resolution);
+    float2 aa1 = pixelateCoords(ScreenPosition * NoiseScale, Resolution / NoiseScale);
     
     float4 col1 = tex2D(NoiseSampler, pixelateCoords(a, Resolution) + aa1);
     
