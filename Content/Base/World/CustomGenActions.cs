@@ -186,7 +186,7 @@ public class CustomGenActions
                 Main.tile[x, y].TileType = (ushort)MeteorGeneration.CharredSoil;
             }
 
-            WorldUtils.TileFrame(x, y, true);
+            WorldUtils.TileFrame(x, y);
             return UnitApply(origin, x, y, args);
         }
     }

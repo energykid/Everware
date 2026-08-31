@@ -16,6 +16,7 @@ public class CharredSoilTile : EverTile
         DustType = DustID.Silt;
         AddMapEntry(new Color(28, 29, 29));
         Main.tileMergeDirt[Type] = true;
+        Main.tileMerge[Type][TileID.Dirt] = true;
     }
     public override void ExtraDrawSingleTile(int i, int j)
     {

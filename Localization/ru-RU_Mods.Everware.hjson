@@ -343,6 +343,11 @@ Items: {
 		// DisplayName: Magic Stone
 		// Tooltip: ""
 	}
+
+	CharredSoilWallItem: {
+		// DisplayName: Charred Soil Wall Item
+		// Tooltip: ""
+	}
 }
 
 Biomes: {

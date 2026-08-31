@@ -11,6 +11,7 @@ public class MeteorGeneration
 {
     public static readonly int SizeX = 125;
     public static readonly int SizeY = 60;
+    public static readonly int CharredSoilWall = ModContent.WallType<CharredSoilWall>();
     public static readonly int CharredSoil = ModContent.TileType<CharredSoilTile>();
     public static readonly int StarCrossedGrass = ModContent.TileType<StarCrossedGrassTile>();
     public static readonly int StarCrossedGrassFoliage = TileID.AshPlants;
@@ -58,26 +59,25 @@ public class MeteorGeneration
         {
             float x = 0;
 
-            x = Easing.KeyFloat(i, -SizeX, -30, 0, 10, Easing.InOutExpo);
-            x = Easing.KeyFloat(i, -30, -10, 10, 20, Easing.InExpo, x);
-            x = Easing.KeyFloat(i, -10, 10, 20, 20, Easing.InOutExpo, x);
-            x = Easing.KeyFloat(i, 10, 30, 20, 10, Easing.OutExpo, x);
-            x = Easing.KeyFloat(i, 30, SizeX + 1, 10, 0, Easing.InOutExpo, x);
-
-            Point ptT = new(pt.X + i, pt.Y - SizeY - 1);
-
-            if (TileID.Sets.IsATreeTrunk[Main.tile[ptT].TileType])
-            {
-                ushort t = Main.tile[ptT].TileType;
-                while (Main.tile[ptT].TileType == t && Main.tile[ptT].HasTile && ptT.Y > 200)
-                {
-                    ptT.Y--;
-                    Main.tile[ptT + new Point(0, 1)].ClearTile();
-                }
-            }
+            x = Easing.KeyFloat(i, -30, -10, 0, 12, Easing.InExpo, x);
+            x = Easing.KeyFloat(i, -10, 10, 12, 12, Easing.InOutExpo, x);
+            x = Easing.KeyFloat(i, 10, 30, 12, 0, Easing.OutExpo, x);
 
             for (float j = -SizeY; j <= SizeY + x; j++)
             {
+                Point ptT = new(pt.X + i, pt.Y + (int)j);
+
+                if (TileID.Sets.IsATreeTrunk[Main.tile[ptT].TileType])
+                {
+                    ushort t = Main.tile[ptT].TileType;
+                    while (Main.tile[ptT].TileType == t && Main.tile[ptT].HasTile && ptT.Y > 200)
+                    {
+                        ptT.Y--;
+                        Point pp = ptT + new Point(0, 1);
+                        WorldGen.KillTile(pp.X, pp.Y, false, false, true);
+                    }
+                }
+
                 float l = (float)Math.Sin(i / 20f);
 
                 Point pt1 = new(pt.X + i, pt.Y + (int)j);
@@ -148,6 +148,9 @@ public class MeteorGeneration
     public static void ReplaceTile(TileUtils.Buffer buffer, Point to, Point center)
     {
         int tt = buffer.TileType;
+        int ww = buffer.WallType;
+
+        if (ww != WallID.None) ww = CharredSoilWall;
 
         Vector2 v = to.ToVector2();
         v.Y = MathHelper.Lerp(v.Y, center.ToVector2().Y, -0.75f);
@@ -173,11 +176,11 @@ public class MeteorGeneration
         }
         else
         {
-            Main.tile[to].ClearEverything();
+            Main.tile[to].ClearTile();
         }
         Main.tile[to].TileFrameX = (short)buffer.FrameX;
         Main.tile[to].TileFrameY = (short)buffer.FrameY;
-        Main.tile[to].WallType = (ushort)buffer.WallType;
+        Main.tile[to].WallType = (ushort)ww;
         Main.tile[to].wallFrameX((short)buffer.WallFrameX);
         Main.tile[to].wallFrameY((short)buffer.WallFrameY);
         Main.tile[to].halfBrick(buffer.HalfTile);

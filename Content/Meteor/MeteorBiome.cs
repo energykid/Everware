@@ -45,7 +45,7 @@ public class MeteorEffectSystem : ModSystem
     public static float Intensity = 0f;
     public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
     {
-        if (Main.LocalPlayer.InModBiome<MeteorBiome>())
+        if (Main.LocalPlayer.InModBiome<MeteorBiome>() && Main.LocalPlayer.Center.Y < Main.worldSurface * 16f)
         {
             Intensity = MathHelper.Lerp(Intensity, 1f, 0.0075f);
         }
@@ -71,5 +71,16 @@ public class MeteorEffectSystem : ModSystem
     public override void ResetNearbyTileEffects()
     {
         Main.LocalPlayer.GetModPlayer<MeteorMusicStats>().meteorTiles = 0;
+    }
+
+    [ModSystemHooks.PostUpdateEverything]
+    public void LightingStuff()
+    {
+        if (Intensity > 0.05f)
+        {
+            for (int i = 0; i < Main.screenWidth / 16; i++)
+                for (int j = 0; j < Main.screenHeight / 16; j++)
+                    Lighting.AddLight(Main.screenPosition + (new Vector2(i, j) * 16f), new Vector3(0.01f));
+        }
     }
 }

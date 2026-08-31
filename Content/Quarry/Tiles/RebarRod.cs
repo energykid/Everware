@@ -16,7 +16,7 @@ public class RebarRod : EverPlaceableItem
     {
         Recipe recipe1 = CreateRecipe(8);
         recipe1.AddRecipeGroup(RecipeGroupID.IronBar, 1);
-        recipe1.AddTile(ModContent.TileType<WeldingStation>()); // replace with Welding Station ASAP
+        recipe1.AddTile(ModContent.TileType<WeldingStation>());
         recipe1.Register();
     }
 }
