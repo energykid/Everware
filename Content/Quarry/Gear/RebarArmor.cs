@@ -35,7 +35,7 @@ public class RebarCrest : EverItem
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        return head.type == Type && body.type == ModContent.ItemType<RebarGridmail>() && legs.type == ModContent.ItemType<RebarSandals>();
+        return head.type == ModContent.ItemType<RebarCrest>() && body.type == ModContent.ItemType<RebarGridmail>() && legs.type == ModContent.ItemType<RebarSandals>();
     }
     public override void UpdateArmorSet(Player player)
     {

@@ -34,14 +34,12 @@ public class KilnstoneHelmet : EverItem
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        return head.type == Type && body.type == ModContent.ItemType<KilnstoneBrickplate>() && legs.type == ModContent.ItemType<KilnstoneChausses>();
+        return head.type == ModContent.ItemType<KilnstoneHelmet>() && body.type == ModContent.ItemType<KilnstoneBrickplate>() && legs.type == ModContent.ItemType<KilnstoneChausses>();
     }
     public override void UpdateArmorSet(Player player)
     {
-        {
-            player.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetBonus = true;
-            player.setBonus = LocalizationReferences.Mods.Everware.Items.KilnstoneHelmet.SetBonus.GetTextValue();
-        }
+        player.GetModPlayer<KilnstoneSetBonus>().kilnstoneSetBonus = true;
+        player.setBonus = LocalizationReferences.Mods.Everware.Items.KilnstoneHelmet.SetBonus.GetTextValue();
     }
 }
 [AutoloadEquip(EquipType.Body)]
