@@ -19,7 +19,17 @@ public class CharredSoilTile : EverTile
     }
     public override void ExtraDrawSingleTile(int i, int j)
     {
-        DrawingUtils.DrawSlopedTile(Main.spriteBatch, Assets.Textures.Meteor.Tiles.CharredSoilGlow.Asset, i, j, Color.White, Vector2.Zero);
+        var asset = Assets.Textures.Meteor.Tiles.CharredSoilGlow.Asset;
+
+        int paint = Main.tile[i, j].TileColor;
+
+        Texture2D? texture = null;
+
+        bool useColor = paint > PaintID.None && !TryGetPaintTexture(paint, asset, out texture);
+
+        texture ??= asset.Value;
+
+        DrawingUtils.DrawSlopedTile(Main.spriteBatch, texture, i, j, Color.White, Vector2.Zero);
     }
     public override void ExtraDrawEverything()
     {

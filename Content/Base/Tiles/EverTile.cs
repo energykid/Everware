@@ -1,10 +1,62 @@
 ﻿using Everware.Common.Systems;
 using Everware.Utils;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Everware.Content.Base.Tiles;
 
 public abstract class EverTile : ModTile
 {
+    #region Paint
+    private readonly Dictionary<int, EverTileRenderTargetHolder> paintCache = [];
+
+    internal class EverTileRenderTargetHolder(int paintColor, Asset<Texture2D> asset, int copySettingsFrom = -1) : TilePaintSystemV2.ARenderTargetHolder
+    {
+        public int PaintColor = paintColor;
+
+        public TreePaintingSettings PaintSettings = TreePaintSystemData.GetTileSettings(copySettingsFrom, 0);
+
+        public Asset<Texture2D> Texture = asset;
+
+        public override void Prepare()
+        {
+            Texture.Wait();
+
+            PrepareTextureIfNecessary(Texture.Value);
+        }
+
+        public override void PrepareShader()
+        {
+            PrepareShader(PaintColor, PaintSettings);
+        }
+    }
+
+    public bool TryGetPaintTexture(
+        int paintColor,
+        Asset<Texture2D> asset,
+        [NotNullWhen(true)] out Texture2D? texture
+    )
+    {
+        texture = null;
+
+        if (paintCache.TryGetValue(paintColor, out EverTileRenderTargetHolder? holder) &&
+            holder.IsReady)
+        {
+            texture = holder.Target;
+
+            return true;
+        }
+
+        var newHolder = new EverTileRenderTargetHolder(paintColor, asset);
+
+        paintCache[paintColor] = newHolder;
+
+        Main.instance.TilePaintSystem._requests.Add(newHolder);
+
+        return false;
+    }
+    #endregion
+
     public static RenderTargetLease ExtraTarget;
     public Asset<Texture2D> Asset => ModContent.Request<Texture2D>(Texture);
     public virtual bool UsesExtraTarget => false;

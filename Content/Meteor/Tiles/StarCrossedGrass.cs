@@ -122,7 +122,16 @@ public class StarCrossedGrassTile : EverTile
     public override void ExtraDrawSingleTile(int i, int j)
     {
         var asset = Assets.Textures.Meteor.Tiles.StarCrossedGrassGlow.Asset;
-        DrawingUtils.DrawSlopedTile(Main.spriteBatch, asset, i, j, Color.White, Vector2.Zero);
+
+        int paint = Main.tile[i, j].TileColor;
+
+        Texture2D? texture = null;
+
+        bool useColor = paint > PaintID.None && !TryGetPaintTexture(paint, asset, out texture);
+
+        texture ??= asset.Value;
+
+        DrawingUtils.DrawSlopedTile(Main.spriteBatch, texture, i, j, Color.White, Vector2.Zero);
     }
 
     [ModSystemHooks.PostUpdateDusts]

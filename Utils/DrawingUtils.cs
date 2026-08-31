@@ -120,6 +120,120 @@ public static class DrawingUtils
         }
     }
 
+    public static void DrawSlopedTile(SpriteBatch sb, Texture2D asset, int i, int j, Color color, Vector2 offset, float sc = 1f)
+    {
+        var hasTile = Main.tile[i, j].HasTile;
+        var slope = Main.tile[i, j].Slope;
+        var halfTile = Main.tile[i, j].IsHalfBlock;
+        var invisible = Main.tile[i, j].IsTileInvisible;
+        var fullBright = Main.tile[i, j].IsTileFullbright;
+
+        var tileRenderer = Main.instance.TilesRenderer;
+
+        var drawData = new TileDrawInfo
+        {
+            tileCache = Main.tile[i, j]
+        };
+        drawData.typeCache = drawData.tileCache.type;
+        drawData.tileFrameX = drawData.tileCache.frameX;
+        drawData.tileFrameY = drawData.tileCache.frameY;
+        drawData.tileLight = Color.White;
+        drawData.colorTint = Color.White;
+        drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
+        tileRenderer.GetTileDrawData(
+            i,
+            j,
+            drawData.tileCache,
+            drawData.typeCache,
+            ref drawData.tileFrameX,
+            ref drawData.tileFrameY,
+            out drawData.tileWidth,
+            out drawData.tileHeight,
+            out drawData.tileTop,
+            out drawData.halfBrickHeight,
+            out drawData.addFrX,
+            out drawData.addFrY,
+            out drawData.tileSpriteEffect,
+            out drawData.glowTexture,
+            out drawData.glowSourceRect,
+            out drawData.glowColor
+        );
+        drawData.drawTexture = tileRenderer.GetTileDrawTexture(drawData.tileCache, i, j);
+
+        if (!hasTile || invisible)
+        {
+            return;
+        }
+
+        var position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition + (new Vector2(-8, -8) * sc);
+
+        var source = new Rectangle(drawData.tileFrameX + drawData.addFrX, drawData.tileFrameY + drawData.addFrY, drawData.tileWidth, drawData.tileHeight);
+
+        drawData.tileLight = Color.White;
+        drawData.colorTint = Color.White;
+        drawData.finalColor = TileDrawing.GetFinalLight(drawData.tileCache, drawData.typeCache, drawData.tileLight, drawData.colorTint);
+
+        if (asset is null)
+        {
+            return;
+        }
+
+        if (slope == SlopeType.Solid && !halfTile)
+        {
+            sb.Draw(asset, position, source, color, 0f, Vector2.Zero, sc, drawData.tileSpriteEffect, 0f);
+        }
+        else if (halfTile)
+        {
+            position = new Vector2(i * 16f, j * 16f + drawData.tileTop) + offset - Main.screenPosition + (new Vector2(-8, -4));
+            sb.Draw(asset, new Vector2(position.X, position.Y + 4), new Rectangle(source.X, source.Y, 16, 8), color);
+        }
+        else
+        {
+            if (slope is SlopeType.SlopeDownLeft or SlopeType.SlopeDownRight)
+            {
+                for (var a = 0; a < 16; a += 2)
+                {
+                    int length;
+                    int height;
+
+                    if (slope == SlopeType.SlopeDownRight)
+                    {
+                        length = 16 - a - 2;
+                        height = 16 - a;
+                    }
+                    else
+                    {
+                        length = a;
+                        height = 16 - length;
+                    }
+
+                    sb.Draw(asset, position + new Vector2(length * sc, a), new Rectangle(source.X + length, source.Y, 2, height), color);
+                }
+            }
+            else
+            {
+                for (var a = 0; a < 16; a += 2)
+                {
+                    int length;
+                    int height;
+
+                    if (slope == SlopeType.SlopeUpLeft)
+                    {
+                        length = a;
+                        height = 16 - length;
+                    }
+                    else
+                    {
+                        length = 16 - a - 2;
+                        height = 16 - a;
+                    }
+
+                    sb.Draw(asset, position + new Vector2(length * sc, 0), new Rectangle(source.X + length, source.Y + 16 - height, 2, height), color);
+                }
+            }
+        }
+    }
+
     public static void DrawTile(SpriteBatch spriteBatch, Asset<Texture2D> asset, int i, int j)
     {
         if (Main.tile[i, j].Slope == Terraria.ID.SlopeType.Solid)
