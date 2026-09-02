@@ -3,12 +3,43 @@ using Everware.Content.Base;
 using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Base.Tiles;
 using Everware.Utils;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Terraria.ID;
 
 namespace Everware.Content.Meteor.Tiles;
 
 public class StarCrossedGrassTile : EverTile
 {
+
+    #region Magic Stone Paint Aura
+    private readonly Dictionary<int, EverTileRenderTargetHolder> mPaintCache = [];
+
+    public bool TryGetMPaintTexture(
+        int paintColor,
+        Asset<Texture2D> asset,
+        [NotNullWhen(true)] out Texture2D? texture
+    )
+    {
+        texture = null;
+
+        if (mPaintCache.TryGetValue(paintColor, out EverTileRenderTargetHolder? holder) &&
+            holder.IsReady)
+        {
+            texture = holder.Target;
+
+            return true;
+        }
+
+        var newHolder = new EverTileRenderTargetHolder(paintColor, asset);
+
+        mPaintCache[paintColor] = newHolder;
+
+        Main.instance.TilePaintSystem._requests.Add(newHolder);
+
+        return false;
+    }
+    #endregion
     public static RenderTargetLease BlueGlow;
     public override void Load()
     {
@@ -16,7 +47,7 @@ public class StarCrossedGrassTile : EverTile
 
         ThreadUtils.RunOnMainThread(() =>
         {
-            BlueGlow = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
+            BlueGlow = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW / 2, offH / 2));
         });
     }
 
@@ -80,7 +111,7 @@ public class StarCrossedGrassTile : EverTile
     {
         Main.spriteBatch.End(out var sb);
 
-        using (BlueGlow.Scope(clearColor: Color.Black))
+        using (BlueGlow.Scope(clearColor: new Color(0.4f, 0.7f, 1f, 0f)))
         {
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
             for (int i = -8; i < (Main.screenWidth / 16) + 8; i++)
@@ -93,8 +124,14 @@ public class StarCrossedGrassTile : EverTile
 
                     if (Main.tile[a].TileType == ModContent.TileType<MagicStoneTile>())
                     {
-                        var asset = Assets.Textures.Misc.SmallGlow.Asset;
-                        Main.EntitySpriteDraw(asset.Value, (a.ToVector2() * 16) + new Vector2(8, 8) - Main.screenPosition, asset.Frame(), new Color(1f, 1f, 1f, 0f), 0f, asset.Frame().Size() / 2f, 1.5f, SpriteEffects.None);
+                        var asset = Assets.Textures.Meteor.Tiles.MagicStoneGlowRing.Asset;
+                        Texture2D? texture = asset.Value;
+                        int paint2 = Main.tile[a.X, a.Y].TileColor;
+                        bool useColor = paint2 > PaintID.None && !TryGetMPaintTexture(paint2, asset, out texture);
+
+                        texture ??= asset.Value;
+
+                        Main.EntitySpriteDraw(texture, ((a.ToVector2() * 16) + new Vector2(8, 8) - Main.screenPosition) / 2f, asset.Frame(), useColor ? new Color(1f, 1f, 1f, 1f) : Color.LightBlue, 0f, asset.Frame().Size() / 2f, 1f, SpriteEffects.None);
                     }
                 }
             }
@@ -106,11 +143,11 @@ public class StarCrossedGrassTile : EverTile
         eff.Parameters.BlueGlow = BlueGlow.Target;
         eff.Parameters.Progress = GlobalTimer.Value / 20f;
         eff.Parameters.Color = [
-            Color.Blue.ToVector4(),
-            Color.Blue.ToVector4(),
-            Color.LightBlue.ToVector4() * new Vector4(0.7f, 0.7f, 1f, 1f),
-            Color.CornflowerBlue.ToVector4() * new Vector4(0.7f, 0.7f, 1f, 1f),
-            Color.Lerp(Color.LightSkyBlue, Color.White, (float)Math.Sin(GlobalTimer.Value / 20f)).ToVector4()
+            Color.Black.ToVector4(),
+            Color.DarkGray.ToVector4(),
+            Color.DarkGray.ToVector4(),
+            Color.Gray.ToVector4(),
+            Color.Lerp(Color.LightGray, Color.White, (float)Math.Sin(GlobalTimer.Value / 20f)).ToVector4()
         ];
 
         eff.Apply();
