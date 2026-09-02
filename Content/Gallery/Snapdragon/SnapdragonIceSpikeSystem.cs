@@ -185,7 +185,7 @@ public class SnapdragonIceSpikeSystem : ModSystem
         Main.spriteBatch.Draw(spikeTarget.Target, (GallerySystem.GalleryPosition.ToVector2() * 16f) - Main.screenPosition, spikeTarget.Target.Frame(), Color.White, 0f, spikeTarget.Target.Size() / 2f, 2f, SpriteEffects.None, 0f);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, null, null, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(sb);
 
         spikeTarget.Dispose();
 
