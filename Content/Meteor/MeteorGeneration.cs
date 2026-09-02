@@ -150,23 +150,28 @@ public class MeteorGeneration
         int tt = buffer.TileType;
         int ww = buffer.WallType;
 
-        if (ww != WallID.None) ww = CharredSoilWall;
+        bool bb = true;
 
         Vector2 v = to.ToVector2();
         v.Y = MathHelper.Lerp(v.Y, center.ToVector2().Y, -0.75f);
         float k = 1f + (float)(Math.Sin(v.AngleTo(center.ToVector2()) * MathHelper.TwoPi) * 0.1f);
         if (v.Distance(center.ToVector2()) < SizeX * k)
         {
-            if (tt != -1)
+            if (v.Distance(center.ToVector2()) > (SizeX - 6)) bb = Main.rand.NextBool((int)(1 + (v.Distance(center.ToVector2()) - (SizeX - 6))));
             {
-                if (tt == TileID.Dirt || tt == TileID.ClayBlock || tt == TileID.Mud) tt = CharredSoil;
-                if (TileID.Sets.Grass[tt]) tt = StarCrossedGrass;
-                if (TileID.Sets.Stone[tt]) tt = CharredSoil;
+                if (tt != -1)
+                {
+                    if (tt == TileID.Dirt || tt == TileID.ClayBlock || tt == TileID.Mud) tt = CharredSoil;
+                    if (TileID.Sets.Grass[tt]) tt = StarCrossedGrass;
+                    if (TileID.Sets.Stone[tt]) tt = CharredSoil;
 
-                if (tt == TileID.Plants || tt == TileID.Plants2)
-                    tt = -1;
-                else
-                    if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;
+                    if (!Main.tileSolid[tt])
+                        tt = -1;
+                    else
+                        if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;
+                }
+
+                if (ww != WallID.None) ww = CharredSoilWall;
             }
         }
 
