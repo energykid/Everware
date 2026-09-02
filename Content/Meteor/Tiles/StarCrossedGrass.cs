@@ -131,7 +131,7 @@ public class StarCrossedGrassTile : EverTile
 
         texture ??= asset.Value;
 
-        DrawingUtils.DrawSlopedTile(Main.spriteBatch, texture, i, j, Color.White, Vector2.Zero);
+        DrawingUtils.DrawSlopedTile(Main.spriteBatch, texture, i, j, Color.White, new Vector2(8f, 8f) - ScreenOffset);
     }
 
     [ModSystemHooks.PostUpdateDusts]

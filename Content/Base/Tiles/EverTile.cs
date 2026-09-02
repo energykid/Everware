@@ -70,7 +70,6 @@ public abstract class EverTile : ModTile
 
     public static Vector2 MoreDrawOffset => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange, Main.offScreenRange);
 
-
     /// <summary>
     /// Calls once per tile of this type when UsesExtraDrawing is enabled. 
     /// Draws to ExtraTarget, a RenderTargetLease.
@@ -80,7 +79,7 @@ public abstract class EverTile : ModTile
     /// <param name="j"></param>
     public virtual void ExtraDrawSingleTile(int i, int j)
     {
-        DrawingUtils.DrawSlopedTile(Main.spriteBatch, Asset, i, j, Color.White, Vector2.Zero);
+        DrawingUtils.DrawSlopedTile(Main.spriteBatch, Asset, i, j, Color.White, new Vector2(16) - ScreenOffset);
     }
 
     public virtual void ExtraDrawPreEverything()
@@ -97,7 +96,7 @@ public abstract class EverTile : ModTile
     /// <param name="spriteBatch"></param>
     public virtual void ExtraDrawEverything()
     {
-        Main.spriteBatch.Draw(ExtraTarget.Target, new(8), ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, Main.GameViewMatrix.Effects, 0f);
+        Main.spriteBatch.Draw(ExtraTarget.Target, ScreenOffset, ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, Main.GameViewMatrix.Effects, 0f);
     }
 
     public override void Load()
@@ -112,17 +111,27 @@ public abstract class EverTile : ModTile
         ExtraTarget.Dispose();
     }
 
+    public Vector2 RoundedScreenPosition;
+    public Vector2 ScreenOffset;
+
     [ModSystemHooks.PostDrawTiles]
     public void A()
     {
         if (UsesExtraTarget)
         {
+            RoundedScreenPosition = Main.screenPosition;
+
+            if (RoundedScreenPosition.X % 2 >= 1) RoundedScreenPosition.X -= 1;
+            if (RoundedScreenPosition.Y % 2 >= 1) RoundedScreenPosition.Y -= 1;
+
+            ScreenOffset = RoundedScreenPosition - Main.screenPosition;
+
             using (ExtraTarget.Scope(clearColor: Color.Transparent))
             {
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
-                for (int i = -8; i < (Main.screenWidth / 16) + 8; i++)
+                for (int i = -16; i < (Main.screenWidth / 16) + 16; i++)
                 {
-                    for (int j = -8; j < (Main.screenHeight / 16) + 8; j++)
+                    for (int j = -16; j < (Main.screenHeight / 16) + 16; j++)
                     {
                         Point topLeft = (Main.screenPosition / 16).ToPoint();
 

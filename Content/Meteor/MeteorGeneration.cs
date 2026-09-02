@@ -158,6 +158,8 @@ public class MeteorGeneration
         if (v.Distance(center.ToVector2()) < SizeX * k)
         {
             if (v.Distance(center.ToVector2()) > (SizeX - 6)) bb = Main.rand.NextBool((int)(1 + (v.Distance(center.ToVector2()) - (SizeX - 6))));
+
+            if (bb)
             {
                 if (tt != -1)
                 {

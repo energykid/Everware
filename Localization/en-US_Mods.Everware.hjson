@@ -340,7 +340,7 @@ Items: {
 	}
 
 	CharredSoilWallItem: {
-		DisplayName: Charred Soil Wall Item
+		DisplayName: Charred Wall
 		Tooltip: ""
 	}
 }
