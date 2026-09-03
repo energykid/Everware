@@ -44,7 +44,7 @@ public class MasterLockpick : EverWeaponItem
 
         Vector2 pos = player.Center + new Vector2(0, player.gfxOffY);
 
-        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Quarter, dir);
+        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Quarter, MathHelper.ToRadians(dir - (player.direction == 1 ? 90f : 135f)));
 
         Main.EntitySpriteDraw(asset.Value, pos - Main.screenPosition, asset.Frame(), Lighting.GetColor((pos / 16).ToPoint()), MathHelper.ToRadians(dir + 45f), origin, 1f, eff);
     }
@@ -66,10 +66,10 @@ public class MasterLockpick : EverWeaponItem
 
         if (player.itemAnimation == (int)(player.itemAnimationMax * 0.65f))
         {
-            SoundEngine.PlaySound(SoundID.Item1.WithPitchOffset(-1f), player.MountedCenter, snd =>
+            SoundEngine.PlaySound(SoundID.Item1.WithPitchOffset(0f), player.MountedCenter, snd =>
             {
-                snd.Pitch += 0.1f;
-                return snd.IsPlaying;
+                snd.Pitch -= 0.1f;
+                return snd.IsPlaying && player.HeldItem.type == Type;
             });
         }
 
@@ -134,14 +134,14 @@ public class MasterLockpick : EverWeaponItem
     public override bool? CanHitNPC(Player player, NPC target)
     {
         if (!CanHit(player))
-            return base.CanHitNPC(player, target);
-        return true;
+            return false;
+        return base.CanHitNPC(player, target);
     }
     public override bool CanHitPvp(Player player, Player target)
     {
         if (!CanHit(player))
-            return base.CanHitPvp(player, target);
-        return true;
+            return false;
+        return base.CanHitPvp(player, target);
     }
     public override void ModifyHitNPC(Player player, NPC target, ref NPC.HitModifiers modifiers)
     {

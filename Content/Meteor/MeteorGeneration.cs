@@ -1,6 +1,7 @@
 ﻿using Everware.Content.Base.World;
 using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
+using System.Collections.Generic;
 using System.Threading;
 using Terraria.ID;
 using Terraria.WorldBuilding;
@@ -17,6 +18,18 @@ public class MeteorGeneration
     public static readonly int StarCrossedGrassFoliage = TileID.AshPlants;
     public static readonly int MagicStone = ModContent.TileType<MagicStoneTile>();
     public static readonly int MeteoriteOre = TileID.Meteorite;
+    public static List<int> BlacklistedBlocks => [
+        TileID.SnowBlock,
+        TileID.BlueDungeonBrick,
+        TileID.PinkDungeonBrick,
+        TileID.GreenDungeonBrick,
+        TileID.Sand,
+        TileID.Cloud,
+        TileID.RainCloud,
+        TileID.Ebonstone,
+        TileID.Crimstone,
+        TileID.LivingWood,
+    ];
     public static void GenerateWholeSite(Point pt)
     {
         Thread thread = new Thread(() =>
@@ -104,31 +117,34 @@ public class MeteorGeneration
             new Actions.Smooth(true)
         ));
 
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(15, 0)).Grounded(), Actions.Chain(
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(22, 0)).Grounded(), Actions.Chain(
-            new CustomGenActions.SetMeteorFromGrass(),
-            new Actions.Smooth(true)
-        ));
-
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(-15, 0)).Grounded(), Actions.Chain(
-            new CustomGenActions.SetMeteorFromGrass(),
-            new Actions.Smooth(true)
-        ));
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(-22, 0)).Grounded(), Actions.Chain(
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(22, 0)).Grounded() + new Point(0, 3), Actions.Chain(
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
 
-        for (int i = -6; i <= 6; i++)
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(-15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
+            new CustomGenActions.SetMeteorFromGrass(),
+            new Actions.Smooth(true)
+        ));
+        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(-22, 0)).Grounded() + new Point(0, 3), Actions.Chain(
+            new CustomGenActions.SetMeteorFromGrass(),
+            new Actions.Smooth(true)
+        ));
+
+        for (int i = -7; i <= 7; i++)
         {
-            if (Math.Abs(i) >= 3)
-                new Shapes.Slime(20, Main.rand.NextFloat(0.06f, 0.1f), Main.rand.NextFloat(0.12f, 0.4f)).Perform((pt + new Point(i * 10, 0) + new Point(Main.rand.Next(-6, 6), 0)).Grounded(), Actions.Chain(
+            if (Math.Abs(i) >= 4)
+            {
+                Point center = pt + new Point(i * 10, 0) + new Point(Main.rand.Next(-3, 3), 0);
+                new Shapes.Slime(20, Main.rand.NextFloat(0.1f, 0.2f), Main.rand.NextFloat(0.12f, 0.4f)).Perform(center.Grounded(), Actions.Chain(
                     new Actions.SetTile((ushort)MagicStone, true),
                     new Actions.Smooth(true)
                 ));
+            }
         }
 
         GenerateMeteor(pt);
@@ -147,6 +163,7 @@ public class MeteorGeneration
     }
     public static void ReplaceTile(TileUtils.Buffer buffer, Point to, Point center)
     {
+        int tt1 = buffer.TileType;
         int tt = buffer.TileType;
         int ww = buffer.WallType;
 
@@ -157,20 +174,20 @@ public class MeteorGeneration
         float k = 1f + (float)(Math.Sin(v.AngleTo(center.ToVector2()) * MathHelper.TwoPi) * 0.1f);
         if (v.Distance(center.ToVector2()) < SizeX * k)
         {
-            if (v.Distance(center.ToVector2()) > (SizeX - 6)) bb = Main.rand.NextBool((int)(1 + (v.Distance(center.ToVector2()) - (SizeX - 6))));
+            if (v.Distance(center.ToVector2()) > ((SizeX * k) - 6)) bb = Main.rand.NextBool((int)(1 + (v.Distance(center.ToVector2()) - ((SizeX * k) - 6))));
 
             if (bb)
             {
                 if (tt != -1)
                 {
-                    if (tt == TileID.Dirt || tt == TileID.ClayBlock || tt == TileID.Mud) tt = CharredSoil;
-                    if (TileID.Sets.Grass[tt]) tt = StarCrossedGrass;
-                    if (TileID.Sets.Stone[tt]) tt = CharredSoil;
+                    if (!BlacklistedBlocks.Contains(tt1)) tt = CharredSoil;
+                    if (TileID.Sets.Grass[tt1] || tt1 == TileID.JungleGrass) tt = StarCrossedGrass;
+                    if (TileID.Sets.Stone[tt1]) tt = CharredSoil;
 
-                    if (!Main.tileSolid[tt])
+                    if (!Main.tileSolid[tt1])
                         tt = -1;
                     else
-                        if (TileID.Sets.IsATreeTrunk[tt] || tt == TileID.LargePiles || tt == TileID.LargePiles2 || tt == TileID.SmallPiles || tt == TileID.Sunflower) tt = -1;
+                        if (TileID.Sets.IsATreeTrunk[tt1] || tt1 == TileID.LargePiles || tt1 == TileID.LargePiles2 || tt1 == TileID.SmallPiles || tt1 == TileID.Sunflower) tt = -1;
                 }
 
                 if (ww != WallID.None) ww = CharredSoilWall;
@@ -180,18 +197,18 @@ public class MeteorGeneration
         if (tt != -1)
         {
             Main.tile[to].TileType = (ushort)tt;
+            Main.tile[to].TileFrameX = (short)buffer.FrameX;
+            Main.tile[to].TileFrameY = (short)buffer.FrameY;
+            Main.tile[to].WallType = (ushort)ww;
+            Main.tile[to].wallFrameX((short)buffer.WallFrameX);
+            Main.tile[to].wallFrameY((short)buffer.WallFrameY);
+            Main.tile[to].halfBrick(buffer.HalfTile);
+            Main.tile[to].slope((byte)buffer.Slope);
+            Main.tile[to].LiquidAmount = 0;
         }
         else
         {
-            Main.tile[to].ClearTile();
+            Main.tile[to].active(false);
         }
-        Main.tile[to].TileFrameX = (short)buffer.FrameX;
-        Main.tile[to].TileFrameY = (short)buffer.FrameY;
-        Main.tile[to].WallType = (ushort)ww;
-        Main.tile[to].wallFrameX((short)buffer.WallFrameX);
-        Main.tile[to].wallFrameY((short)buffer.WallFrameY);
-        Main.tile[to].halfBrick(buffer.HalfTile);
-        Main.tile[to].slope((byte)buffer.Slope);
-        Main.tile[to].LiquidAmount = 0;
     }
 }

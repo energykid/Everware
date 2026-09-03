@@ -15,6 +15,7 @@ public class Groundshakers : EverItem
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/Groundshakers";
     public override void SetDefaults()
     {
+        base.SetDefaults();
         Item.DefaultToAccessory(26, 28);
         Item.value = Sell.Gold(1) + Sell.Silver(35);
     }
