@@ -1,7 +1,7 @@
 // ModName: Everware
 // ENNWAY: ENNWAY!
 // By: by
-// ByENNWAY: "{$By} {ENNWAY}"
+// ByENNWAY: "{$By} {$ENNWAY}"
 
 SomewhereElse: {
 	// Name: Somewhere Else
