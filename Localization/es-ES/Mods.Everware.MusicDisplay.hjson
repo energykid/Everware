@@ -1,0 +1,29 @@
+// ModName: Everware
+// ENNWAY: ENNWAY!
+// By: by
+// ByENNWAY: "{$By} {ENNWAY}"
+
+SomewhereElse: {
+	// Name: Somewhere Else
+	// Author: "{$ByENNWAY}"
+}
+
+Kiln: {
+	// Name: Wildfire
+	// Author: "{$ByENNWAY}"
+}
+
+Quarry: {
+	// Name: Stonecutter
+	// Author: "{$ByENNWAY}"
+}
+
+Silence: {
+	// Name: No Music
+	// Author: ""
+}
+
+EyeOfCthulhu: {
+	// Name: Hemolacriac Hunt
+	// Author: "{$ByENNWAY}"
+}

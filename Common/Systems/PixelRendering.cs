@@ -79,24 +79,6 @@ namespace Everware.Common.Systems
 
     public class PixelRendering : ModSystem
     {
-        public override void PostSetupContent()
-        {
-            ThreadUtils.RunOnMainThread(() =>
-            {
-                PixelTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
-                    Main.screenWidth / 2, Main.screenHeight / 2);
-                AdditivePixelTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
-                Main.screenWidth / 2, Main.screenHeight / 2);
-            });
-        }
-        public override void Unload()
-        {
-            PixelTarget.Dispose();
-            AdditivePixelTarget.Dispose();
-        }
-        public static RenderTargetLease PixelTarget;
-        public static RenderTargetLease AdditivePixelTarget;
-
         public static List<DeferredSprite> Draws = [];
         public static List<DeferredPrim> Prims = [];
 
@@ -109,9 +91,14 @@ namespace Everware.Common.Systems
         {
             orig(self);
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            var pixTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+                Main.screenWidth / 2, Main.screenHeight / 2);
+            var addPixTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+                Main.screenWidth / 2, Main.screenHeight / 2);
 
-            using (PixelTarget.Scope(clearColor: Color.Transparent))
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
+
+            using (pixTarget.Scope(clearColor: Color.Transparent))
             {
                 foreach (DeferredSprite draw in Draws)
                 {
@@ -130,7 +117,7 @@ namespace Everware.Common.Systems
                 }
             }
 
-            using (AdditivePixelTarget.Scope(clearColor: Color.Transparent))
+            using (addPixTarget.Scope(clearColor: Color.Transparent))
             {
                 foreach (DeferredSprite draw in Draws)
                 {
@@ -152,14 +139,17 @@ namespace Everware.Common.Systems
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-            Main.spriteBatch.Draw(PixelTarget.Target, Vector2.Zero, PixelTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(pixTarget.Target, Vector2.Zero, pixTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End(out var ss);
             Main.spriteBatch.Begin(ss with { BlendState = BlendState.Additive });
 
-            Main.spriteBatch.Draw(AdditivePixelTarget.Target, Vector2.Zero, AdditivePixelTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(addPixTarget.Target, Vector2.Zero, pixTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
+
+            pixTarget.Dispose();
+            addPixTarget.Dispose();
 
             Draws.Clear();
             Prims.Clear();
