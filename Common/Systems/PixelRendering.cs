@@ -96,7 +96,7 @@ namespace Everware.Common.Systems
             var addPixTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
                 Main.screenWidth / 2, Main.screenHeight / 2);
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null);
 
             using (pixTarget.Scope(clearColor: Color.Transparent))
             {
