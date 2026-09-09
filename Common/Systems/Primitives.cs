@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Everware.Utils;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Everware.Common.Systems;
@@ -300,5 +301,63 @@ public sealed class PrimitiveDrawing : ILoadable
             pass.Apply();
             Device.DrawUserIndexedPrimitives(type, vertices, 0, vertices.Length, indices, 0, primitiveCount);
         }
+    }
+
+    public Color TrailColorFromPosition(float input, Vector2 position)
+    {
+        return Lighting.GetColor((position / 16).ToPoint());
+    }
+    public delegate Color ColorFunction(float input, Vector2 position);
+    public static void DrawPrimitiveTrail(List<Vector2> positions, float Width, Easing.AnimationCurve widthCurve, float textureLoops = 1f, float textureLoopOffset = 0f, ColorFunction colors = null, Asset<Texture2D>? asset = null, bool add = false)
+    {
+        List<Vector2> finalPositions = [];
+        List<Color> finalColors = [];
+        List<Vector2> finalTexcoords = [];
+        for (int i = 0; i < positions.Count; i++)
+        {
+            Vector2 pos1 = Vector2.Zero;
+            Vector2 pos2 = Vector2.Zero;
+
+            if (i < positions.Count - 1)
+            {
+                pos1 = positions[i];
+                pos2 = positions[i + 1];
+            }
+            else
+            {
+                pos1 = positions[i - 1];
+                pos2 = positions[i];
+            }
+
+            float ii = (float)i / positions.Count;
+
+            float rot = pos1.AngleTo(pos2);
+
+            Vector2 fp1 = positions[i] + new Vector2(widthCurve(ii), 0).RotatedBy(rot + MathHelper.ToRadians(90f));
+            Vector2 fp2 = positions[i] + new Vector2(widthCurve(ii), 0).RotatedBy(rot - MathHelper.ToRadians(90f));
+
+            finalPositions.Add(fp1);
+            finalPositions.Add(fp2);
+
+            if (colors != null)
+            {
+                finalColors.Add(colors(ii, fp1));
+                finalColors.Add(colors(ii, fp2));
+            }
+            else
+            {
+                finalColors.Add(Color.White);
+                finalColors.Add(Color.White);
+            }
+
+            finalTexcoords.Add(new Vector2(textureLoopOffset + (textureLoops * ii), 0));
+            finalTexcoords.Add(new Vector2(textureLoopOffset + (textureLoops * ii), 1));
+        }
+
+        Texture2D val = null;
+
+        if (asset != null) val = asset.Value;
+
+        DrawPrimitiveStrip2(finalPositions, finalColors, val, finalTexcoords, add);
     }
 }
