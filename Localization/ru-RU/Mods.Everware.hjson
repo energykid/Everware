@@ -567,6 +567,8 @@ NPCs: {
 			// Princess_LovesNPC: I like {NPCName}.
 		}
 	}
+
+	// Cosmoeba.DisplayName: Cosmoeba
 }
 
 // DeathReason.SnapdragonIce: experienced absolute zero.

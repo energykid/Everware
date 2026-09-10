@@ -6,6 +6,7 @@ public abstract class EverNPC : ModNPC
 {
     public virtual Vector2 Size => new Vector2(20, 20);
     public virtual int FrameNumber => 1;
+    public int CurrentFrame = 1;
     public virtual int Damage => 0;
     public virtual int TrailLength => 5;
     public virtual bool UsesCustomTrail => false;
@@ -13,6 +14,7 @@ public abstract class EverNPC : ModNPC
     {
         NPC.width = (int)Size.X;
         NPC.height = (int)Size.Y;
+        NPC.life = NPC.lifeMax = 100;
         NPC.damage = Damage;
     }
     public override void SetStaticDefaults()

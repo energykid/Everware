@@ -562,6 +562,8 @@ NPCs: {
 			Princess_LovesNPC: Me agrada {NPCName}.
 		}
 	}
+
+	// Cosmoeba.DisplayName: Cosmoeba
 }
 
 DeathReason.SnapdragonIce: experimentó el cero absoluto.

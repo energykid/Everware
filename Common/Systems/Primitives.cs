@@ -303,12 +303,12 @@ public sealed class PrimitiveDrawing : ILoadable
         }
     }
 
-    public Color TrailColorFromPosition(float input, Vector2 position)
+    public static Color TrailColorFromPosition(float input, Vector2 position)
     {
         return Lighting.GetColor((position / 16).ToPoint());
     }
     public delegate Color ColorFunction(float input, Vector2 position);
-    public static void DrawPrimitiveTrail(List<Vector2> positions, float Width, Easing.AnimationCurve widthCurve, float textureLoops = 1f, float textureLoopOffset = 0f, ColorFunction colors = null, Asset<Texture2D>? asset = null, bool add = false)
+    public static void DrawPrimitiveTrail(Vector2 targetSize, List<Vector2> positions, float Width, Easing.AnimationCurve widthCurve, float textureLoops = 1f, float textureLoopOffset = 0f, ColorFunction colors = null, Asset<Texture2D>? asset = null, bool add = false)
     {
         List<Vector2> finalPositions = [];
         List<Color> finalColors = [];
@@ -358,6 +358,6 @@ public sealed class PrimitiveDrawing : ILoadable
 
         if (asset != null) val = asset.Value;
 
-        DrawPrimitiveStrip2(finalPositions, finalColors, val, finalTexcoords, add);
+        DrawPrimitiveStrip2(finalPositions, finalColors, targetSize, val, finalTexcoords, add);
     }
 }
