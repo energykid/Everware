@@ -58,6 +58,19 @@ public abstract class EverTile : ModTile
     #endregion
 
     public static RenderTargetLease ExtraTarget;
+
+    public override void Load()
+    {
+        ThreadUtils.RunOnMainThread(() =>
+        {
+            ExtraTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
+        });
+    }
+    public override void Unload()
+    {
+        ExtraTarget.Dispose();
+    }
+
     public Asset<Texture2D> Asset => ModContent.Request<Texture2D>(Texture);
     public virtual bool UsesExtraTarget => false;
 
@@ -97,18 +110,6 @@ public abstract class EverTile : ModTile
     public virtual void ExtraDrawEverything()
     {
         Main.spriteBatch.Draw(ExtraTarget.Target, ScreenOffset, ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, Main.GameViewMatrix.Effects, 0f);
-    }
-
-    public override void Load()
-    {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            ExtraTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
-        });
-    }
-    public override void Unload()
-    {
-        ExtraTarget.Dispose();
     }
 
     public Vector2 RoundedScreenPosition;

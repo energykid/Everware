@@ -83,7 +83,7 @@ public class StarCrossedGrassTile : EverTile
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
-        DustType = DustID.CrystalSerpent_Pink;
+        DustType = DustID.YellowStarDust;
         AddMapEntry(new Color(245, 242, 150));
         Main.tileLighted[Type] = true;
         TileID.Sets.NeedsGrassFraming[Type] = true;

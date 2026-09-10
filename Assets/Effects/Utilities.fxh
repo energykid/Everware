@@ -73,6 +73,16 @@ float skewLerp(float time, float start, float end, float pointA, float pointB, f
     return defaultValue;
 }
 
+
+float skewLerp(float time, float start, float end, float4 pointA, float4 pointB, float4 defaultValue)
+{
+    if (time >= start && time <= end)
+    {
+        return lerp(pointA, pointB, (time - start) / (end - start));
+    }
+    return defaultValue;
+}
+
 float2 swirl(float2 coords, float2 center, float amount, float extra)
 {
     return rotated(coords - center, (length2(coords - center) * amount) + extra) + center;

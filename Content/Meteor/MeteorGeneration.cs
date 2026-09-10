@@ -17,7 +17,7 @@ public class MeteorGeneration
     public static readonly int StarCrossedGrass = ModContent.TileType<StarCrossedGrassTile>();
     public static readonly int StarCrossedGrassFoliage = TileID.AshPlants;
     public static readonly int MagicStone = ModContent.TileType<MagicStoneTile>();
-    public static readonly int MeteoriteOre = TileID.Meteorite;
+    public static readonly int MeteoriteOre = ModContent.TileType<Meteorite>();
     public static List<int> BlacklistedBlocks => [
         TileID.SnowBlock,
         TileID.BlueDungeonBrick,
