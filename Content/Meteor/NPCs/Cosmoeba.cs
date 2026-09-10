@@ -1,4 +1,5 @@
 ﻿using Everware.Common.Systems;
+using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,8 @@ public class Cosmoeba : EverNPC
         float spd = 1f + ((float)Math.Sin(NPC.ai[0] / 30f) * 0.7f);
         base.AI();
         NPC.rotation = NPC.AngleTo(Main.MouseWorld) + MathHelper.Pi;
-        NPC.velocity = Vector2.Lerp(NPC.velocity, new Vector2(-3 * spd, 0).RotatedBy(NPC.rotation), 0.2f);
+
+        NPC.velocity = Vector2.Lerp(NPC.Center, Main.MouseWorld, 0.01f) - NPC.Center;
 
 
         for (int i = 0; i < NPC.oldPos.Length; i++)
@@ -46,13 +48,13 @@ public class Cosmoeba : EverNPC
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         var Body = Assets.Textures.Meteor.NPCs.CosmoebaBody.Asset;
+        var BodyInternal = Assets.Textures.Meteor.NPCs.CosmoebaBodyInternal.Asset;
         var Feelers = Assets.Textures.Meteor.NPCs.CosmoebaFeelers.Asset;
-        var Tail = Assets.Textures.Meteor.NPCs.CosmoebaTail.Asset;
         var Stars = Assets.Textures.Meteor.NPCs.CosmoebaStars.Asset;
 
         Rectangle bodyFrame = Body.Frame(1, 3, 0, 0);
 
-        Rectangle feelerFrame = Feelers.Frame(1, 4, 0, (int)((NPC.ai[1] / 20) % 4));
+        Rectangle feelerFrame = Feelers.Frame(1, 4, 0, (int)(((NPC.ai[1] / 20) + (GlobalTimer.Value / 20)) % 4));
 
         List<Vector2> p = NPC.oldPos.ToList();
 
@@ -68,22 +70,32 @@ public class Cosmoeba : EverNPC
 
         using (target.Scope(clearColor: Color.Transparent))
         {
+            PrimitiveDrawing.DrawPrimitiveTrail(new Vector2(200, 200), p, 20, a => { return MathHelper.Lerp(1.2f, 0.7f, a); }, colors: (a, b) =>
+            {
+                return new Color(126, 187, 237);
+            });
             PrimitiveDrawing.DrawPrimitiveTrail(new Vector2(200, 200), p, 20, a => { return MathHelper.Lerp(1, 0.5f, a); });
         }
 
-        for (int i = 0; i < 4; i++)
-        {
-            Main.EntitySpriteDraw(target.Target, NPC.Center - Main.screenPosition + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(i * 90)), target.Target.Bounds, new Color(7, 64, 127), 0f, target.Target.Bounds.Size() / 2f, 2f, SpriteEffects.None);
-        }
+        var StarShader = Assets.Effects.Meteor.NPCs.CosmoebaStars.CreateEffect();
+        StarShader.Parameters.StarTexture = Assets.Textures.Meteor.NPCs.CosmoebaStars.Asset.Value;
+        StarShader.Parameters.Progress = -NPC.ai[1] / 200f;
+        StarShader.Apply();
 
         Main.spriteBatch.End(out var sb);
         Main.spriteBatch.Begin(sb with { SamplerState = SamplerState.PointWrap });
 
-        Main.EntitySpriteDraw(target.Target, NPC.Center - Main.screenPosition, target.Target.Bounds, new Color(136, 224, 255), 0f, target.Target.Bounds.Size() / 2f, 2f, SpriteEffects.None);
+        Vector2 off = new Vector2(20, 0).RotatedBy(-NPC.rotation);
+
+        Main.EntitySpriteDraw(target.Target, NPC.Center - Main.screenPosition, target.Target.Bounds, new Color(126, 187, 237), 0f, target.Target.Bounds.Size() / 2f, 2f, SpriteEffects.None);
 
         Main.EntitySpriteDraw(Body.Value, NPC.Center - Main.screenPosition, bodyFrame, Color.White, NPC.rotation, bodyFrame.Size() / 2f, 1f, SpriteEffects.None);
 
         Main.EntitySpriteDraw(Feelers.Value, NPC.Center - Main.screenPosition, feelerFrame, Color.White, NPC.rotation, new Vector2(feelerFrame.Width + 6, feelerFrame.Height / 2f), 1f, SpriteEffects.None);
+
+        Main.spriteBatch.Restart(sb with { CustomEffect = StarShader.Shader });
+
+        Main.EntitySpriteDraw(BodyInternal.Value, NPC.Center - Main.screenPosition, bodyFrame, Color.White, NPC.rotation, bodyFrame.Size() / 2f, 1f, SpriteEffects.None);
 
         Main.spriteBatch.Restart(sb);
 

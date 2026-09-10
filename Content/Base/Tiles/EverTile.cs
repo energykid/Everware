@@ -65,10 +65,15 @@ public abstract class EverTile : ModTile
         {
             ExtraTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
         });
+
+        On_Main.DoDraw_DrawNPCsOverTiles += DrawExtraTarget;
     }
+
     public override void Unload()
     {
         ExtraTarget.Dispose();
+
+        On_Main.DoDraw_DrawNPCsOverTiles -= DrawExtraTarget;
     }
 
     public Asset<Texture2D> Asset => ModContent.Request<Texture2D>(Texture);
@@ -115,8 +120,7 @@ public abstract class EverTile : ModTile
     public Vector2 RoundedScreenPosition;
     public Vector2 ScreenOffset;
 
-    [ModSystemHooks.PostDrawTiles]
-    public void A()
+    private void DrawExtraTarget(On_Main.orig_DoDraw_DrawNPCsOverTiles orig, Main self)
     {
         if (UsesExtraTarget)
         {
@@ -152,5 +156,7 @@ public abstract class EverTile : ModTile
             ExtraDrawEverything();
             Main.spriteBatch.End();
         }
+
+        orig(self);
     }
 }
