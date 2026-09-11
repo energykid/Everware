@@ -1,6 +1,8 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
+using Everware.Content.Meteor.Tiles;
+using Everware.Utils;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,27 +14,95 @@ public class Cosmoeba : EverNPC
     public override Vector2 Size => new Vector2(42, 42);
     public override int FrameNumber => 3;
     public override int TrailLength => 10;
+    public override int Damage => 10;
 
     public override void SetDefaults()
     {
         base.SetDefaults();
         NPC.noGravity = true;
         NPC.noTileCollide = true;
+        State = (int)BehaviorState.Wandering;
+        NPC.netUpdate = true;
     }
+
+    Vector2 TargetPosition = Vector2.Zero;
+    public enum BehaviorState
+    {
+        Wandering,
+        CirclingMagicStone,
+        Fleeing,
+        FindingMeteor,
+        Charging
+    }
+
     public override void AI()
     {
+        switch (State)
+        {
+            case (int)BehaviorState.Wandering:
+
+                if (NPC.ai[0] % 5 == 0)
+                {
+                    var pos = BehaviorUtils.FindNearbyTilePosition(NPC.Center, 30, ModContent.TileType<MagicStoneTile>(), 2);
+
+                    if (pos != null)
+                    {
+                        TargetPosition = pos.Value;
+                        State = (int)BehaviorState.CirclingMagicStone;
+                        NPC.ai[2] = 0;
+                        break;
+                    }
+                }
+                if (NPC.ai[2] >= 0)
+                {
+                    TargetPosition = NPC.Center + new Vector2(Main.rand.NextFloat(80, 300), 0).RotatedByRandom(MathHelper.TwoPi);
+                    NPC.ai[2] = -Main.rand.NextFloat(120, 480);
+                    NPC.netUpdate = true;
+                }
+                NPC.ai[2]++;
+                TargetPosition += new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 6f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 6f);
+
+                if (NPC.ai[0] % 50 == 0)
+                {
+                    var pos = BehaviorUtils.FindNearbyTilePosition(NPC.Center, 300, ModContent.TileType<MagicStoneTile>(), 8);
+
+                    if (pos != null)
+                    {
+                        TargetPosition = Vector2.Lerp(TargetPosition, pos.Value, 0.2f);
+                        break;
+                    }
+                }
+
+                NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
+
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, TargetPosition, 0.005f) - NPC.Center, 0.05f);
+
+                break;
+            case (int)BehaviorState.CirclingMagicStone:
+                NPC.ai[2]++;
+
+                NPC.ai[1] += 2f;
+
+                NPC.rotation = NPC.Center.AngleTo(TargetPosition) + MathHelper.Pi;
+
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, TargetPosition + new Vector2(8, 0).RotatedBy(NPC.rotation) + new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 7f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 7f), 0.015f) - NPC.Center, 0.1f);
+                break;
+            case (int)BehaviorState.Fleeing:
+                break;
+            case (int)BehaviorState.FindingMeteor:
+                break;
+            case (int)BehaviorState.Charging:
+                break;
+        }
+
         NPC.ai[0]++;
         NPC.ai[1] += NPC.velocity.Length();
         float spd = 1f + ((float)Math.Sin(NPC.ai[0] / 30f) * 0.7f);
         base.AI();
-        NPC.rotation = NPC.AngleTo(Main.MouseWorld) + MathHelper.Pi;
-
-        NPC.velocity = Vector2.Lerp(NPC.Center, Main.MouseWorld, 0.01f) - NPC.Center;
-
 
         for (int i = 0; i < NPC.oldPos.Length; i++)
         {
-            NPC.oldPos[i] += NPC.rotation.ToRotationVector2() * 2f;
+            NPC.oldPos[i] += NPC.rotation.ToRotationVector2() * 3f;
         }
 
         for (int i = 1; i < NPC.oldPos.Length; i++)

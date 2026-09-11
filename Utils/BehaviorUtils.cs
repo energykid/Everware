@@ -2,11 +2,22 @@
 using Everware.Content.Base.Items;
 using Everware.Content.Base.ParticleSystem;
 using Terraria.ID;
+using static Everware.Utils.PathfindingUtils;
 
 namespace Everware.Utils;
 
 public static class BehaviorUtils
 {
+    public static Vector2? FindNearbyTilePosition(Vector2 center, int size, int tileID, int divider = 2)
+    {
+        Point centerPoint = (center / 16).ToPoint();
+
+        bool foundTile = new PathNodeSet(centerPoint, new Rectangle(centerPoint.X - size, centerPoint.Y - size, size * 2, size * 2), divider).FindTile(tileID, out Point foundPos);
+
+        if (foundTile) return (foundPos.ToVector2() * 16) + new Vector2(8, -10);
+
+        return null;
+    }
     public static void ThrowTileReplicants(Vector2 velocity, Point pt, int num)
     {
         for (int i = -num; i <= num; i++)

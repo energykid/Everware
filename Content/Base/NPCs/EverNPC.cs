@@ -1,4 +1,5 @@
-﻿using Terraria.ID;
+﻿using System.IO;
+using Terraria.ID;
 
 namespace Everware.Content.Base.NPCs;
 
@@ -8,13 +9,16 @@ public abstract class EverNPC : ModNPC
     public virtual int FrameNumber => 1;
     public int CurrentFrame = 1;
     public virtual int Damage => 0;
+    public virtual int Health => 100;
     public virtual int TrailLength => 5;
     public virtual bool UsesCustomTrail => false;
+    public int State = 0;
+    public float[] ExtraAI = { 0f, 0f };
     public override void SetDefaults()
     {
         NPC.width = (int)Size.X;
         NPC.height = (int)Size.Y;
-        NPC.life = NPC.lifeMax = 100;
+        NPC.life = NPC.lifeMax = Health;
         NPC.damage = Damage;
     }
     public override void SetStaticDefaults()
@@ -22,5 +26,19 @@ public abstract class EverNPC : ModNPC
         NPCID.Sets.TrailingMode[Type] = UsesCustomTrail ? -1 : 3;
         NPCID.Sets.TrailCacheLength[Type] = TrailLength;
         Main.npcFrameCount[Type] = FrameNumber;
+    }
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        base.SendExtraAI(writer);
+        writer.Write(State);
+        writer.Write(ExtraAI[0]);
+        writer.Write(ExtraAI[1]);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        base.ReceiveExtraAI(reader);
+        State = reader.ReadInt32();
+        ExtraAI[0] = reader.ReadSingle();
+        ExtraAI[1] = reader.ReadSingle();
     }
 }
