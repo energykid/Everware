@@ -22,6 +22,7 @@ public class Cosmoeba : EverNPC
         NPC.noGravity = true;
         NPC.noTileCollide = true;
         State = (int)BehaviorState.Wandering;
+        ExtraAI[0] = -Main.rand.NextFloat(100f);
         NPC.netUpdate = true;
     }
 
@@ -41,7 +42,9 @@ public class Cosmoeba : EverNPC
         {
             case (int)BehaviorState.Wandering:
 
-                if (NPC.ai[0] % 5 == 0)
+                ExtraAI[0]++;
+
+                if (ExtraAI[0] > 150 && NPC.ai[0] % 5 == 0)
                 {
                     var pos = BehaviorUtils.FindNearbyTilePosition(NPC.Center, 30, ModContent.TileType<MagicStoneTile>(), 2);
 

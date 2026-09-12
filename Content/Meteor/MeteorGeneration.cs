@@ -29,6 +29,7 @@ public class MeteorGeneration
         TileID.Ebonstone,
         TileID.Crimstone,
         TileID.LivingWood,
+        TileID.LeafBlock,
     ];
     public static void GenerateWholeSite(Point pt)
     {
@@ -72,9 +73,9 @@ public class MeteorGeneration
         {
             float x = 0;
 
-            x = Easing.KeyFloat(i, -30, -10, 0, 12, Easing.InExpo, x);
-            x = Easing.KeyFloat(i, -10, 10, 12, 12, Easing.InOutExpo, x);
-            x = Easing.KeyFloat(i, 10, 30, 12, 0, Easing.OutExpo, x);
+            x = Easing.KeyFloat(i, -30, -13, 0, 12, Easing.InExpo, x);
+            x = Easing.KeyFloat(i, -13, 13, 12, 12, Easing.InOutExpo, x);
+            x = Easing.KeyFloat(i, 13, 30, 12, 0, Easing.OutExpo, x);
 
             for (float j = -SizeY; j <= SizeY + x; j++)
             {
@@ -87,7 +88,8 @@ public class MeteorGeneration
                     {
                         ptT.Y--;
                         Point pp = ptT + new Point(0, 1);
-                        WorldGen.KillTile(pp.X, pp.Y, false, false, true);
+                        Tile tt = Main.tile[pp];
+                        tt.HasTile = false;
                     }
                 }
 
@@ -121,16 +123,8 @@ public class MeteorGeneration
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(22, 0)).Grounded() + new Point(0, 3), Actions.Chain(
-            new CustomGenActions.SetMeteorFromGrass(),
-            new Actions.Smooth(true)
-        ));
 
         new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(-15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
-            new CustomGenActions.SetMeteorFromGrass(),
-            new Actions.Smooth(true)
-        ));
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.1f, 0.4f)).Perform((pt + new Point(-22, 0)).Grounded() + new Point(0, 3), Actions.Chain(
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
@@ -152,7 +146,7 @@ public class MeteorGeneration
     public static void GenerateMeteor(Point pt)
     {
         pt = pt.Grounded();
-        new Shapes.Slime(15, 1, 1.2).Perform(pt, Actions.Chain(
+        new Shapes.Slime(20, 1, 1.2).Perform(pt, Actions.Chain(
             new CustomGenActions.SetTileFromNone((ushort)MeteoriteOre),
             new Actions.Smooth(true)
         ));
@@ -194,21 +188,22 @@ public class MeteorGeneration
             }
         }
 
+        Tile t = Main.tile[to];
         if (tt != -1)
         {
-            Main.tile[to].TileType = (ushort)tt;
-            Main.tile[to].TileFrameX = (short)buffer.FrameX;
-            Main.tile[to].TileFrameY = (short)buffer.FrameY;
-            Main.tile[to].WallType = (ushort)ww;
-            Main.tile[to].wallFrameX((short)buffer.WallFrameX);
-            Main.tile[to].wallFrameY((short)buffer.WallFrameY);
-            Main.tile[to].halfBrick(buffer.HalfTile);
-            Main.tile[to].slope((byte)buffer.Slope);
-            Main.tile[to].LiquidAmount = 0;
+            t.TileType = (ushort)tt;
+            t.TileFrameX = (short)buffer.FrameX;
+            t.TileFrameY = (short)buffer.FrameY;
+            t.halfBrick(buffer.HalfTile);
+            t.slope((byte)buffer.Slope);
         }
         else
         {
-            Main.tile[to].active(false);
+            t.HasTile = false;
         }
+        t.WallType = (ushort)ww;
+        t.wallFrameX((short)buffer.WallFrameX);
+        t.wallFrameY((short)buffer.WallFrameY);
+        t.LiquidAmount = 0;
     }
 }
