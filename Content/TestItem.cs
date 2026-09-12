@@ -1,5 +1,6 @@
 ﻿using Everware.Content.Base.Items;
 using Everware.Content.Meteor;
+using Everware.Utils;
 using Terraria.ID;
 
 namespace Everware.Content;
@@ -25,7 +26,10 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-            MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
+            MeteorGeneration.GenerateWholeSite(out Point p);
+            player.Teleport((p.Grounded()).ToVector2() * 16 + new Vector2(16, -48));
+
+            //MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
         }
         return base.UseItem(player);
     }

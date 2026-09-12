@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Terraria.ID;
 using Terraria.WorldBuilding;
+using static Everware.Utils.PathfindingUtils;
 
 namespace Everware.Content.Meteor;
 
@@ -19,20 +20,15 @@ public class MeteorGeneration
     public static readonly int MagicStone = ModContent.TileType<MagicStoneTile>();
     public static readonly int MeteoriteOre = ModContent.TileType<Meteorite>();
     public static List<int> BlacklistedBlocks => [
-        TileID.SnowBlock,
         TileID.BlueDungeonBrick,
         TileID.PinkDungeonBrick,
         TileID.GreenDungeonBrick,
-        TileID.Sand,
-        TileID.Cloud,
-        TileID.RainCloud,
-        TileID.Ebonstone,
-        TileID.Crimstone,
         TileID.LivingWood,
-        TileID.LeafBlock,
+        TileID.LeafBlock
     ];
-    public static void GenerateWholeSite(Point pt)
+    public static void GenerateWholeSite(out Point outputPosition)
     {
+        Point pt = GetMeteorPosition(1000, Main.maxTilesX / 6, Main.maxTilesX / 3, fromLeft: true);
         Thread thread = new Thread(() =>
         {
             GenerateCrater(pt);
@@ -42,6 +38,7 @@ public class MeteorGeneration
             IsBackground = true,
         };
         thread.Start();
+        outputPosition = pt;
     }
     public static void GenerateCrater(Point pt)
     {
@@ -135,7 +132,7 @@ public class MeteorGeneration
             {
                 Point center = pt + new Point(i * 10, 0) + new Point(Main.rand.Next(-3, 3), 0);
                 new Shapes.Slime(20, Main.rand.NextFloat(0.1f, 0.2f), Main.rand.NextFloat(0.12f, 0.4f)).Perform(center.Grounded(), Actions.Chain(
-                    new Actions.SetTile((ushort)MagicStone, true),
+                    new Actions.SetTileKeepWall((ushort)MagicStone, true),
                     new Actions.Smooth(true)
                 ));
             }
@@ -205,5 +202,58 @@ public class MeteorGeneration
         t.wallFrameX((short)buffer.WallFrameX);
         t.wallFrameY((short)buffer.WallFrameY);
         t.LiquidAmount = 0;
+    }
+    public static Point GetMeteorPosition(int numChecks = 10, int minDist = 50, int maxDist = 250, bool fromLeft = true)
+    {
+        Point p = new Point(Main.maxTilesX / 2, (int)Main.worldSurface - 200).Grounded();
+        Point refP = new Point(p.X, p.Y);
+
+        for (int j = 0; j < 10; j++)
+        {
+            for (int i = 0; i <= numChecks; i++)
+            {
+                if (i < numChecks)
+                {
+                    refP = new Point(p.X, p.Y)
+                    {
+                        X = (int)MathHelper.Lerp(0, Main.maxTilesX, (float)i / numChecks)
+                    };
+                    if (!fromLeft)
+                    {
+                        refP.X = (int)MathHelper.Lerp(Main.maxTilesX, 0, (float)i / numChecks);
+                    }
+                    refP.X += Main.rand.Next(-200, 200);
+                    if (Math.Abs(refP.X - p.X) > minDist && Math.Abs(refP.X - p.X) < maxDist)
+                    {
+                        refP = refP.Grounded();
+
+                        int slope = new FlatnessCheck(refP, new Point(160, 20), 2).ApproximateTerrainFlatness();
+
+                        if (slope < (100 - (j * 5)))
+                        {
+                            bool skip = false;
+                            {
+                                for (int k = 0; k < BlacklistedBlocks.Count; k++)
+                                {
+                                    if (new TileCheck(new Rectangle(refP.X - 160, refP.Y - 20, 320, 40)).IsTileInside(BlacklistedBlocks[k]))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!skip)
+                            {
+                                p = refP;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (p == refP) break;
+        }
+
+        return p;
     }
 }

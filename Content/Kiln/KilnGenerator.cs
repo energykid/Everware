@@ -1,6 +1,5 @@
 ﻿using Everware.Content.Base.World;
 using Everware.Content.Kiln.Tiles;
-using System;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 

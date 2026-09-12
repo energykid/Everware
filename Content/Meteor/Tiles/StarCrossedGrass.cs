@@ -188,7 +188,7 @@ public class StarCrossedGrassTile : EverTile
             Tile t1 = Main.tile[p + new Point(i, j - 1)];
             if (t.HasTile && t.TileType == Type && !t1.HasTile)
             {
-                new Streak(pp.ToVector2() * 16).Spawn(StreakLayer);
+                new Streak(pp.ToVector2() * 16 + new Vector2(16, 0)).Spawn(StreakLayer);
             }
         }
     }

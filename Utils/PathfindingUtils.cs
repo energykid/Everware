@@ -4,6 +4,34 @@ namespace Everware.Utils;
 
 public static class PathfindingUtils
 {
+    public static Point GetFlatPointFromSpawn(Point p, int scale = 80, int numChecks = 10, int minDist = 50, int maxDist = 250)
+    {
+        Point refP = new Point(p.X, p.Y);
+
+        for (int i = 0; i <= numChecks; i++)
+        {
+            if (i < numChecks)
+            {
+                refP = new Point(p.X, p.Y);
+                refP.X += Main.rand.Next(minDist, maxDist) * (Main.rand.NextBool() ? 1 : -1);
+                refP = refP.Grounded();
+
+                int slope = new FlatnessCheck(refP, new Point(scale, 20), 2).ApproximateTerrainFlatness();
+
+                if (slope < (int)(scale * 0.65f))
+                {
+                    p = refP;
+                    break;
+                }
+            }
+            else
+            {
+                return p;
+            }
+        }
+
+        return p;
+    }
     const int WorldPadding = 200;
     public struct PathNodeSet(Point start, Rectangle bounds, int divider = 1)
     {
@@ -63,10 +91,28 @@ public static class PathfindingUtils
             return false;
         }
     }
+    public struct TileCheck(Rectangle bounds, int divider = 1)
+    {
+        public Rectangle Bounds = bounds;
+        public bool IsTileInside(int type)
+        {
+            for (int i = Bounds.X; i < Bounds.X + Bounds.Width; i += divider)
+            {
+                for (int j = Bounds.Y; j < Bounds.Y + Bounds.Height; j += divider)
+                {
+                    if (Main.tile[i, j].HasTile && Main.tile[i, j].TileType == type)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
     public struct FlatnessCheck(Point position, Point scale, int divider = 1)
     {
         public int Divider = divider;
-        public Rectangle Bounds = new Rectangle(position.X, position.Y, scale.X, scale.Y);
+        public Rectangle Bounds = new Rectangle(position.X - (scale.X / 2), position.Y - (scale.Y / 2), scale.X, scale.Y);
         public int OccupiedTilesTop = 0;
         public int NonOccupiedTilesBottom = 0;
 
