@@ -1,4 +1,5 @@
 displayName = Everware
 author = ENNWAY
 version = 0.2.6.0
+dllReferences = TileHelper
 modReferences = Daybreak

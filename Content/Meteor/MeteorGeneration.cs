@@ -148,10 +148,6 @@ public class MeteorGeneration
             new Actions.Smooth(true)
         ));
     }
-    public static void GenerateStar(Point pt)
-    {
-
-    }
     public static void ReplaceTile(TileUtils.Buffer buffer, Point to, Point center)
     {
         int tt1 = buffer.TileType;

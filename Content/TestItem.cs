@@ -27,7 +27,7 @@ public class TestItem : EverItem
         if (player.ItemAnimationJustStarted)
         {
             MeteorGeneration.GenerateWholeSite(out Point p);
-            player.Teleport((p.Grounded()).ToVector2() * 16 + new Vector2(16, -48));
+            player.Teleport((p.Grounded()).ToVector2() * 16 + new Vector2(16, -480));
 
             //MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
         }

@@ -42,10 +42,9 @@ public class UndergroundHouseEdits : ModSystem
                                 {
                                     Tile t = Main.tile[Main.chest[i].x + k, Main.chest[i].y + l];
                                     t.TileType = (ushort)ModContent.TileType<SteelChestTile>();
-                                    t.TileFrameX -= 36;
                                 }
+                                Chest.Lock(Main.chest[i].x, Main.chest[i].y);
                             }
-                            Chest.Lock(Main.chest[i].x, Main.chest[i].y);
                             Chest chest = Main.chest[i];
                             chest.item[0] = new Item(DeepCaveLoot[Main.rand.Next(DeepCaveLoot.Count)]);
                         }
