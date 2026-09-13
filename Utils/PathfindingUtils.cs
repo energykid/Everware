@@ -93,6 +93,7 @@ public static class PathfindingUtils
     }
     public struct TileCheck(Rectangle bounds, int divider = 1)
     {
+        public delegate bool Condition(Tile t);
         public Rectangle Bounds = bounds;
         public bool IsTileInside(int type)
         {
@@ -101,6 +102,20 @@ public static class PathfindingUtils
                 for (int j = Bounds.Y; j < Bounds.Y + Bounds.Height; j += divider)
                 {
                     if (Main.tile[i, j].HasTile && Main.tile[i, j].TileType == type)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public bool IsCriteriaMetInside(Condition condition)
+        {
+            for (int i = Bounds.X; i < Bounds.X + Bounds.Width; i += divider)
+            {
+                for (int j = Bounds.Y; j < Bounds.Y + Bounds.Height; j += divider)
+                {
+                    if (condition(Main.tile[i, j]))
                     {
                         return true;
                     }

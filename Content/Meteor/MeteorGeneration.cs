@@ -2,6 +2,7 @@
 using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Terraria.ID;
 using Terraria.WorldBuilding;
@@ -199,6 +200,20 @@ public class MeteorGeneration
         t.wallFrameY((short)buffer.WallFrameY);
         t.LiquidAmount = 0;
     }
+    public static bool CanMeteorSpawnHere(Point p)
+    {
+        bool b = true;
+        TileCheck check = new TileCheck(new Rectangle(p.X - 160, p.Y - 20, 320, 40));
+        for (int k = 0; k < BlacklistedBlocks.Count; k++)
+        {
+            if (check.IsTileInside(BlacklistedBlocks[k])) b = false;
+        }
+        if (check.IsCriteriaMetInside(Tile => { return Main.wallHouse[Tile.WallType] || TileID.Sets.CountsAsPylon.Contains(Tile.TileType); }))
+        {
+            b = true;
+        }
+        return b;
+    }
     public static Point GetMeteorPosition(int numChecks = 10, int minDist = 50, int maxDist = 250, bool fromLeft = true)
     {
         Point p = new Point(Main.maxTilesX / 2, (int)Main.worldSurface - 200).Grounded();
@@ -218,7 +233,7 @@ public class MeteorGeneration
                     {
                         refP.X = (int)MathHelper.Lerp(Main.maxTilesX, 0, (float)i / numChecks);
                     }
-                    refP.X += Main.rand.Next(-200, 200);
+                    refP.X += Main.rand.Next(-50, 50);
                     if (Math.Abs(refP.X - p.X) > minDist && Math.Abs(refP.X - p.X) < maxDist)
                     {
                         refP = refP.Grounded();
