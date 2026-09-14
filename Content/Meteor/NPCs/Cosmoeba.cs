@@ -10,6 +10,10 @@ namespace Everware.Content.Meteor.NPCs;
 
 public class Cosmoeba : EverNPC
 {
+    public override float SpawnChance(NPCSpawnInfo spawnInfo)
+    {
+        return spawnInfo.Player.InModBiome<MeteorBiome>() ? 0.25f : 0f;
+    }
     public override string Texture => "Everware/Assets/Textures/Meteor/NPCs/CosmoebaBody";
     public override Vector2 Size => new Vector2(42, 42);
     public override int FrameNumber => 3;
@@ -139,6 +143,14 @@ public class Cosmoeba : EverNPC
             p[i] += new Vector2(100, 100);
         }
 
+        var StarShader = Assets.Effects.Meteor.NPCs.CosmoebaStars.CreateEffect();
+        StarShader.Parameters.StarTexture = Assets.Textures.Meteor.NPCs.CosmoebaStars.Asset.Value;
+        StarShader.Parameters.Progress = -NPC.ai[1] / 200f;
+        StarShader.Apply();
+
+        Main.spriteBatch.End(out var sb);
+        Main.spriteBatch.Begin(sb with { SamplerState = Main.DefaultSamplerState });
+
         var target = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, 200, 200);
 
         using (target.Scope(clearColor: Color.Transparent))
@@ -150,15 +162,9 @@ public class Cosmoeba : EverNPC
             PrimitiveDrawing.DrawPrimitiveTrail(new Vector2(200, 200), p, 20, a => { return MathHelper.Lerp(1, 0.5f, a); });
         }
 
-        var StarShader = Assets.Effects.Meteor.NPCs.CosmoebaStars.CreateEffect();
-        StarShader.Parameters.StarTexture = Assets.Textures.Meteor.NPCs.CosmoebaStars.Asset.Value;
-        StarShader.Parameters.Progress = -NPC.ai[1] / 200f;
-        StarShader.Apply();
-
-        Main.spriteBatch.End(out var sb);
-        Main.spriteBatch.Begin(sb with { SamplerState = SamplerState.PointWrap });
-
         Vector2 off = new Vector2(20, 0).RotatedBy(-NPC.rotation);
+
+        Main.spriteBatch.Restart(sb with { SamplerState = Main.DefaultSamplerState });
 
         Main.EntitySpriteDraw(target.Target, NPC.Center - Main.screenPosition, target.Target.Bounds, new Color(126, 187, 237), 0f, target.Target.Bounds.Size() / 2f, 2f, SpriteEffects.None);
 
@@ -170,7 +176,8 @@ public class Cosmoeba : EverNPC
 
         Main.EntitySpriteDraw(BodyInternal.Value, NPC.Center - Main.screenPosition, bodyFrame, Color.White, NPC.rotation, bodyFrame.Size() / 2f, 1f, SpriteEffects.None);
 
-        Main.spriteBatch.Restart(sb);
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(sb);
 
         target.Dispose();
 

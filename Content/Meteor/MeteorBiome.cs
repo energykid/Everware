@@ -10,9 +10,10 @@ public class MeteorBiome : ModBiome
     }
     public override void Load()
     {
-        On_Main.DoDraw_WallsAndBlacks += DrawStuff;
+        On_Main.DrawBackground += DrawStuff;
     }
-    private void DrawStuff(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+
+    private void DrawStuff(On_Main.orig_DrawBackground orig, Main self)
     {
         var asset = Assets.Textures.Misc.SinglePixel.Asset;
 
@@ -21,7 +22,7 @@ public class MeteorBiome : ModBiome
 
         Main.spriteBatch.End(out var sb);
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, eff.Shader);
-        Main.EntitySpriteDraw(asset.Value, Vector2.Zero, asset.Frame(), Color.White.MultiplyRGBA(new(MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity)), 0f, Vector2.Zero, new Vector2(Main.screenWidth * 5f, Main.screenHeight), Main.GameViewMatrix.Effects);
+        Main.EntitySpriteDraw(asset.Value, Vector2.Zero, asset.Frame(), Color.White.MultiplyRGBA(new(MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity)), 0f, Vector2.Zero, new Vector2(Main.screenWidth * 5f, Main.screenHeight * 3f), Main.GameViewMatrix.Effects);
         Main.spriteBatch.Restart(sb);
 
         orig(self);
@@ -29,7 +30,7 @@ public class MeteorBiome : ModBiome
 
     public override void Unload()
     {
-        On_Main.DoDraw_WallsAndBlacks -= DrawStuff;
+        On_Main.DrawBackground -= DrawStuff;
     }
 }
 public class MeteorEffectSystem : ModSystem
@@ -41,7 +42,6 @@ public class MeteorEffectSystem : ModSystem
     {
         WorldGen.spawnMeteor = false;
     }
-
     public static float Intensity = 0f;
     public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
     {
