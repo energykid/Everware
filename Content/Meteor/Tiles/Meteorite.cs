@@ -14,6 +14,7 @@ public class Meteorite : EverTile
     {
         base.SetStaticDefaults();
         DustType = DustID.Silt;
+        HitSound = SoundID.Tink;
         AddMapEntry(new Color(116, 55, 55));
         TileID.Sets.ChecksForMerge[Type] = true;
         Main.tileMerge[ModContent.TileType<CharredSoilTile>()][Type] = true;

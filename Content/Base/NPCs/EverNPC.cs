@@ -5,6 +5,7 @@ namespace Everware.Content.Base.NPCs;
 
 public abstract class EverNPC : ModNPC
 {
+    public Player Target => Main.player[NPC.target];
     public virtual Vector2 Size => new Vector2(20, 20);
     public virtual int FrameNumber => 1;
     public int CurrentFrame = 1;
@@ -14,6 +15,7 @@ public abstract class EverNPC : ModNPC
     public virtual bool UsesCustomTrail => false;
     public int State = 0;
     public float[] ExtraAI = { 0f, 0f };
+    public Vector2 AIPosition = Vector2.Zero;
     public override void SetDefaults()
     {
         NPC.width = (int)Size.X;
@@ -33,6 +35,7 @@ public abstract class EverNPC : ModNPC
         writer.Write(State);
         writer.Write(ExtraAI[0]);
         writer.Write(ExtraAI[1]);
+        writer.WriteVector2(AIPosition);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
@@ -40,5 +43,6 @@ public abstract class EverNPC : ModNPC
         State = reader.ReadInt32();
         ExtraAI[0] = reader.ReadSingle();
         ExtraAI[1] = reader.ReadSingle();
+        AIPosition = reader.ReadVector2();
     }
 }

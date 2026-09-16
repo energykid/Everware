@@ -29,8 +29,6 @@ public class Cosmoeba : EverNPC
         ExtraAI[0] = -Main.rand.NextFloat(100f);
         NPC.netUpdate = true;
     }
-
-    Vector2 TargetPosition = Vector2.Zero;
     public enum BehaviorState
     {
         Wandering,
@@ -40,11 +38,15 @@ public class Cosmoeba : EverNPC
         Charging
     }
 
+    #region Behavior
     public override void AI()
     {
         switch (State)
         {
             case (int)BehaviorState.Wandering:
+                NPC.TargetClosest(false);
+
+                FleeIfTooClose();
 
                 ExtraAI[0]++;
 
@@ -54,20 +56,19 @@ public class Cosmoeba : EverNPC
 
                     if (pos != null)
                     {
-                        TargetPosition = pos.Value;
-                        State = (int)BehaviorState.CirclingMagicStone;
-                        NPC.ai[2] = 0;
+                        AIPosition = pos.Value;
+                        ChangeState(BehaviorState.CirclingMagicStone);
                         break;
                     }
                 }
                 if (NPC.ai[2] >= 0)
                 {
-                    TargetPosition = NPC.Center + new Vector2(Main.rand.NextFloat(80, 300), 0).RotatedByRandom(MathHelper.TwoPi);
+                    AIPosition = NPC.Center + new Vector2(Main.rand.NextFloat(80, 300), 0).RotatedByRandom(MathHelper.TwoPi);
                     NPC.ai[2] = -Main.rand.NextFloat(120, 480);
                     NPC.netUpdate = true;
                 }
                 NPC.ai[2]++;
-                TargetPosition += new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 6f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 6f);
+                AIPosition += new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 6f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 6f);
 
                 if (NPC.ai[0] % 50 == 0)
                 {
@@ -75,26 +76,43 @@ public class Cosmoeba : EverNPC
 
                     if (pos != null)
                     {
-                        TargetPosition = Vector2.Lerp(TargetPosition, pos.Value, 0.2f);
+                        AIPosition = Vector2.Lerp(AIPosition, pos.Value, 0.2f);
                         break;
                     }
                 }
 
                 NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
 
-                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, TargetPosition, 0.005f) - NPC.Center, 0.05f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, AIPosition, 0.005f) - NPC.Center, 0.05f);
 
                 break;
             case (int)BehaviorState.CirclingMagicStone:
+                NPC.TargetClosest(false);
+
+                FleeIfTooClose();
+
                 NPC.ai[2]++;
 
                 NPC.ai[1] += 2f;
 
-                NPC.rotation = NPC.Center.AngleTo(TargetPosition) + MathHelper.Pi;
+                NPC.rotation = NPC.Center.AngleTo(AIPosition) + MathHelper.Pi;
 
-                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, TargetPosition + new Vector2(8, 0).RotatedBy(NPC.rotation) + new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 7f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 7f), 0.015f) - NPC.Center, 0.1f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, AIPosition + new Vector2(8, 0).RotatedBy(NPC.rotation) + new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 7f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 7f), 0.015f) - NPC.Center, 0.1f);
                 break;
             case (int)BehaviorState.Fleeing:
+                ExtraAI[0] = MathHelper.Lerp(ExtraAI[0], 3f, 0.2f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, (Target.DirectionTo(NPC.Center) * ExtraAI[0]) + new Vector2(0, -0.25f * ExtraAI[0]), 0.2f);
+                NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
+                NPC.TargetClosest(false);
+
+                /// TODO: Make amoebas find meteors and program in that behavior
+                /*
+                if (NPC.life < NPC.lifeMax / 2f && NPC.Distance(Target.Center) > 150)
+                    ChangeState(BehaviorState.FindingMeteor);
+                    */
+
+                if (NPC.Distance(Target.Center) > 300)
+                    ChangeState(BehaviorState.Wandering);
                 break;
             case (int)BehaviorState.FindingMeteor:
                 break;
@@ -122,6 +140,23 @@ public class Cosmoeba : EverNPC
             }
         }
     }
+    public void FleeIfTooClose()
+    {
+        if (NPC.Distance(Target.Center) < 100)
+        {
+            ExtraAI[0] = 10;
+            State = (int)BehaviorState.Fleeing;
+            NPC.ai[2] = 0;
+        }
+    }
+    public void ChangeState(BehaviorState state)
+    {
+        State = (int)state;
+        NPC.ai[2] = 0;
+    }
+    #endregion
+
+    #region Drawing
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         var Body = Assets.Textures.Meteor.NPCs.CosmoebaBody.Asset;
@@ -183,4 +218,5 @@ public class Cosmoeba : EverNPC
 
         return false;
     }
+    #endregion
 }
