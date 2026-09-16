@@ -28,6 +28,8 @@ public class Cosmoeba : EverNPC
         State = (int)BehaviorState.Wandering;
         ExtraAI[0] = -Main.rand.NextFloat(100f);
         NPC.netUpdate = true;
+        NPC.HitSound = Assets.Sounds.NPC.CosmoebaHurt.Asset;
+        NPC.DeathSound = Assets.Sounds.NPC.CosmoebaKill.Asset;
     }
     public enum BehaviorState
     {
@@ -57,6 +59,7 @@ public class Cosmoeba : EverNPC
                     if (pos != null)
                     {
                         AIPosition = pos.Value;
+                        SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaLocateStone.Asset, NPC.Center);
                         ChangeState(BehaviorState.CirclingMagicStone);
                         break;
                     }
@@ -111,7 +114,11 @@ public class Cosmoeba : EverNPC
                     ChangeState(BehaviorState.FindingMeteor);
                     */
 
-                if (NPC.Distance(Target.Center) > 300)
+                NPC.ai[2]++;
+                if (NPC.ai[2] % 15 == 0)
+                    SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFleeLoop.Asset, NPC.Center);
+
+                if (NPC.Distance(Target.Center) > 300 && NPC.ai[2] > 50)
                     ChangeState(BehaviorState.Wandering);
                 break;
             case (int)BehaviorState.FindingMeteor:
@@ -144,15 +151,24 @@ public class Cosmoeba : EverNPC
     {
         if (NPC.Distance(Target.Center) < 100)
         {
-            ExtraAI[0] = 10;
-            State = (int)BehaviorState.Fleeing;
-            NPC.ai[2] = 0;
+            StartFleeing();
         }
+    }
+    public void StartFleeing()
+    {
+        ExtraAI[0] = 10;
+        ChangeState(BehaviorState.Fleeing);
+        SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFlee.Asset, NPC.Center);
     }
     public void ChangeState(BehaviorState state)
     {
         State = (int)state;
         NPC.ai[2] = 0;
+    }
+    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
+    {
+        base.OnHitByProjectile(projectile, hit, damageDone);
+        StartFleeing();
     }
     #endregion
 
