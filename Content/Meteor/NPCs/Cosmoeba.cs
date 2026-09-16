@@ -115,7 +115,7 @@ public class Cosmoeba : EverNPC
                     */
 
                 NPC.ai[2]++;
-                if (NPC.ai[2] % 15 == 0)
+                if (NPC.ai[2] > 25 && NPC.ai[2] % 15 < 1)
                     SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFleeLoop.Asset, NPC.Center);
 
                 if (NPC.Distance(Target.Center) > 300 && NPC.ai[2] > 50)
