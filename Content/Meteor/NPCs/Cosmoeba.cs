@@ -251,6 +251,7 @@ public class Cosmoeba : EverNPC
         return false;
     }
     #endregion
+
     public class PanicParticle : Particle
     {
         int npc = 0;
