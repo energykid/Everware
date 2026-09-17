@@ -20,16 +20,19 @@ public class Cosmoeba : EverNPC
     public override int TrailLength => 10;
     public override int Damage => 10;
 
+    float Personality = Main.rand.NextFloat(-0.2f, 0.2f);
+
     public override void SetDefaults()
     {
         base.SetDefaults();
+        Personality = Main.rand.NextFloat(-0.2f, 0.2f);
         NPC.noGravity = true;
         NPC.noTileCollide = true;
         State = (int)BehaviorState.Wandering;
         ExtraAI[0] = -Main.rand.NextFloat(100f);
         NPC.netUpdate = true;
-        NPC.HitSound = Assets.Sounds.NPC.CosmoebaHurt.Asset;
-        NPC.DeathSound = Assets.Sounds.NPC.CosmoebaKill.Asset;
+        NPC.HitSound = Assets.Sounds.NPC.CosmoebaHurt.Asset.WithPitchVariance(0.2f) with { MaxInstances = 5 };
+        NPC.DeathSound = Assets.Sounds.NPC.CosmoebaKill.Asset.WithPitchVariance(0.1f) with { MaxInstances = 2 };
     }
     public enum BehaviorState
     {
@@ -59,17 +62,18 @@ public class Cosmoeba : EverNPC
                     if (pos != null)
                     {
                         AIPosition = pos.Value;
-                        SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaLocateStone.Asset, NPC.Center);
+                        SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaLocateStone.Asset.WithPitchVariance(0.2f) with { MaxInstances = 5 }, NPC.Center);
                         ChangeState(BehaviorState.CirclingMagicStone);
                         break;
                     }
                 }
-                if (NPC.ai[2] >= 0)
+                if (ExtraAI[1] > 0)
                 {
                     AIPosition = NPC.Center + new Vector2(Main.rand.NextFloat(80, 300), 0).RotatedByRandom(MathHelper.TwoPi);
-                    NPC.ai[2] = -Main.rand.NextFloat(120, 480);
+                    ExtraAI[1] = -Main.rand.NextFloat(120, 480);
                     NPC.netUpdate = true;
                 }
+                ExtraAI[1]++;
                 NPC.ai[2]++;
                 AIPosition += new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 6f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 6f);
 
@@ -103,22 +107,23 @@ public class Cosmoeba : EverNPC
                 NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, AIPosition + new Vector2(8, 0).RotatedBy(NPC.rotation) + new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 7f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 7f), 0.015f) - NPC.Center, 0.1f);
                 break;
             case (int)BehaviorState.Fleeing:
+                NPC.ai[1] += 2.5f;
                 ExtraAI[0] = MathHelper.Lerp(ExtraAI[0], 3f, 0.2f);
                 NPC.velocity = Vector2.Lerp(NPC.velocity, (Target.DirectionTo(NPC.Center) * ExtraAI[0]) + new Vector2(0, -0.25f * ExtraAI[0]), 0.2f);
                 NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
                 NPC.TargetClosest(false);
 
+                NPC.velocity = NPC.velocity.RotatedBy(MathHelper.ToRadians((float)Math.Sin(NPC.ai[1] / 20f) * 7f));
+
                 /// TODO: Make amoebas find meteors and program in that behavior
-                /*
-                if (NPC.life < NPC.lifeMax / 2f && NPC.Distance(Target.Center) > 150)
+                if ((NPC.life < NPC.lifeMax / 2f && NPC.Distance(Target.Center) > 150) || NPC.ai[2] > (15 * 12))
                     ChangeState(BehaviorState.FindingMeteor);
-                    */
 
                 NPC.ai[2]++;
                 if (NPC.ai[2] > 25 && NPC.ai[2] % 15 < 1)
-                    SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFleeLoop.Asset, NPC.Center);
+                    SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFleeLoop.Asset with { MaxInstances = 3, Pitch = Personality }, NPC.Center);
 
-                if (NPC.Distance(Target.Center) > 300 && NPC.ai[2] > 50)
+                if (NPC.Distance(Target.Center) > 200 && NPC.ai[2] > 50)
                     ChangeState(BehaviorState.Wandering);
                 break;
             case (int)BehaviorState.FindingMeteor:
@@ -157,8 +162,9 @@ public class Cosmoeba : EverNPC
     public void StartFleeing()
     {
         ExtraAI[0] = 10;
+        if (State != (int)BehaviorState.Fleeing)
+            SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFlee.Asset with { MaxInstances = 3, Pitch = Personality }, NPC.Center);
         ChangeState(BehaviorState.Fleeing);
-        SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFlee.Asset, NPC.Center);
     }
     public void ChangeState(BehaviorState state)
     {

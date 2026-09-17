@@ -66,11 +66,7 @@ public class MasterLockpick : EverWeaponItem
 
         if (player.itemAnimation == (int)(player.itemAnimationMax * 0.65f))
         {
-            SoundEngine.PlaySound(SoundID.Item1.WithPitchOffset(0f), player.MountedCenter, snd =>
-            {
-                snd.Pitch -= 0.1f;
-                return snd.IsPlaying && player.HeldItem.type == Type;
-            });
+            SoundEngine.PlaySound(SoundID.Item1, player.MountedCenter);
         }
 
         if (player.itemAnimation >= player.itemAnimationMax - 2)

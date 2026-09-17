@@ -10,8 +10,8 @@ public class MeteorHeadChanges : GlobalNPC
         if (spawnInfo.Player.InModBiome<MeteorBiome>())
         {
             pool[0] = 0f;
-            pool[NPCID.MeteorHead] = 0.3f;
-            pool[NPCID.EnchantedNightcrawler] = 0.1f;
+            pool[NPCID.MeteorHead] = 0.2f;
+            pool[NPCID.EnchantedNightcrawler] = 0.075f;
         }
         base.EditSpawnPool(pool, spawnInfo);
     }
