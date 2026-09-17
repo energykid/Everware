@@ -1,0 +1,558 @@
+Items: {
+	Kilnstone: {
+		DisplayName: Pedra de Forno
+		Tooltip: ""
+	}
+
+	KilnBrick: {
+		DisplayName: Tijolos de Forno
+		Tooltip: ""
+	}
+
+	KilnstoneHelmet: {
+		DisplayName: Capacete de Pedra de Forno
+		Tooltip: ""
+		SetBonus: Aumento prolongado na velocidade de mineração ao minerar blocos macios ou pedra
+	}
+
+	KilnstoneBrickplate: {
+		DisplayName: Peitoral de Pedra de Forno
+		Tooltip: ""
+	}
+
+	KilnstoneChausses: {
+		DisplayName: Calças de Pedra de Forno
+		Tooltip: ""
+	}
+
+	KilnBrickWall: {
+		DisplayName: Parede de Tijolos de Forno
+		Tooltip: ""
+	}
+
+	TestItem: {
+		DisplayName: Item de Desenvolvedor
+		Tooltip: ""
+	}
+
+	ForgingKilnItem: {
+		DisplayName: Forno de Fundição
+		Tooltip: ""
+	}
+
+	KilnBrickPlatform: {
+		DisplayName: Plataforma de Tijolos de Forno
+		Tooltip: ""
+	}
+
+	KilnWorkbench: {
+		DisplayName: Bancada de Trabalho de Forno
+		Tooltip: ""
+	}
+
+	WornFence: {
+		DisplayName: Cerca Desgastada
+		Tooltip: ""
+	}
+
+	WornWood: {
+		DisplayName: Madeira Desgastada
+		Tooltip: ""
+	}
+
+	RebarRod: {
+		DisplayName: Vergalhão
+		Tooltip: ""
+	}
+
+	SturdyBricks: {
+		DisplayName: Tijolo Reforçado
+		Tooltip: ""
+	}
+
+	WeldingStationItem: {
+		DisplayName: Estação de Solda
+		Tooltip: ""
+	}
+
+	RebarCrest: {
+		DisplayName: Elmo de Vergalhão
+		Tooltip: ""
+		SetBonus: Chance to duplicate most ores
+	}
+
+	RebarGridmail: {
+		DisplayName: Cota de Vergalhão
+		Tooltip: ""
+	}
+
+	RebarSandals: {
+		DisplayName: Sandálias de Vergalhão
+		Tooltip: ""
+	}
+
+	Kilnpost: {
+		DisplayName: Poste de Forno
+		Tooltip: Pode se desprender contra inimigos ao soltar <left>
+	}
+
+	Rebuker: {
+		DisplayName: Repreensor
+		Tooltip: Dispara uma barra de metal perfurante que causa menos dano a cada acerto subsequente
+	}
+
+	KilnMusicBox: {
+		DisplayName: Caixa de Música (Forno)
+		Tooltip: ""
+	}
+
+	QuarryMusicBox: {
+		DisplayName: Caixa de Música (Pedreira)
+		Tooltip: ""
+	}
+
+	MenuMusicBox: {
+		DisplayName: Caixa de Música (Algum Outro Lugar)
+		Tooltip: ""
+	}
+
+	EyeMusicBox: {	
+		DisplayName: Caixa de Música (Olho de Cthulhu)
+		Tooltip: ""
+	}
+
+	BloodRubyCharm: {
+		DisplayName: Rubi do Diabo
+		Tooltip:
+			'''
+			Double tap a direction to dash, creating a damaging explosion behind you
+			Dashing also briefly stops you from falling
+			'''
+	}
+
+	Pyrocleavers: {
+		DisplayName: Cutelos Pirotécnicos
+		Tooltip:
+			'''
+			Arremessa cutelos derretidos que se fundem ao chão, deixando lava persistente
+			Ao atingir uma parede, os cutelos ricocheteiam
+			'''
+	}
+
+	SkullStaff: {
+		DisplayName: Cajado da Caveira de Obsidiana
+		Tooltip:
+			'''
+			Invoca uma caveira de obsidiana aterrorizante, risonha e gritante que explode ao contato
+			Regenera pouco depois de atingir um inimigo
+			'''
+	}
+
+	HotShot: {
+		DisplayName: Tiro Quente
+		Tooltip:
+			'''
+			Clique com o botão direito para bombear, aumentando a quantidade e a velocidade das balas enquanto reduz a dispersão
+			Bombear três vezes consecutivas antes de disparar maximiza sua carga e causa um forte recuo ao atacar
+			'''
+	}
+
+	UnwieldyStaff: {
+		DisplayName: Cajado Desajeitado
+		Tooltip: Após uma longa preparação, invoca espinhos mágicos do chão
+	}
+
+	BookOfBoulders: {
+		DisplayName: Livro dos Pedregulhos
+		Tooltip: Conjura um pedregulho acima do cursor para esmagar seus inimigos
+	}
+
+	ArgonGlowcoat: {
+		DisplayName: Revestimento Luminoso de Argônio
+		Tooltip: Aplique a um bloco para conceder um intenso brilho rosa
+	}
+
+	KryptonGlowcoat: {
+		DisplayName: Revestimento Luminoso de Criptônio
+		Tooltip: Aplique a um bloco para conceder um chamativo brilho verde
+	}
+
+	NeonGlowcoat: {
+		DisplayName: Revestimento Luminoso de Neônio
+		Tooltip: Aplique a um bloco para conceder um marcante brilho roxo
+	}
+
+	XenonGlowcoat: {
+		DisplayName: Revestimento Luminoso de Xenônio
+		Tooltip: Aplique a um bloco para conceder um rico brilho azul
+	}
+
+	OganessonGlowcoat: {
+		DisplayName: Revestimento Luminoso de Oganessônio
+		Tooltip: Aplique a um bloco para conceder um elegante brilho branco
+	}
+
+	RadonGlowcoat: {
+		DisplayName: Revestimento Luminoso de Radônio
+		Tooltip: Aplique a um bloco para conceder um vívido brilho amarelo
+	}
+
+	ChromaticGlowcoat: {
+		DisplayName: Revestimento Luminoso Cromático
+		Tooltip: Aplique a um bloco para conceder um esplêndido brilho multicolorido
+	}
+
+	MagmaticGlowcoat: {
+		DisplayName: Revestimento Luminoso Magmático
+		Tooltip: Aplique a um bloco para conceder um intenso brilho flamejante
+	}
+
+	AuroralGlowcoat: {
+		DisplayName: Revestimento Luminoso Auroral
+		Tooltip: Aplique a um bloco para conceder um sereno brilho gélido
+	}
+
+	Groundshakers: {
+		DisplayName: Abaladores de Terra
+		Tooltip:
+			'''
+			Toque duas vezes para BAIXO para golpear o chão
+			Atingir inimigos com esse golpe causa dano e lança você para cima
+			'''
+	}
+
+	WeatheredWood: {
+		DisplayName: Madeira Envelhecida
+		Tooltip: ""
+	}
+
+	KilnstoneWall: {
+		DisplayName: Parede de Pedra de Forno
+		Tooltip: ""
+	}
+
+	ShardShredder: {
+		DisplayName: Triturador de Estilhaços
+		Tooltip:
+			'''
+			Clique com o botão direito para inserir gelo na metralhadora
+			Ao disparar, a metralhadora resfriará rapidamente e converterá pequenos pedaços de gelo em grandes estilhaços para causar dano adicional
+			Depois de um tempo, no entanto, o gelo ainda acabará
+			'''
+	}
+
+	CrystalHeartStatueItem: {
+		DisplayName: Estátua de Coração de Cristal
+		Tooltip: Quando ativada por um fio, gera um [c/E295B7:Coração do Poder] que restaura 60 de vida ao longo de 5 segundos
+	}
+
+	PowerHeart.DisplayName: Coração do Poder
+
+	CrystalStarStatueItem: {
+		DisplayName: Estátua de Estrela de Cristal
+		Tooltip: Quando ativada por um fio, gera uma [c/AA95E1:Estrela do Poder] que aumenta consideravelmente a velocidade dos seus ataques mágicos, mas reduz o dano mágico
+	}
+
+	PowerStar.DisplayName: Estrela do Poder
+
+	GreatGargoyle: {
+		DisplayName: Grande Gárgula
+		Tooltip:
+			'''
+			Atingir inimigos acumula seu [c/A3FF33:Medidor de Carga]
+			Com o medidor cheio, clique com o botão direito para despertar a Gárgula
+			Isso causa dano e marca inimigos próximos, aumentando o dano corpo a corpo e de invocação causado a eles
+			'''
+		SummonDamage: dano de invocação ao despertar
+	}
+
+	MasterLockpick: {
+		DisplayName: Gazua Mestra
+		Tooltip:
+			'''
+			Destranca baús de ouro e aço ao ser brandida
+			'Ótima para abrir fechaduras mestras!'
+			'''
+	}
+
+	SteelChestItem: {
+		DisplayName: Baú de Aço
+		Tooltip: ""
+	}
+
+	MagmaticAmmokit: {
+		DisplayName: Kit de Munição Magmática
+		Tooltip:
+			'''
+			+5% de chance de acerto crítico à distância
+			Acertos críticos à distância criam uma explosão que atinge atrás do inimigo
+			'''
+	}
+
+	Whetstone: {
+		DisplayName: Pedra de Afiar
+		Tooltip:
+			'''
+			Permite ripostar projéteis usando armas corpo a corpo
+			Ao ripostar um projétil com sucesso, concede +20% de velocidade corpo a corpo
+			10 segundos de recarga
+			'''
+	}
+
+	DichromaticSkull: {
+		DisplayName: Caveira Dicromática
+		Tooltip:
+			'''
+			Olhar para a esquerda dispara bolhas persistentes que reduzem a defesa
+			Olhar para a direita dispara uma rajada de fogo de médio alcance
+			Inimigos afetados por ambos os efeitos negativos recebem dano adicional
+			'''
+	}
+
+	AtlasCrown: {
+		DisplayName: Coroa de Atlas
+		Tooltip:
+			'''
+			Enquanto não estiver atacando, segure CIMA para invocar gradualmente aglomerados do chão
+			Atacar os lança em direção ao cursor
+			O tamanho, dano e frequência dos aglomerados invocados dependem da velocidade de ataque da arma empunhada
+			'''
+	}
+
+	GravelItem: {
+		DisplayName: Cascalho
+		Tooltip: ""
+	}
+
+	ChiselRecipeCondition: Cinzelado pelo Escultor
+	Hits: Acertos
+	Times: vezes
+	AnyCopperBar: Qualquer Barra de Cobre
+}
+
+Biomes: {
+	KilnMusic: {
+		DisplayName: Forno
+		TownNPCDialogueName: o Forno
+	}
+
+	QuarryMusic: {
+		DisplayName: Pedreira
+		TownNPCDialogueName: a Pedreira
+	}
+
+	TheGallery: {
+		DisplayName: Galeria
+		TownNPCDialogueName: a Galeria
+	}
+}
+
+Projectiles: {
+	KilnpostBreakaway.DisplayName: Fragmento de Forno
+	RebukerBolt.DisplayName: Barra de Metal
+	CthulhuBloodProjectile.DisplayName: Sangue de Olho
+	BloodRubyExplosion.DisplayName: Explosão
+	FloorIsLava.DisplayName: Lava Derretida
+	PyrocleaverProjectile.DisplayName: Cutelo Pirotécnico
+	SkullMinion.DisplayName: Caveira de Obsidiana Gritante, Risonha, Aterrorizante
+	SkullMinionExplosion.DisplayName: Explosão
+	HotShotBurst.DisplayName: Clarão do Disparo
+	HotShotBurstLarge.DisplayName: Clarão do Disparo
+	CustomItemDrawProjectile.DisplayName: Projétil
+	ManaSpike.DisplayName: Espinho de Mana
+	EverCustomDrawProjectile.DisplayName: Projétil
+	ConjuredBoulder.DisplayName: Pedregulho
+	SnapdragonFrostBreathHitbox.DisplayName: Sopro Gélido
+	SnapdragonFrostBreath.DisplayName: Sopro Gélido
+	SnapFreezeProjectile.DisplayName: Congelamento Súbito
+	ShardShredderProj.DisplayName: Triturador de Estilhaços
+	ShardShredderIcicle.DisplayName: Espinho de Gelo
+	SnapdragonIceSpike.DisplayName: Espinho de Gelo
+	GreatGargoyleHoldout.DisplayName: Grande Gárgula
+	MagmaticExplosion.DisplayName: Explosão Magmática
+	DichromaticSkullFlame.DisplayName: Mania
+	DichromaticSkullWater.DisplayName: Bolha
+	TileCluster.DisplayName: Aglomerado
+}
+
+Buffs: {
+	SkullMinionBuff: {
+		DisplayName: Caveira de Obsidiana Gritante, Risonha, Aterrorizante
+		Description: A Caveira de Obsidiana Gritante, Risonha, Aterrorizante lutará por você
+	}
+
+	PowerHealingBuff: {
+		DisplayName: Cura Poderosa
+		Description: Sua cura foi acelerada drasticamente
+	}
+
+	PowerManaBuff: {
+		DisplayName: Magia Poderosa
+		Description: Seus ataques mágicos foram acelerados drasticamente
+	}
+
+	DichromaticFireDebuff: {
+		DisplayName: Piromania
+		Description: Você está maníaco! E em chamas!
+	}
+
+	DichromaticWaterDebuff: {
+		DisplayName: Depressão
+		Description: Você está muito deprimido! E encharcado!
+	}
+
+	RazorsEdgeBuff: {
+		DisplayName: Fio da Navalha
+		Description: Suas espadas atacam mais rápido!
+	}
+
+	RazorsEdgeCooldownBuff: {
+		DisplayName: Recarga de Riposta
+		Description: Você não pode ripostar novamente por um curto período
+	}
+}
+
+MusicText: {
+	MusicianENNWAY: ENNWAY!
+	MusicKiln: Wildfire
+	MusicQuarry: Stonecutter
+	MusicHemolacriac: Hemolacriac Hunt
+	MusicGallery: House Of Glass
+	MusicCenterpiece: Centerpiece
+	MusicOptimist: Chromium and Positivity
+}
+
+BossIntroText: {
+	EyeOfCthulhu: Night Stalker
+	Snapdragon: Sculptor's Masterwork
+}
+
+ConfigKeys: {
+	StyleSettings: {
+		DisplayName: Configurações de Estilo
+		Unchanged: Inalterado
+	}
+}
+
+Configs: {
+	StyleSettings: {
+		eocEnabled: {
+			Label: Comportamento do Olho de Cthulhu
+			Tooltip: Escolha entre os estilos de comportamento Vanilla ou Everware para o Olho de Cthulhu.
+		}
+	}
+}
+
+NPCs: {
+	Snapdragon.DisplayName: Snapdragon
+
+	SculptorNPC: {
+		DisplayName: Escultor
+		Reliquary: Relicário
+		Chisel: Cinzel
+		BestiaryEntry: Um velho e sábio artista de uma época muito anterior à sua. Anos de criostase deixaram sua pele pálida, mas frio algum é capaz de apagar sua paixão pelo ofício!
+
+		Dialogue: {
+			Greeting: {
+				One: Afinal, quem fica deixando aquelas estátuas de morcego por toda parte? É muito estranho esculpir a mesma coisa quinze vezes.
+				Two: Deixei meu cinzel cair em algum lugar e não consigo encontrá-lo. Por acaso você o viu em algum lugar no gelo?
+				Three: Eu costumava fazer esculturas de pedra na selva, mas elas sempre eram roubadas assim que eu virava as costas!
+				Four: Eu sei que você tem encontrado estátuas por toda parte, mas cuidado com essa picareta. Você vai acabar danificando elas!
+				Five: Sabe, algumas das peças que as pessoas vivem me mostrando são um tanto... simplórias. Eu poderia dar meu próprio toque, se quiser.
+				Six: Ah, aquela do esqueleto? Não fui eu. Sério, não fui. Por que a pergunta?
+			}
+
+			TradeGreeting: {
+				One: É só me mostrar uma estátua e verei o que posso fazer!
+				Two: Certo, deixe-me pegar minhas ferramentas...
+				Three: Outra colaboração? Esplêndido!
+			}
+
+			NoStatue: {
+				One: Não tem nenhuma estátua para cinzelar, amigo.
+				Two: Parece que você não tem nenhuma estátua pronta.
+				Three: Vai trazer uma estátua?
+			}
+
+			InvalidStatue: {
+				One: Infelizmente, não posso fazer nada com esta.
+				Two: Hmm, não consigo pensar em como salvar esta aqui.
+				Three: Não tem muito como melhorar este design.
+			}
+
+			AngelStatue: {
+				One: Quem foi que fez isso?
+				Two: Posso até ser grosseiro, mas você me toma por um bárbaro?
+				Three: Quem você pensa que eu sou, um pastor?
+			}
+
+			NoMaterial: {
+				One: Tive uma ideia, mas vou precisar de alguns materiais.
+				Two: Uma boa base, mas vou precisar de um toque a mais!
+				Three: Você sabe que eu não gosto de trabalhar com uma cor só!
+			}
+
+			WrongMaterial: {
+				One: Não, não, não foi isso que eu pedi.
+				Two: Você me trouxe os materiais errados!
+				Three: O que é isso que você me trouxe?
+			}
+
+			NotEnoughMaterial: {
+				One: Vou precisar de um pouco mais deste material.
+				Two: Quero ter certeza de que os materiais não vão acabar.
+				Three: Hmm, vou precisar de um pouco mais da nossa cor secundária.
+			}
+
+			SculptAnimation: {
+				One: Hmm, vamos lá...
+				Two: Vejamos...
+				Three: Um pouco aqui, um pouco ali...
+			}
+
+			SculptAnimationFinished: {
+				One: E... pronto! Aproveite!
+				Two: Sim, assim está melhor!
+				Three: Agora está mais do meu agrado!
+			}
+
+			TooManyStatues: {
+				One: Calma aí, não consigo trabalhar em várias peças ao mesmo tempo!
+				Two: Não consigo fazer tudo ao mesmo tempo assim, amigo!
+				Three: Estátuas demais aí, me dê apenas uma, por favor!
+			}
+		}
+
+		TownNPCMood: {
+			Content: Espero que não se importe se eu trabalhar um pouco por aqui.
+			NoHome: Não tenho onde colocar minhas ferramentas!
+			FarFromHome: Adoro explorar, mas admito que estou com um pouco de saudade de casa.
+			LoveSpace: Este é um belo espaço para trabalhar!
+			DislikeCrowded: Tem barulho demais por aqui para eu conseguir me concentrar no trabalho.
+			HateCrowded: Não, não, não! Não consigo fazer nada aqui! Tem barulho demais!
+			LoveBiome: Ah, {BiomeName}! Ótimo lugar para ficar!
+			LikeBiome: Gosto de {BiomeName}. É um bom lugar para trabalhar.
+			DislikeBiome: ...{BiomeName}... Clima péssimo para alvenaria.
+			HateBiome: Não posso ficar em {BiomeName}. Meu trabalho vive sendo roubado por lá!
+			LoveNPC: Adoro trabalhar com {NPCName}! Talvez ele queira colaborar comigo novamente em breve?
+			LikeNPC: Sabe, {NPCName} não é tão ruim. Parece até apreciar meu trabalho!
+			DislikeNPC: Argh... {NPCName}. Prefiro não trabalhar perto dessa pessoa.
+			HateNPC: Para alguém com uma barba tão requintada, {NPCName} NÃO tem gosto algum para arte!
+			LikeNPC_Princess: Eu gosto de {NPCName}.
+			Princess_LovesNPC: Eu gosto de {NPCName}.
+		}
+	}
+}
+
+DeathReason.SnapdragonIce: experimentou o zero absoluto.
+
+Tiles: {
+	SteelChestTile: {
+		MapEntry0: Baú de Aço
+		MapEntry1: Baú de Aço Trancado
+	}
+}
+
+ConfigCategory.StyleSettings.Description: Configurações de Estilo
+
+Bestiary.Sculptor: Um velho e sábio artista de uma época muito anterior à sua. Anos de criostase deixaram sua pele pálida, mas frio algum é capaz de apagar sua paixão pelo ofício!
