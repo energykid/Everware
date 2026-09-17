@@ -1,6 +1,7 @@
 ﻿using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
+using Everware.Content.Base.ParticleSystem;
 using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
 using System.Collections.Generic;
@@ -121,7 +122,13 @@ public class Cosmoeba : EverNPC
 
                 NPC.ai[2]++;
                 if (NPC.ai[2] > 25 && NPC.ai[2] % 15 < 1)
+                {
+                    Vector2 v = new Vector2(20, 0).RotatedByRandom(MathHelper.TwoPi);
+
+                    new PanicParticle(NPC.Center + v, v / 16f, NPC.whoAmI).Spawn();
+
                     SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFleeLoop.Asset with { MaxInstances = 3, Pitch = Personality }, NPC.Center);
+                }
 
                 if (NPC.Distance(Target.Center) > 200 && NPC.ai[2] > 50)
                     ChangeState(BehaviorState.Wandering);
@@ -161,6 +168,8 @@ public class Cosmoeba : EverNPC
     }
     public void StartFleeing()
     {
+        Vector2 v = new Vector2(20, 0).RotatedByRandom(MathHelper.TwoPi);
+        new PanicParticle(NPC.Center + v, v / 16f, NPC.whoAmI).Spawn();
         ExtraAI[0] = 10;
         if (State != (int)BehaviorState.Fleeing)
             SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFlee.Asset with { MaxInstances = 3, Pitch = Personality }, NPC.Center);
@@ -168,6 +177,7 @@ public class Cosmoeba : EverNPC
     }
     public void ChangeState(BehaviorState state)
     {
+        NPC.netUpdate = true;
         State = (int)state;
         NPC.ai[2] = 0;
     }
@@ -241,4 +251,28 @@ public class Cosmoeba : EverNPC
         return false;
     }
     #endregion
+    public class PanicParticle : Particle
+    {
+        int npc = 0;
+        public override Asset<Texture2D> Texture => Assets.Textures.Meteor.NPCs.CosmoebaPanic.Asset;
+        public PanicParticle(Vector2 pos, Vector2 vel, int whoAmI) : base(pos, vel, Vector2.One, null, null)
+        {
+            Center += new Vector2(0, -5);
+            FrameCount = new Vector2(1, 4);
+            FrameNum = new Vector2(0, 0);
+            Rotation = vel.ToRotation() + MathHelper.ToRadians(-90f);
+            AffectedByLight = false;
+            npc = whoAmI;
+            Effects = velocity.X > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+        }
+        public override void Update()
+        {
+            Center += Main.npc[npc].velocity;
+            base.Update();
+            velocity *= 0.9f;
+            velocity.Y += 0.2f;
+            FrameNum.Y += 0.3f;
+            if (FrameNum.Y >= 4) Kill();
+        }
+    }
 }

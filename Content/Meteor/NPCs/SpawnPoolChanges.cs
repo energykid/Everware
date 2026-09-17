@@ -3,7 +3,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Meteor.NPCs;
 
-public class MeteorHeadChanges : GlobalNPC
+public class SpawnPoolChanges : GlobalNPC
 {
     public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
     {
