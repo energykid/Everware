@@ -6,6 +6,8 @@ using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using Terraria.GameContent.Bestiary;
+using Terraria.ID;
 
 namespace Everware.Content.Meteor.NPCs;
 
@@ -47,6 +49,7 @@ public class Cosmoeba : EverNPC
     #region Behavior
     public override void AI()
     {
+        NPC.scale = MathHelper.Lerp(NPC.scale, 1f, 0.025f);
         switch (State)
         {
             case (int)BehaviorState.Wandering:
@@ -80,7 +83,7 @@ public class Cosmoeba : EverNPC
 
                 if (NPC.ai[0] % 50 == 0)
                 {
-                    var pos = BehaviorUtils.FindNearbyTilePosition(NPC.Center, 300, ModContent.TileType<MagicStoneTile>(), 8);
+                    var pos = BehaviorUtils.FindNearbyTilePosition(NPC.Center, 300, ModContent.TileType<MagicStoneTile>(), 12);
 
                     if (pos != null)
                     {
@@ -108,17 +111,27 @@ public class Cosmoeba : EverNPC
                 NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Lerp(NPC.Center, AIPosition + new Vector2(8, 0).RotatedBy(NPC.rotation) + new Vector2((float)Math.Sin(NPC.ai[2] / 14f) * 7f, (float)Math.Sin(NPC.ai[2] / 12.5f) * 7f), 0.015f) - NPC.Center, 0.1f);
                 break;
             case (int)BehaviorState.Fleeing:
-                NPC.ai[1] += 2.5f;
                 ExtraAI[0] = MathHelper.Lerp(ExtraAI[0], 3f, 0.2f);
                 NPC.velocity = Vector2.Lerp(NPC.velocity, (Target.DirectionTo(NPC.Center) * ExtraAI[0]) + new Vector2(0, -0.25f * ExtraAI[0]), 0.2f);
-                NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
                 NPC.TargetClosest(false);
 
+                NPC.ai[1] += 2.5f;
                 NPC.velocity = NPC.velocity.RotatedBy(MathHelper.ToRadians((float)Math.Sin(NPC.ai[1] / 20f) * 7f));
+                NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
 
                 /// TODO: Make amoebas find meteors and program in that behavior
                 if ((NPC.life < NPC.lifeMax / 2f && NPC.Distance(Target.Center) > 150) || NPC.ai[2] > (15 * 12))
-                    ChangeState(BehaviorState.FindingMeteor);
+                {
+                    NPC? MeteorHead = PathfindingUtils.GetClosestNPC(NPC.position, 800, NPCID.MeteorHead);
+
+                    if (MeteorHead != null)
+                    {
+                        AbsorbedMeteorHead = MeteorHead;
+                        MeteorHead.ai[2] = 1;
+                        ExtraAI[1] = MeteorHead.whoAmI;
+                        ChangeState(BehaviorState.FindingMeteor);
+                    }
+                }
 
                 NPC.ai[2]++;
                 if (NPC.ai[2] > 25 && NPC.ai[2] % 15 < 1)
@@ -134,8 +147,53 @@ public class Cosmoeba : EverNPC
                     ChangeState(BehaviorState.Wandering);
                 break;
             case (int)BehaviorState.FindingMeteor:
+                NPC foundMeteorHead = Main.npc[(int)ExtraAI[1]];
+                if (!foundMeteorHead.active || foundMeteorHead.life <= 0)
+                {
+                    ChangeState(BehaviorState.Wandering);
+                }
+                else
+                {
+                    if (foundMeteorHead.Distance(NPC.Center) < 30)
+                    {
+                        NPC.velocity *= 0.8f;
+                        NPC.scale = MathHelper.Lerp(NPC.scale, 1.4f, 0.05f);
+                        foundMeteorHead.Center = Vector2.Lerp(foundMeteorHead.Center, NPC.Center, 0.3f);
+                        BodyFrame = MathHelper.Lerp(BodyFrame, 2f, 0.1f);
+                        foundMeteorHead.velocity *= 0.8f;
+                        if (NPC.ai[2] <= 1)
+                        {
+                            SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaEatMeteorHead.Asset.WithVolumeScale(1.3f), NPC.Center);
+                        }
+                        foundMeteorHead.ai[2]++;
+                        NPC.ai[2]++;
+                        if (NPC.ai[2] > 80)
+                        {
+                            foundMeteorHead.active = false;
+                            NPC.TargetClosest(false);
+                            SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaCharge.Asset.WithPitchVariance(0.2f).WithVolumeScale(2f), NPC.Center);
+                            NPC.velocity = NPC.DirectionTo(Target.Center) * 2f;
+                            ChangeState(BehaviorState.Charging);
+                        }
+                    }
+                    else
+                    {
+                        NPC.ai[1] += 1.5f;
+                        NPC.velocity = Vector2.Lerp(NPC.velocity, NPC.DirectionTo(foundMeteorHead.Center) * 9, 0.3f);
+                        NPC.velocity = NPC.velocity.RotatedBy(MathHelper.ToRadians((float)Math.Sin(NPC.ai[1] / 20f) * 7f));
+                        NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
+                    }
+                }
                 break;
             case (int)BehaviorState.Charging:
+                BodyFrame = MathHelper.Lerp(BodyFrame, 0f, 0.2f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, NPC.DirectionTo(Target.Center) * 10f, 0.05f);
+                NPC.rotation = Vector2.Zero.AngleTo(NPC.velocity) + MathHelper.Pi;
+                if (NPC.Distance(Target.Center) < 60)
+                {
+                    NPC.active = false;
+                    SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaExplode.Asset.WithPitchVariance(0.2f), NPC.Center);
+                }
                 break;
         }
 
@@ -143,7 +201,10 @@ public class Cosmoeba : EverNPC
         NPC.ai[1] += NPC.velocity.Length();
         float spd = 1f + ((float)Math.Sin(NPC.ai[0] / 30f) * 0.7f);
         base.AI();
-
+        WaveTail();
+    }
+    public void WaveTail()
+    {
         for (int i = 0; i < NPC.oldPos.Length; i++)
         {
             NPC.oldPos[i] += NPC.rotation.ToRotationVector2() * 3f;
@@ -168,12 +229,15 @@ public class Cosmoeba : EverNPC
     }
     public void StartFleeing()
     {
-        Vector2 v = new Vector2(20, 0).RotatedByRandom(MathHelper.TwoPi);
-        new PanicParticle(NPC.Center + v, v / 16f, NPC.whoAmI).Spawn();
-        ExtraAI[0] = 10;
-        if (State != (int)BehaviorState.Fleeing)
-            SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFlee.Asset with { MaxInstances = 3, Pitch = Personality }, NPC.Center);
-        ChangeState(BehaviorState.Fleeing);
+        if (State != (int)BehaviorState.Charging && State != (int)BehaviorState.FindingMeteor)
+        {
+            Vector2 v = new Vector2(20, 0).RotatedByRandom(MathHelper.TwoPi);
+            new PanicParticle(NPC.Center + v, v / 16f, NPC.whoAmI).Spawn();
+            ExtraAI[0] = 10;
+            if (State != (int)BehaviorState.Fleeing)
+                SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaFlee.Asset with { MaxInstances = 3, Pitch = Personality }, NPC.Center);
+            ChangeState(BehaviorState.Fleeing);
+        }
     }
     public void ChangeState(BehaviorState state)
     {
@@ -189,14 +253,32 @@ public class Cosmoeba : EverNPC
     #endregion
 
     #region Drawing
+    float BodyFrame = 0;
+    NPC? AbsorbedMeteorHead = null;
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
+        if (NPC.IsABestiaryIconDummy)
+        {
+            NPC.velocity = new Vector2(-2, 0);
+            NPC.ai[0]++;
+            NPC.ai[1] += NPC.velocity.Length() / 2f;
+            for (float i = 0; i < NPC.oldPos.Length; i++)
+            {
+                NPC.oldPos[(int)i] = NPC.position + new Vector2(i * 3f, MathHelper.Lerp(0f, (float)Math.Sin((i / 2f) + (-NPC.ai[0] / 4f)) * 4f, i / (float)NPC.oldPos.Length));
+            }
+        }
+
+        if (AbsorbedMeteorHead != null && AbsorbedMeteorHead.active)
+        {
+            MeteorHeadRework.Draw(AbsorbedMeteorHead, screenPos, drawColor);
+        }
+
         var Body = Assets.Textures.Meteor.NPCs.CosmoebaBody.Asset;
         var BodyInternal = Assets.Textures.Meteor.NPCs.CosmoebaBodyInternal.Asset;
         var Feelers = Assets.Textures.Meteor.NPCs.CosmoebaFeelers.Asset;
         var Stars = Assets.Textures.Meteor.NPCs.CosmoebaStars.Asset;
 
-        Rectangle bodyFrame = Body.Frame(1, 3, 0, 0);
+        Rectangle bodyFrame = Body.Frame(1, 3, 0, (int)BodyFrame);
 
         Rectangle feelerFrame = Feelers.Frame(1, 4, 0, (int)(((NPC.ai[1] / 20) + (GlobalTimer.Value / 20)) % 4));
 
@@ -233,15 +315,15 @@ public class Cosmoeba : EverNPC
 
         Main.spriteBatch.Restart(sb with { SamplerState = Main.DefaultSamplerState });
 
-        Main.EntitySpriteDraw(target.Target, NPC.Center - Main.screenPosition, target.Target.Bounds, new Color(126, 187, 237), 0f, target.Target.Bounds.Size() / 2f, 2f, SpriteEffects.None);
+        Main.EntitySpriteDraw(target.Target, NPC.Center - screenPos + new Vector2(10, 0).RotatedBy(NPC.rotation), target.Target.Bounds, new Color(126, 187, 237), 0f, target.Target.Bounds.Size() / 2f, 2f * NPC.scale, SpriteEffects.None);
 
-        Main.EntitySpriteDraw(Body.Value, NPC.Center - Main.screenPosition, bodyFrame, Color.White, NPC.rotation, bodyFrame.Size() / 2f, 1f, SpriteEffects.None);
+        Main.EntitySpriteDraw(Body.Value, NPC.Center - screenPos, bodyFrame, Color.White, NPC.rotation, bodyFrame.Size() / 2f, NPC.scale, SpriteEffects.None);
 
-        Main.EntitySpriteDraw(Feelers.Value, NPC.Center - Main.screenPosition, feelerFrame, Color.White, NPC.rotation, new Vector2(feelerFrame.Width + 6, feelerFrame.Height / 2f), 1f, SpriteEffects.None);
+        Main.EntitySpriteDraw(Feelers.Value, NPC.Center - screenPos, feelerFrame, Color.White, NPC.rotation, new Vector2(feelerFrame.Width + 6, feelerFrame.Height / 2f), NPC.scale, SpriteEffects.None);
 
         Main.spriteBatch.Restart(sb with { CustomEffect = StarShader.Shader });
 
-        Main.EntitySpriteDraw(BodyInternal.Value, NPC.Center - Main.screenPosition, bodyFrame, Color.White, NPC.rotation, bodyFrame.Size() / 2f, 1f, SpriteEffects.None);
+        Main.EntitySpriteDraw(BodyInternal.Value, NPC.Center - screenPos, bodyFrame, Color.White.MultiplyRGBA(new(0.5f, 0.5f, 0.5f, 0.5f)), NPC.rotation, bodyFrame.Size() / 2f, NPC.scale, SpriteEffects.None);
 
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(sb);
@@ -251,6 +333,11 @@ public class Cosmoeba : EverNPC
         return false;
     }
     #endregion
+
+    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+    {
+        bestiaryEntry.AddTags(BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Meteor);
+    }
 
     public class PanicParticle : Particle
     {
