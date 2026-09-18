@@ -1,12 +1,12 @@
 
 sampler uImage0 : register(s0);
 
-float Progress;
+float Clip;
 
-texture StarTexture;
-sampler2D StarSampler = sampler_state
+texture NoiseTexture;
+sampler2D NoiseSampler = sampler_state
 {
-    Texture = (StarTexture);
+    Texture = (NoiseTexture);
     AddressU = WRAP;
     AddressV = WRAP;
     MagFilter = POINT;
@@ -16,11 +16,15 @@ sampler2D StarSampler = sampler_state
 
 float4 Effect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
 {
+    float2 NoiseScale = float2(2.5, 2.5);
+    if (tex2D(NoiseSampler, coords * NoiseScale).r < Clip)
+        return float4(0.0, 0.0, 0.0, 0.0);
+        
     float4 col = tex2D(uImage0, coords);
-    if (col.a > 0)
-    {
-        col.rgb += tex2D(StarSampler, coords + float2(Progress, 0.0)).rgb;
-    }
+    
+    if (col.a == 1.0 && tex2D(NoiseSampler, coords / NoiseScale).r < Clip + 0.2)
+        return float4(1.0, 0.6, 0.0, 1.0);
+        
     return col * color;
 }
 
