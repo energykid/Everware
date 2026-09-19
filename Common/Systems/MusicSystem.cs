@@ -1,5 +1,4 @@
 ﻿using Everware.Content.EyeOfCthulhuRework;
-using Everware.Content.Gallery.Snapdragon;
 using Terraria.ID;
 using Terraria.Localization;
 
@@ -30,7 +29,8 @@ public class EverMusicSystem : ModSystem
 
     public override void Load()
     {
-        On_Main.UpdateAudio_DecideOnNewMusic += DecideBossMusic;
+        if (Main.netMode != NetmodeID.Server)
+            On_Main.UpdateAudio_DecideOnNewMusic += DecideBossMusic;
     }
 
     private void DecideBossMusic(On_Main.orig_UpdateAudio_DecideOnNewMusic orig, Main self)
@@ -57,6 +57,7 @@ public class EverMusicSystem : ModSystem
                 {
                     MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", 0f);
                 }
+                /*
                 if (NPC.CountNPCS(ModContent.NPCType<Snapdragon>()) > 0)
                 {
                     if ((Main.npc[NPC.FindFirstNPC(ModContent.NPCType<Snapdragon>())].ModNPC as Snapdragon).NumSpineSegmentsActive >= 22)
@@ -70,6 +71,7 @@ public class EverMusicSystem : ModSystem
                         Main.musicFade[Main.newMusic] = 1;
                     }
                 }
+                */
             }
         }
     }

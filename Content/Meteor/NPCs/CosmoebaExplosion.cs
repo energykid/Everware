@@ -1,7 +1,8 @@
-﻿using Everware.Content.Misc.Particles;
+﻿using Everware.Content.Base.Projectiles;
+using Everware.Content.Misc.Particles;
 using static Everware.Content.Meteor.NPCs.Cosmoeba;
 
-namespace Everware.Content.Base.Projectiles;
+namespace Everware.Content.Meteor.NPCs;
 
 public class CosmoebaExplosion : EverExplosionProjectile
 {

@@ -2,7 +2,6 @@
 using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
-using Everware.Content.Base.Projectiles;
 using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
 using System.Collections.Generic;

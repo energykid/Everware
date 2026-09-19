@@ -17,12 +17,18 @@ public class MeteoriteChanges : GlobalItem
     }
     public override void Load()
     {
-        VanillaMeteoriteSprite = TextureAssets.Item[ItemID.Meteorite];
-        TextureAssets.Item[ItemID.Meteorite] = Assets.Textures.Meteor.Tiles.MeteoriteItem.Asset;
+        if (Main.netMode != NetmodeID.Server)
+        {
+            VanillaMeteoriteSprite = TextureAssets.Item[ItemID.Meteorite];
+            TextureAssets.Item[ItemID.Meteorite] = Assets.Textures.Meteor.Tiles.MeteoriteItem.Asset;
+        }
     }
     public override void Unload()
     {
-        if (VanillaMeteoriteSprite != null)
-            TextureAssets.Item[ItemID.Meteorite] = VanillaMeteoriteSprite;
+        if (Main.netMode != NetmodeID.Server)
+        {
+            if (VanillaMeteoriteSprite != null)
+                TextureAssets.Item[ItemID.Meteorite] = VanillaMeteoriteSprite;
+        }
     }
 }

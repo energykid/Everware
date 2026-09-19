@@ -120,11 +120,13 @@ public class MeteorHeadRework : GlobalNPC
     }
     public override void Load()
     {
-        On_NPC.FindFrame += CancelMeteorHeadDust;
+        if (Main.netMode != NetmodeID.Server)
+            On_NPC.FindFrame += CancelMeteorHeadDust;
     }
     public override void Unload()
     {
-        On_NPC.FindFrame -= CancelMeteorHeadDust;
+        if (Main.netMode != NetmodeID.Server)
+            On_NPC.FindFrame -= CancelMeteorHeadDust;
     }
 
     private void CancelMeteorHeadDust(On_NPC.orig_FindFrame orig, NPC self)

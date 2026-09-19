@@ -67,6 +67,9 @@ public abstract class EverTile : ModTile
 
     public override void Load()
     {
+        if (Main.netMode != NetmodeID.Server)
+            Asset = ModContent.Request<Texture2D>(Texture);
+
         ThreadUtils.RunOnMainThread(() =>
         {
             if (Main.netMode != NetmodeID.Server)
@@ -87,7 +90,7 @@ public abstract class EverTile : ModTile
         On_Main.DoDraw_DrawNPCsOverTiles -= DrawExtraTarget;
     }
 
-    public Asset<Texture2D> Asset => ModContent.Request<Texture2D>(Texture);
+    public Asset<Texture2D> Asset;
     public virtual bool UsesExtraTarget => false;
 
     public override void SetStaticDefaults()

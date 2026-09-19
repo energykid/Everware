@@ -10,9 +10,6 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
 	<ItemGroup>
-		<Reference Include="Daybreak">
-			<HintPath>Daybreak.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 
 	<!-- References -->
