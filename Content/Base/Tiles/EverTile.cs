@@ -57,6 +57,11 @@ public abstract class EverTile : ModTile
     }
     #endregion
 
+    /// <summary>
+    /// For making sure glowcoats don't appear invisible when using dummy tile textures.
+    /// Set to a value if you want glowcoats to draw a different texture for the outline.
+    /// </summary>
+    public virtual string GlowcoatTileTexture => "";
     public static RenderTargetLease ExtraTarget;
 
     public override void Load()

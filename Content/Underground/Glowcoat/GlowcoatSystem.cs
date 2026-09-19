@@ -1,4 +1,5 @@
-﻿using Everware.Utils;
+﻿using Everware.Content.Base.Tiles;
+using Everware.Utils;
 using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -58,6 +59,12 @@ public class GlowcoatSystem : ModSystem
         On_Main.DrawTiles += On_Main_DrawTiles;
     }
 
+    public struct TileAssetPair(int ID, Asset<Texture2D> Texture)
+    {
+        public int ID { get; } = ID;
+        public Asset<Texture2D> Texture { get; } = Texture;
+    }
+
     private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
     {
         if (!solidLayer)
@@ -90,7 +97,20 @@ public class GlowcoatSystem : ModSystem
                             Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
 
                             for (float k = 0; k < 360; k += 90)
-                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                            {
+                                bool overrideTexture = false;
+                                if (ModContent.GetModTile(t.TileType) is EverTile eT)
+                                {
+                                    if (eT.GlowcoatTileTexture != "")
+                                    {
+                                        Asset<Texture2D> tt = ModContent.Request<Texture2D>(eT.GlowcoatTileTexture);
+                                        DrawingUtils.DrawSlopedTile(Main.spriteBatch, tt, a.X, a.Y, Color.White, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)) + new Vector2(8));
+                                        overrideTexture = true;
+                                    }
+                                }
+                                if (!overrideTexture)
+                                    Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                            }
                         }
                     }
                 }

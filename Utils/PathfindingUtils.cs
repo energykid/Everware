@@ -4,6 +4,20 @@ namespace Everware.Utils;
 
 public static class PathfindingUtils
 {
+    public static NPC? GetClosestNPC(Vector2 position, float radius, int type, Func<NPC, bool> condition)
+    {
+        NPC? whoami = null;
+        float dist = radius;
+        foreach (NPC npc in Main.npc)
+        {
+            if (npc.type == type && npc.Distance(position) < dist && npc.active && condition(npc))
+            {
+                whoami = npc;
+                dist = npc.Distance(position);
+            }
+        }
+        return whoami;
+    }
     public static NPC? GetClosestNPC(Vector2 position, float radius, int type)
     {
         NPC? whoami = null;

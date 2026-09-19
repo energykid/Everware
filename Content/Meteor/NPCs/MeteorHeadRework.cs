@@ -11,10 +11,6 @@ public class MeteorHeadRework : GlobalNPC
         Personality = Main.rand.Next(5);
         base.SetDefaults(entity);
     }
-    public override void DrawBehind(NPC npc, int index)
-    {
-        Main.instance.DrawCacheNPCsMoonMoon.Add(index);
-    }
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
         return entity.type == NPCID.MeteorHead;

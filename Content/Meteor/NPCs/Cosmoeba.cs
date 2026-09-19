@@ -281,7 +281,7 @@ public class Cosmoeba : EverNPC
     {
         if (State != (int)BehaviorState.FindingMeteor)
         {
-            NPC? MeteorHead = PathfindingUtils.GetClosestNPC(NPC.position, 800, NPCID.MeteorHead);
+            NPC? MeteorHead = PathfindingUtils.GetClosestNPC(NPC.position, 800, NPCID.MeteorHead, NPC2 => { return NPC2.ai[1] == 0; });
 
             if (MeteorHead != null)
             {
