@@ -5,6 +5,7 @@
 
 	<!-- General -->
 	<PropertyGroup>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<TmlBuildBootstrapFeatures>tomat.assethotreloading;tomat.enablemod;lolxd87.splashskip</TmlBuildBootstrapFeatures>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
