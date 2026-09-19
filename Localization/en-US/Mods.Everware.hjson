@@ -393,6 +393,7 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Mania
 	DichromaticSkullWater.DisplayName: Bubble
 	TileCluster.DisplayName: Cluster
+	CosmoebaExplosion.DisplayName: Cosmoeba Explosion
 }
 
 Buffs: {

@@ -2,6 +2,7 @@
 using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
 using Everware.Content.Base.ParticleSystem;
+using Everware.Content.Base.Projectiles;
 using Everware.Content.Meteor.Tiles;
 using Everware.Utils;
 using System.Collections.Generic;
@@ -245,8 +246,8 @@ public class Cosmoeba : EverNPC
     }
     public void Explode()
     {
-        for (int i = 0; i < 10; i++)
-            new FizzParticle(NPC.Center + new Vector2(Main.rand.NextFloat(-20, 20), 0).RotatedByRandom(MathHelper.TwoPi), new Vector2(Main.rand.Next(7), 0).RotatedByRandom(MathHelper.TwoPi), NPC.whoAmI) { Scale = new Vector2(1f) }.Spawn();
+        Projectile.NewProjectile(new EntitySource_Parent(NPC, "Cosmoeba Explosion"),
+        NPC.Center, Vector2.Zero, ModContent.ProjectileType<CosmoebaExplosion>(), 40, 5f);
 
         NPC.active = false;
         SoundEngine.PlaySound(Assets.Sounds.NPC.CosmoebaExplode.Asset.WithPitchVariance(0.2f), NPC.Center);
@@ -371,7 +372,7 @@ public class Cosmoeba : EverNPC
 
         var target = RenderTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, 200, 200);
 
-        Color c1 = new Color(126, 187, 237);
+        Color c1 = new Color(43, 101, 180);
         Color c2 = new Color(136, 224, 255);
 
         if (FireAmount > 0.5f)
@@ -462,7 +463,8 @@ public class Cosmoeba : EverNPC
         }
         public override void Update()
         {
-            Center += Main.npc[npc].velocity;
+            if (npc != -1)
+                Center += Main.npc[npc].velocity;
             base.Update();
             velocity *= 0.95f;
             FrameNum.Y += 0.3f;
