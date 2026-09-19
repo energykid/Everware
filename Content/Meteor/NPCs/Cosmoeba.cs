@@ -33,6 +33,7 @@ public class Cosmoeba : EverNPC
         Personality = Main.rand.NextFloat(-0.2f, 0.2f);
         NPC.noGravity = true;
         NPC.noTileCollide = true;
+        NPC.damage = 0;
         State = (int)BehaviorState.Wandering;
         ExtraAI[0] = -Main.rand.NextFloat(100f);
         NPC.netUpdate = true;

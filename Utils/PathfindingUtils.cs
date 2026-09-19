@@ -10,7 +10,7 @@ public static class PathfindingUtils
         float dist = radius;
         foreach (NPC npc in Main.npc)
         {
-            if (npc.type == type && npc.Distance(position) < dist)
+            if (npc.type == type && npc.Distance(position) < dist && npc.active)
             {
                 whoami = npc;
                 dist = npc.Distance(position);
