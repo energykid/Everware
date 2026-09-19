@@ -2,6 +2,7 @@
 using Everware.Utils;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Terraria.ID;
 
 namespace Everware.Content.Base.Tiles;
 
@@ -68,7 +69,8 @@ public abstract class EverTile : ModTile
     {
         ThreadUtils.RunOnMainThread(() =>
         {
-            ExtraTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
+            if (Main.netMode != NetmodeID.Server)
+                ExtraTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
         });
 
         On_Main.DoDraw_DrawNPCsOverTiles += DrawExtraTarget;
@@ -76,7 +78,11 @@ public abstract class EverTile : ModTile
 
     public override void Unload()
     {
-        ExtraTarget.Dispose();
+        ThreadUtils.RunOnMainThread(() =>
+        {
+            if (Main.netMode != NetmodeID.Server)
+                ExtraTarget.Dispose();
+        });
 
         On_Main.DoDraw_DrawNPCsOverTiles -= DrawExtraTarget;
     }
