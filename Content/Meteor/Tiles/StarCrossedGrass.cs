@@ -94,6 +94,31 @@ public class StarCrossedGrassTile : EverTile
         TileID.Sets.NeedsGrassFraming[Type] = true;
         TileID.Sets.NeedsGrassFramingDirt[Type] = ModContent.TileType<CharredSoilTile>();
     }
+    //foliage growth
+    public override void RandomUpdate(int i, int j)
+    {
+        Tile tile = Main.tile[i, j];
+        int grassType = tile.TileType;
+        Tile above = Main.tile[i, j - 1];
+
+        if (!above.HasTile && WorldGen.genRand.NextBool(10))
+        {
+            WorldGen.PlaceTile(i, j - 1, ModContent.TileType<StarCrossedFoliage>(), mute: true);
+            if (above.HasTile)
+            {
+                above.CopyPaintAndCoating(tile);
+
+
+                above.TileFrameX = (short)(WorldGen.genRand.Next(23) * 18);
+            }
+
+            if (Main.netMode == NetmodeID.Server && above.HasTile)
+            {
+                NetMessage.SendTileSquare(-1, i, j - 1);
+            }
+        }
+    }
+
     public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
     {
         r = 0.8f;
