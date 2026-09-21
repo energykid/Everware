@@ -1,15 +1,5 @@
-﻿using Everware.Common.Systems;
-using Everware.Content.Base;
-using Everware.Content.Base.NPCs;
-using Everware.Content.Base.ParticleSystem;
-using Everware.Content.Base.Projectiles;
-using Everware.Content.Meteor.Tiles;
-using Everware.Utils;
-using System.Collections.Generic;
-using System.Linq;
-using Terraria.GameContent.Bestiary;
+﻿using Everware.Content.Base.NPCs;
 using Terraria.ID;
-using static Daybreak.Common.Features.Hooks.GlobalNPCHooks;
 
 namespace Everware.Content.Meteor.NPCs;
 
@@ -22,21 +12,27 @@ public class SpectralSnail : EverNPC
         Main.npcFrameCount[Type] = 14;
     }
 
+    // Note: EverNPC has an abstract value called Health that can be automatically set
+    public override int Health => 400;
     public override void SetDefaults()
     {
-
+        // default EverNPC things (like automatically setting health) are run here in base.SetDefaults
+        base.SetDefaults();
         NPC.width = 156;
         NPC.height = 70;
         NPC.damage = 14;
         NPC.defense = 6;
-        NPC.lifeMax = 2000;
         NPC.noGravity = true;
         NPC.noTileCollide = true;
         NPC.HitSound = SoundID.NPCHit1;
         NPC.DeathSound = SoundID.NPCDeath1;
-        NPC.value = Item.buyPrice(gold: 5);
+        NPC.value = CoinValue.Silver(50);
         NPC.aiStyle = -1;
         NPC.knockBackResist = 0f;
+    }
+    public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
+    {
+        base.ApplyDifficultyAndPlayerScaling(1, balance, bossAdjustment);
     }
     public override void FindFrame(int frameHeight)
     {
@@ -55,15 +51,12 @@ public class SpectralSnail : EverNPC
             {
                 NPC.frame.Y = startFrame * frameHeight;
             }
-
         }
     }
 
+    //Flips every 3000 ticks, probably will need to be adjusted depending on the desired behavior.
 
-
-        //Flips every 3000 ticks, probably will need to be adjusted depending on the desired behavior.
-
-        int fliptimer = 0;
+    int fliptimer = 0;
 
     public override void AI()
     {
@@ -78,18 +71,27 @@ public class SpectralSnail : EverNPC
 
         if (fliptimer > 3000)
         {
-            
             NPC.velocity.X = -0.5f;
             NPC.direction = MathF.Sign(NPC.velocity.X);
             NPC.spriteDirection = NPC.direction;
-
         }
-        
+
         if (fliptimer > 6000)
         {
             fliptimer = 0;
         }
 
     }
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    {
+        var asset = Assets.Textures.Meteor.NPCs.SpectralSnail.Asset;
+        var asset2 = Assets.Textures.Meteor.NPCs.SpectralSnail_Glow.Asset;
+
+        var effects = NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+        Main.EntitySpriteDraw(asset.Value, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
+        Main.EntitySpriteDraw(asset2.Value, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
+        return false;
+    }
 }
-   
+

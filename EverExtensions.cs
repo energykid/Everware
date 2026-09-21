@@ -49,3 +49,43 @@ public static class Sell
         return copper * 5;
     }
 }
+
+public static class CoinValue
+{
+    /// <summary>
+    /// Converts a value in silver coins to copper coins.
+    /// </summary>
+    /// <param name="silver">The number of silver coins this value should be equal to.</param>
+    /// <returns>The equivalent number of copper coins.</returns>
+    public static int Silver(int silver)
+    {
+        return silver * 100;
+    }
+    /// <summary>
+    /// Converts a value in gold coins to copper coins.
+    /// </summary>
+    /// <param name="silver">The number of gold coins this value should be equal to.</param>
+    /// <returns>The equivalent number of copper coins.</returns>
+    public static int Gold(int gold)
+    {
+        return gold * 100 * 100;
+    }
+    /// <summary>
+    /// Converts a value in platinum coins to copper coins.
+    /// </summary>
+    /// <param name="silver">The number of platinum coins this value should be equal to.</param>
+    /// <returns>The equivalent number of copper coins.</returns>
+    public static int Platinum(int plat)
+    {
+        return plat * 100 * 100 * 100;
+    }
+    /// <summary>
+    /// Converts a desired sell price to raw value.
+    /// </summary>
+    /// <param name="copper">The integer to return.</param>
+    /// <returns>The integer fed in. Don't use this for anything except sell prices.</returns>
+    public static int Copper(int copper)
+    {
+        return copper;
+    }
+}

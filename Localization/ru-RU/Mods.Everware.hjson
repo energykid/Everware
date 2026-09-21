@@ -348,6 +348,11 @@ Items: {
 		// DisplayName: Charred Wall
 		// Tooltip: ""
 	}
+
+	LivingStarWand: {
+		// DisplayName: Living Star Wand
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -570,6 +575,7 @@ NPCs: {
 	}
 
 	// Cosmoeba.DisplayName: Cosmoeba
+	// SpectralSnail.DisplayName: Spectral Snail
 }
 
 // DeathReason.SnapdragonIce: experienced absolute zero.
