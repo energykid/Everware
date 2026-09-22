@@ -1,10 +1,22 @@
 ﻿using Everware.Content.Base.NPCs;
+using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 
 namespace Everware.Content.Meteor.NPCs;
 
 public class SpectralSnail : EverNPC
 {
+    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+    {
+        bestiaryEntry.AddTags(
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Meteor,
+            new FlavorTextBestiaryInfoElement("Mods.Everware.Bestiary.SpectralSnail"));
+    }
+    public override float SpawnChance(NPCSpawnInfo spawnInfo)
+    {
+        return spawnInfo.Player.InModBiome<MeteorBiome>() ? 0.15f : 0f;
+    }
+
     public override string Texture => "Everware/Assets/Textures/Meteor/NPCs/SpectralSnail";
 
     public override void SetStaticDefaults()
@@ -12,11 +24,9 @@ public class SpectralSnail : EverNPC
         Main.npcFrameCount[Type] = 14;
     }
 
-    // Note: EverNPC has an abstract value called Health that can be automatically set
     public override int Health => 400;
     public override void SetDefaults()
     {
-        // default EverNPC things (like automatically setting health) are run here in base.SetDefaults
         base.SetDefaults();
         NPC.width = 156;
         NPC.height = 70;
@@ -89,7 +99,26 @@ public class SpectralSnail : EverNPC
 
         var effects = NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
+        var shader = Assets.Effects.Meteor.NPCs.SpectralSnailDither.CreateEffect();
+        shader.Parameters.Resolution = asset.Size() / 2;
+        shader.Parameters.Frames = 14;
+        shader.Parameters.FrameNum = NPC.frame.Y / NPC.height;
+        shader.Parameters.Progress = MathHelper.Lerp(-1f, 1f, NPC.ai[1]);
+        shader.Apply();
+
+        Main.spriteBatch.End(out var sb);
+        Main.spriteBatch.Begin(sb with { CustomEffect = shader.Shader });
         Main.EntitySpriteDraw(asset.Value, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
+        Main.spriteBatch.End();
+
+        var shader2 = Assets.Effects.Meteor.NPCs.SpectralSnailDither.CreateEffect();
+        shader2.Parameters.Resolution = asset.Size() / 2;
+        shader2.Parameters.Frames = 14;
+        shader2.Parameters.FrameNum = NPC.frame.Y / NPC.height;
+        shader2.Parameters.Progress = MathHelper.Lerp(-1f, 1f, NPC.ai[2]);
+        shader2.Apply();
+        Main.spriteBatch.Begin(sb with { CustomEffect = shader2.Shader });
+
         Main.EntitySpriteDraw(asset2.Value, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
         return false;
     }

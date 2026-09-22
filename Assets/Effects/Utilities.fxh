@@ -3,6 +3,14 @@ float2 pixelateCoords(float2 coords, float2 pixelGridSize)
     return float2(floor(coords.x * pixelGridSize.x) / pixelGridSize.x, floor(coords.y * pixelGridSize.y) / pixelGridSize.y);
 }
 
+bool dither(float2 coords, float2 pixelGridSize)
+{
+    float x = floor(coords.x * pixelGridSize.x);
+    float y = floor(coords.y * pixelGridSize.y);
+
+    return (x % 2 == y % 2);
+}
+
 float vignetteMult(float2 coords)
 {
     float lr = lerp(0.0, 1.0, coords.x * 2.0);

@@ -420,7 +420,9 @@ public class Cosmoeba : EverNPC
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
-        bestiaryEntry.AddTags(BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Meteor);
+        bestiaryEntry.AddTags(
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Meteor,
+            new FlavorTextBestiaryInfoElement("Mods.Everware.Bestiary.Cosmoeba"));
     }
 
     public class PanicParticle : Particle
