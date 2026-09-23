@@ -154,7 +154,7 @@ public abstract class EverTile : ModTile
                     {
                         Point topLeft = (Main.screenPosition / 16).ToPoint();
 
-                        Point a = new Point(topLeft.X + i, topLeft.Y + j);
+                        Point a = new Point(Math.Clamp(topLeft.X + i, 0, Main.maxTilesX), Math.Clamp(topLeft.Y + j, 0, Main.maxTilesY));
 
                         if (Main.tile[a].TileType == Type)
                         {

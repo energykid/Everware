@@ -99,23 +99,27 @@ public class StarCrossedGrassTile : EverTile
     {
         Tile tile = Main.tile[i, j];
         int grassType = tile.TileType;
-        Tile above = Main.tile[i, j - 1];
-
-        if (!above.HasTile && WorldGen.genRand.NextBool(10))
+        // only run foliage if theres actually space here
+        if (j > 1)
         {
-            bool b = WorldGen.genRand.NextBool(3);
-            WorldGen.PlaceTile(i, j - 1, b ? ModContent.TileType<LargeStarCrossedFoliage>() : ModContent.TileType<StarCrossedFoliage>(), mute: true);
-            if (above.HasTile)
-            {
-                above.CopyPaintAndCoating(tile);
+            Tile above = Main.tile[i, j - 1];
 
-                above.TileFrameX = (short)(WorldGen.genRand.Next(23) * 18);
-                if (b) above.TileFrameX = (short)WorldGen.genRand.Next(4);
-            }
-
-            if (Main.netMode == NetmodeID.Server && above.HasTile)
+            if (!above.HasTile && WorldGen.genRand.NextBool(10))
             {
-                NetMessage.SendTileSquare(-1, i, j - 1);
+                bool b = WorldGen.genRand.NextBool(5);
+                WorldGen.PlaceTile(i, j - 1, b ? ModContent.TileType<LargeStarCrossedFoliage>() : ModContent.TileType<StarCrossedFoliage>(), mute: true);
+                if (above.HasTile)
+                {
+                    above.CopyPaintAndCoating(tile);
+
+                    above.TileFrameX = (short)(WorldGen.genRand.Next(23) * 18);
+                    if (b) above.TileFrameX = (short)WorldGen.genRand.Next(4);
+                }
+
+                if (Main.netMode == NetmodeID.Server && above.HasTile)
+                {
+                    NetMessage.SendTileSquare(-1, i, j - 1);
+                }
             }
         }
     }
@@ -151,7 +155,7 @@ public class StarCrossedGrassTile : EverTile
                 {
                     Point topLeft = (Main.screenPosition / 16).ToPoint();
 
-                    Point a = new Point(topLeft.X + i, topLeft.Y + j);
+                    Point a = new Point(Math.Clamp(topLeft.X + i, 0, Main.maxTilesX), Math.Clamp(topLeft.Y + j, 0, Main.maxTilesY));
 
                     if (Main.tile[a].TileType == ModContent.TileType<MagicStoneTile>())
                     {
