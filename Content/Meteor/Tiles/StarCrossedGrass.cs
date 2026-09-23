@@ -103,13 +103,14 @@ public class StarCrossedGrassTile : EverTile
 
         if (!above.HasTile && WorldGen.genRand.NextBool(10))
         {
-            WorldGen.PlaceTile(i, j - 1, ModContent.TileType<StarCrossedFoliage>(), mute: true);
+            bool b = WorldGen.genRand.NextBool(3);
+            WorldGen.PlaceTile(i, j - 1, b ? ModContent.TileType<LargeStarCrossedFoliage>() : ModContent.TileType<StarCrossedFoliage>(), mute: true);
             if (above.HasTile)
             {
                 above.CopyPaintAndCoating(tile);
 
-
                 above.TileFrameX = (short)(WorldGen.genRand.Next(23) * 18);
+                if (b) above.TileFrameX = (short)WorldGen.genRand.Next(4);
             }
 
             if (Main.netMode == NetmodeID.Server && above.HasTile)
@@ -188,6 +189,8 @@ public class StarCrossedGrassTile : EverTile
     }
     public override void ExtraDrawSingleTile(int i, int j)
     {
+        float wind = Main.WindForVisuals + ((float)Math.Sin(GlobalTimer.Value / 30f) * 0.2f);
+
         var asset = Assets.Textures.Meteor.Tiles.StarCrossedGrassGlow.Asset;
 
         int paint = Main.tile[i, j].TileColor;
@@ -199,6 +202,50 @@ public class StarCrossedGrassTile : EverTile
         texture ??= asset.Value;
 
         DrawingUtils.DrawSlopedTile(Main.spriteBatch, texture, i, j, Color.White, new Vector2(8f, 8f) - ScreenOffset);
+
+        if (Main.tile[i, j - 1].TileType == ModContent.TileType<StarCrossedFoliage>())
+        {
+            int paint2 = Main.tile[i, j - 1].TileColor;
+
+            var asset2 = Assets.Textures.Meteor.Tiles.StarCrossedFoliage.Asset;
+
+            Texture2D? texture2 = null;
+
+            bool useColor2 = paint > PaintID.None && !TryGetPaintTexture(paint2, asset2, out texture2);
+
+            texture2 ??= asset2.Value;
+
+            float offY = 0f;
+            float rot = 0f;
+            if (Main.tile[i, j].TopSlope)
+            { offY = 4f; rot = MathHelper.ToRadians((float)((Main.tile[i, j].LeftSlope) ? -40f : 40f)); }
+
+            rot += (wind * 0.2f);
+
+            DrawFoliage(Main.spriteBatch, texture2, i, j - 1, Color.White, new Vector2(8f, 24f) - ScreenOffset + new Vector2(0, offY), rot);
+        }
+
+        if (Main.tile[i, j - 1].TileType == ModContent.TileType<LargeStarCrossedFoliage>())
+        {
+            int paint2 = Main.tile[i, j - 1].TileColor;
+
+            var asset2 = Assets.Textures.Meteor.Tiles.LargeStarCrossedFoliage.Asset;
+
+            Texture2D? texture2 = null;
+
+            bool useColor2 = paint > PaintID.None && !TryGetPaintTexture(paint2, asset2, out texture2);
+
+            texture2 ??= asset2.Value;
+
+            float offY = 0f;
+            float rot = 0f;
+            if (Main.tile[i, j].TopSlope)
+            { offY = 4f; rot = MathHelper.ToRadians((float)((Main.tile[i, j].LeftSlope) ? -20f : 20f)); }
+
+            rot += (wind * 0.2f);
+
+            DrawLargeFoliage(Main.spriteBatch, texture2, i, j - 1, Color.White, new Vector2(8f, 24f) - ScreenOffset + new Vector2(0, offY), Main.tile[i, j - 1].TileFrameX, rot);
+        }
     }
 
     [ModSystemHooks.PostUpdateDusts]
@@ -221,5 +268,19 @@ public class StarCrossedGrassTile : EverTile
                 new Streak(pp.ToVector2() * 16 + new Vector2(16, 0)).Spawn(StreakLayer);
             }
         }
+    }
+
+    public static void DrawFoliage(SpriteBatch spriteBatch, Texture2D tex, int i, int j, Color color, Vector2 offset, float rot = 0f)
+    {
+        var fr = new Rectangle(Main.tile[i, j].TileFrameX, Main.tile[i, j].TileFrameY, 16, 16);
+        spriteBatch.Draw(tex, new Vector2(i * 16, j * 16) - Main.screenPosition + new Vector2(0, -2) + offset,
+        fr, Color.White, rot, new Vector2(fr.Width / 2f, fr.Height), 1f, SpriteEffects.None, 0f);
+    }
+
+    public static void DrawLargeFoliage(SpriteBatch spriteBatch, Texture2D tex, int i, int j, Color color, Vector2 offset, int frame, float rot = 0f)
+    {
+        var fr = tex.Frame(4, 1, frame);
+        spriteBatch.Draw(tex, new Vector2(i * 16, j * 16) - Main.screenPosition + new Vector2(0, -2) + offset,
+        fr, Color.White, rot, new Vector2(fr.Width / 2f, fr.Height), 1f, SpriteEffects.None, 0f);
     }
 }
