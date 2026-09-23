@@ -1,4 +1,5 @@
-﻿using Everware.Content.Base.NPCs;
+﻿using Everware.Content.Base;
+using Everware.Content.Base.NPCs;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 
@@ -27,6 +28,11 @@ public class SpectralSnail : EverNPC
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[Type] = 14;
+    }
+
+    public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+    {
+        return NPC.ai[2] < 0.5f ? base.DrawHealthBar(hbPosition, ref scale, ref position) : false;
     }
 
     public override int Health => 400;
@@ -93,13 +99,9 @@ public class SpectralSnail : EverNPC
 
         if (State == (int)BehaviorState.PhasingOut)
         {
-            NPC.velocity.X *= 1.5f + (NPC.ai[1] + NPC.ai[2]);
-            NPC.ai[1] += 0.005f;
-            if (NPC.ai[1] > 0.5f)
-            {
-                NPC.ai[2] += 0.01f;
-            }
-            if (NPC.ai[2] > 1f)
+            NPC.velocity.X *= 1.5f + (NPC.ai[2] * 2.5f);
+            NPC.ai[2] += 0.003f;
+            if (NPC.ai[2] > 0.65f)
             {
                 NPC.active = false;
             }
@@ -124,27 +126,19 @@ public class SpectralSnail : EverNPC
 
         var effects = NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
+        Main.spriteBatch.End(out var sb);
+
         var shader = Assets.Effects.Meteor.NPCs.SpectralSnailDither.CreateEffect();
         shader.Parameters.Resolution = asset.Size() / 2;
         shader.Parameters.Frames = 14;
-        shader.Parameters.FrameNum = NPC.frame.Y / NPC.height;
-        shader.Parameters.Progress = MathHelper.Lerp(-1f, 1f, NPC.ai[1]);
-        shader.Apply();
-
-        Main.spriteBatch.End(out var sb);
-        Main.spriteBatch.Begin(sb with { CustomEffect = shader.Shader });
-        Main.EntitySpriteDraw(asset.Value, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
-
-        Main.spriteBatch.End();
-
-        shader.Parameters.Resolution = asset.Size() / 2;
-        shader.Parameters.Frames = 14;
+        shader.Parameters.Color = Color.Blue.ToVector4();
         shader.Parameters.FrameNum = NPC.frame.Y / NPC.height;
         shader.Parameters.Progress = MathHelper.Lerp(-1f, 1f, NPC.ai[2]);
+        shader.Parameters.Progress2 = GlobalTimer.Value / 119f;
         shader.Apply();
 
         Main.spriteBatch.Begin(sb with { CustomEffect = shader.Shader });
-
+        Main.EntitySpriteDraw(asset.Value, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
         Main.EntitySpriteDraw(asset2.Value, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
 
         Main.spriteBatch.Restart(sb);
