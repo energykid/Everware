@@ -54,6 +54,7 @@ public static class MeteorPositioning
     {
             Thread thread = new Thread(() =>
             {
+                int tries = 100;
                 while (Threshold >= 200)
                 {
                     Point p = new Point(Main.spawnTileX, (int)Main.worldSurface - 200);
@@ -68,6 +69,14 @@ public static class MeteorPositioning
                         MeteorGeneration.GenerateWholeSite(MeteorPosition.Value);
                         Main.LocalPlayer.Teleport(MeteorPosition.Value.ToVector2() * 16 + new Vector2(0, -500));
                         Main.NewText("Meteor position found!");
+                        break;
+                    }
+
+                    tries--;
+
+                    if (tries == 0)
+                    {
+                        MaxThreshold = 300;
                         break;
                     }
                 }
