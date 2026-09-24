@@ -29,10 +29,6 @@
       "executablePath": "$(DotNetName)",
       "commandLineArgs": "Tomat.TML.ClientBootstrap.dll --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode server --mod $(AssemblyName) --sdk-natives-directory \"$(TmlBuildNativeRoot).\" --tml-build-version $(TmlBuildSdkVersion) --tml-version $(TmlVersion) --tml-version-resolved $(TmlVersionResolved) --features \"$(TmlBuildBootstrapFeatures)\"",
       "workingDirectory": "$(TmlBuildBootstrapRoot)"
-    },
-    "Terraria Server (ProjectBuild)": {
-      "commandName": "Project",
-      "commandLineArgs": "\"$(TmlBuildBootstrapRoot)Tomat.TML.ClientBootstrap.dll\" --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode server --mod $(AssemblyName) --sdk-natives-directory \"$(TmlBuildNativeRoot).\" --tml-build-version $(TmlBuildSdkVersion) --tml-version $(TmlVersion) --tml-version-resolved $(TmlVersionResolved) --features \"$(TmlBuildBootstrapFeatures)\""
     }
   }
 }

@@ -1,17 +1,8 @@
-﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1">
+﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.2">
 
-	<!-- Import tModLoader mod properties -->
-	<Import Project="..\tModLoader.targets" />
-
-	<!-- General -->
 	<PropertyGroup>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<TmlBuildBootstrapFeatures>tomat.assethotreloading;tomat.enablemod;lolxd87.splashskip</TmlBuildBootstrapFeatures>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
-	<ItemGroup>
-	</ItemGroup>
-
-	<!-- References -->
 
 </Project>
