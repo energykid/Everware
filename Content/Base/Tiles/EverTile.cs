@@ -70,22 +70,22 @@ public abstract class EverTile : ModTile
         if (Main.netMode != NetmodeID.Server)
             Asset = ModContent.Request<Texture2D>(Texture);
 
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            if (Main.netMode != NetmodeID.Server)
+        if (Main.netMode != NetmodeID.Server)
+            ThreadUtils.RunOnMainThread(() =>
+            {
                 ExtraTarget = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
-        });
+            });
 
         On_Main.DoDraw_DrawNPCsOverTiles += DrawExtraTarget;
     }
 
     public override void Unload()
     {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            if (Main.netMode != NetmodeID.Server)
+        if (Main.netMode != NetmodeID.Server)
+            ThreadUtils.RunOnMainThread(() =>
+            {
                 ExtraTarget.Dispose();
-        });
+            });
 
         On_Main.DoDraw_DrawNPCsOverTiles -= DrawExtraTarget;
     }

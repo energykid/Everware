@@ -27,19 +27,17 @@ public class MeteorGeneration
         TileID.LivingWood,
         TileID.LeafBlock
     ];
-    public static void GenerateWholeSite(out Point outputPosition)
+    public static void GenerateWholeSite(Point position)
     {
-        Point pt = GetMeteorPosition(1000, Main.maxTilesX / 6, Main.maxTilesX / 3, fromLeft: true);
         Thread thread = new Thread(() =>
         {
-            GenerateCrater(pt);
-            GeneratePointZero(pt);
+            GenerateCrater(position.Grounded());
+            GeneratePointZero(position.Grounded());
         })
         {
             IsBackground = true,
         };
         thread.Start();
-        outputPosition = pt;
     }
     public static void GenerateCrater(Point pt)
     {

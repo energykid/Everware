@@ -4,3 +4,7 @@
 *.editorconfig
 *.cache
 Everware.csproj.user
+.idea/.idea.Everware/.idea/encodings.xml
+.idea/.idea.Everware/.idea/indexLayout.xml
+.idea/.idea.Everware/.idea/vcs.xml
+Everware.sln.DotSettings.user

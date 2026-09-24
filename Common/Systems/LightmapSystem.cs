@@ -11,26 +11,22 @@ public class LightmapSystem : ModSystem
 
     public override void Load()
     {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            if (Main.netMode != NetmodeID.Server)
+        if (Main.netMode != NetmodeID.Server)
+            ThreadUtils.RunOnMainThread(() =>
             {
                 RawLightmap = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => ((offW / 16) + Padding, (offH / 16) + Padding));
                 ScreenLightmap = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW, offH));
-            }
-        });
+            });
     }
 
     public override void Unload()
     {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            if (Main.netMode != NetmodeID.Server)
+        if (Main.netMode != NetmodeID.Server)
+            ThreadUtils.RunOnMainThread(() =>
             {
                 RawLightmap.Dispose();
                 ScreenLightmap.Dispose();
-            }
-        });
+            });
     }
 
     public override void PostDrawTiles()
