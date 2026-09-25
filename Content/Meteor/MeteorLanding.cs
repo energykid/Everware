@@ -3,6 +3,7 @@ using Everware.Utils;
 using System.Threading;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
+using Everware.Common;
 
 namespace Everware.Content.Meteor;
 
@@ -129,7 +130,7 @@ public static class MeteorLanding
                 break;
                 // Meteor landing sound
                 case 70:
-                    SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset);
+                    SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset, MeteorPosition.ToWorldCoordinates(), attenuationDistance: 150000f);
                 break;
                 // Meteor landing text
                 case 78:
