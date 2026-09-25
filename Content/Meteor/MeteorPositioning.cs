@@ -100,7 +100,7 @@ public class MeteorPositioning : ModSystem
                 // Meteor landing text
                 if (MeteorAnimationTimer == 78)
                 {
-                    Main.NewText(Mods.Everware.MeteorLanding.GetTextValue());
+                    Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 }
 
