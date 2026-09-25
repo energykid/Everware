@@ -103,7 +103,6 @@ public class MeteorPositioning : ModSystem
                     Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 }
-
                 // Screen shake and effects
                 if (MeteorAnimationTimer > 78 && MeteorAnimationTimer < 400)
                 {
