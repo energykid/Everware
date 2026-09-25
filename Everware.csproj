@@ -3,6 +3,11 @@
 	<PropertyGroup>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<TmlBuildBootstrapFeatures>tomat.assethotreloading;tomat.enablemod;lolxd87.splashskip</TmlBuildBootstrapFeatures>
+		<TargetFrameworks>net10.0</TargetFrameworks>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GoldMeridian.KeyGen" Version="1.0.1" PrivateAssets="All" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	</ItemGroup>
 
 </Project>
