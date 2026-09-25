@@ -66,7 +66,7 @@ class StyleElement : ConfigElement<bool>
         CalculatedStyle dimensions = GetDimensions();
         float b = MathHelper.Lerp(1f, 0f, BlueberryUIThing);
 
-        string EVWString = Everware.Instance.DisplayNameClean;
+        string EVWString = ModImpl.Instance.DisplayNameClean;
 
         ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, Value ? EVWString : Mods.Everware.ConfigKeys.StyleSettings.Unchanged.GetTextValue(), new Vector2(dimensions.X + dimensions.Width - 60f - x + (BlueberryUIThing * 20f), dimensions.Y + 8f), Color.White.MultiplyRGBA(new(b, b, b, b)), 0f, Vector2.Zero, new Vector2(0.8f), spread: 2f - (BlueberryUIThing * 2f));
         Rectangle sourceRectangle = tex.Frame();

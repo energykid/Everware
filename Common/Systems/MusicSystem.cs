@@ -55,7 +55,7 @@ public class EverMusicSystem : ModSystem
                 }
                 else
                 {
-                    MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", 0f);
+                    MusicLoader.GetMusic(ModImpl.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", 0f);
                 }
                 /*
                 if (NPC.CountNPCS(ModContent.NPCType<Snapdragon>()) > 0)
