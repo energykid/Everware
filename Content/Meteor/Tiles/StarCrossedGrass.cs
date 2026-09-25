@@ -45,22 +45,22 @@ public class StarCrossedGrassTile : EverTile
     {
         base.Load();
 
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            if (Main.netMode != NetmodeID.Server)
+        if (Main.netMode != NetmodeID.Server)
+            ThreadUtils.RunOnMainThread(() =>
+            {
                 BlueGlow = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice, (w, h, offW, offH) => (offW / 2, offH / 2));
-        });
+            });
     }
 
     public override void Unload()
     {
         base.Unload();
 
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            if (Main.netMode != NetmodeID.Server)
+        if (Main.netMode != NetmodeID.Server)
+            ThreadUtils.RunOnMainThread(() =>
+            {
                 BlueGlow.Dispose();
-        });
+            });
     }
     ParticleLayer StreakLayer = new();
     public override void ExtraDrawPreEverything()
@@ -265,6 +265,8 @@ public class StarCrossedGrassTile : EverTile
             Point p = (Main.screenPosition / 16f).ToPoint();
 
             Point pp = p + new Point(i, j);
+            pp.X = (int)MathHelper.Clamp(pp.X, 0, Main.maxTilesX);
+            pp.Y = (int)MathHelper.Clamp(pp.Y, 0, Main.maxTilesY);
             Tile t = Main.tile[pp];
             Tile t1 = Main.tile[p + new Point(i, j - 1)];
             if (t.HasTile && t.TileType == Type && !t1.HasTile)

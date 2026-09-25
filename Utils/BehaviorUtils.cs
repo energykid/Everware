@@ -105,18 +105,18 @@ public static class BehaviorUtils
         }
         return baseVec;
     }
-    public static Point Grounded(this Point baseVec)
+    public static Point Grounded(this Point baseVec, int checks = 250)
     {
         if (SolidTileOrPlatform(Main.tile[baseVec]))
         {
-            for (int i = 0; i < 250; i++)
+            for (int i = 0; i < checks; i++)
             {
                 baseVec.Y -= 1;
                 if (!SolidTileOrPlatform(Main.tile[baseVec])) break;
             }
             return baseVec;
         }
-        for (int i = 0; i < 250; i++)
+        for (int i = 0; i < checks; i++)
         {
             baseVec.Y += 1;
             if (SolidTileOrPlatform(Main.tile[baseVec])) break;
