@@ -11,7 +11,7 @@ public static class EverwarePacketHandler
     public static List<string> CustomPacketNames = [];
     public static void SendPacket(EverPacket packet)
     {
-        ModPacket p = Everware.Instance.GetPacket();
+        ModPacket p = ModImpl.Instance.GetPacket();
 
         int ind = CustomPacketNames.FindIndex(A =>
         {
