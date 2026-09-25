@@ -26,7 +26,7 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
-            MeteorPositioning.FindPosition();
+            MeteorLanding.FindPosition();
 
             //MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
         }
