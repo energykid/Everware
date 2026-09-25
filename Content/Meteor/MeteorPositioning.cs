@@ -87,20 +87,24 @@ public class MeteorPositioning : ModSystem
             if (!MeteorSpawned)
             {
                 MeteorAnimationTimer++;
+                // Meteor fall sound
                 if (MeteorAnimationTimer == 1)
                 {
                     SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorFall.Asset);
                 }
+                // Meteor landing sound
                 if (MeteorAnimationTimer == 70)
                 {
                     SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset);
                 }
+                // Meteor landing text
                 if (MeteorAnimationTimer == 78)
                 {
                     Main.NewText(Mods.Everware.MeteorLanding.GetTextValue());
                     MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 }
 
+                // Screen shake and effects
                 if (MeteorAnimationTimer > 78 && MeteorAnimationTimer < 400)
                 {
                     float intensity = MathHelper.Lerp(1f, 0f, (MeteorAnimationTimer - 60f) / 340f);
