@@ -122,9 +122,9 @@ public class MeteorPositioning : ModSystem
                 // Meteor landing text
                 if (MeteorAnimationTimer == 78)
                 {
-                    if (Main.dedServ)
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                         MeteorGeneration.GenerateWholeSite(MeteorPosition);
-                    else
+                    if (!Main.dedServ)
                         Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                 }
                 // Screen shake and effects
