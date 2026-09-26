@@ -26,9 +26,10 @@ public class TestItem : EverItem
     {
         if (player.ItemAnimationJustStarted)
         {
+            MeteorLanding.MeteorSpawned = false;
             NPC.downedBoss2 = true;
 
-            MeteorLanding.FindPosition();
+            MeteorLanding.UpdateMeteorPosition();
 
             //MeteorGeneration.GenerateWholeSite((Main.MouseWorld / 16).ToPoint());
         }

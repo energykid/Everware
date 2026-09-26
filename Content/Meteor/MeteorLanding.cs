@@ -24,16 +24,43 @@ public static class MeteorLanding
         var sb = Main.spriteBatch;
 
         sb.End(out var ss);
-        sb.Begin(ss with { TransformMatrix = Matrix.Identity });
+        sb.Begin(ss with { TransformMatrix = Main.BackgroundViewMatrix.EffectMatrix });
         {
-            var flareScale = animationTimer;
+            DrawFlare((0f, 60f), 1.2f, Color.LightGoldenrodYellow with { A = 0 });
+            DrawFlare((20f, 75f), 1.5f, (Color.Blue * 0.4f) with { A = 0 });
         }
         sb.Restart(in ss);
+
+        return;
+
+        void DrawFlare((float Min, float Max) range, float scale, Color color)
+        {
+            var curve = MathF.Sin(Terraria.Utils.Remap(animationTimer, range.Min, range.Max, 0f, MathF.PI));
+
+            var flareScale = (MathF.Abs(((animationTimer / range.Max * 10f) % 1) - 0.5f) * 2f) - 0.5f;
+            flareScale *= 0.5f * curve;
+            flareScale += curve;
+
+            flareScale *= scale;
+
+            var flareTexture = TextureAssets.Extra[ExtrasID.ThePerfectGlow].Value;
+
+            var flareOrigin = flareTexture.Size() * 0.5f;
+
+            var flarePosition = new Vector2((MeteorPosition.X / (float)Main.maxTilesX) * Main.screenWidth, Main.screenHeight * 0.15f);
+
+            var flareSize = new Vector2(0.5f, 1.4f) * flareScale;
+
+            sb.Draw(flareTexture, flarePosition, null, color, 0f, flareOrigin, flareSize, SpriteEffects.None, 0f);
+
+            flareSize.Y *= 0.6f;
+            sb.Draw(flareTexture, flarePosition, null, color, MathHelper.PiOver2, flareOrigin, flareSize, SpriteEffects.None, 0f);
+        }
     }
 
     public static Point MeteorPosition { get; private set; }
 
-    public static bool MeteorSpawned { get; private set; }
+    public static bool MeteorSpawned { get; set; }
 
     [ModSystemHooks.PreWorldGen]
     public static void PreWorldGen()
@@ -116,8 +143,11 @@ public static class MeteorLanding
         }
         else
         {
-            if (MeteorSpawned)
+            const int fall_duration = 90;
+
+            if (MeteorSpawned || animationTimer >= Assets.Sounds.Misc.MeteorCrash.Asset.FrameDuration + 70)
             {
+                animationTimer = 0;
                 return;
             }
 
@@ -129,16 +159,17 @@ public static class MeteorLanding
                     SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorFall.Asset);
                 break;
                 // Meteor landing sound
-                case 70:
+                case fall_duration:
                     SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset, MeteorPosition.ToWorldCoordinates(), attenuationDistance: 150000f);
                 break;
                 // Meteor landing text
-                case 78:
+                case fall_duration + 8:
                     Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
-                    MeteorGeneration.GenerateWholeSite(MeteorPosition);
+                    MeteorSpawned = true;
+                    // MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
                 // Screen shake and effects
-                case > 78 and < 400:
+                case > fall_duration + 8 and < 400:
                 {
                     float intensity = MathHelper.Lerp(1f, 0f, (animationTimer - 60f) / 340f);
 
