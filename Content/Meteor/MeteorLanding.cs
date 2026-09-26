@@ -4,6 +4,8 @@ using System.Threading;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 using Everware.Common;
+using Everware.Common.Colors;
+using MonoMod.Cil;
 
 namespace Everware.Content.Meteor;
 
@@ -13,9 +15,79 @@ public static class MeteorLanding
     private static void Load()
     {
         On_Main.DrawSunAndMoon += DrawSunAndMoon_DrawFlare;
+        On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_BrightenBackground;
+        On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2_BrightenBackground;
+        IL_Main.DrawSurfaceBG += DrawSurfaceBG_BrightenBackground;
     }
 
     private static int animationTimer;
+
+    private static readonly Color sky_flash_blue = new Color(235, 153, 255);
+    private static readonly Color sky_flash_yellow = new Color(255, 197, 153);
+
+    private static void DrawSurfaceBG_BackMountainsStep1_BrightenBackground(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
+    {
+        const float brightness = 0.35f;
+
+        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+
+        var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
+
+        var lightColor = interpolated * alpha * brightness;
+
+        lightColor = Color.Max(Main.ColorOfSurfaceBackgroundsBase, lightColor);
+
+        using var _ = Main.ColorOfSurfaceBackgroundsBase.Override(lightColor);
+
+        orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
+    }
+
+    private static void DrawSurfaceBG_BackMountainsStep2_BrightenBackground(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
+    {
+        const float brightness = 0.6f;
+
+        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+
+        var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
+
+        var lightColor = interpolated * alpha * brightness;
+
+        lightColor = Color.Max(Main.ColorOfSurfaceBackgroundsBase, lightColor);
+
+        using var _ = Main.ColorOfSurfaceBackgroundsBase.Override(lightColor);
+
+        orig(self, pushBGTopHack);
+    }
+
+    private static void DrawSurfaceBG_BrightenBackground(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        c.GotoNext(
+            i => i.MatchCall<Main>(nameof(Main.DrawSurfaceBG_Forest))
+        );
+
+        c.GotoPrev(
+            MoveType.After,
+            i => i.MatchStsfld<Main>(nameof(Main.ColorOfSurfaceBackgroundsModified))
+        );
+
+        c.EmitDelegate(
+            static () =>
+            {
+                const float brightness = 0.95f;
+
+                var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+
+                var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
+
+                var lightColor = interpolated * alpha * brightness;
+
+                lightColor = Color.Max(Main.ColorOfSurfaceBackgroundsModified, lightColor);
+                Main.ColorOfSurfaceBackgroundsModified = lightColor;
+            }
+        );
+    }
 
     private static void DrawSunAndMoon_DrawFlare(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
     {
@@ -56,6 +128,15 @@ public static class MeteorLanding
             flareSize.Y *= 0.6f;
             sb.Draw(flareTexture, flarePosition, null, color, MathHelper.PiOver2, flareOrigin, flareSize, SpriteEffects.None, 0f);
         }
+    }
+
+    [ModSystemHooks.ModifySunLightColor]
+    private static void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
+    {
+        var lightColor = sky_flash_yellow * MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+
+        tileColor = Color.Max(tileColor, lightColor * 0.6f);
+        backgroundColor = Color.Max(backgroundColor, lightColor * 0.2f);
     }
 
     public static Point MeteorPosition { get; private set; }
@@ -145,9 +226,12 @@ public static class MeteorLanding
         {
             const int fall_duration = 90;
 
-            if (MeteorSpawned || animationTimer >= Assets.Sounds.Misc.MeteorCrash.Asset.FrameDuration + 70)
+            if (!MeteorSpawned && animationTimer > fall_duration + 8)
             {
                 animationTimer = 0;
+            }
+            if (MeteorSpawned && animationTimer >= Assets.Sounds.Misc.MeteorCrash.Asset.FrameDuration + 70)
+            {
                 return;
             }
 
