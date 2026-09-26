@@ -155,10 +155,13 @@ public class MeteorPositioning : ModSystem
             if (!IsPositionBlacklisted(p))
             {
                 MeteorPosition = p;
-                new MeteorPositionPacket
+                if (Main.dedServ)
                 {
-                    X = p.X, Y = p.Y
-                }.Send();
+                    new MeteorPositionPacket
+                    {
+                        X = p.X, Y = p.Y
+                    }.Send();
+                }
                 break;
             }
 
