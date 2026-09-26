@@ -163,7 +163,7 @@ public class KilnpostHoldout : EverHoldoutProjectile
 
         npc.SimpleStrikeNPC(8, Owner.direction, false);
 
-        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Misc("Breakaway Spear"), npc.Center, Vector2.Zero, ModContent.ProjectileType<KilnpostBreakaway>(), 0, 0f, Projectile.owner, npcWhoAmI);
+        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(Projectile, "Breakaway Spear"), npc.Center, Vector2.Zero, ModContent.ProjectileType<KilnpostBreakaway>(), 0, 0f, Projectile.owner, npcWhoAmI);
         proj.rotation = Projectile.rotation;
         ((KilnpostBreakaway)proj.ModProjectile).Pos = (Projectile.Center - npc.Center) / 1.2f;
     }

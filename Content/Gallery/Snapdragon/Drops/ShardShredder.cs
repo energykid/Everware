@@ -137,12 +137,12 @@ public class ShardShredderProj : EverHoldoutProjectile
 
                 if (it != null)
                 {
-                    Projectile.NewProjectile(new EntitySource_Parent(Projectile, "Shard Shredder bullet"), MuzzlePosition(), new Vector2(20, 0).RotatedBy(Rotation), it.shoot, 15, Projectile.knockBack, Projectile.owner);
+                    Projectile.NewProjectile(new EntitySource_ItemUse_WithAmmo(Owner, Owner.HeldItem, it.type, "Shard Shredder bullet"), MuzzlePosition(), new Vector2(20, 0).RotatedBy(Rotation), it.shoot, 15, Projectile.knockBack, Projectile.owner);
 
                     if (GunFullness() > 0.1f)
                     {
                         ScreenEffects.AddScreenShake(Projectile.Center, 3f, 0.1f);
-                        Projectile p = Projectile.NewProjectileDirect(new EntitySource_Parent(Projectile, "Shard Shredder ice"), MuzzlePosition() + (Projectile.rotation.ToRotationVector2() * 45), new Vector2(1f, 0).RotatedBy(Rotation + Main.rand.NextFloat(-0.1f, 0.1f)), ModContent.ProjectileType<ShardShredderIcicle>(), Projectile.damage * 2, Projectile.knockBack, Projectile.owner);
+                        Projectile p = Projectile.NewProjectileDirect(new EntitySource_ItemUse_WithAmmo(Owner, Owner.HeldItem, it.type, "Shard Shredder ice"), MuzzlePosition() + (Projectile.rotation.ToRotationVector2() * 45), new Vector2(1f, 0).RotatedBy(Rotation + Main.rand.NextFloat(-0.1f, 0.1f)), ModContent.ProjectileType<ShardShredderIcicle>(), Projectile.damage * 2, Projectile.knockBack, Projectile.owner);
                         p.rotation = Owner.AngleTo(NetworkOwner.MousePosition) + Main.rand.NextFloat(-0.1f, 0.1f);
                         p.ai[1] = p.rotation;
                         p.ai[2] = Main.rand.NextFloat(-0.3f, 0.3f);
