@@ -255,23 +255,29 @@ public class StarCrossedGrassTile : EverTile
     [ModSystemHooks.PostUpdateDusts]
     public void UpdateStreaks()
     {
-        StreakLayer.Update();
-
-        for (int k = 0; k < 30; k++)
+        if (!Main.dedServ)
         {
-            int i = Main.rand.Next(Main.screenWidth / 16);
-            int j = Main.rand.Next(Main.screenHeight / 16);
+            StreakLayer.Update();
 
-            Point p = (Main.screenPosition / 16f).ToPoint();
-
-            Point pp = p + new Point(i, j);
-            pp.X = (int)MathHelper.Clamp(pp.X, 0, Main.maxTilesX);
-            pp.Y = (int)MathHelper.Clamp(pp.Y, 0, Main.maxTilesY);
-            Tile t = Main.tile[pp];
-            Tile t1 = Main.tile[p + new Point(i, j - 1)];
-            if (t.HasTile && t.TileType == Type && !t1.HasTile)
+            for (int k = 0; k < 30; k++)
             {
-                new Streak(pp.ToVector2() * 16 + new Vector2(16, 0)).Spawn(StreakLayer);
+                int i = Main.rand.Next(Main.screenWidth / 16);
+                int j = Main.rand.Next(Main.screenHeight / 16);
+
+                Point p = (Main.screenPosition / 16f).ToPoint();
+                p.X = (int)MathHelper.Clamp(p.X, 0, Main.maxTilesX);
+                p.Y = (int)MathHelper.Clamp(p.Y, 0, Main.maxTilesY);
+
+                Point pp = p + new Point(i, j);
+                pp.X = (int)MathHelper.Clamp(pp.X, 0, Main.maxTilesX);
+                pp.Y = (int)MathHelper.Clamp(pp.Y, 0, Main.maxTilesY);
+            
+                Tile t = Main.tile[pp];
+                Tile t1 = Main.tile[p + new Point(i, j - 1)];
+                if (t.HasTile && t.TileType == Type && !t1.HasTile)
+                {
+                    new Streak(pp.ToVector2() * 16 + new Vector2(16, 0)).Spawn(StreakLayer);
+                }
             }
         }
     }

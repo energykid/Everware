@@ -98,11 +98,16 @@ public class ScreenEffectsPlayer : ModPlayer
     {
         screenZoom = MathHelper.Lerp(screenZoom, 0f, 0.1f);
     }
+
+    public override void PostUpdate()
+    {
+        if (shouldScreenPositionDecrement) screenPositionIncrement = MathHelper.Lerp(screenPositionIncrement, 0f, 0.03f);
+        shouldScreenPositionDecrement = true;
+    }
+
     public override void ModifyScreenPosition()
     {
         screenDim = MathHelper.Lerp(screenDim, 0f, 0.1f);
-        if (shouldScreenPositionDecrement) screenPositionIncrement = MathHelper.Lerp(screenPositionIncrement, 0f, 0.03f);
-        shouldScreenPositionDecrement = true;
 
         screenTime += 1 + (screenShake);
 

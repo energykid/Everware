@@ -1,5 +1,9 @@
-﻿using System.Threading;
+﻿using System.IO;
+using System.Linq;
+using System.Threading;
+using Everware.Common;
 using Everware.Common.Systems;
+using Everware.Content.Base.Tiles.TileData;
 using Everware.Core;
 using Everware.Utils;
 using Terraria.ID;
@@ -9,6 +13,24 @@ namespace Everware.Content.Meteor;
 
 public class MeteorPositioning : ModSystem
 {
+    public class MeteorPositionPacket : EverPacket
+    {
+        public int X;
+        public int Y;
+        public override void Read(Mod mod, BinaryReader reader, int playerID)
+        {
+            X = reader.ReadInt32();
+            Y = reader.ReadInt32();
+
+            MeteorPosition = new Point(X, Y);
+        }
+        public override void Write(ModPacket packet)
+        {
+            packet.Write(X);
+            packet.Write(Y);
+        }
+    }
+    
     public static Point MeteorPosition = Point.Zero;
 
     public static int MeteorAnimationTimer = 0;
@@ -42,7 +64,7 @@ public class MeteorPositioning : ModSystem
     private static int Threshold = 400;
     private static int MaxThreshold = 400;
 
-    private static int CheckTime;
+    private static int CheckTime = -(60 * 5);
     
     [ModSystemHooks.PostUpdateEverything]
     public static void UpdateMeteorPosition()
@@ -61,7 +83,7 @@ public class MeteorPositioning : ModSystem
                             || Main.LocalPlayer.position.Y > Main.worldSurface)
                             FindPosition();
                     }
-                    else if (Main.netMode == NetmodeID.Server)
+                    else if (Main.netMode == NetmodeID.Server && Main.ActivePlayers.span.Length > 0)
                     {
                         bool shouldCheck = true;
                         foreach (Player player in Main.player)
@@ -73,13 +95,11 @@ public class MeteorPositioning : ModSystem
                         }
 
                         if (shouldCheck)
+                        {
                             FindPosition();
+                        }
                     }
                 }
-            }
-            else
-            {
-                CheckTime = -(60 * 20);
             }
         }
         else
@@ -90,27 +110,34 @@ public class MeteorPositioning : ModSystem
                 // Meteor fall sound
                 if (MeteorAnimationTimer == 1)
                 {
-                    SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorFall.Asset);
+                    if (!Main.dedServ)
+                        SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorFall.Asset);
                 }
                 // Meteor landing sound
                 if (MeteorAnimationTimer == 70)
                 {
-                    SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset);
+                    if (!Main.dedServ)
+                        SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset);
                 }
                 // Meteor landing text
                 if (MeteorAnimationTimer == 78)
                 {
-                    Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
-                    MeteorGeneration.GenerateWholeSite(MeteorPosition);
+                    if (Main.dedServ)
+                        MeteorGeneration.GenerateWholeSite(MeteorPosition);
+                    else
+                        Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                 }
                 // Screen shake and effects
                 if (MeteorAnimationTimer > 78 && MeteorAnimationTimer < 400)
                 {
-                    float intensity = MathHelper.Lerp(1f, 0f, (MeteorAnimationTimer - 60f) / 340f);
+                    if (!Main.dedServ)
+                    {
+                        float intensity = MathHelper.Lerp(1f, 0f, (MeteorAnimationTimer - 60f) / 340f);
                     
-                    ScreenEffects.DimScreen(intensity * 0.1f);
-                    ScreenEffects.ZoomScreen(-intensity * 0.05f);
-                    ScreenEffects.AddScreenShake(Main.LocalPlayer.Center, intensity * 10f, 0.8f);
+                        ScreenEffects.DimScreen(intensity * 0.1f);
+                        ScreenEffects.ZoomScreen(-intensity * 0.05f);
+                        ScreenEffects.AddScreenShake(Main.LocalPlayer.Center, intensity * 10f, 0.8f);
+                    }
                 }
             }
         }
@@ -128,6 +155,10 @@ public class MeteorPositioning : ModSystem
             if (!IsPositionBlacklisted(p))
             {
                 MeteorPosition = p;
+                new MeteorPositionPacket
+                {
+                    X = p.X, Y = p.Y
+                }.Send();
                 break;
             }
 

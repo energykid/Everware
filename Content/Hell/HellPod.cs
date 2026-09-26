@@ -442,15 +442,16 @@ public class HellPodGlobalProjectile : GlobalProjectile
     public bool HasHitPod = false;
     public override void PostAI(Projectile projectile)
     {
-        if (projectile.friendly && projectile.damage > 0 && !HasHitPod)
+        Point p = (projectile.Center / 16).ToPoint();
+        Point p2 = new Point(Math.Clamp(p.X, 0, Main.maxTilesX), Math.Clamp(p.Y, 0, Main.maxTilesY));
+        if (projectile.friendly && projectile.damage > 0 && !HasHitPod && p == p2)
         {
-            if (Main.tile[(projectile.Center / 16).ToPoint()].TileType == ModContent.TileType<HellPod>() && Main.tile[(projectile.Center / 16).ToPoint()].HasTile)
+            if (Main.tile[p].TileType == ModContent.TileType<HellPod>() && Main.tile[p].HasTile)
             {
                 if (Main.netMode == NetmodeID.SinglePlayer)
                 {
                     HasHitPod = true;
                     projectile.penetrate--;
-                    Point p = (projectile.Center / 16).ToPoint();
                     HellPod.DamagePod(p.X, p.Y);
                 }
                 if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -463,7 +464,6 @@ public class HellPodGlobalProjectile : GlobalProjectile
                         {
                             HasHitPod = true;
                             projectile.penetrate--;
-                            Point p = (projectile.Center / 16).ToPoint();
 
                             EverwarePacketHandler.SendPacket(
                                 new HellPodDamagePacket() { X = p.X, Y = p.Y }
@@ -493,8 +493,8 @@ public class HellPodGlobalPlayer : ModPlayer
                 {
                     ModPacket packet = Everware.Instance.GetPacket();
                     packet.Write("DamageHellPodFromServer");
-                    packet.Write((int)Player.tileTargetX);
-                    packet.Write((int)Player.tileTargetY);
+                    packet.Write(Player.tileTargetX);
+                    packet.Write(Player.tileTargetY);
                     packet.Send();
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.Items;
 using Everware.Utils;
+using Terraria.ID;
 
 namespace Everware.Content.Misc;
 
@@ -76,7 +77,7 @@ public class ChargeMeters : ILoadable
     {
         LocalChargeMeterAnim *= 0.8f;
 
-        if (Main.LocalPlayer.GetEverWeaponItem() != null)
+        if (Main.netMode != NetmodeID.Server && Main.LocalPlayer.GetEverWeaponItem() != null)
             LocalChargeMeterFill = MathHelper.Lerp(LocalChargeMeterFill, Main.LocalPlayer.GetEverWeaponItem().MeterFill, 0.4f);
 
         LocalChargeMeterVisibility *= 0.98f;

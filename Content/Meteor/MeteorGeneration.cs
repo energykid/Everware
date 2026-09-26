@@ -115,12 +115,12 @@ public class MeteorGeneration
             new Actions.Smooth(true)
         ));
 
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
+        new Shapes.Slime(20, 0.06, WorldGen.genRand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
 
-        new Shapes.Slime(20, 0.06, Main.rand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(-15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
+        new Shapes.Slime(20, 0.06, WorldGen.genRand.NextFloat(0.2f, 0.7f)).Perform((pt + new Point(-15, 0)).Grounded() + new Point(0, 3), Actions.Chain(
             new CustomGenActions.SetMeteorFromGrass(),
             new Actions.Smooth(true)
         ));
@@ -129,8 +129,8 @@ public class MeteorGeneration
         {
             if (Math.Abs(i) >= 4)
             {
-                Point center = pt + new Point(i * 10, 0) + new Point(Main.rand.Next(-3, 3), 0);
-                new Shapes.Slime(20, Main.rand.NextFloat(0.1f, 0.2f), Main.rand.NextFloat(0.12f, 0.4f)).Perform(center.Grounded(), Actions.Chain(
+                Point center = pt + new Point(i * 10, 0) + new Point(WorldGen.genRand.Next(-3, 3), 0);
+                new Shapes.Slime(20, WorldGen.genRand.NextFloat(0.1f, 0.2f), WorldGen.genRand.NextFloat(0.12f, 0.4f)).Perform(center.Grounded(), Actions.Chain(
                     new Actions.SetTileKeepWall((ushort)MagicStone, true),
                     new Actions.Smooth(true)
                 ));
@@ -160,7 +160,7 @@ public class MeteorGeneration
         float k = 1f + (float)(Math.Sin(v.AngleTo(center.ToVector2()) * MathHelper.TwoPi) * 0.1f);
         if (v.Distance(center.ToVector2()) < SizeX * k)
         {
-            if (v.Distance(center.ToVector2()) > ((SizeX * k) - 6)) bb = Main.rand.NextBool((int)(1 + (v.Distance(center.ToVector2()) - ((SizeX * k) - 6))));
+            if (v.Distance(center.ToVector2()) > ((SizeX * k) - 6)) bb = WorldGen.genRand.NextBool((int)(1 + (v.Distance(center.ToVector2()) - ((SizeX * k) - 6))));
 
             if (bb)
             {
@@ -231,7 +231,7 @@ public class MeteorGeneration
                     {
                         refP.X = (int)MathHelper.Lerp(Main.maxTilesX, 0, (float)i / numChecks);
                     }
-                    refP.X += Main.rand.Next(-50, 50);
+                    refP.X += WorldGen.genRand.Next(-50, 50);
                     if (Math.Abs(refP.X - p.X) > minDist && Math.Abs(refP.X - p.X) < maxDist)
                     {
                         refP = refP.Grounded();
