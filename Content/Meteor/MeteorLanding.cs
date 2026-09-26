@@ -134,7 +134,7 @@ public static class MeteorLanding
                 break;
                 // Meteor landing text
                 case 78:
-                    Main.NewText(Mods.Everware.MeteorLanding.GetTextValue());
+                    Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
                 // Screen shake and effects
