@@ -4,3 +4,7 @@
 *.editorconfig
 *.cache
 Everware.csproj.user
+.idea/.idea.Everware/.idea/indexLayout.xml
+.idea/.idea.Everware/.idea/projectSettingsUpdater.xml
+.idea/.idea.Everware/.idea/vcs.xml
+.idea/.idea.Everware/.idea/workspace.xml

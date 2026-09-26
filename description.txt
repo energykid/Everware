@@ -36,7 +36,7 @@ added Book of Boulders, found occasionally in ruined underground houses with new
 added text keys for Kiln/Quarry crafting stations, Eye of Cthulhu fables boss text, and armor set bonuses for localizers
 
 .....
-Everware 0.2.4 - small fixed and Russian localization
+Everware 0.2.4 - small fixes and Russian localization
 
 added Russian localization by Nexora & Kraken
 made the Eye of Cthulhu temporarily not spawn tile ripples when hitting reflective salt from Spirit Reforged
@@ -46,6 +46,8 @@ caused Kiln and Quarry music to stop playing underground, and slightly improved 
 Everware 0.2.5 - beneath the crust update
 
 Everware now depends on Daybreak
+added Glowcoats, a paint-like coating which can give most tiles a glowing outline. 
+different colors can be crafted with glow moss, including Spirit Reforged variants!
 added Steel Chests in deep cavern ruins
 added Groundshakers
 added Magmatic Ammo Kit
@@ -64,3 +66,14 @@ buffed the Eye of Cthulhu's damage in expert and above
 changed the workshop icon
 made certain Everware weapons display how many times they hit per attack animation
 added a custom mod panel for Everware
+
+.....
+Everware 0.2.5.1 through 0.2.5.4 - small fixes and Portuguese localization
+
+added Portuguese localization by nakamurash
+fixed a bug caused by Everware's underlying VFX system where swinging Light's Bane would cause background tiles to look odd
+fixed pixelated effects zooming incorrectly
+fixed a lot of graphical issues with gravitation potions
+fixed various other glitches places
+Everware weapons now consistently function correctly with glyphs from Spirit Reforged
+added Music Display support
