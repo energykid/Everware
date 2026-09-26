@@ -595,4 +595,5 @@ Bestiary: {
 	// SpectralSnail: Plasma snails come in multiple varieties. These ones can be found feeding on cosmic radiation near foreign objects from space. This radiation, while harmless to you, grants these snails the ability to phase out of tangibility when threatened.
 }
 
-// MeteorLanding: A meteor has crash-landed in your world!
+// MeteorLandingGen: A meteor has crash-landed in your world!
+// KilnQuarryGen: Generating an abandoned processing site

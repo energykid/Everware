@@ -17,7 +17,7 @@ public class KilnOrQuarryGeneration : ModSystem
     };
     public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
     {
-        tasks.Add(new PassLegacy("Generating an abandoned processing site", delegate (GenerationProgress progress, GameConfiguration configuration)
+        tasks.Add(new PassLegacy(Mods.Everware.KilnQuarryGen.GetTextValue(), delegate (GenerationProgress progress, GameConfiguration configuration)
         {
             Point spawn = new(Main.spawnTileX, Main.spawnTileY);
             if (!Main.drunkWorld)
