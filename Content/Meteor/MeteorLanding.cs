@@ -1,12 +1,13 @@
-﻿using System.Linq;
+﻿using Everware.Common;
+using Everware.Common.Colors;
 using Everware.Common.Systems;
 using Everware.Utils;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+using MonoMod.Cil;
+using System.Linq;
 using System.Threading;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
-using Everware.Common;
-using Everware.Common.Colors;
-using MonoMod.Cil;
 
 namespace Everware.Content.Meteor;
 
@@ -28,7 +29,7 @@ public static class MeteorLanding
     private static readonly TrailSparkle[] sparkles_sky = new TrailSparkle[128];
     private static readonly TrailSparkle[] sparkles_far = new TrailSparkle[128];
     private static readonly TrailSparkle[] sparkles_middle = new TrailSparkle[128];
-    private static readonly TrailSparkle[] sparkles_near = new TrailSparkle[128];
+    private static readonly TrailSparkle[] sparkles_near = new TrailSparkle[256];
 
     private static int animationTimer;
 
@@ -59,9 +60,34 @@ public static class MeteorLanding
                 to += screenSize * 0.5f;
             }
 
-            var position = Vector2.Lerp(from, to, MathF.Pow(sparkle.Parallax, 1.3f)) + (sparkle.Offset * sparkle.Parallax);
+            var position = Vector2.Lerp(from, to, MathF.Pow(sparkle.Parallax, 1.3f)) + (sparkle.Offset * MathF.Pow(sparkle.Parallax, 1.5f));
 
-            sb.Draw(texture, position, null, Color.White, 0f, origin, 0.5f, SpriteEffects.None, 0f);
+            var scale = (1f - MathF.Pow(sparkle.TimeLeft, 2.3f)) * (1f - MathF.Pow(1f - sparkle.Parallax, 5f));
+
+            var color = Color.HslLerp(sky_flash_blue, sky_flash_yellow, sparkle.Parallax * scale);
+            color.A = 0;
+
+            var white = Color.White * sparkle.Parallax * scale;
+            white.A = 0;
+
+            scale *= 0.9f;
+
+            var size = new Vector2(0.3f, 1.4f) * scale;
+
+            var phase = (float)Main.timeForVisualEffects;
+            phase *= 0.01f;
+
+            var yScale = Terraria.Utils.Remap(MathF.Sin(phase) * sparkle.Parallax, -1f, 1f, 0.7f, 1f);
+
+            sb.Draw(texture, position, null, color, 0f, origin, size * yScale, SpriteEffects.None, 0f);
+            sb.Draw(texture, position, null, white, 0f, origin, size * yScale * 0.35f, SpriteEffects.None, 0f);
+
+            size *= 0.7f;
+
+            var xScale = Terraria.Utils.Remap(MathF.Cos(phase * 0.97f) * sparkle.Parallax, -1f, 1f, 0.6f, 1.05f);
+
+            sb.Draw(texture, position, null, color, MathHelper.PiOver2, origin, size * xScale, SpriteEffects.None, 0f);
+            sb.Draw(texture, position, null, white, MathHelper.PiOver2, origin, size * xScale * 0.35f, SpriteEffects.None, 0f);
         }
     }
 
@@ -208,19 +234,34 @@ public static class MeteorLanding
     public static bool MeteorSpawned { get; set; }
 
     [ModSystemHooks.PreWorldGen]
-    public static void PreWorldGen()
+    private static void PreWorldGen()
     {
         MeteorPosition = Point.Zero;
         MeteorSpawned = false;
     }
 
     [ModSystemHooks.OnWorldLoad]
-    public static void OnWorldLoad()
+    private static void OnWorldLoad()
     {
         animationTimer = 0;
         checkTime = -(60 * 20);
         MeteorPosition = Point.Zero;
         MeteorSpawned = false;
+        ClearSparkles();
+    }
+
+    [ModSystemHooks.ClearWorld]
+    private static void ClearWorld()
+    {
+        ClearSparkles();
+    }
+
+    private static void ClearSparkles()
+    {
+        Array.Clear(sparkles_sky);
+        Array.Clear(sparkles_far);
+        Array.Clear(sparkles_middle);
+        Array.Clear(sparkles_near);
     }
 
     private sealed class Inner : ModSystem
@@ -350,7 +391,9 @@ public static class MeteorLanding
                     MeteorSpawned = true;
                     for (var i = 0; i < 200; i++)
                     {
-                        SpawnSparkle(Main.rand.NextFloat());
+                        var depth = 1f - MathF.Pow(1f - Main.rand.NextFloat(), 3f);
+
+                        SpawnSparkle(depth);
                     }
                     // MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
@@ -383,9 +426,9 @@ public static class MeteorLanding
                 return;
             }
 
-            var offset = Main.rand.NextVector2Unit() * Main.rand.NextFloat(0f, 500f);
+            var offset = Main.rand.NextVector2Unit() * Main.rand.NextFloat(0f, 1900f);
 
-            target[index] = new TrailSparkle(true, offset, depth, 0f, Main.rand.NextFloat(0.001f, 0.01f));
+            target[index] = new TrailSparkle(true, offset, depth, Main.rand.NextFloat(0f, 0.4f), Main.rand.NextFloat(0.0003f, 0.001f));
 
             return;
 
