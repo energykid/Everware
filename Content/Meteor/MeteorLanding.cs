@@ -1,4 +1,5 @@
-﻿using Everware.Common.Systems;
+﻿using System.Linq;
+using Everware.Common.Systems;
 using Everware.Utils;
 using System.Threading;
 using Terraria.ID;
@@ -15,17 +16,56 @@ public static class MeteorLanding
     private static void Load()
     {
         On_Main.DrawSunAndMoon += DrawSunAndMoon_DrawFlare;
-        On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_BrightenBackground;
-        On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2_BrightenBackground;
-        IL_Main.DrawSurfaceBG += DrawSurfaceBG_BrightenBackground;
+        On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1;
+        On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2;
+        IL_Main.DrawSurfaceBG += DrawSurfaceBG;
+        On_Main.DrawSurfaceBG += DrawSurfaceBG_Sparkles;
     }
+
+    // TODO: Shill Rosemary's particle system to the Everware team.
+    private record struct TrailSparkle(bool Active, Vector2 Offset, float Parallax, float TimeLeft, float Increment);
+
+    private static readonly TrailSparkle[] sparkles_sky = new TrailSparkle[128];
+    private static readonly TrailSparkle[] sparkles_far = new TrailSparkle[128];
+    private static readonly TrailSparkle[] sparkles_middle = new TrailSparkle[128];
+    private static readonly TrailSparkle[] sparkles_near = new TrailSparkle[128];
 
     private static int animationTimer;
 
     private static readonly Color sky_flash_blue = new Color(235, 153, 255);
     private static readonly Color sky_flash_yellow = new Color(255, 138, 112);
 
-    private static void DrawSurfaceBG_BackMountainsStep1_BrightenBackground(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
+    private static void DrawSparkles(SpriteBatch sb, TrailSparkle[] sparkles)
+    {
+        var texture = TextureAssets.Extra[ExtrasID.ThePerfectGlow].Value;
+
+        var origin = texture.Size() * 0.5f;
+
+        foreach (var sparkle in sparkles)
+        {
+            if (!sparkle.Active)
+            {
+                continue;
+            }
+
+            var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+
+            var from = GetFlarePosition();
+
+            var to = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
+            {
+                to -= screenSize * 0.5f;
+                to *= Main.GameZoomTarget;
+                to += screenSize * 0.5f;
+            }
+
+            var position = Vector2.Lerp(from, to, MathF.Pow(sparkle.Parallax, 1.3f)) + (sparkle.Offset * sparkle.Parallax);
+
+            sb.Draw(texture, position, null, Color.White, 0f, origin, 0.5f, SpriteEffects.None, 0f);
+        }
+    }
+
+    private static void DrawSurfaceBG_BackMountainsStep1(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
     {
         const float brightness = 0.35f;
 
@@ -40,9 +80,11 @@ public static class MeteorLanding
         using var _ = Main.ColorOfSurfaceBackgroundsBase.Override(lightColor);
 
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
+
+        DrawSparkles(Main.spriteBatch, sparkles_far);
     }
 
-    private static void DrawSurfaceBG_BackMountainsStep2_BrightenBackground(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
+    private static void DrawSurfaceBG_BackMountainsStep2(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
     {
         const float brightness = 0.6f;
 
@@ -57,9 +99,11 @@ public static class MeteorLanding
         using var _ = Main.ColorOfSurfaceBackgroundsBase.Override(lightColor);
 
         orig(self, pushBGTopHack);
+
+        DrawSparkles(Main.spriteBatch, sparkles_middle);
     }
 
-    private static void DrawSurfaceBG_BrightenBackground(ILContext il)
+    private static void DrawSurfaceBG(ILContext il)
     {
         var c = new ILCursor(il);
 
@@ -88,6 +132,19 @@ public static class MeteorLanding
             }
         );
     }
+    private static void DrawSurfaceBG_Sparkles(On_Main.orig_DrawSurfaceBG orig, Main self)
+    {
+        orig(self);
+
+        if (!Main.BackgroundEnabled)
+        {
+            DrawSparkles(Main.spriteBatch, sparkles_sky);
+            DrawSparkles(Main.spriteBatch, sparkles_far);
+            DrawSparkles(Main.spriteBatch, sparkles_near);
+        }
+
+        DrawSparkles(Main.spriteBatch, sparkles_near);
+    }
 
     private static void DrawSunAndMoon_DrawFlare(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
     {
@@ -100,6 +157,8 @@ public static class MeteorLanding
         {
             DrawFlare((0f, 60f), 1.2f, Color.LightGoldenrodYellow with { A = 0 });
             DrawFlare((20f, 75f), 1.5f, (Color.Blue * 0.4f) with { A = 0 });
+
+            DrawSparkles(sb, sparkles_sky);
         }
         sb.Restart(in ss);
 
@@ -119,7 +178,7 @@ public static class MeteorLanding
 
             var flareOrigin = flareTexture.Size() * 0.5f;
 
-            var flarePosition = new Vector2((MeteorPosition.X / (float)Main.maxTilesX) * Main.screenWidth, Main.screenHeight * 0.15f);
+            var flarePosition = GetFlarePosition();
 
             var flareSize = new Vector2(0.5f, 1.4f) * flareScale;
 
@@ -128,6 +187,11 @@ public static class MeteorLanding
             flareSize.Y *= 0.6f;
             sb.Draw(flareTexture, flarePosition, null, color, MathHelper.PiOver2, flareOrigin, flareSize, SpriteEffects.None, 0f);
         }
+    }
+
+    private static Vector2 GetFlarePosition()
+    {
+        return new Vector2((1f - (MeteorPosition.X / (float)Main.maxTilesX)) * Main.screenWidth, Main.screenHeight * 0.15f);
     }
 
     [ModSystemHooks.ModifySunLightColor]
@@ -183,6 +247,13 @@ public static class MeteorLanding
     [ModSystemHooks.PostUpdateEverything]
     public static void UpdateMeteorPosition()
     {
+        const int fall_duration = 90;
+
+        UpdateSparkles(sparkles_sky);
+        UpdateSparkles(sparkles_far);
+        UpdateSparkles(sparkles_middle);
+        UpdateSparkles(sparkles_near);
+
         if (MeteorPosition == Point.Zero)
         {
             if (!NPC.downedBoss2)
@@ -224,8 +295,6 @@ public static class MeteorLanding
         }
         else
         {
-            const int fall_duration = 90;
-
             if (!MeteorSpawned && animationTimer > fall_duration + 8)
             {
                 animationTimer = 0;
@@ -235,6 +304,35 @@ public static class MeteorLanding
                 return;
             }
 
+            UpdateEffects();
+        }
+
+        return;
+
+        static void UpdateSparkles(TrailSparkle[] sparkles)
+        {
+            for (var i = 0; i < sparkles.Length; i++)
+            {
+                ref var sparkle = ref sparkles[i];
+
+                if (!sparkle.Active)
+                {
+                    continue;
+                }
+
+                sparkle.TimeLeft += sparkle.Increment;
+
+                if (sparkle.TimeLeft < 1f)
+                {
+                    continue;
+                }
+
+                sparkle.Active = false;
+            }
+        }
+
+        static void UpdateEffects()
+        {
             animationTimer++;
             switch (animationTimer)
             {
@@ -250,6 +348,10 @@ public static class MeteorLanding
                 case fall_duration + 8:
                     Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorSpawned = true;
+                    for (var i = 0; i < 200; i++)
+                    {
+                        SpawnSparkle(Main.rand.NextFloat());
+                    }
                     // MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
                 // Screen shake and effects
@@ -262,6 +364,44 @@ public static class MeteorLanding
                     ScreenEffects.AddScreenShake(Main.LocalPlayer.Center, intensity * 10f, 0.8f);
                     break;
                 }
+            }
+        }
+
+        static void SpawnSparkle(float depth)
+        {
+            var target = depth switch
+            {
+                < 0.15f => sparkles_sky,
+                < 0.2f => sparkles_far,
+                < 0.4f => sparkles_middle,
+                _ => sparkles_near,
+            };
+
+            var index = FindFirstInactive(target);
+            if (index == -1)
+            {
+                return;
+            }
+
+            var offset = Main.rand.NextVector2Unit() * Main.rand.NextFloat(0f, 500f);
+
+            target[index] = new TrailSparkle(true, offset, depth, 0f, Main.rand.NextFloat(0.001f, 0.01f));
+
+            return;
+
+            static int FindFirstInactive(TrailSparkle[] sparkles)
+            {
+                for (var i = 0; i < sparkles.Length; i++)
+                {
+                    if (sparkles[i].Active)
+                    {
+                        continue;
+                    }
+
+                    return i;
+                }
+
+                return -1;
             }
         }
     }
