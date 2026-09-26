@@ -131,6 +131,13 @@ public static partial class ColorExtensions
 
             float WrapLerp(float a, float b)
             {
+                if (a < b)
+                {
+                    a += 1;
+
+                    return Lerp(a, b) % 1f;
+                }
+
                 b += 1;
 
                 return Lerp(a, b) % 1f;

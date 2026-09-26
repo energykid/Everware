@@ -23,7 +23,7 @@ public static class MeteorLanding
     private static int animationTimer;
 
     private static readonly Color sky_flash_blue = new Color(235, 153, 255);
-    private static readonly Color sky_flash_yellow = new Color(255, 197, 153);
+    private static readonly Color sky_flash_yellow = new Color(255, 138, 112);
 
     private static void DrawSurfaceBG_BackMountainsStep1_BrightenBackground(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
     {
@@ -46,7 +46,7 @@ public static class MeteorLanding
     {
         const float brightness = 0.6f;
 
-        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 88, 300, 0f, MathF.PI));
 
         var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
 
@@ -77,9 +77,9 @@ public static class MeteorLanding
             {
                 const float brightness = 0.95f;
 
-                var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+                var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 85, 320, 0f, MathF.PI));
 
-                var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
+                var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness * 0.7f);
 
                 var lightColor = interpolated * alpha * brightness;
 
