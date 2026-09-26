@@ -2,9 +2,7 @@
 using Everware.Common.Colors;
 using Everware.Common.Systems;
 using Everware.Utils;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoMod.Cil;
-using System.Linq;
 using System.Threading;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -60,7 +58,9 @@ public static class MeteorLanding
                 to += screenSize * 0.5f;
             }
 
-            var position = Vector2.Lerp(from, to, MathF.Pow(sparkle.Parallax, 1.3f)) + (sparkle.Offset * MathF.Pow(sparkle.Parallax, 1.5f));
+            var zoom = MathHelper.Lerp(1f, Main.GameZoomTarget, MathF.Pow(sparkle.Parallax, 1.3f));
+
+            var position = Vector2.Lerp(from, to, MathF.Pow(sparkle.Parallax, 1.3f)) + (sparkle.Offset * zoom * MathF.Pow(sparkle.Parallax, 1.5f));
 
             var scale = (1f - MathF.Pow(sparkle.TimeLeft, 2.3f)) * (1f - MathF.Pow(1f - sparkle.Parallax, 5f));
 
