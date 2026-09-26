@@ -250,6 +250,12 @@ public static class MeteorLanding
         ClearSparkles();
     }
 
+    [ModSystemHooks.OnWorldUnload]
+    private static void OnWorldUnload()
+    {
+        ClearSparkles();
+    }
+
     [ModSystemHooks.ClearWorld]
     private static void ClearWorld()
     {
