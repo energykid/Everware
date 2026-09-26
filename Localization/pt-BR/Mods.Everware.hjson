@@ -116,7 +116,7 @@ Items: {
 		Tooltip: ""
 	}
 
-	EyeMusicBox: {	
+	EyeMusicBox: {
 		DisplayName: Caixa de Música (Olho de Cthulhu)
 		Tooltip: ""
 	}
@@ -554,5 +554,4 @@ Tiles: {
 }
 
 ConfigCategory.StyleSettings.Description: Configurações de Estilo
-
 Bestiary.Sculptor: Um velho e sábio artista de uma época muito anterior à sua. Anos de criostase deixaram sua pele pálida, mas frio algum é capaz de apagar sua paixão pelo ofício!
