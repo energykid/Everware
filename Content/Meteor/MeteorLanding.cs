@@ -18,11 +18,11 @@ public static class MeteorLanding
         On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1;
         On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2;
         IL_Main.DrawSurfaceBG += DrawSurfaceBG;
-        On_Main.DrawSurfaceBG += DrawSurfaceBG_Sparkles;
+        On_Main.DrawSurfaceBG += DrawSurfaceBG;
     }
 
     // TODO: Shill Rosemary's particle system to the Everware team.
-    private record struct TrailSparkle(bool Active, Vector2 Offset, float Parallax, float TimeLeft, float Increment);
+    private record struct TrailSparkle(bool Active, Vector2 Offset, Vector2 Velocity, float RotationalVelocity, float Parallax, float TimeLeft, float Increment);
 
     private static readonly TrailSparkle[] sparkles_sky = new TrailSparkle[128];
     private static readonly TrailSparkle[] sparkles_far = new TrailSparkle[128];
@@ -40,22 +40,23 @@ public static class MeteorLanding
 
         var origin = texture.Size() * 0.5f;
 
+        var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+
+        var from = GetFlarePosition();
+
+        // Best way we can respect zoom here, looks mediocre in motion but should be fine at constant zooms.
+        var to = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
+        {
+            to -= screenSize * 0.5f;
+            to *= Main.GameZoomTarget;
+            to += screenSize * 0.5f;
+        }
+
         foreach (var sparkle in sparkles)
         {
             if (!sparkle.Active)
             {
                 continue;
-            }
-
-            var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
-
-            var from = GetFlarePosition();
-
-            var to = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
-            {
-                to -= screenSize * 0.5f;
-                to *= Main.GameZoomTarget;
-                to += screenSize * 0.5f;
             }
 
             var zoom = MathHelper.Lerp(1f, Main.GameZoomTarget, MathF.Pow(sparkle.Parallax, 1.3f));
@@ -99,7 +100,7 @@ public static class MeteorLanding
     {
         const float brightness = 0.35f;
 
-        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 50, 290, 0f, MathF.PI));
 
         var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
 
@@ -118,7 +119,7 @@ public static class MeteorLanding
     {
         const float brightness = 0.6f;
 
-        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 88, 300, 0f, MathF.PI));
+        var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 59, 350, 0f, MathF.PI));
 
         var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness);
 
@@ -151,7 +152,7 @@ public static class MeteorLanding
             {
                 const float brightness = 0.95f;
 
-                var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 85, 320, 0f, MathF.PI));
+                var alpha = MathF.Sin(Terraria.Utils.Remap(animationTimer, 65, 420, 0f, MathF.PI));
 
                 var interpolated = Color.HslLerp(sky_flash_blue, sky_flash_yellow, alpha * brightness * 0.7f);
 
@@ -162,18 +163,73 @@ public static class MeteorLanding
             }
         );
     }
-    private static void DrawSurfaceBG_Sparkles(On_Main.orig_DrawSurfaceBG orig, Main self)
+    private static void DrawSurfaceBG(On_Main.orig_DrawSurfaceBG orig, Main self)
     {
         orig(self);
 
+        var sb = Main.spriteBatch;
+
         if (!Main.BackgroundEnabled)
         {
-            DrawSparkles(Main.spriteBatch, sparkles_sky);
-            DrawSparkles(Main.spriteBatch, sparkles_far);
-            DrawSparkles(Main.spriteBatch, sparkles_near);
+            DrawSparkles(sb, sparkles_sky);
+            DrawSparkles(sb, sparkles_far);
+            DrawSparkles(sb, sparkles_near);
         }
 
-        DrawSparkles(Main.spriteBatch, sparkles_near);
+        DrawSparkles(sb, sparkles_near);
+
+        var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+
+        var from = GetFlarePosition();
+
+        var to = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
+        {
+            to -= screenSize * 0.5f;
+            to *= Main.GameZoomTarget;
+            to += screenSize * 0.5f;
+        }
+
+        const float lower = 55f;
+        const float upper = 98f;
+
+        if (animationTimer < lower
+         || animationTimer > upper)
+        {
+            return;
+        }
+
+        var interpolator = Terraria.Utils.Remap(animationTimer, lower, upper, 0f, 1f);
+
+        interpolator = MathF.Pow(interpolator, 2f);
+
+        var meteorTexture = Assets.Textures.Meteor.Falling.Asset.Value;
+
+        var meteorOrigin = meteorTexture.Size() * new Vector2(0.5f, 0.5f);
+
+        var meteorPosition = Vector2.Lerp(from, to, interpolator);
+
+        var meteorScale = interpolator * 6.4f;
+
+        var color = new Color(226, 130, 255) * 0.7f;
+        color.A = 0;
+
+        var rotation = from.DirectionTo(to).ToRotation();
+        rotation -= MathHelper.PiOver2;
+
+        sb.Draw(meteorTexture, meteorPosition, null, color, rotation, meteorOrigin, new Vector2(1.5f, 1f) * meteorScale, SpriteEffects.None, 0f);
+
+        color = new Color(255, 214, 99) * 0.8f;
+        color.A = 0;
+
+        meteorScale *= 0.7f;
+
+        sb.Draw(meteorTexture, meteorPosition, null, color, rotation, meteorOrigin, meteorScale, SpriteEffects.None, 0f);
+
+        var flareTexture = TextureAssets.Extra[ExtrasID.ThePerfectGlow].Value;
+
+        var flareOrigin = flareTexture.Size() * 0.5f;
+
+        sb.Draw(flareTexture, meteorPosition, null, color, MathHelper.PiOver2, flareOrigin, 3f, SpriteEffects.None, 0f);
     }
 
     private static void DrawSunAndMoon_DrawFlare(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
@@ -227,7 +283,7 @@ public static class MeteorLanding
     [ModSystemHooks.ModifySunLightColor]
     private static void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
     {
-        var lightColor = sky_flash_yellow * MathF.Sin(Terraria.Utils.Remap(animationTimer, 90, 290, 0f, MathF.PI));
+        var lightColor = sky_flash_yellow * MathF.Sin(Terraria.Utils.Remap(animationTimer, 60, 490, 0f, MathF.PI));
 
         tileColor = Color.Max(tileColor, lightColor * 0.6f);
         backgroundColor = Color.Max(backgroundColor, lightColor * 0.2f);
@@ -349,8 +405,9 @@ public static class MeteorLanding
             if (!MeteorSpawned && animationTimer > fall_duration + 8)
             {
                 animationTimer = 0;
+                ClearSparkles();
             }
-            if (MeteorSpawned && animationTimer >= Assets.Sounds.Misc.MeteorCrash.Asset.FrameDuration + 70)
+            if (MeteorSpawned && animationTimer >= 1700)
             {
                 return;
             }
@@ -372,6 +429,12 @@ public static class MeteorLanding
                 }
 
                 sparkle.TimeLeft += sparkle.Increment;
+
+                sparkle.Velocity = sparkle.Velocity.RotatedBy(sparkle.RotationalVelocity);
+                sparkle.RotationalVelocity *= 0.996f;
+
+                sparkle.Offset += sparkle.Velocity;
+                sparkle.Velocity *= 0.998f;
 
                 if (sparkle.TimeLeft < 1f)
                 {
@@ -399,24 +462,49 @@ public static class MeteorLanding
                 case fall_duration + 8:
                     Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorSpawned = true;
-                    for (var i = 0; i < 200; i++)
-                    {
-                        var depth = 1f - MathF.Pow(1f - Main.rand.NextFloat(), 3f);
-
-                        SpawnSparkle(depth);
-                    }
                     // MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
                 // Screen shake and effects
                 case > fall_duration + 8 and < 400:
                 {
-                    float intensity = MathHelper.Lerp(1f, 0f, (animationTimer - 60f) / 340f);
+                    float intensity = MathHelper.Lerp(1f, 0f, (animationTimer - 60f) / 400f);
 
                     ScreenEffects.DimScreen(intensity * 0.1f);
                     ScreenEffects.ZoomScreen(-intensity * 0.05f);
                     ScreenEffects.AddScreenShake(Main.LocalPlayer.Center, intensity * 10f, 0.8f);
                     break;
                 }
+            }
+
+            var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+
+            var from = GetFlarePosition();
+
+            var to = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
+            {
+                to -= screenSize * 0.5f;
+                to *= Main.GameZoomTarget;
+                to += screenSize * 0.5f;
+            }
+
+            const float lower = 55f;
+            const float upper = 98f;
+
+            if (animationTimer < lower
+             || animationTimer > upper)
+            {
+                return;
+            }
+
+            var priorInterpolator = Terraria.Utils.Remap(animationTimer - 1, lower, upper, 0f, 1f);
+            priorInterpolator = MathF.Pow(priorInterpolator, 2f);
+
+            var interpolator = Terraria.Utils.Remap(animationTimer, lower, upper, 0f, 1f);
+            interpolator = MathF.Pow(interpolator, 2f);
+
+            for (int i = 0; i < Main.rand.Next((int)(30 * (1f - MathF.Pow(1f - interpolator, 1.2f)))); i++)
+            {
+                SpawnSparkle(Main.rand.NextFloat(priorInterpolator, interpolator));
             }
         }
 
@@ -436,9 +524,17 @@ public static class MeteorLanding
                 return;
             }
 
-            var offset = Main.rand.NextVector2Unit() * Main.rand.NextFloat(0f, 1900f);
+            var offset = Main.rand.NextVector2Unit();
 
-            target[index] = new TrailSparkle(true, offset, depth, Main.rand.NextFloat(0f, 0.3f), Main.rand.NextFloat(0.0002f, 0.001f));
+            target[index] = new TrailSparkle(
+                true,
+                offset * Main.rand.NextFloat(60f, 300f),
+                offset * Main.rand.NextFloat(0.6f, 4f),
+                Main.rand.NextFloat(-0.006f, 0.006f),
+                depth,
+                Main.rand.NextFloat(0f, 0.3f),
+                Main.rand.NextFloat(0.0002f, 0.001f)
+            );
 
             return;
 
