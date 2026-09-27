@@ -64,6 +64,10 @@ public static class MeteorLanding
 
             var scale = (1f - MathF.Pow(sparkle.TimeLeft, 2.3f)) * (1f - MathF.Pow(1f - sparkle.Parallax, 5f));
 
+            var bump = MathF.Sin(Terraria.Utils.Remap(sparkle.TimeLeft, 1f - (sparkle.Increment * 25f), 1f, 0f, MathF.PI));
+
+            scale += bump * 0.85f;
+
             var color = Color.HslLerp(sky_flash_blue, sky_flash_yellow, sparkle.Parallax * scale);
             color.A = 0;
 
@@ -434,7 +438,7 @@ public static class MeteorLanding
 
             var offset = Main.rand.NextVector2Unit() * Main.rand.NextFloat(0f, 1900f);
 
-            target[index] = new TrailSparkle(true, offset, depth, Main.rand.NextFloat(0f, 0.4f), Main.rand.NextFloat(0.0003f, 0.001f));
+            target[index] = new TrailSparkle(true, offset, depth, Main.rand.NextFloat(0f, 0.3f), Main.rand.NextFloat(0.0002f, 0.001f));
 
             return;
 
