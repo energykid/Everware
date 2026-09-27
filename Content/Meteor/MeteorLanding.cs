@@ -19,6 +19,42 @@ public static class MeteorLanding
         On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2;
         IL_Main.DrawSurfaceBG += DrawSurfaceBG;
         On_Main.DrawSurfaceBG += DrawSurfaceBG;
+
+        On_Main.DrawInfernoRings += DrawInfernoRings_Shockwave;
+    }
+
+    private static void DrawInfernoRings_Shockwave(On_Main.orig_DrawInfernoRings orig, Main self)
+    {
+        orig(self);
+
+        var sb = Main.spriteBatch;
+
+        var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+
+        var distance = (animationTimer - 75) * 300f;
+
+        var position = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
+        position += position.DirectionTo(screenSize * 0.5f) * distance;
+
+        var texture = Assets.Textures.Meteor.Shockwave.Asset.Value;
+
+        var origin = texture.Size() * 0.5f;
+
+        var scale = screenSize.Length() / texture.Height;
+
+        var rotation = position.DirectionTo(screenSize * 0.5f).ToRotation();
+
+        var color = sky_flash_blue * 0.4f;
+        color.A = 0;
+
+        sb.Draw(texture, position, null, color, rotation, origin, scale, SpriteEffects.None, 0f);
+
+        color = sky_flash_yellow;
+        color.A = 0;
+
+        position -= position.DirectionTo(screenSize * 0.5f) * 140;
+
+        sb.Draw(texture, position, null, color, rotation, origin, scale, SpriteEffects.FlipVertically, 0f);
     }
 
     // TODO: Shill Rosemary's particle system to the Everware team.
@@ -283,7 +319,7 @@ public static class MeteorLanding
     [ModSystemHooks.ModifySunLightColor]
     private static void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
     {
-        var lightColor = sky_flash_yellow * MathF.Sin(Terraria.Utils.Remap(animationTimer, 60, 490, 0f, MathF.PI));
+        var lightColor = sky_flash_yellow * MathF.Sin(Terraria.Utils.Remap(animationTimer, 50, 690, 0f, MathF.PI));
 
         tileColor = Color.Max(tileColor, lightColor * 0.6f);
         backgroundColor = Color.Max(backgroundColor, lightColor * 0.2f);
@@ -402,7 +438,7 @@ public static class MeteorLanding
         }
         else
         {
-            if (!MeteorSpawned && animationTimer > fall_duration + 8)
+            if (!MeteorSpawned && animationTimer > fall_duration + 60)
             {
                 animationTimer = 0;
                 ClearSparkles();
@@ -454,37 +490,23 @@ public static class MeteorLanding
                 case 1:
                     SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorFall.Asset);
                 break;
-                // Meteor landing sound
-                case fall_duration:
-                    SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset, MeteorPosition.ToWorldCoordinates(), attenuationDistance: 150000f);
-                break;
                 // Meteor landing text
-                case fall_duration + 8:
+                case fall_duration + 20:
                     Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorSpawned = true;
                     // MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
-                // Screen shake and effects
-                case > fall_duration + 8 and < 400:
-                {
-                    float intensity = MathHelper.Lerp(1f, 0f, (animationTimer - 60f) / 400f);
-
-                    ScreenEffects.DimScreen(intensity * 0.1f);
-                    ScreenEffects.ZoomScreen(-intensity * 0.05f);
-                    ScreenEffects.AddScreenShake(Main.LocalPlayer.Center, intensity * 10f, 0.8f);
-                    break;
-                }
             }
+
+            var distance = (animationTimer - 75) * 300f;
 
             var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
 
-            var from = GetFlarePosition();
-
-            var to = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
+            if (distance > MeteorPosition.ToWorldCoordinates().Distance(Main.screenPosition + screenSize) - 200f
+             && distance < MeteorPosition.ToWorldCoordinates().Distance(Main.screenPosition + screenSize) + 400f)
             {
-                to -= screenSize * 0.5f;
-                to *= Main.GameZoomTarget;
-                to += screenSize * 0.5f;
+                ScreenEffects.AddScreenShake(MeteorPosition.ToWorldCoordinates(), 23f, 0.99f, 150000f);
+                SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset, MeteorPosition.ToWorldCoordinates(), attenuationDistance: 150000f);
             }
 
             const float lower = 55f;
@@ -502,7 +524,7 @@ public static class MeteorLanding
             var interpolator = Terraria.Utils.Remap(animationTimer, lower, upper, 0f, 1f);
             interpolator = MathF.Pow(interpolator, 2f);
 
-            for (int i = 0; i < Main.rand.Next((int)(30 * (1f - MathF.Pow(1f - interpolator, 1.2f)))); i++)
+            for (int i = 0; i < (int)(20 * (1f - MathF.Pow(1f - interpolator, 1.2f))); i++)
             {
                 SpawnSparkle(Main.rand.NextFloat(priorInterpolator, interpolator));
             }
