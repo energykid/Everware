@@ -348,6 +348,11 @@ Items: {
 		DisplayName: Living Star Wand
 		Tooltip: ""
 	}
+
+	ExcessiveForce: {
+		DisplayName: Excessive Force
+		Tooltip: This benefits noone.
+	}
 }
 
 Biomes: {
@@ -398,7 +403,7 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Mania
 	DichromaticSkullWater.DisplayName: Bubble
 	TileCluster.DisplayName: Cluster
-	CosmoebaExplosion.DisplayName: Cosmoeba Explosion
+	CosmoebaExplosion.DisplayName: Cosmoeba
 }
 
 Buffs: {

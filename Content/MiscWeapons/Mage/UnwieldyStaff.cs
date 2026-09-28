@@ -31,7 +31,7 @@ class UnwieldyStaff : EverWeaponItem
     {
         Item.noMelee = true;
         Item.noUseGraphic = true;
-        Item.DefaultToBasicWeapon(32, 120, DamageClass.Magic);
+        Item.DefaultToBasicWeapon(40, 90, DamageClass.Magic);
         Item.rare = ItemRarityID.Green;
         Item.mana = 10;
         Item.value = Sell.Silver(30);
