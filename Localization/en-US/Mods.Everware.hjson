@@ -328,6 +328,31 @@ Items: {
 	Hits: Hits
 	Times: times
 	AnyCopperBar: Any Copper Bar
+
+	CharredSoilItem: {
+		DisplayName: Charred Soil
+		Tooltip: ""
+	}
+
+	MagicStoneItem: {
+		DisplayName: Magic Stone
+		Tooltip: ""
+	}
+
+	CharredSoilWallItem: {
+		DisplayName: Charred Wall
+		Tooltip: ""
+	}
+
+	LivingStarWand: {
+		DisplayName: Living Star Wand
+		Tooltip: ""
+	}
+
+	ExcessiveForce: {
+		DisplayName: Excessive Force
+		Tooltip: This benefits noone.
+	}
 }
 
 Biomes: {
@@ -344,6 +369,11 @@ Biomes: {
 	TheGallery: {
 		DisplayName: Gallery
 		TownNPCDialogueName: the Gallery
+	}
+
+	MeteorBiome: {
+		DisplayName: Meteor
+		TownNPCDialogueName: the Meteor
 	}
 }
 
@@ -373,6 +403,7 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Mania
 	DichromaticSkullWater.DisplayName: Bubble
 	TileCluster.DisplayName: Cluster
+	CosmoebaExplosion.DisplayName: Cosmoeba
 }
 
 Buffs: {
@@ -450,7 +481,7 @@ NPCs: {
 		DisplayName: Sculptor
 		Reliquary: Reliquary
 		Chisel: Chisel
-		BestiaryEntry: An old, wisened artist from a time long before yours. Years of cryostasis made his skin pale, but no cold can dull his passion for his craft!
+		BestiaryEntry: An old, wisened artist from a time long before yours. Years of cryostasis have made his skin pale as marble, but not even the coldest ice can dull his passion for his craft!
 
 		Dialogue: {
 			Greeting: {
@@ -542,6 +573,9 @@ NPCs: {
 			Princess_LovesNPC: I like {NPCName}.
 		}
 	}
+
+	Cosmoeba.DisplayName: Cosmoeba
+	SpectralSnail.DisplayName: Spectral Snail
 }
 
 DeathReason.SnapdragonIce: experienced absolute zero.
@@ -554,4 +588,12 @@ Tiles: {
 }
 
 ConfigCategory.StyleSettings.Description: Style Settings
-Bestiary.Sculptor: An old, wisened artist from a time long before yours. Years of cryostasis made his skin pale, but no cold can dull his passion for his craft!
+
+Bestiary: {
+	Sculptor: An old, wisened artist from a time long before yours. Years of cryostasis made his skin pale, but no cold can dull his passion for his craft!
+	Cosmoeba: These skittish creatures feed off the magic stone found near meteors. They are usually docile, but if threatened they will go to extreme lengths to defend their colony.
+	SpectralSnail: Plasma snails come in multiple varieties. These ones can be found feeding on cosmic radiation near foreign objects from space. This radiation, while harmless to you, grants these snails the ability to phase out of tangibility when threatened.
+}
+
+MeteorLandingGen: A meteor has crash-landed in your world!
+KilnQuarryGen: Generating an abandoned processing site
