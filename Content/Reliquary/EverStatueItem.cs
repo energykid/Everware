@@ -10,6 +10,7 @@ public abstract class EverStatueItem : EverPlaceableItem
     public virtual int UpgradeStack => 1;
     public override void SetStaticDefaults()
     {
+        base.SetStaticDefaults();
         ChiselablesList.AllChiselables.Add(new(BaseStatue, Type, UpgradeMaterial, UpgradeStack));
     }
     public override int DuplicationAmount => 1;

@@ -4,7 +4,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Underground.DeepCaveLoot;
 
-public class TrickGlove : EverItem
+public class TrickGlove : EverEquipmentItem
 {
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/TrickGlove";
 
@@ -50,8 +50,7 @@ public class TrickGlove : EverItem
         public SleightParticle(Vector2 pos, float rot, int player, float dir) : base(pos, Vector2.Zero, Vector2.One, null, null)
         {
             AffectedByLight = false;
-            Asset = Assets.Textures.Misc.LensFlash.Asset;
-            Origin = Asset.Size() / 2f;
+            Origin = Texture.Size() / 2f;
             Color = new Color(255, 255, 61, 255);
             Scale = new Vector2(0.3f, 1f);
             Rotation = rot;
