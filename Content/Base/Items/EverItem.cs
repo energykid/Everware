@@ -9,7 +9,7 @@ public abstract class EverItem : ModItem
 
     public virtual int Rarity => ItemRarityID.White;
 
-    public static Asset<Texture2D> Asset = null;
+    public Asset<Texture2D> Asset;
 
     public override void SetDefaults()
     {

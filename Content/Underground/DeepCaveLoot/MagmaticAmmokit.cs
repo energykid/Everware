@@ -7,7 +7,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Underground.DeepCaveLoot;
 
-public class MagmaticAmmokit : EverItem
+public class MagmaticAmmokit : EverEquipmentItem
 {
     public override int Rarity => 3;
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/MagmaticAmmokit";
