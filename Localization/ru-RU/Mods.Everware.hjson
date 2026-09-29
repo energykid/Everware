@@ -358,6 +358,11 @@ Items: {
 		// DisplayName: Excessive Force
 		// Tooltip: This benefits noone.
 	}
+
+	TrickGlove: {
+		// DisplayName: Trick Glove
+		// Tooltip: ""
+	}
 }
 
 Biomes: {

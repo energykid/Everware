@@ -118,7 +118,6 @@ public class MagmaticExplosion : EverProjectile
             {
                 Rotation = Projectile.rotation
             }.Spawn();
-
         }
 
         if (Projectile.ai[0] > 8) Projectile.Kill();
