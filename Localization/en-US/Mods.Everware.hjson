@@ -12,7 +12,7 @@ Items: {
 	KilnstoneHelmet: {
 		DisplayName: Kilnstone Helmet
 		Tooltip: ""
-		SetBonus: Lingering mining speed boost when breaking soft blocks or stone
+		SetBonus: Gradual mining speed boost when breaking soft blocks or stone
 	}
 
 	KilnstoneBrickplate: {
@@ -98,7 +98,7 @@ Items: {
 
 	Rebuker: {
 		DisplayName: Rebuker
-		Tooltip: Fires a piercing metal rod that deals less damage on subsequent hits
+		Tooltip: Fires a metal rod that deals less damage on subsequent hits
 	}
 
 	KilnMusicBox: {
@@ -125,8 +125,8 @@ Items: {
 		DisplayName: Devil's Ruby
 		Tooltip:
 			'''
-			Double tap a direction to dash, creating a damaging explosion behind you
-			Dashing also briefly stops you from falling
+			Double tap a direction to dash, creating an explosion behind you
+			Dashing also stops you from falling
 			'''
 	}
 
@@ -134,8 +134,7 @@ Items: {
 		DisplayName: Pyrocleavers
 		Tooltip:
 			'''
-			Throws molten cleavers that melt into the floor, leaving lingering lava
-			If hitting a wall, the cleavers will bounce off of it
+			Throws molten cleavers that bounce off walls and melt into the floor
 			'''
 	}
 
@@ -143,8 +142,7 @@ Items: {
 		DisplayName: Obsidian Skull Staff
 		Tooltip:
 			'''
-			Summons a terrifying, laughing, screaming obsidian skull that explodes on contact
-			Regenerates shortly after hitting an enemy
+			Summons a terrifying, laughing, screaming obsidian skull that explodes and regenerates
 			'''
 	}
 
@@ -153,7 +151,7 @@ Items: {
 		Tooltip:
 			'''
 			Right click to pump, increasing bullet count and speed while reducing spread
-			Three consecutive pumps before firing maxes your charge and causes heavy recoil when attacking
+			Heavy recoil after three pumps
 			'''
 	}
 
@@ -217,7 +215,6 @@ Items: {
 		Tooltip:
 			'''
 			Double-tap DOWN to perform a ground pound
-			Hitting enemies with this move deals damage and bounces you upward
 			'''
 	}
 
@@ -236,8 +233,7 @@ Items: {
 		Tooltip:
 			'''
 			Right click to insert ice into the minigun
-			When firing, the minigun will rapidly chill and convert small chunks of ice into large shards for extra damage
-			After a while, however, it will still run out of ice
+			When firing, the minigun will convert inserted ice into extra shards
 			'''
 	}
 
@@ -250,7 +246,7 @@ Items: {
 
 	CrystalStarStatueItem: {
 		DisplayName: Crystal Star Statue
-		Tooltip: When wired, spawns a [c/AA95E1:Power Star] which increases your magic attack speed greatly but decreases magic damage
+		Tooltip: When wired, spawns a [c/AA95E1:Power Star] which increases magic attack speed but decreases damage
 	}
 
 	PowerStar.DisplayName: Power Star
@@ -259,9 +255,9 @@ Items: {
 		DisplayName: Great Gargoyle
 		Tooltip:
 			'''
-			Hitting enemies builds up your [c/A3FF33:Charge Meter]
-			At full meter buildup, right click to awaken the Gargoyle
-			This harms and tags nearby enemies for increased melee and summon damage
+			Hitting enemies builds up your [c/A3FF33:Meter]
+			At full meter buildup, right click to awaken the Gargoyle, tagging nearby enemies
+			Tagged enemies take increased melee and summon damage
 			'''
 		SummonDamage: summon damage when awakened
 	}
@@ -270,7 +266,7 @@ Items: {
 		DisplayName: Master Lockpick
 		Tooltip:
 			'''
-			Unlocks gold and steel chests when swung
+			Unlocks common chests when swung
 			'Great for picking master locks!'
 			'''
 	}
@@ -285,7 +281,7 @@ Items: {
 		Tooltip:
 			'''
 			+5% increased ranged critical strike chance
-			Ranged critical strikes create an explosion which hits behind the enemy
+			Ranged critical strikes explode
 			'''
 	}
 
@@ -294,7 +290,7 @@ Items: {
 		Tooltip:
 			'''
 			Allows parrying projectiles using melee weapons
-			Upon successfully parrying a projectile, gain +20% melee speed
+			Upon successful parry, gain +20% melee speed
 			10 second cooldown
 			'''
 	}
@@ -305,7 +301,7 @@ Items: {
 			'''
 			Facing left will shoot lingering, defense-reducing bubbles
 			Facing right will shoot a mid-range burst of fire
-			Enemies afflicted with both debuffs will take extra damage
+			Enemies afflicted with both will take extra damage
 			'''
 	}
 
@@ -313,9 +309,8 @@ Items: {
 		DisplayName: Atlas' Crown
 		Tooltip:
 			'''
-			While not attacking, hold UP to gradually summon clusters from the ground
+			Hold UP to gradually summon clusters from the ground
 			Attacking will unleash them towards your cursor
-			The size, damage and frequency of summoned clusters depend on your held weapon's attack speed
 			'''
 	}
 
@@ -352,6 +347,15 @@ Items: {
 	ExcessiveForce: {
 		DisplayName: Excessive Force
 		Tooltip: This benefits noone.
+	}
+
+	TrickGlove: {
+		DisplayName: Trick Glove
+		Tooltip: 
+			'''
+			Swapping held magic weapons boosts magic power
+            Attack 3 times to refresh
+			'''
 	}
 }
 
@@ -439,7 +443,7 @@ Buffs: {
 
 	RazorsEdgeCooldownBuff: {
 		DisplayName: Parry Cooldown
-		Description: You cannot parry again for a short period of time
+		Description: You briefly cannot parry
 	}
 }
 
