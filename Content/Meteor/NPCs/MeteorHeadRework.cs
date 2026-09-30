@@ -17,6 +17,9 @@ public class MeteorHeadRework : GlobalNPC
     }
     public override bool PreAI(NPC npc)
     {
+        if (npc.ai[3] == 1)
+            return false;
+
         if (npc.ai[1] != 0)
         {
             if (!Main.npc[(int)npc.ai[1]].active)
