@@ -270,7 +270,7 @@ public static class MeteorLanding
 
         var meteorTexture = Assets.Textures.Meteor.Falling.Asset.Value;
 
-        sb.Draw(meteorTexture, meteorPosition, null, Color.Black, 0f, meteorTexture.Size() * 0.5f, flatInterpolator * 2.5f, SpriteEffects.None, 0f);
+        sb.Draw(meteorTexture, meteorPosition, null, Color.Black, 0f, meteorTexture.Size() * 0.5f, MathF.Pow(flatInterpolator, 2f) * 2.1f, SpriteEffects.None, 0f);
 
         sb.End(out var ss);
         sb.Begin(ss with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
@@ -291,7 +291,7 @@ public static class MeteorLanding
             size *= flatInterpolator * 2;
 
             var rotation = from.DirectionTo(to).ToRotation();
-
+            
             var origin = noise.Size() * new Vector2(0.825f, 0.5f);
 
             sb.Draw(noise, meteorPosition, null, Color.White, rotation, origin, size, SpriteEffects.None, 0f);
