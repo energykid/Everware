@@ -195,6 +195,11 @@ public class HotShotHoldout : EverHoldoutProjectile
 
         if (it != null)
         {
+            Player player = Main.player[Projectile.owner];
+
+            var Source = new EntitySource_ItemUse_WithAmmo(player, player.HeldItem, it.type, "Hot Shot fire");
+            var BlastSource = new EntitySource_ItemUse_WithAmmo(player, player.HeldItem, it.type, "Hot Shot fire");
+            
             float charge = GetChargeAmount() / 3f;
             charge = Math.Clamp(charge, 0f, 1f);
             Vector2 blastlocation = new Vector2(40, 0).RotatedBy(Rotation);
@@ -205,12 +210,12 @@ public class HotShotHoldout : EverHoldoutProjectile
             {
                 Vector2 v = new Vector2(20, 0).RotatedBy(Rotation);
                 if (Collision.CanHitLine(Owner.Center, 2, 2, Owner.Center + v, 2, 2)) v = Vector2.Zero;
-                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot fire"), Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
+                Projectile.NewProjectile(Source, Owner.Center + v, new Vector2(speed, 0).RotatedBy(Owner.AngleTo(NetworkOwner.MousePosition)).RotatedByRandom(MathHelper.ToRadians(spread)), it.shoot, Projectile.damage, 4, Projectile.owner);
             }
             if (GetChargeAmount() <= 2)
             {
                 ScreenEffects.AddScreenShake(Owner.Center, 5f, 0.5f);
-                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+                Projectile.NewProjectile(BlastSource, Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurst>(), Projectile.damage * (int)amt, 4, Projectile.owner);
             }
             else
             {
@@ -219,7 +224,7 @@ public class HotShotHoldout : EverHoldoutProjectile
                 vel *= new Vector2(0.5f, 0.75f);
                 Owner.velocity += vel;
                 NetMessage.SendData(MessageID.PlayerControls, number: Owner.whoAmI);
-                Projectile.NewProjectile(new EntitySource_Parent(Main.player[Projectile.owner], "Hot Shot blast"), Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
+                Projectile.NewProjectile(BlastSource, Owner.Center + blastlocation, Vector2.Zero, ModContent.ProjectileType<HotShotBurstLarge>(), Projectile.damage * (int)amt, 4, Projectile.owner);
             }
 
             Lighting.AddLight(Projectile.Center, 0.6f, 0.4f, 0.1f);

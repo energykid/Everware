@@ -7,7 +7,7 @@ using Terraria.ID;
 namespace Everware.Content.Underground.DeepCaveLoot;
 
 [AutoloadEquip(EquipType.Shoes)]
-public class Groundshakers : EverItem
+public class Groundshakers : EverEquipmentItem
 {
     public override int DuplicationAmount => 1;
     public static int Damage => 20;

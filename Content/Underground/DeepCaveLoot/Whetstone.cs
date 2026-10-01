@@ -6,7 +6,7 @@ using Terraria.ID;
 
 namespace Everware.Content.Underground.DeepCaveLoot;
 
-public class Whetstone : EverItem
+public class Whetstone : EverEquipmentItem
 {
     public override int Rarity => ItemRarityID.Pink;
     public static readonly float ParryRange = 1.5f;

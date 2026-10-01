@@ -10,11 +10,13 @@ public class MeteorBiome : ModBiome
     }
     public override void Load()
     {
-        On_Main.DrawBackground += DrawStuff;
+        On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawMeteorBackground;
     }
 
-    private void DrawStuff(On_Main.orig_DrawBackground orig, Main self)
+    private void DrawMeteorBackground(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBgTopHack)
     {
+        orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBgTopHack);
+        
         var asset = Assets.Textures.Misc.SinglePixel.Asset;
 
         var eff = Assets.Effects.Meteor.MeteorBackground.CreateEffect();
@@ -24,13 +26,11 @@ public class MeteorBiome : ModBiome
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, eff.Shader);
         Main.EntitySpriteDraw(asset.Value, Vector2.Zero, asset.Frame(), Color.White.MultiplyRGBA(new(MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity, MeteorEffectSystem.Intensity)), 0f, Vector2.Zero, new Vector2(Main.screenWidth * 5f, Main.screenHeight * 3f), Main.GameViewMatrix.Effects);
         Main.spriteBatch.Restart(sb);
-
-        orig(self);
     }
 
     public override void Unload()
     {
-        On_Main.DrawBackground -= DrawStuff;
+        On_Main.DrawSurfaceBG_BackMountainsStep1 -= DrawMeteorBackground;
     }
 }
 public class MeteorEffectSystem : ModSystem

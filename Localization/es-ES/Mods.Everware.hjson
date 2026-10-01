@@ -348,6 +348,16 @@ Items: {
 		// DisplayName: Living Star Wand
 		// Tooltip: ""
 	}
+
+	ExcessiveForce: {
+		// DisplayName: Excessive Force
+		// Tooltip: This benefits noone.
+	}
+
+	TrickGlove: {
+		// DisplayName: Trick Glove
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -398,7 +408,7 @@ Projectiles: {
 	DichromaticSkullFlame.DisplayName: Llamas de la Calavera Dicromática
 	DichromaticSkullWater.DisplayName: Agua de la Calavera Dicromática
 	TileCluster.DisplayName: Trozo de Bloques
-	// CosmoebaExplosion.DisplayName: Cosmoeba Explosion
+	// CosmoebaExplosion.DisplayName: Cosmoeba
 }
 
 Buffs: {

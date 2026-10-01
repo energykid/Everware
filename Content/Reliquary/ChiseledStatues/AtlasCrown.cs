@@ -7,7 +7,7 @@ using Terraria.ID;
 namespace Everware.Content.Reliquary.ChiseledStatues;
 
 [AutoloadEquip(EquipType.Face)]
-public class AtlasCrown : EverItem
+public class AtlasCrown : EverEquipmentItem
 {
     public override string Texture => "Everware/Assets/Textures/Reliquary/ChiseledStatues/AtlasCrown";
     public override int Rarity => 6;

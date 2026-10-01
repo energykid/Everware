@@ -124,7 +124,7 @@ public abstract class EverWeaponItem : EverItem
         }
         if (HoldoutType != null && player.ownedProjectileCounts[(int)HoldoutType] < 1 && player.heldProj == -1 && !Main.dedServ && Main.myPlayer == player.whoAmI)
         {
-            var proj = Projectile.NewProjectileDirect(new EntitySource_Misc("Held Projectile"), player.Center, Vector2.Zero, (int)HoldoutType, Item.damage, Item.knockBack, player.whoAmI);
+            var proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(player, Item, "Everware Held Projectile"), player.Center, Vector2.Zero, (int)HoldoutType, Item.damage, Item.knockBack, player.whoAmI);
 
             (proj.ModProjectile as EverHoldoutProjectile).AmmoType = Ammo;
         }
@@ -142,21 +142,23 @@ public abstract class EverWeaponItem : EverItem
     {
         if (HoldoutType != null && player.heldProj == -1)
         {
-            var proj = Projectile.NewProjectileDirect(new EntitySource_Misc("Held Projectile"), player.Center, Vector2.Zero, (int)HoldoutType, Item.damage, Item.knockBack, player.whoAmI);
+            var proj = Projectile.NewProjectileDirect(new EntitySource_ItemUse(player, Item, "Everware Held Projectile"), player.Center, Vector2.Zero, (int)HoldoutType, Item.damage, Item.knockBack, player.whoAmI);
 
             (proj.ModProjectile as EverHoldoutProjectile).AmmoType = Ammo;
             return false;
         }
         return base.Shoot(player, source, position, velocity, type, damage, knockback);
     }
-    public void ConsumeAmmo(Player player)
+    public Item ConsumeAmmo(Player player)
     {
-        EntitySource_ItemUse_WithAmmo es = new EntitySource_ItemUse_WithAmmo(player, Item, Ammo);
-
         Item ammo = player.ChooseAmmo(Item);
 
+        EntitySource_ItemUse_WithAmmo es = new EntitySource_ItemUse_WithAmmo(player, Item, ammo.type);
+        
         if (ammo.consumable)
             ammo.stack--;
+
+        return ammo;
     }
     public void ShootBasic(Player player, Vector2 position)
     {
@@ -164,9 +166,9 @@ public abstract class EverWeaponItem : EverItem
         {
             if (Ammo != AmmoID.None)
             {
-                EntitySource_ItemUse_WithAmmo es = new EntitySource_ItemUse_WithAmmo(player, Item, Ammo);
-
                 Item ammo = player.ChooseAmmo(Item);
+                
+                EntitySource_ItemUse_WithAmmo es = new EntitySource_ItemUse_WithAmmo(player, Item, ammo.type);
 
                 if (ammo.consumable)
                     ammo.stack--;
