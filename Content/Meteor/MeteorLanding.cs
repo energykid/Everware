@@ -3,6 +3,7 @@ using Everware.Common.Colors;
 using Everware.Common.Systems;
 using Everware.Utils;
 using MonoMod.Cil;
+using System.IO;
 using System.Threading;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -11,6 +12,24 @@ namespace Everware.Content.Meteor;
 
 public static class MeteorLanding
 {
+    public class MeteorPositionPacket : EverPacket
+    {
+        public int X;
+        public int Y;
+        public override void Read(Mod mod, BinaryReader reader, int playerID)
+        {
+            X = reader.ReadInt32();
+            Y = reader.ReadInt32();
+
+            MeteorPosition = new Point(X, Y);
+        }
+        public override void Write(ModPacket packet)
+        {
+            packet.Write(X);
+            packet.Write(Y);
+        }
+    }
+
     [OnLoad]
     private static void Load()
     {
@@ -395,7 +414,7 @@ public static class MeteorLanding
     private static int threshold = 400;
     private static int maxThreshold = 400;
 
-    private static int checkTime;
+    private static int checkTime = -(60 * 5);
 
     [ModSystemHooks.PostUpdateEverything]
     public static void UpdateMeteorPosition()
@@ -430,7 +449,7 @@ public static class MeteorLanding
                     FindPosition();
                 }
             }
-            else if (Main.netMode == NetmodeID.Server)
+            else if (Main.netMode == NetmodeID.Server && Main.ActivePlayers.span.Length > 0)
             {
                 var shouldCheck = true;
                 foreach (Player player in Main.ActivePlayers)
@@ -598,6 +617,14 @@ public static class MeteorLanding
             if (!IsPositionBlacklisted(p))
             {
                 MeteorPosition = p;
+                if (Main.dedServ)
+                {
+                    new MeteorPositionPacket
+                    {
+                        X = p.X,
+                        Y = p.Y
+                    }.Send();
+                }
                 break;
             }
 
