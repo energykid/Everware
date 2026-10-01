@@ -132,18 +132,12 @@ Items: {
 
 	Pyrocleavers: {
 		DisplayName: Pyrocleavers
-		Tooltip:
-			'''
-			Throws molten cleavers that bounce off walls and melt into the floor
-			'''
+		Tooltip: Throws molten cleavers that bounce off walls and melt into the floor
 	}
 
 	SkullStaff: {
 		DisplayName: Obsidian Skull Staff
-		Tooltip:
-			'''
-			Summons a terrifying, laughing, screaming obsidian skull that explodes and regenerates
-			'''
+		Tooltip: Summons a terrifying, laughing, screaming obsidian skull that explodes and regenerates
 	}
 
 	HotShot: {
@@ -212,10 +206,7 @@ Items: {
 
 	Groundshakers: {
 		DisplayName: Groundshakers
-		Tooltip:
-			'''
-			Double-tap DOWN to perform a ground pound
-			'''
+		Tooltip: Double-tap DOWN to perform a ground pound
 	}
 
 	WeatheredWood: {
@@ -351,10 +342,10 @@ Items: {
 
 	TrickGlove: {
 		DisplayName: Trick Glove
-		Tooltip: 
+		Tooltip:
 			'''
 			Swapping held magic weapons boosts magic power
-            Attack 3 times to refresh
+			         Attack 3 times to refresh
 			'''
 	}
 }
