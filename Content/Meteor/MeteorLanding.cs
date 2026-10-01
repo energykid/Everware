@@ -118,13 +118,13 @@ public static class MeteorLanding
 
             var position = Vector2.Lerp(from, to, MathF.Pow(sparkle.Parallax, 1.3f)) + (sparkle.Offset * zoom * MathF.Pow(sparkle.Parallax, 1.5f));
 
-            var scale = (1f - MathF.Pow(sparkle.TimeLeft, 2.3f)) * (1f - MathF.Pow(1f - sparkle.Parallax, 5f));
+            var scale = (1f - MathF.Pow(sparkle.TimeLeft, 2.3f)) * (1f - MathF.Pow(1f - sparkle.Parallax, 3.4f));
 
             var bump = MathF.Sin(Terraria.Utils.Remap(sparkle.TimeLeft, 1f - (sparkle.Increment * 25f), 1f, 0f, MathF.PI));
 
             scale += bump * 0.85f;
 
-            var color = Color.HslLerp(sky_flash_blue, sky_flash_yellow, sparkle.Parallax * scale);
+            var color = Color.HslLerp(sky_flash_blue, sky_flash_yellow, sparkle.Parallax * scale) * (1f - MathF.Pow(1f - sparkle.Parallax, 2f));
             color.A = 0;
 
             var white = Color.White * sparkle.Parallax * scale;
@@ -264,11 +264,13 @@ public static class MeteorLanding
 
         var interpolator = GetMeteorInterpolant(animationTimer);
 
+        var flatInterpolator = Terraria.Utils.Remap(animationTimer, meteor_fall_start, meteor_fall_end, 0f, 1f);
+
         var meteorPosition = Vector2.Lerp(from, to, interpolator);
 
         var meteorTexture = Assets.Textures.Meteor.Falling.Asset.Value;
 
-        sb.Draw(meteorTexture, meteorPosition, null, Color.Black, 0f, meteorTexture.Size() * 0.5f, MathF.Pow(interpolator, 1f / 2.3f) * 2.5f, SpriteEffects.None, 0f);
+        sb.Draw(meteorTexture, meteorPosition, null, Color.Black, 0f, meteorTexture.Size() * 0.5f, flatInterpolator * 2.5f, SpriteEffects.None, 0f);
 
         sb.End(out var ss);
         sb.Begin(ss with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
@@ -285,8 +287,8 @@ public static class MeteorLanding
 
             var noise = Assets.Textures.Misc.PerlinNoise.Asset.Value;
 
-            var size = new Vector2(800, 200) / noise.Size();
-            size *= MathF.Pow(interpolator, 1f/2.3f) * 2;
+            var size = new Vector2(800 * flatInterpolator, 200 * (1f - MathF.Pow(1f - flatInterpolator, 2f))) / noise.Size();
+            size *= flatInterpolator * 2;
 
             var rotation = from.DirectionTo(to).ToRotation();
 
