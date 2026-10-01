@@ -31,7 +31,7 @@ public static class MeteorLanding
 
         var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
 
-        var distance = (animationTimer - 75) * 300f;
+        var distance = (animationTimer - 110) * 300f;
 
         var position = MeteorPosition.ToWorldCoordinates() - Main.screenPosition;
         position += position.DirectionTo(screenSize * 0.5f) * distance;
@@ -199,6 +199,18 @@ public static class MeteorLanding
             }
         );
     }
+
+    private const float meteor_fall_start = 42;
+
+    private const float meteor_fall_end = 87;
+
+    private static float GetMeteorInterpolant(float time)
+    {
+        var interpolator = Terraria.Utils.Remap(time, meteor_fall_start, meteor_fall_end, 0f, 1f);
+
+        return MathF.Pow(interpolator, 2.3f);
+    }
+
     private static void DrawSurfaceBG(On_Main.orig_DrawSurfaceBG orig, Main self)
     {
         orig(self);
@@ -225,47 +237,45 @@ public static class MeteorLanding
             to += screenSize * 0.5f;
         }
 
-        const float lower = 55f;
-        const float upper = 98f;
-
-        if (animationTimer < lower
-         || animationTimer > upper)
+        if (animationTimer < meteor_fall_start
+         || animationTimer > meteor_fall_end)
         {
             return;
         }
 
-        var interpolator = Terraria.Utils.Remap(animationTimer, lower, upper, 0f, 1f);
-
-        interpolator = MathF.Pow(interpolator, 2f);
-
-        var meteorTexture = Assets.Textures.Meteor.Falling.Asset.Value;
-
-        var meteorOrigin = meteorTexture.Size() * new Vector2(0.5f, 0.5f);
+        var interpolator = GetMeteorInterpolant(animationTimer);
 
         var meteorPosition = Vector2.Lerp(from, to, interpolator);
 
-        var meteorScale = interpolator * 6.4f;
+        var meteorTexture = Assets.Textures.Meteor.Falling.Asset.Value;
 
-        var color = new Color(226, 130, 255) * 0.7f;
-        color.A = 0;
+        sb.Draw(meteorTexture, meteorPosition, null, Color.Black, 0f, meteorTexture.Size() * 0.5f, MathF.Pow(interpolator, 1f / 2.3f) * 2.5f, SpriteEffects.None, 0f);
 
-        var rotation = from.DirectionTo(to).ToRotation();
-        rotation -= MathHelper.PiOver2;
+        sb.End(out var ss);
+        sb.Begin(ss with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
+        {
+            var effect = Assets.Effects.Meteor.MeteorLandingFire.CreateMeteorFireShader();
 
-        sb.Draw(meteorTexture, meteorPosition, null, color, rotation, meteorOrigin, new Vector2(1.5f, 1f) * meteorScale, SpriteEffects.None, 0f);
+            effect.Parameters.StartColor = sky_flash_yellow.ToVector4();
+            effect.Parameters.MiddleColor = sky_flash_blue.ToVector4();
+            effect.Parameters.EndColor = new Color(166, 0, 6).ToVector4();
 
-        color = new Color(255, 214, 99) * 0.8f;
-        color.A = 0;
+            effect.Parameters.Time = Main.GlobalTimeWrappedHourly * 2f;
 
-        meteorScale *= 0.7f;
+            effect.Apply();
 
-        sb.Draw(meteorTexture, meteorPosition, null, color, rotation, meteorOrigin, meteorScale, SpriteEffects.None, 0f);
+            var noise = Assets.Textures.Misc.PerlinNoise.Asset.Value;
 
-        var flareTexture = TextureAssets.Extra[ExtrasID.ThePerfectGlow].Value;
+            var size = new Vector2(800, 200) / noise.Size();
+            size *= MathF.Pow(interpolator, 1f/2.3f) * 2;
 
-        var flareOrigin = flareTexture.Size() * 0.5f;
+            var rotation = from.DirectionTo(to).ToRotation();
 
-        sb.Draw(flareTexture, meteorPosition, null, color, MathHelper.PiOver2, flareOrigin, 3f, SpriteEffects.None, 0f);
+            var origin = noise.Size() * new Vector2(0.825f, 0.5f);
+
+            sb.Draw(noise, meteorPosition, null, Color.White, rotation, origin, size, SpriteEffects.None, 0f);
+        }
+        sb.Restart(in ss);
     }
 
     private static void DrawSunAndMoon_DrawFlare(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
@@ -390,7 +400,7 @@ public static class MeteorLanding
     [ModSystemHooks.PostUpdateEverything]
     public static void UpdateMeteorPosition()
     {
-        const int fall_duration = 90;
+        const int fall_duration = 120;
 
         UpdateSparkles(sparkles_sky);
         UpdateSparkles(sparkles_far);
@@ -498,7 +508,8 @@ public static class MeteorLanding
                 break;
             }
 
-            var distance = (animationTimer - 75) * 300f;
+            // Shockwave
+            var distance = (animationTimer - 110) * 300f;
 
             var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
 
@@ -509,20 +520,16 @@ public static class MeteorLanding
                 SoundEngine.PlaySound(Assets.Sounds.Misc.MeteorCrash.Asset, MeteorPosition.ToWorldCoordinates(), attenuationDistance: 150000f);
             }
 
-            const float lower = 55f;
-            const float upper = 98f;
-
-            if (animationTimer < lower
-             || animationTimer > upper)
+            // Star trail
+            if (animationTimer < meteor_fall_start
+             || animationTimer > meteor_fall_end)
             {
                 return;
             }
 
-            var priorInterpolator = Terraria.Utils.Remap(animationTimer - 1, lower, upper, 0f, 1f);
-            priorInterpolator = MathF.Pow(priorInterpolator, 2f);
+            var priorInterpolator = GetMeteorInterpolant(animationTimer);
 
-            var interpolator = Terraria.Utils.Remap(animationTimer, lower, upper, 0f, 1f);
-            interpolator = MathF.Pow(interpolator, 2f);
+            var interpolator = GetMeteorInterpolant(animationTimer + 1);
 
             for (int i = 0; i < (int)(20 * (1f - MathF.Pow(1f - interpolator, 1.2f))); i++)
             {
