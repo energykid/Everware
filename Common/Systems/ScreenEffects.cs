@@ -79,6 +79,10 @@ public class ScreenEffects : ModSystem
     {
         screenShakes.Add(new ScreenShakeMultiplier(position, strength, multiplier));
     }
+    public static void AddScreenShake(Vector2 position, float strength, float multiplier, float dist)
+    {
+        screenShakes.Add(new ScreenShakeMultiplier(position, strength, multiplier, dist));
+    }
     public static Asset<Texture2D> ScreenDarkeningTexture => ModContent.Request<Texture2D>("Everware/Textures/ScreenDarkening");
     public override void PostDrawTiles()
     {

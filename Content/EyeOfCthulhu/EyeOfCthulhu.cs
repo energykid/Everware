@@ -139,7 +139,7 @@ public class EyeOfCthulhu : GlobalNPC
             {
                 MusicPitch = 0f;
             }
-            MusicLoader.GetMusic(Everware.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", MusicPitch);
+            MusicLoader.GetMusic(ModImpl.Instance, "Assets/Sounds/Music/EyeOfCthulhu").SetVariable("Pitch", MusicPitch);
         }
 
         ContactDamage = false;

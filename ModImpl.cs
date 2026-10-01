@@ -2,10 +2,10 @@ using System.IO;
 
 namespace Everware;
 
-public class Everware : Mod
+public class ModImpl : Mod
 {
-    public static Everware Instance;
-    public Everware()
+    public static ModImpl Instance;
+    public ModImpl()
     {
         MusicAutoloadingEnabled = false;
         Instance = this;

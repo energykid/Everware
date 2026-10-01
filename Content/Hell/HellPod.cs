@@ -491,7 +491,7 @@ public class HellPodGlobalPlayer : ModPlayer
             {
                 if (Main.LocalPlayer.whoAmI == Player.whoAmI)
                 {
-                    ModPacket packet = Everware.Instance.GetPacket();
+                    ModPacket packet = ModImpl.Instance.GetPacket();
                     packet.Write("DamageHellPodFromServer");
                     packet.Write(Player.tileTargetX);
                     packet.Write(Player.tileTargetY);
