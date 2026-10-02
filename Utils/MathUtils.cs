@@ -62,4 +62,12 @@ public static class MathUtils
 
         return Vector3.Normalize(v);
     }
+
+    public static Vector3 Cross(this Vector3 a, Vector3 b) => new Vector3(
+        a.Y * b.Z - a.Z * b.Y,
+        a.Z * b.X - a.X * b.Z,
+        a.X * b.Y - a.Y * b.X);
+
+    public static Vector3 Nlerp(this Vector3 start, Vector3 end, float percent) =>
+        Vector3.Lerp(start, end, percent).SafeNormalize(Vector3.Zero);
 }
