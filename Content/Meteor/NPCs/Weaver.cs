@@ -5,12 +5,17 @@ using Everware.Utils;
 using System.Collections.Generic;
 using System.IO;
 using Terraria.ID;
+using static Everware.Core.AssetReferences.Assets.Textures.Meteor.NPCs;
 
 namespace Everware.Content.Meteor.NPCs;
 
 internal class Weaver : EverNPC
 {
+    private const int PREFERRED_DISTANCE_GRAB = 800;
+    private const int PREFERRED_METEOR_DIST = 180;
     private const int PREFERRED_HANG_LENGTH = 12 * 16;
+    private const float HANG_ANIM_LENGTH = 25f;
+    private const float THROW_DELAY = 12f;
 
     private enum BehaviorState : byte
     {
@@ -24,7 +29,20 @@ internal class Weaver : EverNPC
     public override int Damage => 50;
     public override string Texture => "Everware/Assets/Textures/Meteor/NPCs/Weaver";
 
-    private ref float Timer => ref ExtraAI[1];
+    private ref float MiscAITimer => ref NPC.ai[2];
+    private ref float Timer => ref ExtraAI[0];
+    private ref float MeteorWhoAmI => ref ExtraAI[1];
+
+    private Vector3 Center3D
+    {
+        get => new Vector3(NPC.Center, NPC.ai[3]);
+        set
+        {
+            NPC.Center = new Vector2(value.X, value.Y);
+            NPC.ai[3] = value.Z;
+        }
+    }
+
 
     private Vector2 HangingPosition 
     { 
@@ -37,7 +55,9 @@ internal class Weaver : EverNPC
     }
 
     private bool LeftHanded = false;
-    private Vector2 OldMeteorPosition = Vector2.Zero;
+    private float MaxDistance = 0f;
+    private Vector3 OldMeteorPosition = Vector3.Zero;
+    private Vector3 MeteorPosition = Vector3.Zero;
     private NPC? GrappledMeteor = null;
 
     public override void SetDefaults()
@@ -48,7 +68,6 @@ internal class Weaver : EverNPC
         NPC.knockBackResist = 1f;
         NPC.damage = 50;
         State = 0;
-        ExtraAI[0] = -Main.rand.NextFloat(100f);
         LeftHanded = Main.rand.NextBool();
         NPC.behindTiles = true;
     }
@@ -56,14 +75,18 @@ internal class Weaver : EverNPC
     public override void SendExtraAI(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
-        writer.WriteVector2(OldMeteorPosition);
+        writer.WriteVector3(OldMeteorPosition);
+        writer.WriteVector3(MeteorPosition);
         writer.Write(LeftHanded);
+        writer.Write(MaxDistance);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
-        OldMeteorPosition = reader.ReadVector2();
+        OldMeteorPosition = reader.ReadVector3();
+        MeteorPosition = reader.ReadVector3();
         LeftHanded = reader.ReadBoolean();
+        MaxDistance = reader.ReadSingle();
     }
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
@@ -129,11 +152,10 @@ internal class Weaver : EverNPC
 
         if (NPC.HasValidTarget && Main.player[NPC.target].Center.DistanceSQ(NPC.Center) <= aggroRange * aggroRange)
         {
-            HangingPosition = NPC.Center - PREFERRED_HANG_LENGTH * Vector2.UnitY;
-            NPC.ai[2] = 150f;
+            Timer = 0;
+            AIPosition = NPC.Center - PREFERRED_HANG_LENGTH * Vector2.UnitY;
+            HangingPosition = NPC.Center;
             NPC.netUpdate = true;
-            NPC.behindTiles = false;
-
             return BehaviorState.HangAndFollowTarget; 
         }
 
@@ -142,22 +164,42 @@ internal class Weaver : EverNPC
 
     private BehaviorState HangAndFollowTarget()
     {
+        int extraAnimLength = 30;
+
+        if (Timer <= HANG_ANIM_LENGTH + extraAnimLength + 7)
+        {
+            var interpolant = MathHelper.Clamp((Timer - HANG_ANIM_LENGTH) / extraAnimLength, 0f, 1f);
+
+            NPC.Center = Vector2.Lerp(HangingPosition, AIPosition, Easing.InOutSine(interpolant));
+
+            MiscAITimer = 150f;
+
+            if (Timer == HANG_ANIM_LENGTH + extraAnimLength + 7)
+            {
+                AIPosition = NPC.Center;
+                HangingPosition = NPC.Center - PREFERRED_HANG_LENGTH * Vector2.UnitY;
+                NPC.behindTiles = false;
+            }
+            return BehaviorState.HangAndFollowTarget;
+        }
+
         if (NPC.HasValidTarget)
         {
             var targetPos = Main.player[NPC.target].Center - 25 * 16 * Vector2.UnitY;
+            targetPos += (LeftHanded ? 1f : -1f) * Vector2.UnitX * 16 * 50;
 
-            HangingPosition = Vector2.Lerp(HangingPosition, targetPos, 0.03f);
+            HangingPosition = Vector2.Lerp(HangingPosition, targetPos, 0.02f);
         }
         else
             return BehaviorState.FindGround;
 
-        HangOnString(1);
-        NPC.ai[2]--;
+        HangOnString();
+        MiscAITimer--;
 
-        if (NPC.ai[2] > 0)
+        if (MiscAITimer > 0)
             return BehaviorState.HangAndFollowTarget;
 
-        NPC? MeteorHead = PathfindingUtils.GetClosestNPC(NPC.position, 800, NPCID.MeteorHead, NPC2 => { return NPC2.ai[1] == 0; });
+        NPC? MeteorHead = PathfindingUtils.GetClosestNPC(Main.player[NPC.target].Center, PREFERRED_DISTANCE_GRAB, NPCID.MeteorHead, NPC2 => { return NPC2.ai[1] == 0; });
 
         if (MeteorHead is null)
             return BehaviorState.HangAndFollowTarget;
@@ -166,87 +208,131 @@ internal class Weaver : EverNPC
         // if found meteor then prepare variables and grab the meteor head
         GrappledMeteor = MeteorHead;
         MeteorHead.ai[1] = NPC.whoAmI;
-        MeteorHead.ai[3] = 1;
         MeteorHead.netUpdate = true;
-        ExtraAI[0] = MeteorHead.whoAmI;
-        NPC.ai[2] = NPC.Center.Distance(MeteorHead.Center);
+        MeteorWhoAmI = MeteorHead.whoAmI;
+        MiscAITimer = NPC.Center.Distance(MeteorHead.Center);
         NPC.netUpdate = true;
-        OldMeteorPosition = GrappledMeteor.Center - GrappledMeteor.velocity;
+        Timer = 0;
+
         return BehaviorState.GrappleMeteor;
     }
 
     private BehaviorState GrappleMeteor()
     {
+        GrappledMeteor = Main.npc[(int)MeteorWhoAmI];
+
         if (GrappledMeteor is null || !GrappledMeteor.active || GrappledMeteor.type != NPCID.MeteorHead)
             return BehaviorState.HangAndFollowTarget;
 
-        var playerPosition = Main.player[NPC.target].Center;
+        if (Timer <= THROW_DELAY)
+        {
 
+            HangOnString();
+            OldMeteorPosition = new Vector3(GrappledMeteor.Center - GrappledMeteor.velocity, 0f);
+            MeteorPosition = new Vector3(GrappledMeteor.Center, 0f);
+        }
+
+        var throwDelay2 = THROW_DELAY + 10;
+
+        if (Timer <= throwDelay2)
+        {
+            MaxDistance = (GrappledMeteor.Center - NPC.Center).Length();
+            return BehaviorState.GrappleMeteor;
+        }
+
+        // Update general meteor variables
         GrappledMeteor.velocity = Vector2.Zero;
-
-        var acceleration = (GrappledMeteor.Center - NPC.Center).SafeNormalize(Vector2.Zero);
-
-        // meteor head verlet integration
-        var oldPosition = GrappledMeteor.Center;
-        var velocity = GrappledMeteor.Center - OldMeteorPosition;
-        velocity *= 0.95f;
-
-        if (LeftHanded)
-            acceleration = new Vector2(acceleration.Y, -acceleration.X) * 5f;
-        else
-            acceleration = new Vector2(-acceleration.Y, acceleration.X) * 5f;
-
-        GrappledMeteor.Center += velocity + acceleration;
-        OldMeteorPosition = oldPosition;
-
-        // move away from player
+        GrappledMeteor.ai[3] = 1; // lobotomize meteor head
+        GrappledMeteor.damage = 0;
+        
+        var playerPosition = Main.player[NPC.target].Center;
         var toTarget = (playerPosition - GrappledMeteor.Center).SafeNormalize(Vector2.Zero);
 
-        HangingPosition -= toTarget * 3f;
+        // make the meteor get closer until it reaches its desired distance
+        var distInterp = Easing.InBack(MathHelper.Clamp((Timer - throwDelay2) / 40, 0, 1));
+        MiscAITimer = MathHelper.Lerp(MaxDistance, PREFERRED_METEOR_DIST, distInterp);
 
-        HangOnString(2);
+        // move further away if too close
+        float dist = Main.player[NPC.target].Center.DistanceSQ(NPC.Center);
+        if (dist <= PREFERRED_METEOR_DIST * PREFERRED_METEOR_DIST * 4f)
+            HangingPosition -= toTarget * 2;
+        if (dist > PREFERRED_METEOR_DIST * PREFERRED_METEOR_DIST * 8f)
+            HangingPosition += toTarget * 2;
 
-        // MAKE IT SPIN
-        var hangPosition = NPC.Center;
-        var preferredLength = 180;
+        HangOnString();
 
-        NPC.ai[2] = MathHelper.Lerp(NPC.ai[2], preferredLength, 0.02f);
+        // get normal vector to cross product with
+        var duration = 2 * 40f;
+        var multiplier = MathHelper.Clamp((Timer - throwDelay2) / duration, 0, 1);
 
-        var midPoint = Vector2.Lerp(GrappledMeteor.Center, NPC.Center, 0.5f);
-        var snapPos = (midPoint - NPC.Center).SafeNormalize(Vector2.Zero) * NPC.ai[2];
+        var x = Vector2.Dot((GrappledMeteor.Center - NPC.Center).SafeNormalize(Vector2.Zero), Vector2.UnitY);
+        var y = Vector2.Dot((GrappledMeteor.Center - NPC.Center).SafeNormalize(Vector2.Zero), Vector2.UnitX);
 
-        var vectorFrom = GrappledMeteor.Center - NPC.Center;
-        float distance = Vector2.Distance(GrappledMeteor.Center, NPC.Center);
+        var normal = MathF.Abs(x) > MathF.Abs(y) ? Vector3.UnitX : Vector3.UnitY;
+        normal = normal.Nlerp(-Vector3.UnitZ, Easing.InExpo(multiplier));
+
+        // meteor head verlet integration in 3d space
+        var oldPosition = MeteorPosition;
+        var velocity = MeteorPosition - OldMeteorPosition - new Vector3(GrappledMeteor.velocity, 0f);
+
+        var axis2 = new Vector2((GrappledMeteor.Center - NPC.Center).X, (GrappledMeteor.Center - NPC.Center).Y);
+        velocity += new Vector3(axis2.X, axis2.Y, 0f).SafeNormalize(Vector3.Zero).Cross(normal) * 2.75f;
+
+        MeteorPosition += velocity;
+        OldMeteorPosition = oldPosition;
+
+        // constrain npc center and meteor position in 3d space
+        var vectorFrom = Center3D - MeteorPosition;
+        float distance = Vector3.Distance(Center3D, MeteorPosition);
         float signedDistance = 0;
 
         if (distance > 0)
-            signedDistance = (NPC.ai[2] / distance) - 1f;
+            signedDistance = (MiscAITimer / distance) - 1f;
 
-        Vector2 translation = vectorFrom * (signedDistance * 0.5f);
+        Vector3 translation = vectorFrom * (signedDistance * 0.5f);
 
-        GrappledMeteor.Center += translation * 0.95f;
-        NPC.Center -= translation * 0.05f;
-        GrappledMeteor.rotation = vectorFrom.ToRotation() - MathHelper.PiOver2;
+        Center3D += translation * 0.05f;
+        MeteorPosition -= translation * 0.95f;
 
-        // throw the meteor if possible
-        if (velocity.LengthSquared() >= 35 * 35 &&
-            Vector2.Dot(toTarget, velocity.SafeNormalize(Vector2.Zero)) > 0.975f &&
-            Main.player[NPC.target].Center.DistanceSQ(NPC.Center) >= NPC.ai[2] * NPC.ai[2] * 4f)
+        // Give the illusion of the meteor moving in 3D space
+        var velocity2D = new Vector2(velocity.X, velocity.Y);
+
+        GrappledMeteor.Center = new Vector2(MeteorPosition.X, MeteorPosition.Y);
+        GrappledMeteor.scale = 1f / MathHelper.Clamp((1 - MeteorPosition.Z / (2f * MiscAITimer)), 0.01f, 50);
+        GrappledMeteor.rotation = Vector2.Zero.AngleFrom(velocity2D);
+        GrappledMeteor.velocity = velocity2D * 0.01f;
+
+        // Update meteor draw order to ensure it draws behind the spider if behind the spider
+        GrappledMeteor.behindTiles = MeteorPosition.Z < 0f;
+        NPC.behindTiles = MeteorPosition.Z >= 0f;
+
+        // Throw the meteor if possible
+        var velocityNormal = velocity.SafeNormalize(Vector3.Zero);
+        var toTargetNormal = new Vector3(toTarget, 0f);
+        var toPlayerNormal = (new Vector3(playerPosition, 0f) - MeteorPosition).SafeNormalize(Vector3.Zero);
+
+        if (multiplier == 1f &&
+            velocity2D.LengthSquared() >= 26 * 26 &&
+            Vector3.Dot(toTargetNormal, toPlayerNormal) >= 0.975f &&
+            Vector3.Dot(toTargetNormal, velocityNormal) >= 0.975f &&
+            Main.player[NPC.target].Center.DistanceSQ(NPC.Center) >= MiscAITimer * MiscAITimer * 4f)
         {
             // ensure that it doesnt miss thje player if they stand still
             var meteorVelocity = GrappledMeteor.Center.DirectionTo(playerPosition) * velocity.Length();
 
             GrappledMeteor.velocity = meteorVelocity;
-            GrappledMeteor.damage += NPC.damage;
-            NPC.ai[2] = 180;
+            GrappledMeteor.damage = NPC.damage; // make it injherit the weaver's damage number
+            GrappledMeteor.scale = 1f;
+            MiscAITimer = 150;
             NPC.netUpdate = true;
+            NPC.ai[3] = 0f; // set z coordinate to 0
             return BehaviorState.HangAndFollowTarget;
         }
 
         return BehaviorState.GrappleMeteor;
     }
 
-    private void HangOnString(int steps = 1)
+    private void HangOnString()
     {
         var tilePosForWind = NPC.Center.ToTileCoordinates();
 
@@ -257,48 +343,57 @@ internal class Weaver : EverNPC
         var velocity = NPC.Center - AIPosition;
         velocity += Vector2.UnitY * 1.5f;
         velocity += Vector2.UnitX * windStrength * 0.2f;
-        velocity *= 0.99f;
+        velocity *= 0.975f;
 
         NPC.Center += velocity + NPC.velocity;
         AIPosition = oldPosition;
 
-        // constrain to web position 
-        for (int i = 0; i < steps; i++)
-        {
-            var vectorFrom = (NPC.Center - HangingPosition).SafeNormalize(Vector2.Zero);
+        // constrain to web position
+        var vectorFrom = (NPC.Center - HangingPosition).SafeNormalize(Vector2.Zero);
 
-            NPC.Center = HangingPosition + vectorFrom * PREFERRED_HANG_LENGTH;
-            NPC.rotation = vectorFrom.ToRotation() - MathHelper.PiOver2;
-        }
-
+        NPC.Center = HangingPosition + vectorFrom * PREFERRED_HANG_LENGTH;
+        NPC.rotation = vectorFrom.ToRotation() - MathHelper.PiOver2;
         NPC.velocity = Vector2.Zero;
     }
     #endregion
 
-    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Microsoft.Xna.Framework.Color drawColor)
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (State != 2 && State != 3)
             return true;
 
+        var interpolant = State == 2 ? Easing.InOutSine(MathHelper.Clamp(Timer / HANG_ANIM_LENGTH, 0, 1)) : 1f;
         var stringBegin = Vector2.UnitY * -42;
         stringBegin = NPC.Center + stringBegin.RotatedBy(NPC.rotation);
 
         var begin = stringBegin - Main.screenPosition;
-        var middle = HangingPosition - Main.screenPosition;
-        var end = HangingPosition with { Y = 0 } - Main.screenPosition;
+        var end = Vector2.Lerp(stringBegin, HangingPosition, interpolant) - Main.screenPosition;
+        var middle = (begin + end) * 0.5f - NPC.velocity;
 
-        int segments = 30;
+        int segments = 40;
 
         var points = new List<Vector2>();
 
         for (int i = 0; i < segments; i++)
             points.Add(Bezier.VectorQuadratic(begin, middle, end, Vector2.One * i / (float)segments));
 
+        if (interpolant < 1f)
+        {
+            for (int i = 0; i < segments - 1; i++)
+            {
+                var vector = points[i + 1] - points[i];
+                vector = vector.SafeNormalize(Vector2.Zero);
+
+                points[i] += MathF.Sin(i / MathHelper.TwoPi) * new Vector2(vector.Y, -vector.X) * (1f - interpolant) * 72f * (1f - (i / (float)segments));
+            }
+        }
+
         var stringColor = new Color(177, 134, 101);
 
         PrimitiveDrawing.DrawPrimitiveTrail(new Vector2(Main.screenWidth, Main.screenHeight), points, 2, a => { return MathHelper.Lerp(1.2f, 0.7f, a); }, colors: (a, b) =>
         {
-            return stringColor;
+            float length = 16 * 8f;
+            return Color.Lerp(stringColor, Color.Transparent, Easing.OutCirc(1f - a));
         });
 
         if (State != 3 || GrappledMeteor is null || !GrappledMeteor.active || GrappledMeteor.type != NPCID.MeteorHead)
@@ -306,15 +401,27 @@ internal class Weaver : EverNPC
 
         points = new List<Vector2>();
 
-        var velocity = GrappledMeteor.Center - OldMeteorPosition;
+        var velocity = MeteorPosition - OldMeteorPosition;
+        interpolant = Easing.InOutSine(MathHelper.Clamp((Timer) / (THROW_DELAY), 0, 1));
 
         begin = NPC.Center - screenPos;
-        end = GrappledMeteor.Center - screenPos;
+        end = Vector2.Lerp(NPC.Center, GrappledMeteor.Center, interpolant) - screenPos;
         middle = (end - begin).SafeNormalize(Vector2.Zero);
-        middle = Vector2.Lerp(begin, end, 0.67f) + velocity * 2f;
+        middle = Vector2.Lerp(begin, end, 0.67f) + new Vector2(velocity.X, velocity.Y) * 2f;
 
         for (int i = 0; i < segments; i++)
             points.Add(Bezier.VectorQuadratic(begin, middle, end, Vector2.One * i / (float)segments));
+
+        if (interpolant < 1)
+        {
+            for (int i = 0; i < segments - 1; i++)
+            {
+                var vector = points[i + 1] - points[i];
+                vector = vector.SafeNormalize(Vector2.Zero);
+
+                points[i] += MathF.Sin(i * 0.4f) * new Vector2(vector.Y, -vector.X) * (1f - interpolant) * 72f * (1f - (i / (float)segments));
+            }
+        }
 
         PrimitiveDrawing.DrawPrimitiveTrail(new Vector2(Main.screenWidth, Main.screenHeight), points, 2, a => { return MathHelper.Lerp(1.2f, 0.7f, a); }, colors: (a, b) =>
         {

@@ -18,7 +18,11 @@ public class MeteorHeadRework : GlobalNPC
     public override bool PreAI(NPC npc)
     {
         if (npc.ai[3] == 1)
+        {
+            npc.ai[0] += 0.5f;
+            SpawnDust(npc);
             return false;
+        }
 
         if (npc.ai[1] != 0)
         {
@@ -39,7 +43,13 @@ public class MeteorHeadRework : GlobalNPC
         npc.rotation = Vector2.Zero.AngleFrom(npc.velocity);
         npc.ai[0] += 0.5f;
         npc.TargetClosest(false);
+        SpawnDust(npc);
 
+        return false;
+    }
+
+    private void SpawnDust(NPC npc)
+    {
         Vector2 pos = npc.Center + new Vector2(14, 0).RotatedBy(npc.rotation).RotatedByRandom(MathHelper.PiOver2);
         Dust d = Dust.NewDustPerfect(pos, DustID.FlameBurst, Vector2.Zero);
         d.noGravity = true;
@@ -49,9 +59,8 @@ public class MeteorHeadRework : GlobalNPC
             d2.scale = 0.5f;
             d2.noGravity = true;
         }
-
-        return false;
     }
+
     public static void Draw(NPC npc, Vector2 screenPos, Color drawColor)
     {
         Lighting.AddLight(npc.Center, Color.Red.ToVector3() * 0.2f);
@@ -71,7 +80,7 @@ public class MeteorHeadRework : GlobalNPC
 
         var Effects = npc.velocity.X < 0 || npc.IsABestiaryIconDummy ? SpriteEffects.None : SpriteEffects.FlipVertically;
 
-        if (npc.ai[2] < 1)
+        if (npc.ai[2] < 1 || npc.ai[3] == 1)
         {
             Main.spriteBatch.End(out var sb);
 
