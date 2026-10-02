@@ -52,4 +52,14 @@ public static class MathUtils
 
         return !(has_neg && has_pos);
     }
+
+    public static bool HasNaNs(this Vector3 vec) => float.IsNaN(vec.X) || float.IsNaN(vec.Y) || float.IsNaN(vec.Z);
+
+    public static Vector3 SafeNormalize(this Vector3 v, Vector3 defaultValue)
+    {
+        if (v == Vector3.Zero || v.HasNaNs())
+            return defaultValue;
+
+        return Vector3.Normalize(v);
+    }
 }
