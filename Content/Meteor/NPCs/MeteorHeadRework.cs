@@ -86,7 +86,7 @@ public class MeteorHeadRework : GlobalNPC
             eff1.Apply();
 
             Main.spriteBatch.Begin(sb with { CustomEffect = eff1.Shader });
-            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, 1.15f, Effects);
+            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, 1.15f * npc.scale, Effects);
 
             Main.spriteBatch.End();
             var eff2 = Assets.Effects.Misc.GradientClip.CreateEffect();
@@ -97,7 +97,7 @@ public class MeteorHeadRework : GlobalNPC
             eff2.Apply();
             Main.spriteBatch.Begin(sb with { CustomEffect = eff2.Shader });
 
-            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, 1.15f, Effects);
+            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, 1.15f * npc.scale, Effects);
 
             Main.spriteBatch.Restart(sb);
         }
@@ -110,8 +110,8 @@ public class MeteorHeadRework : GlobalNPC
         Main.spriteBatch.End(out var sb1);
         Main.spriteBatch.Begin(sb1 with { CustomEffect = eff.Shader });
 
-        Main.EntitySpriteDraw(HeadAsset.Value, npc.Center - screenPos, HeadFrame, Color.Lerp(drawColor, Color.White, 0.75f), npc.rotation, origin, 1f, Effects);
-        Main.EntitySpriteDraw(GlowAsset.Value, npc.Center - screenPos, HeadFrame, Color.White, npc.rotation, origin, 1f, Effects);
+        Main.EntitySpriteDraw(HeadAsset.Value, npc.Center - screenPos, HeadFrame, Color.Lerp(drawColor, Color.White, 0.75f), npc.rotation, origin, npc.scale, Effects);
+        Main.EntitySpriteDraw(GlowAsset.Value, npc.Center - screenPos, HeadFrame, Color.White, npc.rotation, origin, npc.scale, Effects);
 
         Main.spriteBatch.Restart(sb1);
         float pwid(float i) { return (i * 2f); }
