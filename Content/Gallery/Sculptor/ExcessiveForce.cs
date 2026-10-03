@@ -76,6 +76,7 @@ public struct SculptorNameData : ITileData
 
 public class ExcessiveForce : EverPlaceableItem
 {
+    public override int Rarity => 2;
     public override void SetDefaults()
     {
         base.SetDefaults();

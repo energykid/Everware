@@ -36,6 +36,9 @@ public class BookOfBoulders : EverTomeWeapon
         Projectile.NewProjectile(source, pos, new(0), ModContent.ProjectileType<ConjuredBoulder>(), damage, knockback, player.whoAmI);
         return false;
     }
+
+    public override int Rarity => 3;
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
