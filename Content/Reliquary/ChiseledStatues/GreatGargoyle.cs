@@ -37,6 +37,7 @@ public class GreatGargoyle : EverWeaponItem
 
     public override void SetDefaults()
     {
+        Item.knockBack = 5f;
         base.SetDefaults();
         Item.DefaultToBasicWeapon(132, 90, DamageClass.Melee);
     }
@@ -287,6 +288,32 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             base.AI();
         }
+
+        if (!Main.dedServ && Glow > 0.1f && Pause <= 0)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                float rnd = Main.rand.NextFloat(0.6f);
+                Vector2 pos = Owner.MountedCenter + Offset + new Vector2(100f, 0f).RotatedBy(Projectile.rotation - MathHelper.PiOver2 + rnd);
+                Vector2 vel = new Vector2(Flip ? -3 : 3, 0f).RotatedBy(Projectile.rotation + rnd);
+                var dust = Dust.NewDustPerfect(pos, DustID.GreenTorch, vel);
+                dust.noGravity = true;
+                dust.noLight = true;
+                dust.scale = 2f * Glow;
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                float l = Main.rand.NextFloat(60f, 95f);
+                float rnd = Main.rand.NextFloat(0.6f);
+                Vector2 pos = Owner.MountedCenter + Offset + new Vector2(l, 0f).RotatedBy(Projectile.rotation - MathHelper.PiOver2 + rnd);
+                Vector2 vel = new Vector2(Flip ? -3 : 3, 0f).RotatedBy(Projectile.rotation + rnd);
+                var dust = Dust.NewDustPerfect(pos, DustID.SteampunkSteam, vel);
+                dust.noGravity = true;
+                dust.noLight = true;
+                dust.scale = 2.5f * Glow * (l / 95f);
+                
+            }
+        }
     }
     float ExtraRotationOffset = 0f;
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -310,6 +337,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
         var asset = Assets.Textures.Reliquary.ChiseledStatues.GreatGargoyle.Asset;
         var glowAsset = Assets.Textures.Reliquary.ChiseledStatues.GreatGargoyle_Glow.Asset;
         var slashAsset = Assets.Textures.Misc.Slash.Asset;
+        var flareAsset = Assets.Textures.Misc.LensFlash.Asset;
 
         float glow = 0f;
         glow = Easing.KeyFloat(Timer, 0, 30, 0f, 0.2f, Easing.OutElastic, glow);
@@ -320,6 +348,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
         {
             DrawingUtils.DrawGlowWithPadding(asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, asset.Frame(), GreatGargoyle.GreenYellow.MultiplyRGBA(new Color(glow / 3f, glow / 3f, glow / 3f, 0f)), Projectile.rotation + ExtraRotationOffset, Origin, Scale, Effects, 0.01f + (glow * 0.1f));
         }
+        
         Main.EntitySpriteDraw(asset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, asset.Frame(), lightColor, Projectile.rotation + ExtraRotationOffset, Origin, Scale, Effects);
         Main.EntitySpriteDraw(glowAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, glowAsset.Frame(), Color.White.MultiplyRGBA(new Color(Glow * 2f, Glow * 4f, Glow * 2f, 0f)), Projectile.rotation + ExtraRotationOffset, Origin, Scale, Effects);
 
@@ -330,8 +359,10 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
             Main.EntitySpriteDraw(slashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, slashAsset.Frame(), Color.Black.MultiplyRGBA(new Color(Glow * 0.2f, Glow * 0.2f, Glow * 0.2f, Glow * 0.2f)), Projectile.rotation + ExtraRotationOffset - MathHelper.ToRadians((Flip ? 135 : 45)), new Vector2(-20f, 84f), Scale * 1.05f, SpriteEffects.None);
 
             Main.EntitySpriteDraw(slashAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition, slashAsset.Frame(), GreatGargoyle.GreenYellow.MultiplyRGBA(new Color(Glow, Glow, Glow, Glow * 0.6f)), Projectile.rotation + ExtraRotationOffset - MathHelper.ToRadians((Flip ? 135 : 45)), new Vector2(-20f, 84f), Scale, SpriteEffects.None);
+           
+            Main.EntitySpriteDraw(flareAsset.Value, Owner.MountedCenter + Offset + new Vector2(0, Owner.gfxOffY) - Main.screenPosition + new Vector2(80f, 0f).RotatedBy(Projectile.rotation - MathHelper.PiOver2), flareAsset.Frame(), GreatGargoyle.GreenYellow.MultiplyRGBA(new Color(Glow, Glow, Glow, Glow * 0.6f)), 0f, flareAsset.Frame().Size() / 2f, Scale * 0.3f, SpriteEffects.None);
         }
-
+        
         return false;
     }
 }
