@@ -37,4 +37,12 @@ public class GravelItem : EverPlaceableItem
     }
     public override string Texture => "Everware/Assets/Textures/Misc/Tiles/GravelItem";
     public override int PlacementID => ModContent.TileType<GravelTile>();
+    public override void AddRecipes()
+    {
+        Recipe recipe = CreateRecipe(3);
+        recipe.AddIngredient(ItemID.SiltBlock, 2);
+        recipe.AddIngredient(ItemID.StoneBlock);
+        recipe.AddTile(TileID.Sawmill);
+        recipe.Register();
+    }
 }
