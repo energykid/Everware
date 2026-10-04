@@ -9,6 +9,8 @@ public class TrickGlove : EverEquipmentItem
 {
     public override string Texture => "Everware/Assets/Textures/Underground/DeepCaveLoot/TrickGlove";
 
+    public override int Rarity => 6;
+    
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -48,7 +50,7 @@ public class TrickGlove : EverEquipmentItem
                 
                 cooldown = 3;
                 player.statMana = Math.Clamp(player.statMana + 30, 0, player.statManaMax2);
-                player.ManaEffect(30);
+                CombatText.NewText(player.getRect(), Color.MediumPurple, 30);
                 
                 player.AddBuff(BuffID.MagicPower, 240);
                 SoundEngine.PlaySound(Assets.Sounds.Gear.Accessory.TrickGloveSleight.Asset.WithPitchVariance(0.1f), player.Center);

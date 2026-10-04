@@ -7,7 +7,6 @@ using Everware.Core.Projectiles;
 using Everware.Utils;
 using System.IO;
 using Terraria.ID;
-using static Everware.Content.Reliquary.ChiseledStatues.DichromaticSkullFlame;
 
 namespace Everware.Content.Reliquary.ChiseledStatues;
 
@@ -235,13 +234,13 @@ public class DichromaticFireDebuff : ModBuff
     {
         npc.GetGlobalNPC<DichromaticDebuffHandler>().Fire = true;
 
-        FlameLashParticle part = new FlameLashParticle(new Vector2(
+        DichromaticSkullFlame.FlameLashParticle part = new DichromaticSkullFlame.FlameLashParticle(new Vector2(
             Main.rand.NextFloat(npc.Left.X, npc.Right.X),
             Main.rand.NextFloat(npc.Top.Y, npc.Bottom.Y)), new Vector2(0, -3), new Vector2(0.2f, 0.4f));
 
         if (Main.rand.NextBool(3)) part.Color = Color.Black;
 
-        part.Spawn(FireLayer);
+        part.Spawn(DichromaticSkullFlame.FireLayer);
 
         base.Update(npc, ref buffIndex);
     }
@@ -252,11 +251,6 @@ public class DichromaticSkullFlame : EverProjectile
     public void DrawFireLayer()
     {
         var flameTarget = ScreenspaceTargetPool.Shared.Rent(
-            Main.instance.GraphicsDevice,
-            (Width, Height) => (Width / 2, Height / 2)
-        );
-
-        var smokeTarget = ScreenspaceTargetPool.Shared.Rent(
             Main.instance.GraphicsDevice,
             (Width, Height) => (Width / 2, Height / 2)
         );
@@ -289,12 +283,12 @@ public class DichromaticSkullFlame : EverProjectile
             Color.Orange.ToVector4(),
             Color.Orange.ToVector4() * 1.5f,
             Color.White.ToVector4(),
-            ];
+        ];
         effect.Parameters.ColorNumber = 7;
         effect.Apply();
 
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, effect.Shader, Main.GameViewMatrix.TransformationMatrix);
-
+        
         DrawingUtils.DrawGlowWithPadding(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(0.2f, 0.0f, 0.0f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), Main.GameViewMatrix.Effects, radius: 0.01f);
 
         Main.EntitySpriteDraw(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(1f, 0.2f, 0.2f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), Main.GameViewMatrix.Effects);
@@ -302,40 +296,15 @@ public class DichromaticSkullFlame : EverProjectile
         Main.spriteBatch.End();
 
         flameTarget.Dispose();
-        smokeTarget.Dispose();
     }
     [ModSystemHooks.PostUpdateEverything]
     public void UpdateFireLayer()
     {
         if (FireLayer != null)
             FireLayer.Update();
-
-        if (SmokeLayer != null)
-            SmokeLayer.Update();
     }
 
     public static readonly ParticleLayer FireLayer = new(0.5f);
-    public static readonly ParticleLayer SmokeLayer = new(0.5f);
-    public class SwirlingSmokeParticle : Particle
-    {
-        public override Asset<Texture2D> Texture => Assets.Textures.Misc.SwirlingSmoke.Asset;
-        public SwirlingSmokeParticle(Vector2 pos, Vector2 vel, Vector2 scale) : base(pos, vel, scale, null, null)
-        {
-            Color = Color.DarkSlateGray;
-            Rotation = Main.rand.NextFloat(MathHelper.TwoPi);
-            FrameCount = new Vector2(1, 6);
-        }
-        public override void Update()
-        {
-            Scale = Vector2.Lerp(Scale, new Vector2(1.5f), 0.05f);
-            velocity *= 0.95f;
-            base.Update();
-            FrameNum.Y = MathHelper.Lerp(FrameNum.Y, 6f, 0.01f);
-            if (FrameNum.Y >= 5.5f) Kill();
-            Rotation -= MathHelper.ToRadians(1f);
-            Color = Color.Lerp(Color, Color.Transparent, 0.05f);
-        }
-    }
     public class FlameLashParticle : Particle
     {
         float Sc = 0f;
@@ -356,13 +325,22 @@ public class DichromaticSkullFlame : EverProjectile
 
         public override void Update()
         {
+            if (ai[0] < 20)
+            {
+                if (Main.rand.NextBool(5))
+                {
+                    Dust dust = Dust.NewDustDirect(Center - new Vector2(20, 20), 40, 40, DustID.Torch, velocity.X / 2f, velocity.Y / 2f);
+                    dust.noGravity = true;
+                    dust.scale = MathHelper.Lerp(1f, 0f, ai[0] / 20f);
+                }
+            }
             base.Update();
             Lighting.AddLight(Center, Color.OrangeRed.ToVector3() * 0.7f);
             ai[0]++;
             if (Color == Color.Black || ai[0] > 2)
             {
-                FrameNum.Y = MathHelper.Lerp(FrameNum.Y, 13, ai[1]);
-                if (this.FrameNum.Y >= 10.5) Kill();
+                FrameNum.Y = MathHelper.Lerp(FrameNum.Y, 12, ai[1]);
+                if (this.FrameNum.Y >= 11) Kill();
             }
             if (Color != Color.Black && FrameNum.Y > 2f)
             {
@@ -501,8 +479,8 @@ public class DichromaticSkullWater : EverProjectile
 
         Color c = Color.Lerp(Color.White, Lighting.GetColor((Projectile.Center / 16).ToPoint()), 0.5f);
 
-        DrawingUtils.DrawGlowWithPadding(asset.Value, pos, fr, c.MultiplyRGBA(new(0f, 0f, 0.4f, 0.4f)), 0f, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1], SpriteEffects.None);
-        Main.EntitySpriteDraw(asset.Value, pos, fr, c, 0f, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1] * Scale, SpriteEffects.None);
+        DrawingUtils.DrawGlowWithPadding(asset.Value, pos, fr, c.MultiplyRGBA(new(0f, 0f, Projectile.Opacity * 0.4f, Projectile.Opacity)), Projectile.rotation, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1], SpriteEffects.None);
+        Main.EntitySpriteDraw(asset.Value, pos, fr, c.MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, Projectile.Opacity)), Projectile.rotation, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1] * Scale, SpriteEffects.None);
 
         return false;
     }
@@ -525,6 +503,11 @@ public class DichromaticSkullWater : EverProjectile
         {
             if (!Popped)
             {
+                for (int i = 0; i < 20; i++)
+                {
+                    Dust.NewDust(Projectile.Center - new Vector2(40), 80, 80, DustID.Water, Scale: 0.7f);
+                }
+                Projectile.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
                 SoundEngine.PlaySound(SoundID.Item54.WithPitchOffset(-0.7f).WithPitchOffset(0.3f), Projectile.Center);
             }
             Popped = true;
@@ -536,6 +519,7 @@ public class DichromaticSkullWater : EverProjectile
         }
         else
         {
+            Projectile.Opacity *= 0.9f;
             Scale = Vector2.Lerp(Scale, new Vector2(1.5f), 0.2f);
             Projectile.ai[2] = MathHelper.Lerp(Projectile.ai[2], 7, 0.1f);
             if (Projectile.ai[2] >= 6) Projectile.Kill();

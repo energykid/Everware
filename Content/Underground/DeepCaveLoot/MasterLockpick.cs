@@ -87,7 +87,9 @@ public class MasterLockpick : EverWeaponItem
 
                     var c = Chest.FindChest(p.X, p.Y);
 
-                    bool ChestViable = (Main.tile[p].TileType == TileID.Containers && Main.tile[p].TileFrameX == (18 * 2 * 2)) || Main.tile[p].TileType == ModContent.TileType<SteelChestTile>();
+                    bool ChestViable = Main.tile[p].TileType == TileID.Containers && Main.tile[p].TileFrameX == (18 * 2 * 2);
+                    if (!ChestViable) 
+                        ChestViable = Main.tile[p].TileType == ModContent.TileType<SteelChestTile>() && Main.tile[p].TileFrameX == 18 * 2;
                     if (ChestViable)
                     {
                         if (Chest.IsLocked(p.X, p.Y))

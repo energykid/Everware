@@ -26,13 +26,22 @@ extra care has been taken to hone as many details as possible!
 
 -+=+-
 
-[h2]credits:[/h2]
+[h2]the Everware team:[/h2]
 
 ENNWAY - [i]director, lead programmer, artist, sound designer and musician[/i]
 
-Jaqbix - [i]artist[/i]
-pil - [i]artist[/i]
-Dandy - [i]artist[/i]
+Zoey - [i]programmer[/i]
+Azathoth - [i]programmer[/i]
 
-Enderpikmin - [i]localizer (ES)[/i]
-Nexora & Kraken - [i]localizers (RU)[/i]
+Jaqbix - [i]artist[/i]
+Zarachard - [i]artist[/i]
+throudon - [i]artist[/i]
+
+[h2]with contributions from:[/h2]
+
+pil - [i]art[/i]
+Dandy - [i]art[/i]
+
+Enderpikmin - [i]localizaton (es-ES)[/i]
+Nexora & Kraken - [i]localizaton (ru-RU)[/i]
+nakamurash - [i]localizaton (pt-BR)[/i]

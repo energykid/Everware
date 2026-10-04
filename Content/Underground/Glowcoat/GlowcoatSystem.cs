@@ -1,6 +1,8 @@
-﻿using Everware.Content.Base.Tiles;
-using Everware.Utils;
+﻿using Everware.Utils;
 using System.Collections.Generic;
+using System.Linq;
+using Everware.Common.Systems;
+using Everware.Content.Base;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -37,6 +39,7 @@ public class GlowcoatPaintScraper : GlobalItem
 
 public class GlowcoatSystem : ModSystem
 {
+    public static List<Color> AllColors = new();
     public static void Unglowcoat(int i, int j)
     {
         Main.tile[i, j].Get<GlowcoatTileData>().color = Color.Transparent;
@@ -59,64 +62,106 @@ public class GlowcoatSystem : ModSystem
         On_Main.DrawTiles += On_Main_DrawTiles;
     }
 
-    public struct TileAssetPair(int ID, Asset<Texture2D> Texture)
+    public override void PostUpdateWorld()
     {
-        public int ID { get; } = ID;
-        public Asset<Texture2D> Texture { get; } = Texture;
+        foreach (Point a in GlowcoatedTiles)
+        {
+            Tile t = Main.tile[a];
+            
+            if (t.HasTile)
+            {
+                Color c = t.Get<GlowcoatTileData>().color;
+                Lighting.AddLight(a.ToVector2() * 16 + new Vector2(8), c.ToVector3());
+            }
+        }
     }
 
     private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
     {
         if (!solidLayer)
         {
-            var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-            GlowEffect.Parameters.Color = Color.Blue.ToVector4();
-            GlowEffect.Apply();
-
-            Main.spriteBatch.End(out var ss);
-            Main.spriteBatch.Begin(ss with { CustomEffect = GlowEffect.Shader });
-
-            for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
+            for (int ki = 0; ki < AllColors.Count; ki++)
             {
-                for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
+                Main.spriteBatch.End(out var sb);
+                
+                var target = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+                    Main.instance.tileTarget.Width, Main.instance.tileTarget.Height);
+
+                Color color = AllColors[ki];
+                using (target.Scope(clearColor: Color.Transparent))
                 {
-                    Point a = (Main.screenPosition / 16).ToPoint();
-                    a.X += i; a.Y += j;
+                    Color cc = color;
+                    cc.R = (byte)((float)cc.R * 0.4f);
+                    cc.G = (byte)((float)cc.G * 0.7f);
+                    var glowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+                    glowEffect.Parameters.Color = cc.ToVector4();
+                    if (color == new Color(255, 255, 255))
+                        glowEffect.Parameters.Color = new Vector4(Main.DiscoR * 0.4f, Main.DiscoG * 0.7f, Main.DiscoB, 255) / 255f;
+                    glowEffect.Apply();
+                
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                        DepthStencilState.None, null, glowEffect.Shader);
+                
+                    foreach (Point a in GlowcoatedTiles)
+                    {
+                        Tile t = Main.tile[a];
+
+                        if (t.HasTile)
+                        {
+                            Color c = t.Get<GlowcoatTileData>().color;
+                            if (c.PackedValue == color.PackedValue)
+                            {
+                                for (int ii = 0; ii < 4; ii++)
+                                {
+                                    Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                        DrawingUtils.TileOffset() +
+                                        new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
+                                }
+                            }
+                        }
+                    }
+                    Main.spriteBatch.End();
+                }
+
+                var blurEffect = Assets.Effects.Misc.Blur.CreateEffect();
+                blurEffect.Parameters.Radius = 0.005f + (float)(Math.Sin(GlobalTimer.Value / 40f) * 0.002f);
+                blurEffect.Apply();
+                
+                Main.spriteBatch.Begin(sb with { CustomEffect = blurEffect.Shader, BlendState = Main._multiplyBlendState });
+                
+                Main.spriteBatch.Draw(target.Target, target.Target.Bounds, new Color(1f, 1f,  1f, 0f));
+                
+                var glowEffect2 = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+                glowEffect2.Parameters.Color = color.ToVector4() with { W = 0f };
+                if (color == new Color(255, 255, 255))
+                    glowEffect2.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 0f) / 255f;
+                glowEffect2.Apply();
+                
+                Main.spriteBatch.Restart(sb with {SortMode = SpriteSortMode.Deferred, CustomEffect = glowEffect2.Shader, BlendState = Main._multiplyBlendState});
+                
+                foreach (Point a in GlowcoatedTiles)
+                {
                     Tile t = Main.tile[a];
 
                     if (t.HasTile)
                     {
                         Color c = t.Get<GlowcoatTileData>().color;
-                        if (c != Color.Transparent)
+                        if (c.PackedValue == color.PackedValue)
                         {
-                            GlowEffect.Parameters.Color = c.ToVector4();
-                            if (t.Get<GlowcoatTileData>().chromatic)
-                                GlowEffect.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
-                            GlowEffect.Apply();
-
-                            Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
-
-                            for (float k = 0; k < 360; k += 90)
+                            for (int ii = 0; ii < 4; ii++)
                             {
-                                bool overrideTexture = false;
-                                if (ModContent.GetModTile(t.TileType) is EverTile eT)
-                                {
-                                    if (eT.GlowcoatTileTexture != "")
-                                    {
-                                        Asset<Texture2D> tt = ModContent.Request<Texture2D>(eT.GlowcoatTileTexture);
-                                        DrawingUtils.DrawSlopedTile(Main.spriteBatch, tt, a.X, a.Y, Color.White, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)) + new Vector2(8));
-                                        overrideTexture = true;
-                                    }
-                                }
-                                if (!overrideTexture)
-                                    Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                    DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.PiOver2 * ii),
+                                    a.X, a.Y);
                             }
                         }
                     }
                 }
+                
+                Main.spriteBatch.Restart(sb);
+                
+                target.Dispose();
             }
-
-            Main.spriteBatch.Restart(ss);
         }
 
         orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
@@ -129,7 +174,7 @@ public class GlowcoatSystem : ModSystem
 
     public static string PointString(Point p)
     {
-        return p.X.ToString() + "," + p.Y.ToString();
+        return p.X + "," + p.Y;
     }
     public override void SaveWorldData(TagCompound tag)
     {

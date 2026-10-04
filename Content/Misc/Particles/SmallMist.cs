@@ -49,6 +49,6 @@ public class SmallMistFade : Particle
             if (Opacity < 0.05f) Kill();
         }
         velocity *= 0.9f;
-        Rotation += velocity.AngleFrom(Vector2.Zero) / 6f;
+        Rotation += (velocity.AngleFrom(Vector2.Zero) / 6f) * velocity.Length() / 3f;
     }
 }
