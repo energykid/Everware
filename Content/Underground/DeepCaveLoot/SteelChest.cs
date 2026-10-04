@@ -31,13 +31,13 @@ public class SteelChestTile : ChestTile
 
         if (localPlayer.editedChestName)
         {
-            NetMessage.SendData(33, -1, -1, NetworkText.FromLiteral(Main.chest[localPlayer.chest].name), localPlayer.chest, 1f);
+            NetMessage.SendData(MessageID.SyncPlayerChest, -1, -1, NetworkText.FromLiteral(Main.chest[localPlayer.chest].name), localPlayer.chest, 1f);
             localPlayer.editedChestName = false;
         }
 
         bool flag = IsLockedChest(i, j);
         int value;
-        if (Main.netMode == 1 && !flag)
+        if (Main.netMode == NetmodeID.MultiplayerClient && !flag)
         {
             if (i == localPlayer.chestX && j == localPlayer.chestY && localPlayer.chest >= 0)
             {
@@ -47,7 +47,7 @@ public class SteelChestTile : ChestTile
             }
             else
             {
-                NetMessage.SendData(31, -1, -1, null, i, j);
+                NetMessage.SendData(MessageID.RequestChestOpen, -1, -1, null, i, j);
                 Main.stackSplit = 600;
             }
         }

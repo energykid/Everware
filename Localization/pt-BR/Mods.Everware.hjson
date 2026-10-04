@@ -362,6 +362,21 @@ Items: {
 			Attack 3 times to refresh
 			''' */
 	}
+
+	MeteorBoots: {
+		// DisplayName: Meteor Boots
+		// Tooltip: ""
+	}
+
+	MeteorHelmet: {
+		// DisplayName: Meteor Helmet
+		// Tooltip: ""
+	}
+
+	MeteorJacket: {
+		// DisplayName: Meteor Jacket
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -479,6 +494,11 @@ Configs: {
 		eocEnabled: {
 			Label: Comportamento do Olho de Cthulhu
 			Tooltip: Escolha entre os estilos de comportamento Vanilla ou Everware para o Olho de Cthulhu.
+		}
+
+		meteorSetEnabled: {
+			// Label: Meteor Set
+			// Tooltip: Choose between styles for the Meteor set.
 		}
 	}
 }

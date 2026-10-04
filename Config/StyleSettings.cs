@@ -1,4 +1,5 @@
-﻿using Terraria.ID;
+﻿using System.ComponentModel;
+using Terraria.ID;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
@@ -12,25 +13,37 @@ public class StyleSettings : ModConfig
     public override string LocalizationCategory => "ConfigKeys";
 
     // Boss Style
+    [DefaultValue(true)]
     [BackgroundColor(98, 155, 255)]
     [CustomModConfigItem(typeof(StyleElement))]
     public bool eocEnabled = true;
     public static bool EoCEnabled = true;
 
+    // Item Set Style
+    [DefaultValue(true)]
+    [BackgroundColor(75, 72, 132)]
+    [CustomModConfigItem(typeof(StyleElement))]
+    public bool meteorSetEnabled = true;
+    public static bool MeteorSetEnabled = true;
+
     public StyleSettings()
     {
-        eocEnabled = false;
-        EoCEnabled = false;
+        eocEnabled = true;
+        EoCEnabled = true;
+        meteorSetEnabled = true;
+        MeteorSetEnabled = true;
     }
 
     public override void OnChanged()
     {
         EoCEnabled = eocEnabled;
+        MeteorSetEnabled = meteorSetEnabled;
     }
 
     public override void OnLoaded()
     {
         EoCEnabled = eocEnabled = true;
+        MeteorSetEnabled = meteorSetEnabled = true;
     }
 }
 

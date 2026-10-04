@@ -348,6 +348,21 @@ Items: {
 			Attack 3 times to refresh
 			'''
 	}
+
+	MeteorBoots: {
+		DisplayName: Meteor Boots
+		Tooltip: ""
+	}
+
+	MeteorHelmet: {
+		DisplayName: Meteor Helmet
+		Tooltip: ""
+	}
+
+	MeteorJacket: {
+		DisplayName: Meteor Jacket
+		Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -463,8 +478,13 @@ ConfigKeys: {
 Configs: {
 	StyleSettings: {
 		eocEnabled: {
-			Label: Eye of Cthulhu Behavior
-			Tooltip: Choose between Vanilla or Everware behavior styles for the Eye of Cthulhu.
+			Label: Eye of Cthulhu
+			Tooltip: Choose between styles for the Eye of Cthulhu's boss fight.
+		}
+
+		meteorSetEnabled: {
+			Label: Meteor Set
+			Tooltip: Choose between styles for the Meteor set.
 		}
 	}
 }
