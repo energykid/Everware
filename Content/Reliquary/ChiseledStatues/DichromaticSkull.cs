@@ -276,14 +276,14 @@ public class DichromaticSkullFlame : EverProjectile
         var effect = Assets.Effects.Misc.ColorGradientEffect.CreateEffect();
         effect.Parameters.Color = [
             Color.Transparent.ToVector4(),
-            Color.OrangeRed.ToVector4() * new Vector4(0.2f, 0.2f, 0.6f, 1f),
-            Color.OrangeRed.ToVector4() * 0.8f,
+            Color.Black.ToVector4(),
+            Color.DarkGray.ToVector4() * new Vector4(0.2f, 0.2f, 0.2f, 1f),
+            Color.DarkGray.ToVector4() * new Vector4(0.4f, 0.4f, 0.4f, 1f),
             Color.OrangeRed.ToVector4(),
             Color.Orange.ToVector4(),
             Color.Orange.ToVector4() * 1.5f,
             Color.White.ToVector4(),
-            Color.White.ToVector4(),
-            ];
+        ];
         effect.Parameters.ColorNumber = 7;
         effect.Apply();
 

@@ -21,13 +21,13 @@ float4 box(sampler2D tex, float2 coords)
     return tex_sum / weight_sum;
 }
 
-float4 Effect(float2 coords : TEXCOORD0) : COLOR0
+float4 Effect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
 {
     float4 col = tex2D(uImage0, coords);
     if (col.a > 0)
-        return float4(Color.rgb, col.a);
+        return Color * color;
     else
-        return col;
+        return col * color;
 }
 
 technique GradientShader

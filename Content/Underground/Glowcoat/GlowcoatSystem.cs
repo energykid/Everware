@@ -118,17 +118,17 @@ public class GlowcoatSystem : ModSystem
                 blurEffect.Parameters.Radius = 0.01f + (float)(Math.Sin(GlobalTimer.Value / 40f) * 0.002f);
                 blurEffect.Apply();
                 
-                Main.spriteBatch.Begin(sb with { CustomEffect = blurEffect.Shader, BlendState = BlendState.Additive });
+                Main.spriteBatch.Begin(sb with { CustomEffect = blurEffect.Shader, BlendState = Main._multiplyBlendState });
                 
                 Main.spriteBatch.Draw(target.Target, target.Target.Bounds, new Color(1f, 1f,  1f, 0f));
                 
                 var glowEffect2 = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-                glowEffect2.Parameters.Color = color.ToVector4();
+                glowEffect2.Parameters.Color = color.ToVector4() with { W = 0 };
                 if (color == new Color(255, 255, 255))
-                    glowEffect2.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
+                    glowEffect2.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 0) / 255f;
                 glowEffect2.Apply();
                 
-                Main.spriteBatch.Restart(sb with {CustomEffect = glowEffect2.Shader});
+                Main.spriteBatch.Restart(sb with {SortMode = SpriteSortMode.Deferred, CustomEffect = glowEffect2.Shader, BlendState = Main._multiplyBlendState});
                 
                 
                 for (int i = -10; i < Main.screenWidth / 16 + 10; i++)
