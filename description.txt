@@ -77,3 +77,11 @@ fixed a lot of graphical issues with gravitation potions
 fixed various other glitches places
 Everware weapons now consistently function correctly with glyphs from Spirit Reforged
 added Music Display support
+
+.....
+Everware 0.2.5.5 - touch-ups!
+
+reworked the way Glowcoats look
+fixed a bug where the Master Lockpick could screw up chest framing
+added various dust effects to weapons that don't have them
+added the Trick Glove, a magic accessory found in Steel Chests
