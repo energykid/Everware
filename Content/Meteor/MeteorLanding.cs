@@ -523,7 +523,7 @@ public static class MeteorLanding
                 break;
                 // Meteor landing text
                 case fall_duration + 20:
-                    Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
+                    Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue(), Color.Violet);
                     MeteorSpawned = true;
                     MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
