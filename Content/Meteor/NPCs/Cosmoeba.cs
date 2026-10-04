@@ -418,6 +418,27 @@ public class Cosmoeba : EverNPC
     }
     #endregion
 
+    public override void HitEffect(NPC.HitInfo hit)
+    {
+        base.HitEffect(hit);
+        if (NPC.life <= 0)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                new TextureSparkParticle(NPC.Center, new Vector2(Main.rand.NextFloat(-6f, 6f), Main.rand.NextFloat(-6f, 6f)), Main.rand.NextFloat(MathHelper.TwoPi), 
+                    "Everware/Assets/Textures/Meteor/NPCs/CosmoebaBubbles", new Vector2(Main.rand.NextFloat(1f, 2f)), new Vector2(15), Color.White)
+                {
+                    FrameCount = new Vector2(2, 1),
+                    FrameNum = new Vector2(Main.rand.Next(2), 0),
+                    AffectedByLight = false,
+                    Pixelated = true,
+                    UpdateFunction = P => { if (P.Scale.X < 0.3f) P.Kill(); }
+                }.Spawn();
+                Main.NewText("A");
+            }
+        }
+    }
+
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.AddTags(
