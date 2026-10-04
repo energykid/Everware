@@ -19,7 +19,8 @@ public class UndergroundHouseEdits : ModSystem
         ModContent.ItemType<Groundshakers>(),
         ModContent.ItemType<MasterLockpick>(),
         ModContent.ItemType<MagmaticAmmokit>(),
-        ModContent.ItemType<Whetstone>()
+        ModContent.ItemType<Whetstone>(),
+        ModContent.ItemType<TrickGlove>()
         ];
     }
 
@@ -32,7 +33,7 @@ public class UndergroundHouseEdits : ModSystem
                 Tile chestTile = Main.tile[Main.chest[i].x, Main.chest[i].y];
                 if (chestTile.TileType == TileID.Containers)
                 {
-                    if ((int)((float)chestTile.TileFrameX / 36f) == 1) // Gold Chest
+                    if ((int)(chestTile.TileFrameX / 36f) == 1) // Gold Chest
                     {
                         if (Main.chest[i].y > DeepCaveLayer)
                         {

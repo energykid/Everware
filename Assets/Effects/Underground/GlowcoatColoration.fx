@@ -3,31 +3,13 @@ sampler uImage1 : register(s1);
 
 float4 Color;
 
-float4 box(sampler2D tex, float2 coords)
-{
-    //Texture color sum and weight sum for computing the average color
-    float4 tex_sum = float4(0.0, 0.0, 0.0, 0.0);
-    float weight_sum = 0.0;
-
-    //Loop through desired texel "range"
-    for (int x = -2; x <= 2; x++)
-    {
-        for (int y = -2; y <= 2; y++)
-        {
-            tex_sum += tex2D(tex, coords + float2(x, y));
-            weight_sum += 1.0;
-        }
-    }
-    return tex_sum / weight_sum;
-}
-
-float4 Effect(float2 coords : TEXCOORD0) : COLOR0
+float4 Effect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
 {
     float4 col = tex2D(uImage0, coords);
     if (col.a > 0)
-        return float4(Color.rgb, col.a);
+        return Color * color;
     else
-        return col;
+        return col * color;
 }
 
 technique GradientShader

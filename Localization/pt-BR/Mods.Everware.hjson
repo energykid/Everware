@@ -328,6 +328,40 @@ Items: {
 	Hits: Acertos
 	Times: vezes
 	AnyCopperBar: Qualquer Barra de Cobre
+
+	CharredSoilItem: {
+		// DisplayName: Charred Soil
+		// Tooltip: ""
+	}
+
+	MagicStoneItem: {
+		// DisplayName: Magic Stone
+		// Tooltip: ""
+	}
+
+	CharredSoilWallItem: {
+		// DisplayName: Charred Wall
+		// Tooltip: ""
+	}
+
+	LivingStarWand: {
+		// DisplayName: Living Star Wand
+		// Tooltip: ""
+	}
+
+	ExcessiveForce: {
+		// DisplayName: Excessive Force
+		// Tooltip: This benefits noone.
+	}
+
+	TrickGlove: {
+		// DisplayName: Trick Glove
+		/* Tooltip:
+			'''
+			Swapping held magic weapons boosts magic power
+			Attack 3 times to refresh
+			''' */
+	}
 }
 
 Biomes: {
@@ -555,3 +589,4 @@ Tiles: {
 
 ConfigCategory.StyleSettings.Description: Configurações de Estilo
 Bestiary.Sculptor: Um velho e sábio artista de uma época muito anterior à sua. Anos de criostase deixaram sua pele pálida, mas frio algum é capaz de apagar sua paixão pelo ofício!
+// KilnQuarryGen: Generating an abandoned processing site

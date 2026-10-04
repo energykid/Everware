@@ -12,7 +12,10 @@ public class RadonGlowcoat : BaseGlowcoatItem
         return ModLoader.TryGetMod("SpiritReforged", out Mod reforged);
     }
 
-    public override Color Color => new Color(200, 200, 55);
+    public override void SetColor()
+    {
+        Color = new Color(200, 200, 55);
+    }
     public override int DustType => DustID.YellowTorch;
     public override Asset<Texture2D> GlowAsset => Assets.Textures.Underground.RadonGlowcoat_Glow.Asset;
     public override string Texture => "Everware/Assets/Textures/Underground/RadonGlowcoat";

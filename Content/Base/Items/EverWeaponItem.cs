@@ -28,18 +28,18 @@ public abstract class EverWeaponItem : EverItem
         MeterFill = reader.ReadSingle();
     }
 
-    public virtual void ChargeMeter(float amt)
+    public void ChargeMeter(float amt)
     {
-        Item.NetStateChanged();
         ChargeMeters.LocalChargeMeterAnim = 1f;
         MeterFill = MathHelper.Clamp(MeterFill + amt, 0f, 1f);
         ChargeMeters.LocalChargeMeterVisibility = 3f;
-    }
-    public virtual void SetMeter(float amt)
-    {
         Item.NetStateChanged();
+    }
+    public void SetMeter(float amt)
+    {
         MeterFill = MathHelper.Clamp(amt, 0f, 1f);
         ChargeMeters.LocalChargeMeterVisibility = 3f;
+        Item.NetStateChanged();
     }
     public virtual bool IsMeterFull()
     {

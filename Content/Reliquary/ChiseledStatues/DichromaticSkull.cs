@@ -276,19 +276,19 @@ public class DichromaticSkullFlame : EverProjectile
         var effect = Assets.Effects.Misc.ColorGradientEffect.CreateEffect();
         effect.Parameters.Color = [
             Color.Transparent.ToVector4(),
-            Color.OrangeRed.ToVector4() * new Vector4(0.2f, 0.2f, 0.6f, 1f),
-            Color.OrangeRed.ToVector4() * 0.8f,
+            Color.Black.ToVector4(),
+            Color.DarkGray.ToVector4() * new Vector4(0.2f, 0.2f, 0.2f, 1f),
+            Color.DarkGray.ToVector4() * new Vector4(0.4f, 0.4f, 0.4f, 1f),
             Color.OrangeRed.ToVector4(),
             Color.Orange.ToVector4(),
             Color.Orange.ToVector4() * 1.5f,
             Color.White.ToVector4(),
-            Color.White.ToVector4(),
-            ];
+        ];
         effect.Parameters.ColorNumber = 7;
         effect.Apply();
 
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, Main._multiplyBlendState, Main.DefaultSamplerState, null, Main.Rasterizer, effect.Shader, Main.GameViewMatrix.TransformationMatrix);
-
+        
         DrawingUtils.DrawGlowWithPadding(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(0.2f, 0.0f, 0.0f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), Main.GameViewMatrix.Effects, radius: 0.01f);
 
         Main.EntitySpriteDraw(flameTarget.Target, Vector2.Zero, flameTarget.Target.Bounds, new Color(1f, 0.2f, 0.2f, 0f), 0f, Vector2.Zero, new Vector2(2f, 2f), Main.GameViewMatrix.Effects);
@@ -325,6 +325,15 @@ public class DichromaticSkullFlame : EverProjectile
 
         public override void Update()
         {
+            if (ai[0] < 20)
+            {
+                if (Main.rand.NextBool(5))
+                {
+                    Dust dust = Dust.NewDustDirect(Center - new Vector2(20, 20), 40, 40, DustID.Torch, velocity.X / 2f, velocity.Y / 2f);
+                    dust.noGravity = true;
+                    dust.scale = MathHelper.Lerp(1f, 0f, ai[0] / 20f);
+                }
+            }
             base.Update();
             Lighting.AddLight(Center, Color.OrangeRed.ToVector3() * 0.7f);
             ai[0]++;
@@ -470,8 +479,8 @@ public class DichromaticSkullWater : EverProjectile
 
         Color c = Color.Lerp(Color.White, Lighting.GetColor((Projectile.Center / 16).ToPoint()), 0.5f);
 
-        DrawingUtils.DrawGlowWithPadding(asset.Value, pos, fr, c.MultiplyRGBA(new(0f, 0f, 0.4f, 0.4f)), 0f, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1], SpriteEffects.None);
-        Main.EntitySpriteDraw(asset.Value, pos, fr, c, 0f, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1] * Scale, SpriteEffects.None);
+        DrawingUtils.DrawGlowWithPadding(asset.Value, pos, fr, c.MultiplyRGBA(new(0f, 0f, Projectile.Opacity * 0.4f, Projectile.Opacity)), Projectile.rotation, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1], SpriteEffects.None);
+        Main.EntitySpriteDraw(asset.Value, pos, fr, c.MultiplyRGBA(new(Projectile.Opacity, Projectile.Opacity, Projectile.Opacity, Projectile.Opacity)), Projectile.rotation, fr.Size() / 2, new Vector2(1f + sq, 1f - sq) * Projectile.scale * Projectile.ai[1] * Scale, SpriteEffects.None);
 
         return false;
     }
@@ -494,6 +503,11 @@ public class DichromaticSkullWater : EverProjectile
         {
             if (!Popped)
             {
+                for (int i = 0; i < 20; i++)
+                {
+                    Dust.NewDust(Projectile.Center - new Vector2(40), 80, 80, DustID.Water, Scale: 0.7f);
+                }
+                Projectile.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
                 SoundEngine.PlaySound(SoundID.Item54.WithPitchOffset(-0.7f).WithPitchOffset(0.3f), Projectile.Center);
             }
             Popped = true;
@@ -505,6 +519,7 @@ public class DichromaticSkullWater : EverProjectile
         }
         else
         {
+            Projectile.Opacity *= 0.9f;
             Scale = Vector2.Lerp(Scale, new Vector2(1.5f), 0.2f);
             Projectile.ai[2] = MathHelper.Lerp(Projectile.ai[2], 7, 0.1f);
             if (Projectile.ai[2] >= 6) Projectile.Kill();

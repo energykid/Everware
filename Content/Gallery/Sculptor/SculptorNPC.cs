@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.GameContent.Personalities;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Everware.Content.Gallery.Sculptor;
@@ -11,6 +13,12 @@ namespace Everware.Content.Gallery.Sculptor;
 [AutoloadHead]
 public class SculptorNPC : ModNPC
 {
+    public override void ModifyNPCLoot(NPCLoot npcLoot)
+    {
+        npcLoot.Add(new ExcessiveForceDropRule(1));
+    }
+
+    public int NameIndex = 0;
     public override string Texture => "Everware/Assets/Textures/Gallery/Sculptor/SculptorNPC";
     private static Profiles.StackedNPCProfile Profile;
     public bool Focused = false;
@@ -22,12 +30,14 @@ public class SculptorNPC : ModNPC
     public override void SendExtraAI(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
+        writer.Write(NameIndex);
         writer.Write(Focused);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
         Focused = reader.ReadBoolean();
+        NameIndex = reader.ReadInt32();
     }
     public override void SetDefaults()
     {
@@ -36,15 +46,33 @@ public class SculptorNPC : ModNPC
         NPC.width = 18;
         NPC.height = 40;
         NPC.aiStyle = NPCAIStyleID.Passive;
-        NPC.damage = 10;
+        NPC.damage = 30;
         NPC.defense = 15;
         NPC.lifeMax = 250;
         NPC.HitSound = SoundID.NPCHit1;
         NPC.DeathSound = SoundID.NPCDeath1;
         NPC.knockBackResist = 0.5f;
 
+        NameIndex = Main.rand.Next(FirstNameList.Count);
+        NPC.netUpdate = true;
+
         AnimationType = NPCID.Guide;
     }
+
+    public override void TownNPCAttackStrength(ref int damage, ref float knockback)
+    {
+        damage = 23;
+        knockback = 1.5f;
+        base.TownNPCAttackStrength(ref damage, ref knockback);
+    }
+    
+    public override void DrawTownAttackSwing(ref Texture2D item, ref Rectangle itemFrame, ref int itemSize, ref float scale, ref Vector2 offset)
+    {
+        item = Assets.Textures.Gallery.Sculptor.ExcessiveForce.Asset.Value;
+        itemFrame = item.Frame();
+        base.DrawTownAttackSwing(ref item, ref itemFrame, ref itemSize, ref scale, ref offset);
+    }
+
     public override string GetChat()
     {
         List<string> key = ["One", "Two", "Three", "Four", "Five", "Six"];
@@ -83,13 +111,13 @@ public class SculptorNPC : ModNPC
             .SetNPCAffection(NPCID.Pirate, AffectionLevel.Hate);
 
         Main.npcFrameCount[Type] = 25; // The amount of frames the NPC has
-
+        
         NPCID.Sets.ExtraFramesCount[Type] = 9; // Generally for Town NPCs, but this is how the NPC does extra things such as sitting in a chair and talking to other NPCs.
         NPCID.Sets.AttackFrameCount[Type] = 4;
-        NPCID.Sets.DangerDetectRange[Type] = 700; // The amount of pixels away from the center of the npc that it tries to attack enemies.
-        NPCID.Sets.PrettySafe[Type] = 300;
+        NPCID.Sets.DangerDetectRange[Type] = 100; // The amount of pixels away from the center of the npc that it tries to attack enemies.
+        NPCID.Sets.PrettySafe[Type] = 400;
         NPCID.Sets.AttackType[Type] = 3; // Swings a weapon.
-        NPCID.Sets.AttackTime[Type] = 60; // The amount of time it takes for the NPC's attack animation to be over once it starts.
+        NPCID.Sets.AttackTime[Type] = 15; // The amount of time it takes for the NPC's attack animation to be over once it starts.
         NPCID.Sets.AttackAverageChance[Type] = 30;
         NPCID.Sets.HatOffsetY[Type] = 4; // For when a party is active, the party hat spawns at a Y offset.
         NPCID.Sets.ShimmerTownTransform[Type] = true; // This set says that the Town NPC has a Shimmered form. Otherwise, the Town NPC will become transparent when touching Shimmer like other enemies.
@@ -133,16 +161,30 @@ public class SculptorNPC : ModNPC
     {
         return true;
     }
+
+    public static List<String> FirstNameList =
+    [
+        "Gardner",
+        "Toryn",
+        "Ennst",
+        "Arnstron",
+        "Thien",
+        "Nell"
+    ];
+
+    public static List<String> LastNameList =
+    [
+        "Ormsson",
+        "Welsson",
+        "Ferrensson",
+        "Felsson",
+        "Errensson",
+        "Deiusson"
+    ];
     public override List<string> SetNPCNameList()
     {
-        return [
-            "Gardner",
-            "Toryn",
-            "Ennsten",
-            "Arnstron",
-            "Thien",
-            "Nell"
-            ];
+        if (NPC.IsABestiaryIconDummy) return base.SetNPCNameList();
+        return [FirstNameList[NameIndex]];
     }
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
@@ -158,7 +200,7 @@ public class SculptorNPC : ModNPC
     }
     public override void HitEffect(NPC.HitInfo hit)
     {
-        int num = NPC.life > 0 ? 1 : 5;
+        int num = NPC.life > 0 ? 4 : 12;
 
         for (int k = 0; k < num; k++)
         {
@@ -171,8 +213,8 @@ public class SculptorNPC : ModNPC
     }
     public override void TownNPCAttackSwing(ref int itemWidth, ref int itemHeight)
     {
-        itemWidth = 60;
-        itemHeight = 60;
+        itemWidth = 30;
+        itemHeight = 30;
     }
     public override void AI()
     {
@@ -184,6 +226,16 @@ public class SculptorNPC : ModNPC
                 NPC.direction = Math.Sign(Main.player[FocusedPlayer].Center.X - NPC.Center.X);
             }
         }
+    }
+
+    public override void SaveData(TagCompound tag)
+    {
+        tag.Set("NameIndex", NameIndex);
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        NameIndex = tag.GetInt("NameIndex");
     }
 }
 public class SculptorTownNPCArrivalSystem : ModSystem
