@@ -62,6 +62,29 @@ public class GlowcoatSystem : ModSystem
         On_Main.DrawTiles += On_Main_DrawTiles;
     }
 
+    public override void PostUpdateWorld()
+    {
+        foreach (Point a in GlowcoatedTiles)
+        {
+            Tile t = Main.tile[a];
+            
+            
+            if (t.HasTile)
+            {
+                Color c = t.Get<GlowcoatTileData>().color;
+                if (c != Color.Transparent)
+                {
+                    for (int ii = 0; ii < 4; ii++)
+                    {
+                        Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                            DrawingUtils.TileOffset() +
+                            new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
+                    }
+                }
+            }
+        }
+    }
+
     private void On_Main_DrawTiles(On_Main.orig_DrawTiles orig, Main self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets, int waterStyleOverride)
     {
         if (!solidLayer)
@@ -88,56 +111,8 @@ public class GlowcoatSystem : ModSystem
                     Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
                         DepthStencilState.None, null, glowEffect.Shader);
                 
-                    for (int i = -10; i < Main.screenWidth / 16 + 10; i++)
+                    foreach (Point a in GlowcoatedTiles)
                     {
-                        for (int j = -10; j < Main.screenHeight / 16 + 10; j++)
-                        {
-                            Point a = (Main.screenPosition / 16).ToPoint();
-                            a.X += i;
-                            a.Y += j;
-                            Tile t = Main.tile[a];
-
-                            if (t.HasTile)
-                            {
-                                Color c = t.Get<GlowcoatTileData>().color;
-                                if (c.PackedValue == color.PackedValue)
-                                {
-                                    for (int ii = 0; ii < 4; ii++)
-                                    {
-                                        Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
-                                            DrawingUtils.TileOffset() + new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Main.spriteBatch.End();
-                }
-
-                var blurEffect = Assets.Effects.Misc.Blur.CreateEffect();
-                blurEffect.Parameters.Radius = 0.01f + (float)(Math.Sin(GlobalTimer.Value / 40f) * 0.002f);
-                blurEffect.Apply();
-                
-                Main.spriteBatch.Begin(sb with { CustomEffect = blurEffect.Shader, BlendState = Main._multiplyBlendState });
-                
-                Main.spriteBatch.Draw(target.Target, target.Target.Bounds, new Color(1f, 1f,  1f, 0f));
-                
-                var glowEffect2 = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-                glowEffect2.Parameters.Color = color.ToVector4() with { W = 0 };
-                if (color == new Color(255, 255, 255))
-                    glowEffect2.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 0) / 255f;
-                glowEffect2.Apply();
-                
-                Main.spriteBatch.Restart(sb with {SortMode = SpriteSortMode.Deferred, CustomEffect = glowEffect2.Shader, BlendState = Main._multiplyBlendState});
-                
-                
-                for (int i = -10; i < Main.screenWidth / 16 + 10; i++)
-                {
-                    for (int j = -10; j < Main.screenHeight / 16 + 10; j++)
-                    {
-                        Point a = (Main.screenPosition / 16).ToPoint();
-                        a.X += i;
-                        a.Y += j;
                         Tile t = Main.tile[a];
 
                         if (t.HasTile)
@@ -148,8 +123,45 @@ public class GlowcoatSystem : ModSystem
                                 for (int ii = 0; ii < 4; ii++)
                                 {
                                     Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
-                                        DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
+                                        DrawingUtils.TileOffset() +
+                                        new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
                                 }
+                            }
+                        }
+                    }
+                    Main.spriteBatch.End();
+                }
+
+                var blurEffect = Assets.Effects.Misc.Blur.CreateEffect();
+                blurEffect.Parameters.Radius = 0.005f + (float)(Math.Sin(GlobalTimer.Value / 40f) * 0.002f);
+                blurEffect.Apply();
+                
+                Main.spriteBatch.Begin(sb with { CustomEffect = blurEffect.Shader, BlendState = Main._multiplyBlendState });
+                
+                Main.spriteBatch.Draw(target.Target, target.Target.Bounds, new Color(1f, 1f,  1f, 0f));
+                
+                var glowEffect2 = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+                glowEffect2.Parameters.Color = color.ToVector4() with { W = 0f };
+                if (color == new Color(255, 255, 255))
+                    glowEffect2.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 0f) / 255f;
+                glowEffect2.Apply();
+                
+                Main.spriteBatch.Restart(sb with {SortMode = SpriteSortMode.Deferred, CustomEffect = glowEffect2.Shader, BlendState = Main._multiplyBlendState});
+                
+                foreach (Point a in GlowcoatedTiles)
+                {
+                    Tile t = Main.tile[a];
+
+                    if (t.HasTile)
+                    {
+                        Color c = t.Get<GlowcoatTileData>().color;
+                        if (c.PackedValue == color.PackedValue)
+                        {
+                            for (int ii = 0; ii < 4; ii++)
+                            {
+                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                    DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.PiOver2 * ii),
+                                    a.X, a.Y);
                             }
                         }
                     }
@@ -171,7 +183,7 @@ public class GlowcoatSystem : ModSystem
 
     public static string PointString(Point p)
     {
-        return p.X.ToString() + "," + p.Y.ToString();
+        return p.X + "," + p.Y;
     }
     public override void SaveWorldData(TagCompound tag)
     {
