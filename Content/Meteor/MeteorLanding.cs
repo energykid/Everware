@@ -525,7 +525,7 @@ public static class MeteorLanding
                 case fall_duration + 20:
                     Main.NewText(Mods.Everware.MeteorLandingGen.GetTextValue());
                     MeteorSpawned = true;
-                    // MeteorGeneration.GenerateWholeSite(MeteorPosition);
+                    MeteorGeneration.GenerateWholeSite(MeteorPosition);
                 break;
             }
 
