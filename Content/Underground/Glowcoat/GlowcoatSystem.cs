@@ -68,19 +68,10 @@ public class GlowcoatSystem : ModSystem
         {
             Tile t = Main.tile[a];
             
-            
             if (t.HasTile)
             {
                 Color c = t.Get<GlowcoatTileData>().color;
-                if (c != Color.Transparent)
-                {
-                    for (int ii = 0; ii < 4; ii++)
-                    {
-                        Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
-                            DrawingUtils.TileOffset() +
-                            new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
-                    }
-                }
+                Lighting.AddLight(a.ToVector2() * 16 + new Vector2(8), c.ToVector3());
             }
         }
     }
