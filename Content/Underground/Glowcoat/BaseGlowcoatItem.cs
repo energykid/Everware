@@ -11,7 +11,7 @@ public abstract class BaseGlowcoatItem : EverItem
     public virtual int MossBlock => TileID.LavaMoss;
     public virtual int DustType => DustID.LavaMoss;
     public virtual Asset<Texture2D> GlowAsset => Assets.Textures.Underground.MagmaticGlowcoat_Glow.Asset;
-    public virtual Color Color => new Color(255, 90, 0);
+    public Color Color = new(255, 90, 0);
     public override void SetDefaults()
     {
         Item.consumable = true;
@@ -23,7 +23,16 @@ public abstract class BaseGlowcoatItem : EverItem
         Item.autoReuse = true;
         Item.width = GlowAsset.Width();
         Item.height = GlowAsset.Height();
+        SetColor();
     }
+
+    public virtual void SetColor() { }
+    public override void SetStaticDefaults()
+    {
+        SetColor();
+        GlowcoatSystem.AllColors.Add(Color);
+    }
+
     public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
     {
         spriteBatch.Draw(GlowAsset.Value, Item.Center - Main.screenPosition, GlowAsset.Frame(), Color.White, rotation, GlowAsset.Frame().Size() / 2, scale, SpriteEffects.None, 0f);

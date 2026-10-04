@@ -150,6 +150,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
             if (Pause == 0)
             {
                 SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundImpact.WithPitchOffset(0.2f), Projectile.Center);
+                SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.GreatGargoyleHit.Asset.WithPitchVariance(0.2f), Projectile.Center);
             }
 
             Projectile.timeLeft = 10;
@@ -162,6 +163,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
                 if (Timer.ValueAt(42, speed) || Timer.ValueAt(72, speed))
                 {
+                    SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.GreatGargoyleSwing.Asset.WithPitchVariance(0.2f), Projectile.Center);
                     SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
                     HitFrames = 2;
                 }
@@ -245,6 +247,7 @@ public class GreatGargoyleHoldout : EverHoldoutProjectile
 
             if (Timer.ValueAt(3, speed))
             {
+                SoundEngine.PlaySound(Assets.Sounds.Gear.Weapon.GreatGargoyleHoldup.Asset, Projectile.Center);
                 SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
                 SoundEngine.PlaySound(SoundID.NPCHit52, Projectile.Center);
             }

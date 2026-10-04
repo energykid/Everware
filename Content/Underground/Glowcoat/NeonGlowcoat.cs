@@ -8,7 +8,10 @@ public class NeonGlowcoat : BaseGlowcoatItem
 {
     public override int MossBlock => TileID.VioletMoss;
     public override int MossItem => ItemID.VioletMoss;
-    public override Color Color => new Color(167, 31, 197);
+    public override void SetColor()
+    {
+        Color = new Color(167, 31, 197);
+    }
     public override int DustType => DustID.VioletMoss;
     public override Asset<Texture2D> GlowAsset => Assets.Textures.Underground.NeonGlowcoat_Glow.Asset;
     public override string Texture => "Everware/Assets/Textures/Underground/NeonGlowcoat";

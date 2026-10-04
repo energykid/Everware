@@ -12,7 +12,10 @@ public class OganessonGlowcoat : BaseGlowcoatItem
         return ModLoader.TryGetMod("SpiritReforged", out Mod reforged);
     }
 
-    public override Color Color => new Color(185, 185, 185);
+    public override void SetColor()
+    {
+        Color = new Color(185, 185, 185);
+    }
     public override int DustType => DustID.WhiteTorch;
     public override Asset<Texture2D> GlowAsset => Assets.Textures.Underground.OganessonGlowcoat_Glow.Asset;
     public override string Texture => "Everware/Assets/Textures/Underground/OganessonGlowcoat";

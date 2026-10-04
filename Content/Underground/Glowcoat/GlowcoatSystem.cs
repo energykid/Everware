@@ -1,5 +1,8 @@
 ﻿using Everware.Utils;
 using System.Collections.Generic;
+using System.Linq;
+using Everware.Common.Systems;
+using Everware.Content.Base;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -36,6 +39,7 @@ public class GlowcoatPaintScraper : GlobalItem
 
 public class GlowcoatSystem : ModSystem
 {
+    public static List<Color> AllColors = new();
     public static void Unglowcoat(int i, int j)
     {
         Main.tile[i, j].Get<GlowcoatTileData>().color = Color.Transparent;
@@ -62,41 +66,99 @@ public class GlowcoatSystem : ModSystem
     {
         if (!solidLayer)
         {
-            var GlowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
-            GlowEffect.Parameters.Color = Color.Blue.ToVector4();
-            GlowEffect.Apply();
-
-            Main.spriteBatch.End(out var ss);
-            Main.spriteBatch.Begin(ss with { CustomEffect = GlowEffect.Shader });
-
-            for (int i = -10; i < (Main.screenWidth / 16) + 10; i++)
+            for (int ki = 0; ki < AllColors.Count; ki++)
             {
-                for (int j = -10; j < (Main.screenHeight / 16) + 10; j++)
+                Main.spriteBatch.End(out var sb);
+                
+                var target = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice,
+                    Main.instance.tileTarget.Width, Main.instance.tileTarget.Height);
+
+                Color color = AllColors[ki];
+                using (target.Scope(clearColor: Color.Transparent))
                 {
-                    Point a = (Main.screenPosition / 16).ToPoint();
-                    a.X += i; a.Y += j;
-                    Tile t = Main.tile[a];
-
-                    if (t.HasTile)
+                    Color cc = color;
+                    cc.R = (byte)((float)cc.R * 0.4f);
+                    cc.G = (byte)((float)cc.G * 0.7f);
+                    var glowEffect = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+                    glowEffect.Parameters.Color = cc.ToVector4();
+                    if (color == new Color(255, 255, 255))
+                        glowEffect.Parameters.Color = new Vector4(Main.DiscoR * 0.4f, Main.DiscoG * 0.7f, Main.DiscoB, 255) / 255f;
+                    glowEffect.Apply();
+                
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                        DepthStencilState.None, null, glowEffect.Shader);
+                
+                    for (int i = -10; i < Main.screenWidth / 16 + 10; i++)
                     {
-                        Color c = t.Get<GlowcoatTileData>().color;
-                        if (c != Color.Transparent)
+                        for (int j = -10; j < Main.screenHeight / 16 + 10; j++)
                         {
-                            GlowEffect.Parameters.Color = c.ToVector4();
-                            if (t.Get<GlowcoatTileData>().chromatic)
-                                GlowEffect.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
-                            GlowEffect.Apply();
+                            Point a = (Main.screenPosition / 16).ToPoint();
+                            a.X += i;
+                            a.Y += j;
+                            Tile t = Main.tile[a];
 
-                            Lighting.AddLight(new Vector2(a.X * 16, a.Y * 16), c.ToVector3() * 0.25f);
+                            if (t.HasTile)
+                            {
+                                Color c = t.Get<GlowcoatTileData>().color;
+                                if (c.PackedValue == color.PackedValue)
+                                {
+                                    for (int ii = 0; ii < 4; ii++)
+                                    {
+                                        Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                            DrawingUtils.TileOffset() + new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Main.spriteBatch.End();
+                }
 
-                            for (float k = 0; k < 360; k += 90)
-                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition, DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.ToRadians(k)), a.X, a.Y);
+                var blurEffect = Assets.Effects.Misc.Blur.CreateEffect();
+                blurEffect.Parameters.Radius = 0.01f + (float)(Math.Sin(GlobalTimer.Value / 40f) * 0.002f);
+                blurEffect.Apply();
+                
+                Main.spriteBatch.Begin(sb with { CustomEffect = blurEffect.Shader, BlendState = BlendState.Additive });
+                
+                Main.spriteBatch.Draw(target.Target, target.Target.Bounds, new Color(1f, 1f,  1f, 0f));
+                
+                var glowEffect2 = Assets.Effects.Underground.GlowcoatColoration.CreateEffect();
+                glowEffect2.Parameters.Color = color.ToVector4();
+                if (color == new Color(255, 255, 255))
+                    glowEffect2.Parameters.Color = new Vector4(Main.DiscoR, Main.DiscoG, Main.DiscoB, 255) / 255f;
+                glowEffect2.Apply();
+                
+                Main.spriteBatch.Restart(sb with {CustomEffect = glowEffect2.Shader});
+                
+                
+                for (int i = -10; i < Main.screenWidth / 16 + 10; i++)
+                {
+                    for (int j = -10; j < Main.screenHeight / 16 + 10; j++)
+                    {
+                        Point a = (Main.screenPosition / 16).ToPoint();
+                        a.X += i;
+                        a.Y += j;
+                        Tile t = Main.tile[a];
+
+                        if (t.HasTile)
+                        {
+                            Color c = t.Get<GlowcoatTileData>().color;
+                            if (c.PackedValue == color.PackedValue)
+                            {
+                                for (int ii = 0; ii < 4; ii++)
+                                {
+                                    Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                        DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
+                                }
+                            }
                         }
                     }
                 }
+                
+                Main.spriteBatch.Restart(sb);
+                
+                target.Dispose();
             }
-
-            Main.spriteBatch.Restart(ss);
         }
 
         orig(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
