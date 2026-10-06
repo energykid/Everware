@@ -6,8 +6,10 @@ namespace Everware.Content.Meteor.Items;
 
 #region Armor Pieces
 [AutoloadEquip(EquipType.Head)]
-public class MeteorHelmet : EverItem
+public class MeteorHelmet : EverEquipmentItem
 {
+    public override int VanillaID => ItemID.MeteorHelmet;
+    public override bool ReplacementCondition => StyleSettings.MeteorSetEnabled;
     public override string Texture => "Everware/Assets/Textures/Meteor/Items/MeteorHelmet";
     public override int DuplicationAmount => 1;
     public override int Rarity => 5;
@@ -29,8 +31,10 @@ public class MeteorHelmet : EverItem
     }
 }
 [AutoloadEquip(EquipType.Body)]
-public class MeteorJacket : EverItem
+public class MeteorJacket : EverEquipmentItem
 {
+    public override int VanillaID => ItemID.MeteorSuit;
+    public override bool ReplacementCondition => StyleSettings.MeteorSetEnabled;
     public override string Texture => "Everware/Assets/Textures/Meteor/Items/MeteorJacket";
     public override int DuplicationAmount => 1;
     public override int Rarity => 5;
@@ -43,8 +47,10 @@ public class MeteorJacket : EverItem
     }
 }
 [AutoloadEquip(EquipType.Legs)]
-public class MeteorBoots : EverItem
+public class MeteorBoots : EverEquipmentItem
 {
+    public override int VanillaID => ItemID.MeteorLeggings;
+    public override bool ReplacementCondition => StyleSettings.MeteorSetEnabled;
     public override string Texture => "Everware/Assets/Textures/Meteor/Items/MeteorBoots";
     public override int DuplicationAmount => 1;
     public override int Rarity => 5;
@@ -56,28 +62,3 @@ public class MeteorBoots : EverItem
     }
 }
 #endregion
-
-public class MeteorArmorMagicSwap : ModSystem
-{
-    public override void Load()
-    {
-        On_Item.SetDefaults_int += On_Item_SetDefaults_int;
-    }
-
-    private void On_Item_SetDefaults_int(On_Item.orig_SetDefaults_int orig, Item self, int Type)
-    {
-        if (StyleSettings.MeteorSetEnabled)
-        {
-            if (Type == ItemID.MeteorHelmet) Type = ModContent.ItemType<MeteorHelmet>();
-            if (Type == ItemID.MeteorSuit) Type = ModContent.ItemType<MeteorJacket>();
-            if (Type == ItemID.MeteorLeggings) Type = ModContent.ItemType<MeteorBoots>();
-        }
-        else
-        {
-            if (Type == ModContent.ItemType<MeteorHelmet>()) Type = ItemID.MeteorHelmet;
-            if (Type == ModContent.ItemType<MeteorJacket>()) Type = ItemID.MeteorSuit;
-            if (Type == ModContent.ItemType<MeteorBoots>()) Type = ItemID.MeteorLeggings;
-        }
-        orig(self, Type);
-    }
-}

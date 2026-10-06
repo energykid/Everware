@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json;
+using System.ComponentModel;
 using Terraria.ID;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.Config.UI;
@@ -9,42 +10,32 @@ namespace Everware.Config;
 
 public class StyleSettings : ModConfig
 {
+    #region Non-Config Values
+    public static StyleSettings Instance => ModContent.GetInstance<StyleSettings>();
+
     public override ConfigScope Mode => ConfigScope.ServerSide;
     public override string LocalizationCategory => "ConfigKeys";
+    #endregion
 
     // Boss Style
+    [ReloadRequired]
     [DefaultValue(true)]
     [BackgroundColor(98, 155, 255)]
     [CustomModConfigItem(typeof(StyleElement))]
     public bool eocEnabled = true;
-    public static bool EoCEnabled = true;
+
+    [JsonIgnore]
+    public static bool EoCEnabled => Instance.eocEnabled;
 
     // Item Set Style
+    [ReloadRequired]
     [DefaultValue(true)]
-    [BackgroundColor(75, 72, 132)]
+    [BackgroundColor(98, 155, 255)]
     [CustomModConfigItem(typeof(StyleElement))]
     public bool meteorSetEnabled = true;
-    public static bool MeteorSetEnabled = true;
 
-    public StyleSettings()
-    {
-        eocEnabled = true;
-        EoCEnabled = true;
-        meteorSetEnabled = true;
-        MeteorSetEnabled = true;
-    }
-
-    public override void OnChanged()
-    {
-        EoCEnabled = eocEnabled;
-        MeteorSetEnabled = meteorSetEnabled;
-    }
-
-    public override void OnLoaded()
-    {
-        EoCEnabled = eocEnabled = true;
-        MeteorSetEnabled = meteorSetEnabled = true;
-    }
+    [JsonIgnore]
+    public static bool MeteorSetEnabled => Instance.meteorSetEnabled;
 }
 
 class StyleElement : ConfigElement<bool>
