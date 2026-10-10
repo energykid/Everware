@@ -25,7 +25,8 @@ internal class Weaver : EverNPC
         GrappleMeteor
     }
 
-    public override Vector2 Size => new Vector2(70, 120);
+    public override int FrameNumber => 8;
+    public override Vector2 Size => new Vector2(70, 96);
     public override int Damage => 50;
     public override string Texture => "Everware/Assets/Textures/Meteor/NPCs/Weaver";
 
@@ -275,7 +276,7 @@ internal class Weaver : EverNPC
         var oldPosition = MeteorPosition;
         var velocity = MeteorPosition - OldMeteorPosition - new Vector3(GrappledMeteor.velocity, 0f);
 
-        var axis2 = new Vector2((GrappledMeteor.Center - NPC.Center).X, (GrappledMeteor.Center - NPC.Center).Y);
+        var axis2 = GrappledMeteor.Center - NPC.Center;
         velocity += new Vector3(axis2.X, axis2.Y, 0f).SafeNormalize(Vector3.Zero).Cross(normal) * 2.75f;
 
         MeteorPosition += velocity;
@@ -295,9 +296,9 @@ internal class Weaver : EverNPC
         MeteorPosition -= translation * 0.95f;
 
         // Give the illusion of the meteor moving in 3D space
-        var velocity2D = new Vector2(velocity.X, velocity.Y);
+        var velocity2D = velocity.XY();
 
-        GrappledMeteor.Center = new Vector2(MeteorPosition.X, MeteorPosition.Y);
+        GrappledMeteor.Center = MeteorPosition.XY();
         GrappledMeteor.scale = 1f / MathHelper.Clamp((1 - MeteorPosition.Z / (2f * MiscAITimer)), 0.01f, 50);
         GrappledMeteor.rotation = Vector2.Zero.AngleFrom(velocity2D);
         GrappledMeteor.velocity = velocity2D * 0.01f;
@@ -357,6 +358,33 @@ internal class Weaver : EverNPC
     }
     #endregion
 
+    public override void FindFrame(int frameHeight)
+    {
+        float rotationTarget = 0f;
+
+        if ((BehaviorState)State != BehaviorState.FindGround &&
+            (BehaviorState)State != BehaviorState.WaitInGroundToAmbush &&
+            !((BehaviorState)State == BehaviorState.HangAndFollowTarget && Timer <= HANG_ANIM_LENGTH + 37) &&
+            NPC.HasValidTarget)
+        {
+            var toPlayerVector = new Vector3(Main.player[NPC.target].Center, 0f) - new Vector3(NPC.Center, -356f);
+            rotationTarget = toPlayerVector.XZ().ToRotation() - MathHelper.PiOver2;
+        }
+
+        if ((BehaviorState)State == BehaviorState.GrappleMeteor)
+            rotationTarget = (MeteorPosition - Center3D).XZ().ToRotation() - MathHelper.PiOver4;
+
+        NPC.frameCounter = ((float)NPC.frameCounter).AngleLerp(rotationTarget, 0.2f);
+        var newframeCounter = (NPC.frameCounter + MathHelper.TwoPi);
+
+        int frame = ((int)Math.Round(newframeCounter / MathHelper.PiOver4)) % FrameNumber;
+
+        if (newframeCounter < 0)
+            Main.NewText(newframeCounter);
+
+        NPC.frame.Y = frame * frameHeight;
+    }
+
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (State != 2 && State != 3)
@@ -388,12 +416,12 @@ internal class Weaver : EverNPC
             }
         }
 
-        var stringColor = new Color(177, 134, 101);
+        var stringColor = new Color(255, 255, 154);
 
         PrimitiveDrawing.DrawPrimitiveTrail(new Vector2(Main.screenWidth, Main.screenHeight), points, 2, a => { return MathHelper.Lerp(1.2f, 0.7f, a); }, colors: (a, b) =>
         {
             float length = 16 * 8f;
-            return Color.Lerp(stringColor, Color.Transparent, Easing.OutCirc(1f - a));
+            return Color.Lerp(stringColor, Color.Transparent, Easing.OutCirc(a));
         });
 
         if (State != 3 || GrappledMeteor is null || !GrappledMeteor.active || GrappledMeteor.type != NPCID.MeteorHead)
