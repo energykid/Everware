@@ -416,11 +416,9 @@ internal class Starantula : EverNPC
         }
 
         var interpolant = State == 2 ? Easing.InOutSine(MathHelper.Clamp(Timer / HANG_ANIM_LENGTH, 0, 1)) : 1f;
-        var stringBegin = Vector2.UnitY * -42;
-        stringBegin = NPC.Center + stringBegin.RotatedBy(NPC.rotation);
 
-        var begin = stringBegin - Main.screenPosition;
-        var end = Vector2.Lerp(stringBegin, HangingPosition, interpolant) - Main.screenPosition;
+        var begin = NPC.Center - Main.screenPosition;
+        var end = Vector2.Lerp(NPC.Center, HangingPosition, interpolant) - Main.screenPosition;
         var middle = (begin + end) * 0.5f - NPC.velocity;
 
         int segments = 40;
