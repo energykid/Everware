@@ -360,6 +360,7 @@ internal class Weaver : EverNPC
 
     #region Rendering
     private float _bodyRotation = 0f;
+    private int _bodyFrame = 0;
     private bool _leftLimbsDrawFront = false;
     private bool _rightLimbsDrawFront = true;
 
@@ -399,6 +400,7 @@ internal class Weaver : EverNPC
 
         int frame = ((int)Math.Round(newframeCounter / MathHelper.PiOver4)) % FrameNumber;
         _bodyRotation = frame * MathHelper.PiOver4;
+        _bodyFrame = frame;
         NPC.frame.Y = frame * frameHeight;
 
         _leftLimbsDrawFront = limbFrontnessDict[frame].leftFront;
@@ -490,33 +492,36 @@ internal class Weaver : EverNPC
     {
         Vector2 drawPosition = NPC.Center + AnimationWave(2.5f, Timer * 0.5f) * Vector2.UnitY * 5f;
 
-        Matrix bodyRotationMatrix = Matrix.CreateRotationY(_bodyRotation) * Matrix.CreateRotationZ(NPC.rotation);
+        float rotaton = _bodyRotation <= MathHelper.PiOver2 || _bodyRotation >= MathHelper.TwoPi - MathHelper.PiOver2 ? -_bodyRotation : _bodyRotation;
 
-        Vector3 legAnchor = new Vector3(0, 27, 4);
+        Matrix bodyRotationMatrix = Matrix.CreateRotationY(rotaton) * Matrix.CreateRotationZ(NPC.rotation);
+
+        Vector3 legAnchor = new Vector3(0, 27, -4);
 
         if (!_rightLimbsDrawFront)
-            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, 3);
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, false, 3);
 
         if (!_leftLimbsDrawFront)
-            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, -1);
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, -1, false);
 
         spriteBatch.Draw(TextureAssets.Npc[Type].Value, drawPosition - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, 1f, 0, 0);
 
         if (_rightLimbsDrawFront)
-            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, 3);
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, true, 3);
 
         if (_leftLimbsDrawFront)
-            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, -1);
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, -1, true);
     }
 
-    private void DrawLimbSet(SpriteBatch spriteBatch, Vector2 screenPos, Vector2 center, Color drawColor, Matrix bodyRotation, Vector3 legAnchor, int legs, int sign, int sineStart = 0)
+    private void DrawLimbSet(SpriteBatch spriteBatch, Vector2 screenPos, Vector2 center, Color drawColor, Matrix bodyRotation, Vector3 legAnchor, int legs, int sign, bool backToFront, int sineStart = 0)
     {
         var segment1Texture = Assets.Textures.Meteor.NPCs.WeaverLegs1.Asset.Value;
-        var segment2Texture = Assets.Textures.Meteor.NPCs.WeaverLegs2.Asset.Value;
-
         // draw all 3 legs
-        for (int i = 0; i < legs; i++)
+        for (int i = backToFront ? legs - 1 : 0; i < legs && i > -1; i += backToFront ? -1 : 1)
         {
+            var segment2Texture = i == (legs - 1) ?
+                Assets.Textures.Meteor.NPCs.WeaverLegs2.Asset.Value : Assets.Textures.Meteor.NPCs.WeaverLegs2_2.Asset.Value;
+
             float startRotation = sign == -1 ? MathF.PI : 0;
             float expSine = AnimationWave(i + sineStart, Timer);
             startRotation += MathHelper.PiOver4 * 0.5f * sign * expSine;
@@ -536,15 +541,18 @@ internal class Weaver : EverNPC
 
             float leg1DrawRotation = leg1DrawAnchor.AngleTo(leg2DrawAnchor);
             var leg1Scale = new Vector2(leg1DrawAnchor.Distance(leg2DrawAnchor) / (float)segment1Texture.Width, 1f);
-            Vector2 leg1Origin = segment1Texture.Size() * Vector2.UnitY * 0.5f;
+            var leg1Frame = segment1Texture.Frame(1, 3, 0, legs - 1 - i);
+            Vector2 leg1Origin = leg1Frame.Size() * Vector2.UnitY * 0.5f;
 
-            spriteBatch.Draw(segment1Texture, leg1DrawAnchor + center - screenPos, null, drawColor, leg1DrawRotation, leg1Origin, leg1Scale, 0, 1f - (i / legs));
+            spriteBatch.Draw(segment1Texture, leg1DrawAnchor + center - screenPos, leg1Frame, drawColor, leg1DrawRotation, leg1Origin, leg1Scale, 0, 1f - (i / legs));
 
             float leg2DrawRotation = leg2DrawAnchor.AngleTo(leg2End);
             var leg2Scale = new Vector2(leg2DrawAnchor.Distance(leg2End) / (float)segment2Texture.Width, 1f);
-            Vector2 leg2Origin = segment2Texture.Size() * Vector2.UnitY * 0.5f;
+            var leg2Frame = segment2Texture.Frame(1, 8, 0, _bodyFrame);
+            Vector2 leg2Origin = leg2Frame.Size() * Vector2.UnitY * 0.5f;
+            SpriteEffects leg2Effect = sign == 1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
 
-            spriteBatch.Draw(segment2Texture, leg2DrawAnchor + center - screenPos, null, drawColor, leg2DrawRotation, leg2Origin, leg2Scale, 0, 1f - (i / legs));
+            spriteBatch.Draw(segment2Texture, leg2DrawAnchor + center - screenPos, leg2Frame, drawColor, leg2DrawRotation, leg2Origin, leg2Scale, leg2Effect, 1f - (i / legs));
         }
     }
 
