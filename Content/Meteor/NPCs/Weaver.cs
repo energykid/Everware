@@ -358,8 +358,25 @@ internal class Weaver : EverNPC
     }
     #endregion
 
+    #region Rendering
+    private float _bodyRotation = 0f;
+    private bool _leftLimbsDrawFront = false;
+    private bool _rightLimbsDrawFront = true;
+
     public override void FindFrame(int frameHeight)
     {
+        Dictionary<int, (bool leftFront, bool rightFront)> limbFrontnessDict = new Dictionary<int, (bool leftFront, bool rightFront)>
+        {
+            {0, (false, false) },
+            {1, (false, false) },
+            {2, (false, true) },
+            {3, (true, true) },
+            {4, (true, true) },
+            {5, (true, true) },
+            {6, (true, false) },
+            {7, (false, false) }
+        };
+
         float rotationTarget = 0f;
 
         if ((BehaviorState)State != BehaviorState.FindGround &&
@@ -367,28 +384,34 @@ internal class Weaver : EverNPC
             !((BehaviorState)State == BehaviorState.HangAndFollowTarget && Timer <= HANG_ANIM_LENGTH + 37) &&
             NPC.HasValidTarget)
         {
-            var toPlayerVector = new Vector3(Main.player[NPC.target].Center, 0f) - new Vector3(NPC.Center, -356f);
+
+            var toPlayerVector = new Vector3(Main.player[NPC.target].Center, 0f) - new Vector3(NPC.Center, -356f); // -356f
             rotationTarget = toPlayerVector.XZ().ToRotation() - MathHelper.PiOver2;
         }
 
         if ((BehaviorState)State == BehaviorState.GrappleMeteor)
             rotationTarget = (MeteorPosition - Center3D).XZ().ToRotation() - MathHelper.PiOver4;
 
+        //rotationTarget = (Main.GlobalTimeWrappedHourly * 0.76f) % MathHelper.TwoPi;
+
         NPC.frameCounter = ((float)NPC.frameCounter).AngleLerp(rotationTarget, 0.2f);
         var newframeCounter = (NPC.frameCounter + MathHelper.TwoPi);
 
         int frame = ((int)Math.Round(newframeCounter / MathHelper.PiOver4)) % FrameNumber;
-
-        if (newframeCounter < 0)
-            Main.NewText(newframeCounter);
-
+        _bodyRotation = frame * MathHelper.PiOver4;
         NPC.frame.Y = frame * frameHeight;
+
+        _leftLimbsDrawFront = limbFrontnessDict[frame].leftFront;
+        _rightLimbsDrawFront = limbFrontnessDict[frame].rightFront;
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (State != 2 && State != 3)
-            return true;
+        {
+            DrawSpiderBody(spriteBatch, screenPos, drawColor);
+            return false;
+        }
 
         var interpolant = State == 2 ? Easing.InOutSine(MathHelper.Clamp(Timer / HANG_ANIM_LENGTH, 0, 1)) : 1f;
         var stringBegin = Vector2.UnitY * -42;
@@ -425,7 +448,10 @@ internal class Weaver : EverNPC
         });
 
         if (State != 3 || GrappledMeteor is null || !GrappledMeteor.active || GrappledMeteor.type != NPCID.MeteorHead)
-            return true;
+        {
+            DrawSpiderBody(spriteBatch, screenPos, drawColor);
+            return false;
+        }
 
         points = new List<Vector2>();
 
@@ -456,6 +482,76 @@ internal class Weaver : EverNPC
             return stringColor;
         });
 
-        return true;
+        DrawSpiderBody(spriteBatch, screenPos, drawColor);
+        return false;
     }
+
+    private void DrawSpiderBody(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    {
+        Vector2 drawPosition = NPC.Center + AnimationWave(2.5f, Timer * 0.5f) * Vector2.UnitY * 5f;
+
+        Matrix bodyRotationMatrix = Matrix.CreateRotationY(_bodyRotation) * Matrix.CreateRotationZ(NPC.rotation);
+
+        Vector3 legAnchor = new Vector3(0, 27, 4);
+
+        if (!_rightLimbsDrawFront)
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, 3);
+
+        if (!_leftLimbsDrawFront)
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, -1);
+
+        spriteBatch.Draw(TextureAssets.Npc[Type].Value, drawPosition - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, 1f, 0, 0);
+
+        if (_rightLimbsDrawFront)
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, 3);
+
+        if (_leftLimbsDrawFront)
+            DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, -1);
+    }
+
+    private void DrawLimbSet(SpriteBatch spriteBatch, Vector2 screenPos, Vector2 center, Color drawColor, Matrix bodyRotation, Vector3 legAnchor, int legs, int sign, int sineStart = 0)
+    {
+        var segment1Texture = Assets.Textures.Meteor.NPCs.WeaverLegs1.Asset.Value;
+        var segment2Texture = Assets.Textures.Meteor.NPCs.WeaverLegs2.Asset.Value;
+
+        // draw all 3 legs
+        for (int i = 0; i < legs; i++)
+        {
+            float startRotation = sign == -1 ? MathF.PI : 0;
+            float expSine = AnimationWave(i + sineStart, Timer);
+            startRotation += MathHelper.PiOver4 * 0.5f * sign * expSine;
+
+            float leg1Rotation = sign * i * (MathHelper.PiOver4 / legs) + startRotation;
+            float leg2Rotation = leg1Rotation + MathHelper.PiOver2 * sign + expSine * 1f * sign;
+
+            Matrix leg1XRotation = Matrix.CreateRotationX(i * MathHelper.PiOver4 * 0.4f);
+            Matrix leg2XRotation = Matrix.CreateRotationX(-(legs - i) * MathHelper.PiOver4 * 0.2f);
+
+            Vector3 leg1Vector = Vector3.Transform(new Vector3(leg1Rotation.ToRotationVector2() * (float)segment1Texture.Width, 0), leg1XRotation);
+            Vector3 leg2Vector = Vector3.Transform(new Vector3(leg2Rotation.ToRotationVector2() * (float)segment2Texture.Width, 0), leg2XRotation);
+
+            Vector2 leg1DrawAnchor = Vector3.Transform(legAnchor, bodyRotation).XY();
+            Vector2 leg2DrawAnchor = Vector3.Transform(legAnchor + leg1Vector, bodyRotation).XY();
+            Vector2 leg2End = Vector3.Transform(legAnchor + leg1Vector + leg2Vector, bodyRotation).XY();
+
+            float leg1DrawRotation = leg1DrawAnchor.AngleTo(leg2DrawAnchor);
+            var leg1Scale = new Vector2(leg1DrawAnchor.Distance(leg2DrawAnchor) / (float)segment1Texture.Width, 1f);
+            Vector2 leg1Origin = segment1Texture.Size() * Vector2.UnitY * 0.5f;
+
+            spriteBatch.Draw(segment1Texture, leg1DrawAnchor + center - screenPos, null, drawColor, leg1DrawRotation, leg1Origin, leg1Scale, 0, 1f - (i / legs));
+
+            float leg2DrawRotation = leg2DrawAnchor.AngleTo(leg2End);
+            var leg2Scale = new Vector2(leg2DrawAnchor.Distance(leg2End) / (float)segment2Texture.Width, 1f);
+            Vector2 leg2Origin = segment2Texture.Size() * Vector2.UnitY * 0.5f;
+
+            spriteBatch.Draw(segment2Texture, leg2DrawAnchor + center - screenPos, null, drawColor, leg2DrawRotation, leg2Origin, leg2Scale, 0, 1f - (i / legs));
+        }
+    }
+
+    private float AnimationWave(float position, float timer)
+    {
+        float sine = MathF.Sin(position / MathHelper.PiOver4 + timer * 0.15f);
+        return MathF.Exp(sine) / float.E - 0.5f;
+    }
+    #endregion
 }
