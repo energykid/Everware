@@ -9,7 +9,7 @@ using static Everware.Core.AssetReferences.Assets.Textures.Meteor.NPCs;
 
 namespace Everware.Content.Meteor.NPCs;
 
-internal class Weaver : EverNPC
+internal class Starantula : EverNPC
 {
     private const int PREFERRED_DISTANCE_GRAB = 800;
     private const int PREFERRED_METEOR_DIST = 180;
@@ -28,7 +28,7 @@ internal class Weaver : EverNPC
     public override int FrameNumber => 8;
     public override Vector2 Size => new Vector2(70, 96);
     public override int Damage => 50;
-    public override string Texture => "Everware/Assets/Textures/Meteor/NPCs/Weaver";
+    public override string Texture => "Everware/Assets/Textures/Meteor/NPCs/Starantula";
 
     private ref float MiscAITimer => ref NPC.ai[2];
     private ref float Timer => ref ExtraAI[0];
@@ -515,12 +515,13 @@ internal class Weaver : EverNPC
 
     private void DrawLimbSet(SpriteBatch spriteBatch, Vector2 screenPos, Vector2 center, Color drawColor, Matrix bodyRotation, Vector3 legAnchor, int legs, int sign, bool backToFront, int sineStart = 0)
     {
-        var segment1Texture = Assets.Textures.Meteor.NPCs.WeaverLegs1.Asset.Value;
+        var segment1Texture = Assets.Textures.Meteor.NPCs.StarantulaLegs1.Asset.Value;
+
         // draw all 3 legs
         for (int i = backToFront ? legs - 1 : 0; i < legs && i > -1; i += backToFront ? -1 : 1)
         {
             var segment2Texture = i == (legs - 1) ?
-                Assets.Textures.Meteor.NPCs.WeaverLegs2.Asset.Value : Assets.Textures.Meteor.NPCs.WeaverLegs2_2.Asset.Value;
+                Assets.Textures.Meteor.NPCs.StarantulaLegs2.Asset.Value : Assets.Textures.Meteor.NPCs.StarantulaLegs2_2.Asset.Value;
 
             float startRotation = sign == -1 ? MathF.PI : 0;
             float expSine = AnimationWave(i + sineStart, Timer);
