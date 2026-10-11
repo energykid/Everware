@@ -512,6 +512,7 @@ internal class Starantula : EverNPC
 
         spriteBatch.Draw(TextureAssets.Npc[Type].Value, drawPosition - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, 1f, 0, 0);
         spriteBatch.Draw(Assets.Textures.Meteor.NPCs.StarantulaWeb.Asset.Value, drawPosition - screenPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, 1f, 0, 0);
+        spriteBatch.Draw(Assets.Textures.Meteor.NPCs.StarantulaGlow.Asset.Value, drawPosition - screenPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, 1f, 0, 0);
 
         if (_rightLimbsDrawFront)
             DrawLimbSet(spriteBatch, screenPos, drawPosition, drawColor, bodyRotationMatrix, legAnchor, 3, 1, true, 3);
