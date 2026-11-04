@@ -377,6 +377,11 @@ Items: {
 		// DisplayName: Meteor Jacket
 		// Tooltip: ""
 	}
+
+	CruiserKeys: {
+		// DisplayName: Cruiser Keys
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
