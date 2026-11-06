@@ -12,11 +12,17 @@ public class MeteorHamaxe : EverWeaponItem
         Item.CloneDefaults(ItemID.MeteorHamaxe);
     }
 
-    public override void UseAnimation(Player player)
+    public override void UseStyle(Player player, Rectangle heldItemFrame)
     {
-        Dust dust = Dust.NewDustDirect(player.itemLocation + new Vector2(18, -36).RotatedBy(player.itemRotation), 0, 0, DustID.Torch);
+        Dust dust = Dust.NewDustDirect(player.itemLocation + new Vector2(8, -38).RotatedBy(player.itemRotation), 2, 2, DustID.Torch);
         dust.noGravity = true;
-        dust.noLight = true;
+        dust.scale = 1f;
+        Dust dust2 = Dust.NewDustDirect(player.itemLocation + new Vector2(8, -38).RotatedBy(player.itemRotation), 2, 2, DustID.Smoke);
+        dust2.noGravity = true;
+        dust2.scale = 0.8f;
+        dust2.color = Color.Black;
+        dust2.alpha = 200;
+        dust2.velocity = Vector2.Zero;
         base.UseAnimation(player);
     }
 

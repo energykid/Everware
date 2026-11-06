@@ -7,13 +7,23 @@ public class MeteoriteChanges : GlobalItem
 {
     public override bool InstancePerEntity => true;
     static Asset<Texture2D>? VanillaMeteoriteSprite;
+    static Asset<Texture2D>? VanillaMeteoriteBarItemSprite;
+    static Asset<Texture2D>? VanillaMeteoriteBarTileSprite;
     public override bool AppliesToEntity(Item entity, bool lateInstantiation)
     {
-        return entity.type == ItemID.Meteorite;
+        return entity.type == ItemID.Meteorite || entity.type == ItemID.MeteoriteBar;
     }
     public override void SetDefaults(Item entity)
     {
-        entity.DefaultToPlaceableTile(ModContent.TileType<Meteorite>());
+        if (entity.type == ItemID.Meteorite)
+        {
+            entity.DefaultToPlaceableTile(ModContent.TileType<Meteorite>());
+        }
+
+        if (entity.type == ItemID.MeteoriteBar)
+        {
+            entity.DefaultToPlaceableTile(ModContent.TileType<MeteoriteBar>());
+        }
     }
     public override void Load()
     {
@@ -21,6 +31,9 @@ public class MeteoriteChanges : GlobalItem
         {
             VanillaMeteoriteSprite = TextureAssets.Item[ItemID.Meteorite];
             TextureAssets.Item[ItemID.Meteorite] = Assets.Textures.Meteor.Tiles.MeteoriteItem.Asset;
+            
+            VanillaMeteoriteBarItemSprite = TextureAssets.Item[ItemID.MeteoriteBar];
+            TextureAssets.Item[ItemID.MeteoriteBar] = Assets.Textures.Meteor.Items.MeteoriteBar.Asset;
         }
     }
     public override void Unload()
@@ -29,6 +42,9 @@ public class MeteoriteChanges : GlobalItem
         {
             if (VanillaMeteoriteSprite != null)
                 TextureAssets.Item[ItemID.Meteorite] = VanillaMeteoriteSprite;
+            
+            if (VanillaMeteoriteBarItemSprite != null)
+                TextureAssets.Item[ItemID.MeteoriteBar] = VanillaMeteoriteBarItemSprite;
         }
     }
 }

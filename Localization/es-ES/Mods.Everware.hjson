@@ -382,6 +382,11 @@ Items: {
 		// DisplayName: Cruiser Keys
 		// Tooltip: ""
 	}
+
+	MeteorHamaxe: {
+		// DisplayName: Meteor Hamaxe
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
