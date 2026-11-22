@@ -28,7 +28,13 @@ bool Outline;
 
 float4 Effect(float2 coords : TEXCOORD0) : COLOR0
 {
-    return tex2D(uImage0, coords);
+    float4 col = tex2D(FillSampler, (coords * Resolution) + float2(Time, 0));
+
+    float ex = tex2D(uImage0, coords).r;
+    
+    if (tex2D(uImage0, coords).a == 0.0) return float4(0.0, 0.0, 0.0, 0.0);
+    
+    return col * float4(ex, ex, ex, 0.5);
 }
 technique Shader
 {
