@@ -475,6 +475,11 @@ Buffs: {
 		DisplayName: Enfríamiento del Bloqueo
 		Description: No puedes bloquear otra vez por un corto tiempo
 	}
+
+	MeteorCruiserBuff: {
+		// DisplayName: Meteor Cruiser Buff
+		// Description: Mods.Everware.Buffs.MeteorCruiserBuff.Description
+	}
 }
 
 MusicText: {

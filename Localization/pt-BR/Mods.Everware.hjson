@@ -475,6 +475,11 @@ Buffs: {
 		DisplayName: Recarga de Riposta
 		Description: Você não pode ripostar novamente por um curto período
 	}
+
+	MeteorCruiserBuff: {
+		// DisplayName: Meteor Cruiser Buff
+		// Description: Mods.Everware.Buffs.MeteorCruiserBuff.Description
+	}
 }
 
 MusicText: {

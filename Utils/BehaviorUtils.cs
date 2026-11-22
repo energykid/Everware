@@ -105,6 +105,24 @@ public static class BehaviorUtils
         }
         return baseVec;
     }
+    public static Vector2 GroundedWithWater(this Vector2 baseVec)
+    {
+        if (SolidTileOrPlatform(Main.tile[(baseVec / 16).ToPoint()]))
+        {
+            for (int i = 0; i < 250; i++)
+            {
+                baseVec.Y -= 2;
+                if (!SolidTileOrPlatform(Main.tile[(baseVec / 16).ToPoint()]) && Main.tile[(baseVec / 16).ToPoint()].LiquidAmount == 0) break;
+            }
+            return baseVec;
+        }
+        for (int i = 0; i < 250; i++)
+        {
+            baseVec.Y += 2;
+            if (SolidTileOrPlatform(Main.tile[(baseVec / 16).ToPoint()]) || Main.tile[(baseVec / 16).ToPoint()].LiquidAmount > 0) break;
+        }
+        return baseVec;
+    }
     public static Point Grounded(this Point baseVec, int checks = 250)
     {
         if (SolidTileOrPlatform(Main.tile[baseVec]))
