@@ -14,10 +14,12 @@ public class MeteorHamaxe : EverWeaponItem
 
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {
-        Dust dust = Dust.NewDustDirect(player.itemLocation + new Vector2(8, -38).RotatedBy(player.itemRotation), 2, 2, DustID.Torch);
+        float rot = player.itemRotation;
+        if (player.direction < 0) rot += MathHelper.ToRadians(-45);
+        Dust dust = Dust.NewDustDirect(player.itemLocation + new Vector2(8, -38).RotatedBy(rot), 2, 2, DustID.Torch);
         dust.noGravity = true;
         dust.scale = 1f;
-        Dust dust2 = Dust.NewDustDirect(player.itemLocation + new Vector2(8, -38).RotatedBy(player.itemRotation), 2, 2, DustID.Smoke);
+        Dust dust2 = Dust.NewDustDirect(player.itemLocation + new Vector2(8, -38).RotatedBy(rot), 2, 2, DustID.Smoke);
         dust2.noGravity = true;
         dust2.scale = 0.8f;
         dust2.color = Color.Black;
