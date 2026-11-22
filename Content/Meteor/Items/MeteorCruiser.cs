@@ -217,6 +217,7 @@ public class MeteorCruiserPlayer : ModPlayer
     public Vector2 TargetLocation = Vector2.Zero;
     public int Direction = 0;
     public float TargetLocationVelocity = 0f;
+    public float TargetLocationVelocityMultiplier = 1f;
     public float BumpCooldown = 0f;
     public float HopOnAnimation = 0f;
 
@@ -329,6 +330,12 @@ public class MeteorCruiserPlayer : ModPlayer
             {
                 TargetLocationVelocity *= 0.98f;
             }
+
+            if (Player.controlDown)
+            {
+                if (Math.Abs(TargetLocationVelocity) > 10)
+                    TargetLocationVelocity *= 0.9f;
+            }
             
             TargetLocationVelocity = Math.Clamp(TargetLocationVelocity, -15, 15);
 
@@ -336,7 +343,7 @@ public class MeteorCruiserPlayer : ModPlayer
             checkWidth = Math.Max(checkWidth, 3);    
             
             if (Math.Abs(TargetLocationVelocity) > 0.2)
-                TargetLocation.X += TargetLocationVelocity;
+                TargetLocation.X += TargetLocationVelocity * TargetLocationVelocityMultiplier;
 
             List<Vector2> targets = new List<Vector2>();
             for (int i = -checkWidth; i <= checkWidth; i++)
@@ -350,9 +357,9 @@ public class MeteorCruiserPlayer : ModPlayer
                 }
             }
             List<Vector2> targets2 = new List<Vector2>();
-            for (int i = -checkWidth; i <= checkWidth; i++)
+            for (int i = -checkWidth / 2; i <= checkWidth / 2; i++)
             {
-                Vector2 pos = (TargetLocation + new Vector2(20 * i, -50));
+                Vector2 pos = (TargetLocation + new Vector2(20 * i, -30));
                 if (pos.X > 100 && pos.Y > 100 && pos.X < (Main.maxTilesX * 16) - 100 &&
                     pos.Y < (Main.maxTilesY * 16) - 100)
                 {
@@ -380,7 +387,7 @@ public class MeteorCruiserPlayer : ModPlayer
             Player.shimmering = true;
             Player.shimmerTransparency = 0f;
             Player.sitting.isSitting = true;
-
+            
             TargetLocation.X = newLocation.X;
             float Y = TargetLocation.MoveTowards(new Vector2(TargetLocation.X, newLocation.Y), 40).Y;
             if (Math.Abs(Y - TargetLocation.Y) < 40 || Y > TargetLocation.Y)
