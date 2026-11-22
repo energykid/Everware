@@ -5,6 +5,8 @@ using Everware.Common;
 using Everware.Common.Systems;
 using Everware.Content.Base;
 using Everware.Content.Base.Items;
+using Everware.Content.Misc.Particles;
+using Everware.Content.Quarry.Visual;
 using Everware.Utils;
 using Terraria.ID;
 
@@ -47,6 +49,12 @@ public class MeteorCruiser : ModMount
     {
         skipDust = true;
         base.SetMount(player, ref skipDust);
+    }
+
+    public override void Dismount(Player player, ref bool skipDust)
+    {
+        skipDust = true;
+        base.Dismount(player, ref skipDust);
     }
 
     private float vl = 0f;
@@ -244,6 +252,17 @@ public class MeteorCruiserPlayer : ModPlayer
             Sound.Update();
             
             BumpCooldown--;
+
+            if (BumpCooldown > -240)
+            {
+                float intensity = (BumpCooldown + 240) / 240 / 6;
+                if (Main.rand.NextBool(5))
+                    new WeldingSpark(Player.MountedCenter + new Vector2(Main.rand.NextFloat(-60, 60), Main.rand.NextFloat(-20, 20)), new Vector2(Main.rand.NextFloat(1f, 6f)).RotatedByRandom(MathHelper.TwoPi)).Spawn();
+                new SmallSmoke(Player.MountedCenter + new Vector2(Main.rand.NextFloat(-60, 60), Main.rand.NextFloat(-20, 20)), new Vector2(Main.rand.NextFloat(1f, 6f)).RotatedByRandom(MathHelper.TwoPi), Color.Black.MultiplyRGBA(new(0f, 0f, 0f, intensity))) { UpdateFunction =
+                    A => { A.velocity.Y -= 0.2f; }
+                }.Spawn();
+                new SmallMistFade(Player.MountedCenter + new Vector2(Direction * -30 + Main.rand.NextFloat(-7, 7), -10 + Main.rand.NextFloat(-3, 3)).RotatedBy(Player.fullRotation), new Vector2(0, -2), Color.Black.MultiplyRGBA(new(0f, 0f, 0f, intensity)), new(0.7f)) {Rotation = Main.rand.NextFloat(360f)}.Spawn();
+            }
             
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
@@ -254,7 +273,7 @@ public class MeteorCruiserPlayer : ModPlayer
 
             if (TargetLocation == Vector2.Zero)
             {
-                BumpCooldown = 30;
+                BumpCooldown = -240;
                 HopOnAnimation = 0;
                 TargetLocation = Player.Center;
                 TargetLocationVelocity = 0f;
@@ -311,7 +330,7 @@ public class MeteorCruiserPlayer : ModPlayer
                 TargetLocationVelocity *= 0.98f;
             }
             
-            TargetLocationVelocity = Math.Clamp(TargetLocationVelocity, -10, 10);
+            TargetLocationVelocity = Math.Clamp(TargetLocationVelocity, -15, 15);
 
             int checkWidth = Math.Abs((int)(TargetLocationVelocity / 15 * 7));
             checkWidth = Math.Max(checkWidth, 3);    
