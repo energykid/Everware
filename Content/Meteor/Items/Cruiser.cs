@@ -51,7 +51,7 @@ public class Cruiser : ModMount
         skipDust = true;
         
         
-        if (player.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus && !player.controlDown)
+        if (player.GetModPlayer<MeteorCruiserPlayer>().MeteorSetBonus && !player.controlDown)
         {
             if (MountData.backTexture != Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset)
             {
@@ -248,13 +248,15 @@ public class MeteorCruiserPlayer : ModPlayer
     public float TargetLocationVelocity = 0f;
     public float TargetLocationVelocityMultiplier = 1f;
     public float BumpCooldown = 0f;
-    public float HopOnAnimation = 0f;
     public float ShakeAnimation = 0f;
 
     public List<Vector2> OldPositions = new();
-    
+
     public float T = 0f;
     public float Transparency = 0f;
+    
+    public float DashVelocity = 0f;
+    public float DashCooldown = 0f;
     
     public Vector2 PositionPrediction = Vector2.Zero;
 
@@ -262,17 +264,74 @@ public class MeteorCruiserPlayer : ModPlayer
     {
         if (Player.mount.Type == ModContent.MountType<Cruiser>())
         {
-            Player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, 1.3f * -Player.direction);
-            Player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Quarter, 0f);
+            if (!Player.ItemAnimationActive)
+            {
+                Player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, 1.3f * -Player.direction);
+                Player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Quarter, 0f);
+            }
         }
     }
 
     private ActiveSound? Sound = null;
 
+    public void Dash(int direction)
+    {
+        DashCooldown = 120;
+        if (Math.Sign(direction) != Math.Sign(Player.velocity.X))
+        {
+            TargetLocation.X = MathHelper.Lerp(TargetLocation.X, Player.Center.X, 2.5f);
+        }
+        else
+        {
+            TargetLocation.X = MathHelper.Lerp(Player.Center.X, TargetLocation.X, 1.5f);
+        }
+
+        if (Math.Abs(TargetLocation.X - Player.Center.X) < 400)
+        {
+            TargetLocation.X = Player.Center.X + (Math.Sign(TargetLocation.X - Player.Center.X) * 400);
+        }
+        SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserMount.Asset, Player.Center);
+        ScreenEffects.AddScreenShake(Player.Center, 4);
+        Main.instance.CameraModifiers.Add(new PunchCameraModifier(Player.Center, -Player.velocity, 0.2f, 3f, 20));
+    }
+
+    public bool MeteorSetBonus = false;
+    public override void ResetEffects()
+    {
+        if (Player.mount.Type == ModContent.MountType<Cruiser>())
+        {
+            DashCooldown--;
+            if (MeteorSetBonus && BumpCooldown < 0)
+            {
+                if (DashCooldown <= 0 && (Player == Main.LocalPlayer || Main.netMode == NetmodeID.Server))
+                {
+                    if (Player.controlRight && Player.releaseRight && Player.doubleTapCardinalTimer[2] < 15 &&
+                        Player.doubleTapCardinalTimer[3] == 0)
+                    {
+                        TargetLocationVelocity = Math.Abs(TargetLocationVelocity);
+                        Dash(1);
+                    }
+                    else if (Player.controlLeft && Player.releaseLeft && Player.doubleTapCardinalTimer[3] < 15 &&
+                             Player.doubleTapCardinalTimer[2] == 0)
+                    {
+                        TargetLocationVelocity = -Math.Abs(TargetLocationVelocity);
+                        Dash(-1);
+                    }
+                }
+            }
+        }
+
+        MeteorSetBonus = false;
+    }
+
     public override void PreUpdateMovement()
     {
         if (Player.mount.Type == ModContent.MountType<Cruiser>())
         {
+            DashVelocity *= 0.95f;
+            
+            float MaxVelocity = MeteorSetBonus ? 10 : 8;
+            
             if (Sound == null || !Sound.IsPlaying)
             {
                 Sound = new ActiveSound(Assets.Sounds.Gear.Mount.MeteorCruiserLoop.Asset with { IsLooped = true }, Player.Center, snd =>
@@ -309,7 +368,6 @@ public class MeteorCruiserPlayer : ModPlayer
             if (TargetLocation == Vector2.Zero)
             {
                 BumpCooldown = -240;
-                HopOnAnimation = 0;
                 TargetLocation = Player.Center;
                 TargetLocationVelocity = 0f;
                 OldPositions.Clear();
@@ -323,8 +381,6 @@ public class MeteorCruiserPlayer : ModPlayer
             {
                 OldPositions.RemoveAt(20);
             }
-
-            HopOnAnimation++;
 
             if (BumpCooldown < 0)
             {
@@ -360,10 +416,10 @@ public class MeteorCruiserPlayer : ModPlayer
 
             ShakeAnimation *= 0.9f;
             
-            TargetLocationVelocity = Math.Clamp(TargetLocationVelocity, -15, 15);
+            TargetLocationVelocity = Math.Clamp(TargetLocationVelocity, -MaxVelocity, MaxVelocity);
 
             int checkWidth = Math.Abs((int)(TargetLocationVelocity / 15 * 7));
-            checkWidth = Math.Max(checkWidth, 3);    
+            checkWidth = Math.Max(checkWidth, 3);
             
             if (Math.Abs(TargetLocationVelocity) > 0.2)
                 TargetLocation.X += TargetLocationVelocity * TargetLocationVelocityMultiplier;
@@ -444,6 +500,7 @@ public class MeteorCruiserPlayer : ModPlayer
                 }
             }
             Player.velocity = Vector2.Lerp(Player.Center, TargetLocation, 0.1f) - Player.Center;
+            Player.velocity.X += DashVelocity;
             Player.direction = Direction;
             Player.fullRotation = MathHelper.Lerp(Player.fullRotation, MathHelper.Lerp(Player.fullRotation, MathHelper.ToRadians(TargetLocationVelocity * 0.1f) + (MathHelper.ToRadians(TargetLocation.Y - oldLocation.Y) * Math.Sign(TargetLocationVelocity) * 3), 0.05f), 0.5f);
         }

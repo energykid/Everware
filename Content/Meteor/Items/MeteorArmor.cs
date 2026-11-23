@@ -32,7 +32,7 @@ public class MeteorHelmet : EverEquipmentItem
     public override void UpdateArmorSet(Player player)
     {
         base.UpdateArmorSet(player);
-        player.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus = true;
+        player.GetModPlayer<MeteorCruiserPlayer>().MeteorSetBonus = true;
         player.setBonus = Mods.Everware.Items.MeteorHelmet.SetBonus.GetTextValue();
     }
 
@@ -48,7 +48,7 @@ public class MeteorHelmet : EverEquipmentItem
 
     private void MountChanges(On_Player.orig_QuickMount orig, Player self)
     {
-        if (self.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus)
+        if (self.GetModPlayer<MeteorCruiserPlayer>().MeteorSetBonus)
         {
             if (!self.mount.Active && !self.controlDown)
                 self.mount.SetMount(ModContent.MountType<Cruiser>(), self);
@@ -90,17 +90,4 @@ public class MeteorBoots : EverEquipmentItem
         Item.value = Sell.Gold(1) + Sell.Silver(5);
     }
 }
-#endregion
-
-#region Set Bonus
-
-public class MeteorArmorSetBonus : ModPlayer
-{
-    public bool MeteorSetBonus = false;
-    public override void ResetEffects()
-    {
-        MeteorSetBonus = false;
-    }
-}
-
 #endregion
