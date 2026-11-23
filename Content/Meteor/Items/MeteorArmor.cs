@@ -6,6 +6,7 @@ using System.Linq;
 using Everware.Common;
 using Everware.Common.Systems;
 using Everware.Content.Base;
+using Everware.Core;
 using Everware.Utils;
 using Terraria.ID;
 
@@ -28,6 +29,13 @@ public class MeteorHelmet : EverEquipmentItem
         Item.value = Sell.Gold(1) + Sell.Silver(25);
     }
 
+    public override void UpdateArmorSet(Player player)
+    {
+        base.UpdateArmorSet(player);
+        player.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus = true;
+        player.setBonus = Mods.Everware.Items.MeteorHelmet.SetBonus.GetTextValue();
+    }
+
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
         return head.type == Type && body.type == ModContent.ItemType<MeteorJacket>() && legs.type == ModContent.ItemType<MeteorBoots>();
@@ -40,7 +48,14 @@ public class MeteorHelmet : EverEquipmentItem
 
     private void MountChanges(On_Player.orig_QuickMount orig, Player self)
     {
-        orig(self);
+        if (self.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus)
+        {
+            self.mount.SetMount(ModContent.MountType<Cruiser>(), self);
+        }
+        else
+        {
+            orig(self);
+        }
     }
 }
 [AutoloadEquip(EquipType.Body)]
@@ -74,4 +89,17 @@ public class MeteorBoots : EverEquipmentItem
         Item.value = Sell.Gold(1) + Sell.Silver(5);
     }
 }
+#endregion
+
+#region Set Bonus
+
+public class MeteorArmorSetBonus : ModPlayer
+{
+    public bool MeteorSetBonus = false;
+    public override void ResetEffects()
+    {
+        MeteorSetBonus = false;
+    }
+}
+
 #endregion

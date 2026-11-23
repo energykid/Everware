@@ -8,6 +8,7 @@ using Everware.Content.Base.Items;
 using Everware.Content.Misc.Particles;
 using Everware.Content.Quarry.Visual;
 using Everware.Utils;
+using Terraria.Graphics.CameraModifiers;
 using Terraria.ID;
 
 namespace Everware.Content.Meteor.Items;
@@ -19,14 +20,13 @@ public class CruiserKeys : EverItem
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.mountType = ModContent.MountType<MeteorCruiser>();
-        Item.UseSound = Assets.Sounds.Gear.Mount.MeteorCruiserMount.Asset;
+        Item.mountType = ModContent.MountType<Cruiser>();
     }
 }
 
-public class MeteorCruiserBuff : ModBuff
+public class CruiserBuff : ModBuff
 {
-    public override string Texture => "Everware/Assets/Textures/Meteor/Items/MeteorCruiserBuff";
+    public override string Texture => "Everware/Assets/Textures/Meteor/Items/CruiserBuff";
 
     public override void SetStaticDefaults()
     {
@@ -41,18 +41,20 @@ public class MeteorCruiserBuff : ModBuff
     }
 }
 
-public class MeteorCruiser : ModMount
+public class Cruiser : ModMount
 {
-    public override string Texture => "Everware/Assets/Textures/Meteor/Items/MeteorCruiser";
+    public override string Texture => "Everware/Assets/Textures/Meteor/Items/Cruiser";
 
     public override void SetMount(Player player, ref bool skipDust)
     {
+        SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserMount.Asset, player.Center);
         skipDust = true;
         base.SetMount(player, ref skipDust);
     }
 
     public override void Dismount(Player player, ref bool skipDust)
     {
+        SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserMount.Asset, player.Center);
         skipDust = true;
         base.Dismount(player, ref skipDust);
     }
@@ -65,11 +67,11 @@ public class MeteorCruiser : ModMount
         MountData.flightTimeMax = 0;
         MountData.textureWidth = 114;
         MountData.textureHeight = 74;
-        MountData.backTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset;
-        MountData.backTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Back_Glow.Asset;
-        MountData.frontTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Front.Asset;
-        MountData.frontTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Front_Glow.Asset;
-        MountData.buff = ModContent.BuffType<MeteorCruiserBuff>();
+        MountData.backTexture = Assets.Textures.Meteor.Items.Cruiser_Back.Asset;
+        MountData.backTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Back_Glow.Asset;
+        MountData.frontTexture = Assets.Textures.Meteor.Items.Cruiser_Front.Asset;
+        MountData.frontTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Front_Glow.Asset;
+        MountData.buff = ModContent.BuffType<CruiserBuff>();
         MountData.totalFrames = 1;
         MountData.idleFrameCount = 1;
 
@@ -136,7 +138,7 @@ public class MeteorCruiser : ModMount
         
         Main.spriteBatch.End(out var sb);
         
-        vl += Math.Abs(drawPlayer.GetModPlayer<MeteorCruiserPlayer>().TargetLocationVelocity) / 200f;
+        vl += 0.04f + (Math.Abs(drawPlayer.velocity.X) / 2000f);
         
         var eff = Assets.Effects.Meteor.Items.MeteorCruiserTrail.CreateEffect();
         eff.Parameters.FillTexture = asset2.Value;
@@ -171,9 +173,34 @@ public class MeteorCruiser : ModMount
             PrimitiveDrawing.DrawPrimitiveStrip2(v2s, colors, pool.Target, texcoords, true, eff.Shader);
         }
         
-        Main.spriteBatch.Restart(sb);
+        Main.spriteBatch.Restart(sb with {SamplerState = Main.DefaultSamplerState});
         
         pool.Dispose();
+
+        if (drawPlayer.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus)
+        {
+            if (MountData.backTexture != Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset)
+            {
+                MountData.backTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset;
+                MountData.backTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Back_Glow.Asset;
+                MountData.frontTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Front.Asset;
+                MountData.frontTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Front_Glow.Asset;
+                MountData.textureWidth = 114;
+                MountData.textureHeight = 74;
+            }
+        }
+        else
+        {
+            if (MountData.backTexture != Assets.Textures.Meteor.Items.Cruiser_Back.Asset)
+            {
+                MountData.backTexture = Assets.Textures.Meteor.Items.Cruiser_Back.Asset;
+                MountData.backTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Back_Glow.Asset;
+                MountData.frontTexture = Assets.Textures.Meteor.Items.Cruiser_Front.Asset;
+                MountData.frontTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Front_Glow.Asset;
+                MountData.textureWidth = 118;
+                MountData.textureHeight = 66;
+            }
+        }
         
         return base.Draw(playerDrawData, drawType, drawPlayer, ref texture, ref glowTexture, ref drawPosition, ref frame, ref drawColor, ref glowColor, ref rotation, ref spriteEffects, ref drawOrigin, ref drawScale, shadow);
     }
@@ -220,6 +247,7 @@ public class MeteorCruiserPlayer : ModPlayer
     public float TargetLocationVelocityMultiplier = 1f;
     public float BumpCooldown = 0f;
     public float HopOnAnimation = 0f;
+    public float ShakeAnimation = 0f;
 
     public List<Vector2> OldPositions = new();
     
@@ -230,14 +258,18 @@ public class MeteorCruiserPlayer : ModPlayer
 
     public override void PostUpdate()
     {
-        base.PostUpdate();
+        if (Player.mount.Type == ModContent.MountType<Cruiser>())
+        {
+            Player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, 1.3f * -Player.direction);
+            Player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Quarter, 0f);
+        }
     }
 
     private ActiveSound? Sound = null;
 
     public override void PreUpdateMovement()
     {
-        if (Player.mount.Type == ModContent.MountType<MeteorCruiser>())
+        if (Player.mount.Type == ModContent.MountType<Cruiser>())
         {
             if (Sound == null || !Sound.IsPlaying)
             {
@@ -284,7 +316,7 @@ public class MeteorCruiserPlayer : ModPlayer
             if (Transparency <= 0f)
                 OldPositions.Clear();
             
-            OldPositions.Insert(0, Player.Center + new Vector2(Direction * -30, -10));
+            OldPositions.Insert(0, Player.Center + new Vector2(Math.Sign(Player.velocity.X) * -30, -10).RotatedBy(Player.fullRotation));
             if (OldPositions.Count > 20)
             {
                 OldPositions.RemoveAt(20);
@@ -294,48 +326,37 @@ public class MeteorCruiserPlayer : ModPlayer
 
             if (BumpCooldown < 0)
             {
+                if (Math.Abs(Player.velocity.X) > 2)
+                    Transparency = MathHelper.Lerp(Transparency, 1f, 0.075f);
+                else
+                    Transparency = MathHelper.Lerp(Transparency, -0.1f, 0.1f);
+                
+                OldPositions.ForEach(A => { A.X -= (Math.Sign(Player.velocity.X) * 2); });
                 if (Player.controlLeft)
                 {
-                    if (TargetLocationVelocity < 0)
-                        Transparency = MathHelper.Lerp(Transparency, 1f, 0.075f);
-                    else
-                        Transparency = MathHelper.Lerp(Transparency, -0.1f, 0.1f);
-
-                    OldPositions.ForEach(A => { A.X += 2; });
-                    
                     TargetLocationVelocity -= 0.2f;
 
                     Direction = Math.Sign(TargetLocationVelocity);
                 }
                 else if (Player.controlRight)
                 {
-                    if (TargetLocationVelocity > 0)
-                        Transparency = MathHelper.Lerp(Transparency, 1f, 0.075f);
-                    else
-                        Transparency = MathHelper.Lerp(Transparency, -0.1f, 0.1f);
-                    
-                    OldPositions.ForEach(A => { A.X -= 2; });
-                    
                     TargetLocationVelocity += 0.2f;
 
                     Direction = Math.Sign(TargetLocationVelocity);
                 }
                 else
                 {
-                    Transparency = MathHelper.Lerp(Transparency, -0.1f, 0.1f);
                     TargetLocationVelocity = (float)(Math.Max((Math.Abs(TargetLocationVelocity) - 0.2), 0.1) * Math.Sign(TargetLocationVelocity));
                 }
             }
             else
             {
                 TargetLocationVelocity *= 0.98f;
+                Player.fullRotation += (float)Math.Sin(ShakeAnimation / 2f) * 0.002f * ShakeAnimation;
+                
             }
 
-            if (Player.controlDown)
-            {
-                if (Math.Abs(TargetLocationVelocity) > 10)
-                    TargetLocationVelocity *= 0.9f;
-            }
+            ShakeAnimation *= 0.9f;
             
             TargetLocationVelocity = Math.Clamp(TargetLocationVelocity, -15, 15);
 
@@ -415,7 +436,9 @@ public class MeteorCruiserPlayer : ModPlayer
                     Sound.Volume = 0f;
                     Sound.Pitch = -1f;
                     Transparency = 0f;
+                    ShakeAnimation = 30f;
                     SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserCrash.Asset.WithPitchVariance(0.1f), Player.Center);
+                    Main.instance.CameraModifiers.Add(new PunchCameraModifier(Player.Center, Player.velocity, 0.2f, 2f, 120));
                 }
             }
             Player.velocity = Vector2.Lerp(Player.Center, TargetLocation, 0.1f) - Player.Center;
@@ -434,8 +457,7 @@ public class MeteorCruiserPlayer : ModPlayer
         }
     }
 
-    public override void PreUpdate()
+    public override void UpdateEquips()
     {
-        base.PreUpdate();
     }
 }

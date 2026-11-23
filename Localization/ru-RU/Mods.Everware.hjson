@@ -370,6 +370,7 @@ Items: {
 	MeteorHelmet: {
 		// DisplayName: Meteor Helmet
 		// Tooltip: ""
+		// SetBonus: Transform your mount into a powerful Meteor Cruiser with a dash
 	}
 
 	MeteorJacket: {
@@ -478,6 +479,11 @@ Buffs: {
 	MeteorCruiserBuff: {
 		// DisplayName: Meteor Cruiser Buff
 		// Description: Mods.Everware.Buffs.MeteorCruiserBuff.Description
+	}
+
+	CruiserBuff: {
+		// DisplayName: Cruiser Buff
+		// Description: Mods.Everware.Buffs.CruiserBuff.Description
 	}
 }
 
