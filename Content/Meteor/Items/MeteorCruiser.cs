@@ -397,27 +397,30 @@ public class MeteorCruiserPlayer : ModPlayer
                 Y = TargetLocation.MoveTowards(new Vector2(TargetLocation.X, newLocation2.Y), 40).Y;
                 if (Math.Abs(Y - TargetLocation.Y) < 40 || Y > TargetLocation.Y)
                     TargetLocation.Y = Y;
-                else if (BumpCooldown < 0)
+            }
+
+            TargetLocation.Y -= Math.Abs(TargetLocationVelocity);
+            if (BumpCooldown < 0)
+            {
+                
+                Vector2 posToCheck = Player.Center + new Vector2(0, -40);
+                if (!Collision.CanHit(posToCheck, 1, 60,
+                        posToCheck + new Vector2(TargetLocationVelocity, 0), 1,
+                        60))
                 {
-                    Vector2 posToCheck = Player.Center + new Vector2(0, -40);
-                    if (!Collision.CanHit(posToCheck, 1, 60,
-                            posToCheck + new Vector2(TargetLocationVelocity, 0), 1,
-                            60))
-                    {
-                        TargetLocationVelocity = -TargetLocationVelocity * 0.75f;
-                        TargetLocation = Player.Center;
-                        BumpCooldown = 120;
-                        ScreenEffects.AddScreenShake(Player.Center, 12, 0.85f);
-                        Sound.Volume = 0f;
-                        Sound.Pitch = -1f;
-                        Transparency = 0f;
-                        SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserCrash.Asset.WithPitchVariance(0.1f), Player.Center);
-                    }
+                    TargetLocationVelocity = -TargetLocationVelocity * 0.75f;
+                    TargetLocation = Player.Center;
+                    BumpCooldown = 120;
+                    ScreenEffects.AddScreenShake(Player.Center, 12, 0.85f);
+                    Sound.Volume = 0f;
+                    Sound.Pitch = -1f;
+                    Transparency = 0f;
+                    SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserCrash.Asset.WithPitchVariance(0.1f), Player.Center);
                 }
             }
             Player.velocity = Vector2.Lerp(Player.Center, TargetLocation, 0.1f) - Player.Center;
             Player.direction = Direction;
-            Player.fullRotation = MathHelper.Lerp(Player.fullRotation, MathHelper.Lerp(Player.fullRotation, MathHelper.ToRadians(TargetLocationVelocity * 0.1f) + (MathHelper.ToRadians(TargetLocation.Y - oldLocation.Y) * Math.Sign(TargetLocationVelocity) * 2), 0.05f), 0.5f);
+            Player.fullRotation = MathHelper.Lerp(Player.fullRotation, MathHelper.Lerp(Player.fullRotation, MathHelper.ToRadians(TargetLocationVelocity * 0.1f) + (MathHelper.ToRadians(TargetLocation.Y - oldLocation.Y) * Math.Sign(TargetLocationVelocity) * 3), 0.05f), 0.5f);
         }
         else
         {
