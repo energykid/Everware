@@ -11,6 +11,8 @@ public class Meteorite : EverTile
     public override bool UsesExtraTarget => true;
     public override string Texture => "Everware/Assets/Textures/Misc/Tiles/TransparentDummyTileTexture";
     public override string GlowcoatTileTexture => "Everware/Assets/Textures/Meteor/Tiles/MeteoriteTile";
+
+    public override bool HasGlowcoatTileTexture => true;
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
@@ -20,12 +22,20 @@ public class Meteorite : EverTile
         TileID.Sets.ChecksForMerge[Type] = true;
         Main.tileMerge[ModContent.TileType<CharredSoilTile>()][Type] = true;
         Main.tileMerge[Type][ModContent.TileType<CharredSoilTile>()] = true;
+        TileID.Sets.TouchDamageHot[Type] = true;
         MinPick = 50;
         RegisterItemDrop(ItemID.Meteorite);
     }
     public override void ModifyFrameMerge(int i, int j, ref int up, ref int down, ref int left, ref int right, ref int upLeft, ref int upRight, ref int downLeft, ref int downRight)
     {
         WorldGen.TileMergeAttempt(-2, ModContent.TileType<CharredSoilTile>(), ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
+    }
+
+    public override void WalkDust(ref int dustType, ref bool makeDust, ref Color color)
+    {
+        dustType = ModContent.DustType<MeteorScorchDust>();
+        makeDust = true;
+        base.WalkDust(ref dustType, ref makeDust, ref color);
     }
 
     public override void ExtraDrawSingleTile(int i, int j)

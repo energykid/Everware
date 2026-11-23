@@ -63,6 +63,8 @@ public abstract class EverTile : ModTile
     /// Set to a value if you want glowcoats to draw a different texture for the outline.
     /// </summary>
     public virtual string GlowcoatTileTexture => "";
+
+    public virtual bool HasGlowcoatTileTexture => false;
     public static RenderTargetLease ExtraTarget;
 
     public override void Load()

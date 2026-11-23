@@ -50,12 +50,13 @@ public class MeteorHelmet : EverEquipmentItem
     {
         if (self.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus)
         {
-            self.mount.SetMount(ModContent.MountType<Cruiser>(), self);
+            if (!self.mount.Active && !self.controlDown)
+                self.mount.SetMount(ModContent.MountType<Cruiser>(), self);
+            else
+                orig(self);
         }
         else
-        {
             orig(self);
-        }
     }
 }
 [AutoloadEquip(EquipType.Body)]

@@ -106,7 +106,7 @@ float4 Effect(float2 coords : TEXCOORD0, float4 color : COLOR0) : COLOR0
         
         return col2;
     }
-    return (col * lerp(light, float4(1.0, 1.0, 1.0, 1.0), avg(light.rgb) * 1.5)) * float4(1.0 + col2.a * 1.2, 1.0, 1.0, 1.0);
+    return (col * lerp(light + float4(0.25, 0.1, -0.2, 0.0), float4(1.0, 1.0, 1.0, 1.0), (avg(light.rgb) * 1.5))) * float4(1.0 + col2.a * 1.2, 1.0, 1.0, 1.0);
 }
 
 technique Shader

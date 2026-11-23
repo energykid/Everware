@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Everware.Common.Systems;
 using Everware.Content.Base;
+using Everware.Content.Base.Tiles;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -113,7 +114,20 @@ public class GlowcoatSystem : ModSystem
                             {
                                 for (int ii = 0; ii < 4; ii++)
                                 {
-                                    Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                    Asset<Texture2D> asset = null;
+
+                                    if (ModContent.GetModTile(Main.tile[a].TileType) is EverTile evt)
+                                    {
+                                        if (evt.HasGlowcoatTileTexture)
+                                        {
+                                            asset = ModContent.Request<Texture2D>(evt.GlowcoatTileTexture);
+                                        }
+                                    }
+                                    
+                                    if (asset != null)
+                                        DrawingUtils.DrawSlopedTile(Main.spriteBatch, asset, a.X, a.Y, Color.White, new Vector2(8, 8) + DrawingUtils.TileOffset());
+                                    else
+                                        Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
                                         DrawingUtils.TileOffset() +
                                         new Vector2(1, 0).RotatedBy(MathHelper.PiOver2 * ii), a.X, a.Y);
                                 }
@@ -148,9 +162,21 @@ public class GlowcoatSystem : ModSystem
                         Color c = t.Get<GlowcoatTileData>().color;
                         if (c.PackedValue == color.PackedValue)
                         {
+                            Asset<Texture2D> asset = null;
+
+                            if (ModContent.GetModTile(Main.tile[a].TileType) is EverTile evt)
+                            {
+                                if (evt.HasGlowcoatTileTexture)
+                                {
+                                    asset = ModContent.Request<Texture2D>(evt.GlowcoatTileTexture);
+                                }
+                            }
                             for (int ii = 0; ii < 4; ii++)
                             {
-                                Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
+                                if (asset != null)
+                                    DrawingUtils.DrawSlopedTile(Main.spriteBatch, asset, a.X, a.Y, Color.White, new Vector2(8, 8) + DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.PiOver2 * ii));
+                                else
+                                    Main.instance.TilesRenderer.DrawSingleTile(new(), true, 0, Main.screenPosition,
                                     DrawingUtils.TileOffset() + new Vector2(2, 0).RotatedBy(MathHelper.PiOver2 * ii),
                                     a.X, a.Y);
                             }

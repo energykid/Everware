@@ -49,6 +49,33 @@ public class Cruiser : ModMount
     {
         SoundEngine.PlaySound(Assets.Sounds.Gear.Mount.MeteorCruiserMount.Asset, player.Center);
         skipDust = true;
+        
+        
+        if (player.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus && !player.controlDown)
+        {
+            if (MountData.backTexture != Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset)
+            {
+                MountData.backTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset;
+                MountData.backTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Back_Glow.Asset;
+                MountData.frontTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Front.Asset;
+                MountData.frontTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Front_Glow.Asset;
+                MountData.textureWidth = 114;
+                MountData.textureHeight = 74;
+            }
+        }
+        else
+        {
+            if (MountData.backTexture != Assets.Textures.Meteor.Items.Cruiser_Back.Asset)
+            {
+                MountData.backTexture = Assets.Textures.Meteor.Items.Cruiser_Back.Asset;
+                MountData.backTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Back_Glow.Asset;
+                MountData.frontTexture = Assets.Textures.Meteor.Items.Cruiser_Front.Asset;
+                MountData.frontTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Front_Glow.Asset;
+                MountData.textureWidth = 118;
+                MountData.textureHeight = 66;
+            }
+        }
+        
         base.SetMount(player, ref skipDust);
     }
 
@@ -176,31 +203,6 @@ public class Cruiser : ModMount
         Main.spriteBatch.Restart(sb with {SamplerState = Main.DefaultSamplerState});
         
         pool.Dispose();
-
-        if (drawPlayer.GetModPlayer<MeteorArmorSetBonus>().MeteorSetBonus)
-        {
-            if (MountData.backTexture != Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset)
-            {
-                MountData.backTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Back.Asset;
-                MountData.backTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Back_Glow.Asset;
-                MountData.frontTexture = Assets.Textures.Meteor.Items.MeteorCruiser_Front.Asset;
-                MountData.frontTextureGlow = Assets.Textures.Meteor.Items.MeteorCruiser_Front_Glow.Asset;
-                MountData.textureWidth = 114;
-                MountData.textureHeight = 74;
-            }
-        }
-        else
-        {
-            if (MountData.backTexture != Assets.Textures.Meteor.Items.Cruiser_Back.Asset)
-            {
-                MountData.backTexture = Assets.Textures.Meteor.Items.Cruiser_Back.Asset;
-                MountData.backTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Back_Glow.Asset;
-                MountData.frontTexture = Assets.Textures.Meteor.Items.Cruiser_Front.Asset;
-                MountData.frontTextureGlow = Assets.Textures.Meteor.Items.Cruiser_Front_Glow.Asset;
-                MountData.textureWidth = 118;
-                MountData.textureHeight = 66;
-            }
-        }
         
         return base.Draw(playerDrawData, drawType, drawPlayer, ref texture, ref glowTexture, ref drawPosition, ref frame, ref drawColor, ref glowColor, ref rotation, ref spriteEffects, ref drawOrigin, ref drawScale, shadow);
     }

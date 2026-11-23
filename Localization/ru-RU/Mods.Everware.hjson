@@ -370,7 +370,11 @@ Items: {
 	MeteorHelmet: {
 		// DisplayName: Meteor Helmet
 		// Tooltip: ""
-		// SetBonus: Transform your mount into a powerful Meteor Cruiser with a dash
+		/* SetBonus:
+			'''
+			Transform your mount into a powerful Meteor Cruiser with a dash
+			Hold DOWN to use your usual mount, if one is equipped
+			''' */
 	}
 
 	MeteorJacket: {

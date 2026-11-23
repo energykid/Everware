@@ -33,7 +33,7 @@ public static class MeteorLanding
     [OnLoad]
     private static void Load()
     {
-        On_Main.DrawSunAndMoon += DrawSunAndMoon_DrawFlare;
+        On_Main.DrawSunAndMoon += DrawSunAndMoon_DrawSparkles;
         On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1;
         On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2;
         IL_Main.DrawSurfaceBG += DrawSurfaceBG;
@@ -219,9 +219,9 @@ public static class MeteorLanding
         );
     }
 
-    private const float meteor_fall_start = 42;
+    private const float meteor_fall_start = 20;
 
-    private const float meteor_fall_end = 87;
+    private const float meteor_fall_end = 97;
 
     private static float GetMeteorInterpolant(float time)
     {
@@ -275,6 +275,9 @@ public static class MeteorLanding
         sb.End(out var ss);
         sb.Begin(ss with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         {
+            DrawFlare((0f, 60f), 1.2f, Color.LightGoldenrodYellow with { A = 0 });
+            DrawFlare((20f, 75f), 1.5f, (Color.Blue * 0.4f) with { A = 0 });
+            
             var effect = Assets.Effects.Meteor.MeteorLandingFire.CreateMeteorFireShader();
 
             effect.Parameters.StartColor = sky_flash_yellow.ToVector4();
@@ -287,7 +290,7 @@ public static class MeteorLanding
 
             var noise = Assets.Textures.Misc.PerlinNoise.Asset.Value;
 
-            var size = new Vector2(800 * flatInterpolator, 200 * (1f - MathF.Pow(1f - flatInterpolator, 2f))) / noise.Size();
+            var size = new Vector2(3200 * flatInterpolator, 400 * (1f - MathF.Pow(1f - flatInterpolator, 2f))) / noise.Size();
             size *= flatInterpolator * 2;
 
             var rotation = from.DirectionTo(to).ToRotation();
@@ -297,25 +300,6 @@ public static class MeteorLanding
             sb.Draw(noise, meteorPosition, null, Color.White, rotation, origin, size, SpriteEffects.None, 0f);
         }
         sb.Restart(in ss);
-    }
-
-    private static void DrawSunAndMoon_DrawFlare(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
-    {
-        orig(self, sceneArea, moonColor, sunColor, tempMushroomInfluence);
-
-        var sb = Main.spriteBatch;
-
-        sb.End(out var ss);
-        sb.Begin(ss with { TransformMatrix = Main.BackgroundViewMatrix.EffectMatrix });
-        {
-            DrawFlare((0f, 60f), 1.2f, Color.LightGoldenrodYellow with { A = 0 });
-            DrawFlare((20f, 75f), 1.5f, (Color.Blue * 0.4f) with { A = 0 });
-
-            DrawSparkles(sb, sparkles_sky);
-        }
-        sb.Restart(in ss);
-
-        return;
 
         void DrawFlare((float Min, float Max) range, float scale, Color color)
         {
@@ -340,6 +324,22 @@ public static class MeteorLanding
             flareSize.Y *= 0.6f;
             sb.Draw(flareTexture, flarePosition, null, color, MathHelper.PiOver2, flareOrigin, flareSize, SpriteEffects.None, 0f);
         }
+    }
+
+    private static void DrawSunAndMoon_DrawSparkles(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
+    {
+        orig(self, sceneArea, moonColor, sunColor, tempMushroomInfluence);
+
+        var sb = Main.spriteBatch;
+
+        sb.End(out var ss);
+        sb.Begin(ss with { TransformMatrix = Main.BackgroundViewMatrix.EffectMatrix });
+        {
+            DrawSparkles(sb, sparkles_sky);
+        }
+        sb.Restart(in ss);
+
+        return;
     }
 
     private static Vector2 GetFlarePosition()
@@ -372,8 +372,6 @@ public static class MeteorLanding
     {
         animationTimer = 0;
         checkTime = -(60 * 20);
-        MeteorPosition = Point.Zero;
-        MeteorSpawned = false;
         ClearSparkles();
     }
 
@@ -443,27 +441,30 @@ public static class MeteorLanding
                 return;
             }
 
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!MeteorSpawned)
             {
-                if (Main.LocalPlayer.Distance(new Vector2(Main.spawnTileX, Main.spawnTileY) * 16) < 3000
-                 || Main.LocalPlayer.position.Y > Main.worldSurface)
+                if (Main.netMode == NetmodeID.SinglePlayer)
                 {
-                    FindPosition();
+                    if (Main.LocalPlayer.Distance(new Vector2(Main.spawnTileX, Main.spawnTileY) * 16) < 3000
+                        || Main.LocalPlayer.position.Y > Main.worldSurface)
+                    {
+                        FindPosition();
+                    }
                 }
-            }
-            else if (Main.netMode == NetmodeID.Server && Main.ActivePlayers.span.Length > 0)
-            {
-                var shouldCheck = true;
-                foreach (Player player in Main.ActivePlayers)
+                else if (Main.netMode == NetmodeID.Server && Main.ActivePlayers.span.Length > 0)
                 {
-                    if (player.Distance(new Vector2(Main.spawnTileX, Main.spawnTileY) * 16) > 5000
-                     && player.position.Y < Main.worldSurface)
-                        shouldCheck = false;
-                }
+                    var shouldCheck = true;
+                    foreach (Player player in Main.ActivePlayers)
+                    {
+                        if (player.Distance(new Vector2(Main.spawnTileX, Main.spawnTileY) * 16) > 5000
+                            && player.position.Y < Main.worldSurface)
+                            shouldCheck = false;
+                    }
 
-                if (shouldCheck)
-                {
-                    FindPosition();
+                    if (shouldCheck)
+                    {
+                        FindPosition();
+                    }
                 }
             }
         }
