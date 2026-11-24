@@ -392,6 +392,11 @@ Items: {
 		// DisplayName: Meteor Hamaxe
 		// Tooltip: ""
 	}
+
+	Hungrimoire: {
+		// DisplayName: Hungrimoire
+		// Tooltip: ""
+	}
 }
 
 Biomes: {
@@ -443,6 +448,8 @@ Projectiles: {
 	DichromaticSkullWater.DisplayName: Agua de la Calavera Dicromática
 	TileCluster.DisplayName: Trozo de Bloques
 	// CosmoebaExplosion.DisplayName: Cosmoeba
+	// HungrimoireTeeth.DisplayName: Hungrimoire Teeth
+	// HungrimoireToothSpawner.DisplayName: Hungrimoire Tooth Spawner
 }
 
 Buffs: {

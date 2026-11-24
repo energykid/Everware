@@ -6,6 +6,23 @@ namespace Everware.Content.Base.ParticleSystem;
 public class ParticleSystem : ModSystem
 {
     public static ParticleLayer MainParticleLayer = new();
+    public static ParticleLayer BackgroundParticleLayer = new();
+
+    public override void Load()
+    {
+        On_Main.DoDraw_WallsAndBlacks += DrawBackgroundParticles;
+    }
+
+    private void DrawBackgroundParticles(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+    {
+        orig(self);
+        BackgroundParticleLayer.Draw();
+    }
+
+    public override void Unload()
+    {
+        On_Main.DoDraw_WallsAndBlacks -= DrawBackgroundParticles;
+    }
 
     public override void PostDrawTiles()
     {
@@ -17,6 +34,7 @@ public class ParticleSystem : ModSystem
     public override void PostUpdateEverything()
     {
         MainParticleLayer.Update();
+        BackgroundParticleLayer.Update();
     }
 }
 
@@ -32,6 +50,7 @@ public abstract class Particle : Entity
     public SpriteEffects Effects = SpriteEffects.None;
     public bool Pixelated = false;
     public bool DrawBelowEntities = false;
+    public bool DrawBelowTiles = false;
     public bool AffectedByLight = true;
     public float Opacity = 1f;
     public BaseParticleLayer LayerRenderedTo;

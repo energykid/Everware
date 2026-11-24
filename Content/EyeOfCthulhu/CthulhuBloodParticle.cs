@@ -32,16 +32,36 @@ public class CthulhuBloodParticle : Particle
 
         var asset = Assets.Textures.EyeOfCthulhu.EyeOfCthulhu_BloodMask.Asset;
 
-        PixelRendering.DrawPixelatedSprite(asset.Value,
-            position - Main.screenPosition, asset.Frame(), Color.White, Rotation, asset.Size() / 2, Scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None,
-            effect: BloodEffect.Shader, setparams: () =>
-            {
-                BloodEffect.Parameters.BloodGradient = Assets.Textures.EyeOfCthulhu.BloodPalette.Asset.Value;
-                BloodEffect.Parameters.LightingColor = Lighting.GetColor((position / 16f).ToPoint()).ToVector4();
-                BloodEffect.Parameters.ColorClip = Clip;
-                BloodEffect.Parameters.ColorClipUpper = ClipUpper;
-                BloodEffect.Apply();
-            });
+        if (Pixelated)
+        {
+            PixelRendering.DrawPixelatedSprite(asset.Value,
+                position - Main.screenPosition, asset.Frame(), Color.White, Rotation, asset.Size() / 2, Scale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None,
+                effect: BloodEffect.Shader, setparams: () =>
+                {
+                    BloodEffect.Parameters.BloodGradient = Assets.Textures.EyeOfCthulhu.BloodPalette.Asset.Value;
+                    BloodEffect.Parameters.LightingColor = Lighting.GetColor((position / 16f).ToPoint()).ToVector4();
+                    BloodEffect.Parameters.ColorClip = Clip;
+                    BloodEffect.Parameters.ColorClipUpper = ClipUpper;
+                    BloodEffect.Apply();
+                });
+        }
+        else
+        {
+            BloodEffect.Parameters.BloodGradient = Assets.Textures.EyeOfCthulhu.BloodPalette.Asset.Value;
+            BloodEffect.Parameters.LightingColor = Lighting.GetColor((position / 16f).ToPoint()).ToVector4();
+            BloodEffect.Parameters.ColorClip = Clip;
+            BloodEffect.Parameters.ColorClipUpper = ClipUpper;
+            BloodEffect.Apply();
+            
+            Main.spriteBatch.End(out var sb);
+            Main.spriteBatch.Begin(sb with {CustomEffect = BloodEffect.Shader});
+
+            Main.EntitySpriteDraw(asset.Value,
+                position - Main.screenPosition, asset.Frame(), Color.White, Rotation, asset.Size() / 2, Scale,
+                Microsoft.Xna.Framework.Graphics.SpriteEffects.None);
+            
+            Main.spriteBatch.Restart(sb);
+        }
     }
 }
 
