@@ -372,6 +372,8 @@ public static class MeteorLanding
     {
         animationTimer = 0;
         checkTime = -(60 * 20);
+        checkHeight = 15;
+        if (Main.drunkWorld) checkHeight = 40;
         ClearSparkles();
     }
 
@@ -441,8 +443,6 @@ public static class MeteorLanding
                 return;
             }
 
-            if (!MeteorSpawned)
-            {
                 if (Main.netMode == NetmodeID.SinglePlayer)
                 {
                     if (Main.LocalPlayer.Distance(new Vector2(Main.spawnTileX, Main.spawnTileY) * 16) < 3000
@@ -466,7 +466,6 @@ public static class MeteorLanding
                         FindPosition();
                     }
                 }
-            }
         }
         else
         {
@@ -608,8 +607,11 @@ public static class MeteorLanding
 
     private static readonly Thread meteor_locator_thread = new(() =>
     {
+        Main.NewText("Meteor position check running...");
         var tries = 100;
 
+        bool found = false;
+        
         while (threshold >= 200)
         {
             Point p = new Point(Main.spawnTileX, (int)Main.worldSurface - 200);
@@ -628,6 +630,8 @@ public static class MeteorLanding
                         Y = p.Y
                     }.Send();
                 }
+                Main.NewText("Meteor position found!");
+                found = true;
                 break;
             }
 
@@ -636,6 +640,7 @@ public static class MeteorLanding
             if (tries == 0)
             {
                 maxThreshold = 300;
+                Main.NewText("Meteor position unsuccessful...");
                 break;
             }
         }
@@ -646,10 +651,14 @@ public static class MeteorLanding
         }
 
         checkTime = 60 * (maxThreshold < 400 ? 60 : 30);
+        
+        if (!found)
+            Main.NewText("Meteor position unsuccessful...");
     });
 
     public static void FindPosition()
     {
+        Main.NewText("Meteor position check:");
         meteor_locator_thread.Start();
     }
 
@@ -677,17 +686,23 @@ public static class MeteorLanding
         for (int i = 0; i < Main.instance._npcsWithBannersToDraw.Count; i++)
         {
             NPC npc = Main.npc[Main.instance._npcsWithBannersToDraw[i]];
-            if (!npc.homeless && npc.Distance(pt.ToVector2() * 16f) < 200) return true;
+            if (!npc.homeless && npc.Distance(pt.ToVector2() * 16f) < 125) return true;
         }
 
         // check the slope of nearby terrain
-        int slope = new PathfindingUtils.FlatnessCheck(pt, new Point(40, 15)).ApproximateTerrainFlatness();
+        int slope = new PathfindingUtils.FlatnessCheck(pt, new Point(40, checkHeight)).ApproximateTerrainFlatness();
         if (slope > threshold)
         {
             threshold -= 10;
+            checkHeight += 1;
             return true;
         }
 
         return false;
     }
+
+    // The height of the sample location to check for flatness.
+    // The higher this value, the more lenient the meteor spawning logic is when checking for flatness.
+    // Increase this value to allow the meteor to spawn on bumpier swaths of land.
+    public static int checkHeight = 15;
 }
