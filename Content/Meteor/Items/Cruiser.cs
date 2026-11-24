@@ -339,6 +339,12 @@ public class MeteorCruiserPlayer : ModPlayer
                     snd.Pitch = MathHelper.Lerp(snd.Pitch, -0.5f + Math.Abs(TargetLocationVelocity / 7f), 0.01f);
                     snd.Volume = MathHelper.Lerp(snd.Volume, 1f, 0.01f);
                     snd.Position = Player.Center;
+                    
+                    if (!Main.hasFocus)
+                        snd.Pause();
+                    else
+                        snd.Resume();
+                    
                     return Main.instance.IsActive;
                 });
             }

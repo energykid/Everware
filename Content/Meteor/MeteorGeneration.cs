@@ -4,6 +4,7 @@ using Everware.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Everware.Common.Systems;
 using Terraria.ID;
 using Terraria.WorldBuilding;
 using static Everware.Utils.PathfindingUtils;
@@ -129,8 +130,10 @@ public class MeteorGeneration
         {
             if (Math.Abs(i) >= 4)
             {
-                Point center = pt + new Point(i * 10, 0) + new Point(WorldGen.genRand.Next(-3, 3), 0);
-                new Shapes.Slime(20, WorldGen.genRand.NextFloat(0.1f, 0.2f), WorldGen.genRand.NextFloat(0.12f, 0.4f)).Perform(center.Grounded(), Actions.Chain(
+                Point center = (pt + new Point(i * 10, 0) + new Point(WorldGen.genRand.Next(-3, 3), 0)).Grounded();
+
+                float rnd = WorldGen.genRand.NextFloat(6, 10);
+                new CustomGenShapes.Strip(PrimitiveBuilder.TrailFrom(PointsAtSpot(center, rnd / 3, (int)rnd, Math.Sign(-i)), Curve, out var _)).Perform(center.Grounded(), Actions.Chain(
                     new Actions.SetTileKeepWall((ushort)MagicStone, true),
                     new Actions.Smooth(true)
                 ));
@@ -138,6 +141,33 @@ public class MeteorGeneration
         }
 
         GenerateMeteor(pt);
+
+        List<Vector2> PointsAtSpot(Point spot, float width, int height, int dir)
+        {
+            List<Vector2> vec2s = new();
+
+            Vector2 p = spot.ToVector2();
+
+            float off = 0f;
+            for (int i = -height; i < height * 2; i += 2)
+            {
+                float x = Easing.KeyFloat(i, -height / 2f, height, 0f, 1f, Easing.Linear);
+                off -= (MathHelper.Lerp(1f, 0f, Curve(x)) * dir * 3);
+                float wid = MathHelper.Lerp(Curve(x), 1f, 0.2f) * width;
+                Vector2 pp = p + new Vector2(off + WorldGen.genRand.NextFloat(-wid, wid), i * -3);
+                
+                vec2s.Add(pp);
+            }
+
+            return vec2s;
+        }
+
+        float Curve(float x)
+        {
+            float xx = Easing.KeyFloat(x, 0f, 0.5f, 0f, 1f, Easing.InSine);
+            xx = Easing.KeyFloat(x, 0.5f, 1f, 1f, 0f, Easing.OutSine, xx);
+            return xx;
+        }
     }
     public static void GenerateMeteor(Point pt)
     {

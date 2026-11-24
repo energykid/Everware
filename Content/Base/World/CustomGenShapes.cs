@@ -1,11 +1,72 @@
 ﻿using Everware.Utils;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria.WorldBuilding;
 
 namespace Everware.Content.Base.World;
 
 public static class CustomGenShapes
 {
+    public class Strip : GenShape
+    {
+        List<Vector2> _points;
+
+        public Strip(List<Vector2> points)
+        {
+            _points = points;
+        }
+
+        public override bool Perform(Point origin, GenAction action)
+        {
+            if (!Apply(origin, action))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool Apply(Point origin, GenAction action)
+        {
+            Point TopLeft = origin;
+            Point BottomRight = origin;
+
+            var dummyPoints = _points;
+            
+            dummyPoints.Sort((A, B) => A.X < B.X ? -1 : 1);
+            TopLeft.X = (int)dummyPoints.First().X;
+            BottomRight.X = (int)dummyPoints.Last().X;
+            dummyPoints.Sort((A, B) => A.Y < B.Y ? -1 : 1);
+            TopLeft.Y = (int)dummyPoints.First().Y;
+            BottomRight.Y = (int)dummyPoints.Last().Y;
+            
+            Rectangle rect = new Rectangle(TopLeft.X, TopLeft.Y, BottomRight.X - TopLeft.X, BottomRight.Y - TopLeft.Y);
+
+            for (int tri = 0; tri < _points.Count - 4; tri++)
+            {
+                for (int i = rect.X; i <= rect.X + rect.Width; i++)
+                {
+                    for (int j = rect.Y; j <= rect.Y + rect.Height; j++)
+                    {
+                        if (MathUtils.PointInTriangle(new Point(i, j), (_points[tri]).ToPoint(), (_points[tri + 1]).ToPoint(), (_points[tri + 2]).ToPoint()))
+                        {
+                            if (i > 100 && i < Main.maxTilesX - 100)
+                            {
+                                if (j > 100 && j < Main.maxTilesY - 100)
+                                {
+                                    if (!UnitApply(action, Point.Zero, i, j))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
     public class Triangle : GenShape
     {
         Point vert1 = Point.Zero;
