@@ -157,12 +157,12 @@ public class MeteorGeneration
             Vector2 p = spot.ToVector2();
 
             float off = 0f;
-            for (int i = -height; i < height * 2; i += 2)
+            for (int i = -height; i < height; i += 2)
             {
-                float x = Easing.KeyFloat(i, -height / 2f, height, 0f, 1f, Easing.Linear);
+                float x = Easing.KeyFloat(i, -height, height, 0f, 1f, Easing.Linear);
                 off -= (MathHelper.Lerp(1f, 0f, Curve(x)) * dir * 2);
                 float wid = MathHelper.Lerp(Curve(x), 1f, 0.2f) * width;
-                Vector2 pp = p + new Vector2(off + WorldGen.genRand.NextFloat(-wid, wid), i * -3);
+                Vector2 pp = p + new Vector2(off + WorldGen.genRand.NextFloat(-wid, wid), i * -2);
                 
                 vec2s.Add(pp);
             }
