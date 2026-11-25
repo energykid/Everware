@@ -123,10 +123,7 @@ Items: {
 
 	BloodRubyCharm: {
 		DisplayName: Devil's Ruby
-		Tooltip:
-			'''
-			Double tap a direction to dash, creating an explosion behind you
-			'''
+		Tooltip: Double tap a direction to dash, creating an explosion behind you
 	}
 
 	Pyrocleavers: {
@@ -380,10 +377,7 @@ Items: {
 
 	Hungrimoire: {
 		DisplayName: Hungrimoire
-		Tooltip:
-		'''
-		Conjure a wave of teeth from the ground
-		'''
+		Tooltip: Conjure a wave of teeth from the ground
 	}
 }
 
@@ -625,6 +619,7 @@ NPCs: {
 
 	Cosmoeba.DisplayName: Cosmoeba
 	SpectralSnail.DisplayName: Spectral Snail
+	Starantula.DisplayName: Starantula
 }
 
 DeathReason.SnapdragonIce: experienced absolute zero.

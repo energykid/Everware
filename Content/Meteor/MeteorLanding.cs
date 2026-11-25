@@ -365,12 +365,12 @@ public static class MeteorLanding
     {
         MeteorPosition = Point.Zero;
         MeteorSpawned = false;
+        animationTimer = 0;
     }
 
     [ModSystemHooks.OnWorldLoad]
     private static void OnWorldLoad()
     {
-        animationTimer = 0;
         checkTime = -(60 * 20);
         checkHeight = 15;
         if (Main.drunkWorld) checkHeight = 40;
@@ -404,12 +404,14 @@ public static class MeteorLanding
             // TODO: Why is this saved as a vector?
             tag.Set(nameof(MeteorPosition), MeteorPosition.ToVector2());
             tag.Set(nameof(MeteorSpawned), MeteorSpawned);
+            tag.Set(nameof(animationTimer), animationTimer);
         }
 
         public override void LoadWorldData(TagCompound tag)
         {
             MeteorPosition = tag.Get<Vector2>(nameof(MeteorPosition)).ToPoint();
             MeteorSpawned = tag.Get<bool>(nameof(MeteorSpawned));
+            animationTimer = tag.Get<int>(nameof(animationTimer));
         }
     }
 

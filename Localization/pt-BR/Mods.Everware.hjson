@@ -395,7 +395,7 @@ Items: {
 
 	Hungrimoire: {
 		// DisplayName: Hungrimoire
-		// Tooltip: ""
+		// Tooltip: Conjure a wave of teeth from the ground
 	}
 }
 
@@ -637,6 +637,7 @@ NPCs: {
 
 	// Cosmoeba.DisplayName: Cosmoeba
 	// SpectralSnail.DisplayName: Spectral Snail
+	// Starantula.DisplayName: Starantula
 }
 
 DeathReason.SnapdragonIce: experimentou o zero absoluto.

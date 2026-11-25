@@ -13,6 +13,8 @@ namespace Everware.Content.EyeOfCthulhu.Drops;
 
 public class Hungrimoire : EverTomeWeapon
 {
+    public override int Rarity => 3;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -92,19 +94,6 @@ public class HungrimoireTeeth : EverProjectile
         base.NetOnSpawn();
         
         Projectile.spriteDirection = Math.Sign(Projectile.velocity.X);
-
-        for (int i = 0; i < 3; i++)
-        {
-            float rnd = Main.rand.NextFloat(0.5f, 1f);
-            CthulhuBloodParticle part = new CthulhuBloodParticle(Projectile.Bottom,
-                new Vector2(Projectile.spriteDirection * 1, -2).RotatedByRandom(MathHelper.PiOver2) * rnd);
-
-            part.Scale.Y = rnd;
-            part.Scale.X = 0.3f;
-            part.Pixelated = false;
-            
-            part.Spawn(Blood);
-        }
         
         Projectile.Bottom = Projectile.Bottom.Grounded();
         
@@ -114,11 +103,10 @@ public class HungrimoireTeeth : EverProjectile
         Projectile.Bottom = new Vector2(Projectile.Bottom.X, Math.Max(y1, y2));
 
         Hitbox = new Rectangle((int)Projectile.Bottom.X - 15, (int)Projectile.Bottom.Y - (10 * Frame), 30, 10 * Frame);
-
-
+        
         for (int i = 0; i < 20; i++)
         {
-            Dust.NewDust(Projectile.Bottom + new Vector2(-10, -20), 20, 20, DustID.Blood, Projectile.spriteDirection, -2);
+            Dust.NewDust(Projectile.Bottom + new Vector2(-10, -20), 20, 30, DustID.Blood, Projectile.spriteDirection, -2);
         }
         
         SoundEngine.PlaySound(Assets.Sounds.NPC.EoCTendrilEmerge.Asset.WithPitchVariance(0.2f).WithPitchOffset((float)(Projectile.frame / 15f)).WithVolumeScale((Projectile.frame / 14f)) with {MaxInstances = 7}, Projectile.Center);
@@ -197,8 +185,31 @@ public class HungrimoireTeeth : EverProjectile
 
     public override void AI()
     {
-        Hitbox = new Rectangle((int)Projectile.Bottom.X - 15, (int)Projectile.Bottom.Y - (10 * Frame), 30, 10 * Frame);
+        Projectile.ai[2]++;
+        if (Projectile.ai[2] < 6)
+        {
+            float rnd = Main.rand.NextFloat(0.5f, 1f);
+            CthulhuBloodParticle part = new CthulhuBloodParticle(Projectile.Bottom + new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-20, 10)),
+                new Vector2(Projectile.spriteDirection * 1, -2).RotatedByRandom(MathHelper.PiOver2) * rnd);
 
+            part.Scale.Y = rnd * 0.7f;
+            part.Scale.X = 0.5f;
+            part.Pixelated = false;
+            
+            part.Spawn(Blood);
+        }
+        
+        Hitbox = new Rectangle((int)Projectile.Bottom.X - 15, (int)Projectile.Bottom.Y - (10 * Frame), 30, 10 * Frame);
+        
+        float BottomY = Projectile.Bottom.Grounded().Y;
+        
+        float y1 = new Vector2(Projectile.Bottom.X - (3 * Frame), Projectile.Bottom.Y).Grounded().Y;
+        float y2 = new Vector2(Projectile.Bottom.X + (3 * Frame), Projectile.Bottom.Y).Grounded().Y;
+
+        BottomY = MathHelper.Max(y1, y2);
+
+        Projectile.Bottom = Vector2.Lerp(Projectile.Bottom, new(Projectile.Bottom.X, BottomY), 0.4f);
+        
         Projectile.ai[1]++;
         if (Projectile.ai[1] >= 20) Projectile.damage = 0;
         

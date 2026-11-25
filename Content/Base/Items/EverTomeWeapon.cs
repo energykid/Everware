@@ -9,8 +9,8 @@ public abstract class EverTomeWeapon : EverWeaponItem
     {
         float a = ((float)player.itemAnimation / (float)player.itemAnimationMax * FrameCount);
         Rectangle frame = TomeAsset.Frame(1, FrameCount, frameY: (int)(MathHelper.Clamp((float)a, 0f, FrameCount - 1)));
-        Vector2 pos = player.MountedCenter + new Vector2(player.direction > 0 ? 15 : -15, player.gfxOffY);
-        Main.EntitySpriteDraw(TomeAsset.Value, pos - Main.screenPosition, frame, Lighting.GetColor((pos / 16).ToPoint()), 0f, frame.Size() / 2f, 1f, player.direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+        Vector2 pos = player.MountedCenter + (new Vector2(player.direction > 0 ? 15 : -15, player.gfxOffY).RotatedBy(player.fullRotation));
+        Main.EntitySpriteDraw(TomeAsset.Value, pos - Main.screenPosition, frame, Lighting.GetColor((pos / 16).ToPoint()), player.fullRotation, frame.Size() / 2f, 1f, player.direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
     }
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {

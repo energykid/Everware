@@ -294,7 +294,7 @@ Items: {
 		/* Tooltip:
 			'''
 			Allows parrying projectiles using melee weapons
-			Upon successful parry, gain +20% melee speed
+			On successful parry, gain melee speed
 			10 second cooldown
 			''' */
 	}
@@ -314,7 +314,7 @@ Items: {
 		/* Tooltip:
 			'''
 			Hold UP to gradually summon clusters from the ground
-			Attacking will unleash them towards your cursor
+			Attacking unleashes them towards your cursor
 			''' */
 	}
 
@@ -394,7 +394,7 @@ Items: {
 
 	Hungrimoire: {
 		// DisplayName: Hungrimoire
-		// Tooltip: ""
+		// Tooltip: Conjure a wave of teeth from the ground
 	}
 }
 
@@ -636,6 +636,7 @@ NPCs: {
 
 	// Cosmoeba.DisplayName: Cosmoeba
 	// SpectralSnail.DisplayName: Spectral Snail
+	// Starantula.DisplayName: Starantula
 }
 
 // DeathReason.SnapdragonIce: experienced absolute zero.
