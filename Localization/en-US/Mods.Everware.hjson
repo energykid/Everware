@@ -126,7 +126,6 @@ Items: {
 		Tooltip:
 			'''
 			Double tap a direction to dash, creating an explosion behind you
-			Dashing also stops you from falling
 			'''
 	}
 
@@ -137,7 +136,7 @@ Items: {
 
 	SkullStaff: {
 		DisplayName: Obsidian Skull Staff
-		Tooltip: Summons a terrifying, laughing, screaming obsidian skull that explodes and regenerates
+		Tooltip: Summons a terrifying, laughing, screaming obsidian skull
 	}
 
 	HotShot: {
@@ -281,7 +280,7 @@ Items: {
 		Tooltip:
 			'''
 			Allows parrying projectiles using melee weapons
-			Upon successful parry, gain +20% melee speed
+			On successful parry, gain melee speed
 			10 second cooldown
 			'''
 	}
@@ -301,7 +300,7 @@ Items: {
 		Tooltip:
 			'''
 			Hold UP to gradually summon clusters from the ground
-			Attacking will unleash them towards your cursor
+			Attacking unleashes them towards your cursor
 			'''
 	}
 
@@ -381,7 +380,10 @@ Items: {
 
 	Hungrimoire: {
 		DisplayName: Hungrimoire
-		Tooltip: ""
+		Tooltip:
+		'''
+		Conjure a wave of teeth from the ground
+		'''
 	}
 }
 
