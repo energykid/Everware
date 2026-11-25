@@ -52,4 +52,28 @@ public static class MathUtils
 
         return !(has_neg && has_pos);
     }
+
+    public static bool HasNaNs(this Vector3 vec) => float.IsNaN(vec.X) || float.IsNaN(vec.Y) || float.IsNaN(vec.Z);
+
+    public static Vector3 SafeNormalize(this Vector3 v, Vector3 defaultValue)
+    {
+        if (v == Vector3.Zero || v.HasNaNs())
+            return defaultValue;
+
+        return Vector3.Normalize(v);
+    }
+
+    public static Vector3 Cross(this Vector3 a, Vector3 b) => new(
+        a.Y * b.Z - a.Z * b.Y,
+        a.Z * b.X - a.X * b.Z,
+        a.X * b.Y - a.Y * b.X);
+
+    public static Vector3 Nlerp(this Vector3 start, Vector3 end, float percent) =>
+        Vector3.Lerp(start, end, percent).SafeNormalize(Vector3.Zero);
+
+    public static Vector2 XY(this Vector3 start) => new(start.X, start.Y);
+
+    public static Vector2 YZ(this Vector3 start) => new(start.Y, start.Z);
+
+    public static Vector2 XZ(this Vector3 start) => new(start.X, start.Z);
 }
