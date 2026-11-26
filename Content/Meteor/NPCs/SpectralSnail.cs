@@ -1,5 +1,6 @@
 ﻿using Everware.Content.Base;
 using Everware.Content.Base.NPCs;
+using Everware.Utils;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 
@@ -79,9 +80,14 @@ public class SpectralSnail : EverNPC
     {
         NPC.ai[0]++;
 
+        float posY = Math.Min((NPC.Center + new Vector2(-60, 0)).Grounded().Y, Math.Min(NPC.Center.Grounded().Y, (NPC.Center + new Vector2(60, 0)).Grounded().Y));
+        posY -= 100;
+        
         NPC.velocity.X = 0.5f;
-        NPC.velocity.Y = 0f;
+        NPC.velocity.Y = MathHelper.Lerp(NPC.velocity.Y, MathHelper.Lerp(NPC.Center.Y, posY, 0.005f) - NPC.Center.Y, 0.01f);
 
+        NPC.rotation = NPC.direction * NPC.velocity.Y;
+        
         NPC.direction = MathF.Sign(NPC.velocity.X);
         NPC.spriteDirection = NPC.direction;
 
@@ -103,7 +109,9 @@ public class SpectralSnail : EverNPC
             NPC.ai[2] += 0.003f;
             if (NPC.ai[2] > 0.65f)
             {
-                NPC.active = false;
+                NPC.Opacity -= 0.05f;
+                if (NPC.Opacity < 0)
+                    NPC.active = false;
             }
         }
     }
@@ -138,8 +146,8 @@ public class SpectralSnail : EverNPC
         shader.Apply();
 
         Main.spriteBatch.Begin(sb with { CustomEffect = shader.Shader });
-        Main.EntitySpriteDraw(asset.Value, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
-        Main.EntitySpriteDraw(asset2.Value, NPC.Center - screenPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
+        Main.EntitySpriteDraw(asset.Value, NPC.Center - screenPos, NPC.frame, drawColor.MultiplyRGBA(new (NPC.Opacity, NPC.Opacity, NPC.Opacity, NPC.Opacity)), NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
+        Main.EntitySpriteDraw(asset2.Value, NPC.Center - screenPos, NPC.frame, Color.White.MultiplyRGBA(new (NPC.Opacity, NPC.Opacity, NPC.Opacity, NPC.Opacity)), NPC.rotation, NPC.frame.Size() / 2, NPC.scale, effects);
 
         Main.spriteBatch.Restart(sb);
         return false;

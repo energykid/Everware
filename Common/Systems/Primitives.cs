@@ -221,6 +221,10 @@ public sealed class PrimitiveDrawing : ILoadable
             effect.Texture = sprite;
             effect.TextureEnabled = true;
         }
+        else
+        {
+            effect.TextureEnabled = false;
+        }
         effect.VertexColorEnabled = true;
 
         Main.spriteBatch.End();
@@ -322,8 +326,12 @@ public sealed class PrimitiveDrawing : ILoadable
 
         Texture2D val = null;
 
-        if (asset != null) val = asset.Value;
-
-        DrawPrimitiveStrip2(finalPositions, finalColors, targetSize, val, finalTexcoords, add);
+        if (asset != null)
+        {
+            val = asset.Value;
+            DrawPrimitiveStrip2(finalPositions, finalColors, targetSize, val, finalTexcoords, add);
+        }
+        else
+            DrawPrimitiveStrip2(finalPositions, finalColors, targetSize, add: add);
     }
 }

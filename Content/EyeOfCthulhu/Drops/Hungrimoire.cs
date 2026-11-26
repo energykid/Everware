@@ -71,7 +71,7 @@ public class HungrimoireToothSpawner : EverProjectile
                 if (!Main.dedServ)
                 {
                     Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(Owner, "Hungrimoire"),
-                        Projectile.Center.Grounded(), Projectile.velocity, ModContent.ProjectileType<HungrimoireTeeth>(),
+                        Projectile.Center.Grounded(), Projectile.velocity * 0.1f, ModContent.ProjectileType<HungrimoireTeeth>(),
                         20, 5, Projectile.owner);
                     
                     (proj.ModProjectile as HungrimoireTeeth).SetFrame((int)Math.Ceiling(Projectile.ai[0] / 5));

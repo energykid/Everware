@@ -127,7 +127,7 @@ public class MeteorHeadRework : GlobalNPC
     }
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        if (npc.ai[2] == 0) Draw(npc, screenPos, drawColor);
+        if (npc.ai[2] != 1) Draw(npc, screenPos, drawColor);
         return false;
     }
     public override void Load()

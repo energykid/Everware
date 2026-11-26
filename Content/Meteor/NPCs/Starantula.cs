@@ -186,7 +186,7 @@ internal class Starantula : EverNPC
 
         if (NPC.HasValidTarget)
         {
-            var targetPos = Main.player[NPC.target].Center - 6 * 16 * Vector2.UnitY;
+            var targetPos = Main.player[NPC.target].Center - (25 * 16 * Vector2.UnitY);
             targetPos += (LeftHanded ? 1f : -1f) * Vector2.UnitX * 16 * 5;
 
             HangingPosition = Vector2.Lerp(HangingPosition, targetPos, 0.01f);
@@ -227,7 +227,6 @@ internal class Starantula : EverNPC
 
         if (Timer <= THROW_DELAY)
         {
-
             HangOnString();
             OldMeteorPosition = new Vector3(GrappledMeteor.Center - GrappledMeteor.velocity, 0f);
             MeteorPosition = new Vector3(GrappledMeteor.Center, 0f);
@@ -303,9 +302,7 @@ internal class Starantula : EverNPC
         GrappledMeteor.rotation = Vector2.Zero.AngleFrom(velocity2D);
         GrappledMeteor.velocity = velocity2D * 0.01f;
 
-        // Update meteor draw order to ensure it draws behind the spider if behind the spider
-        GrappledMeteor.behindTiles = MeteorPosition.Z < 0f;
-        NPC.behindTiles = MeteorPosition.Z >= 0f;
+        GrappledMeteor.ai[2] = 1;
 
         // Throw the meteor if possible
         var velocityNormal = velocity.SafeNormalize(Vector3.Zero);
@@ -324,6 +321,7 @@ internal class Starantula : EverNPC
             GrappledMeteor.velocity = meteorVelocity;
             GrappledMeteor.damage = NPC.damage; // make it injherit the weaver's damage number
             GrappledMeteor.scale = 1f;
+            GrappledMeteor.ai[2] = 2;
             MiscAITimer = 150;
             NPC.netUpdate = true;
             NPC.ai[3] = 0f; // set z coordinate to 0
@@ -409,13 +407,16 @@ internal class Starantula : EverNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
+        if (GrappledMeteor != null)
+            if (MeteorPosition.Z < 0)
+                MeteorHeadRework.Draw(GrappledMeteor, Main.screenPosition,
+                    Lighting.GetColor(GrappledMeteor.Center.ToTileCoordinates()));
+        
         if (State != 2 && State != 3)
         {
             DrawSpiderBody(spriteBatch, screenPos, drawColor);
             return false;
         }
-
-        
 
         var interpolant = State == 2 ? Easing.OutSine(MathHelper.Clamp(Timer / HANG_ANIM_LENGTH, 0, 1)) : 1f;
 
@@ -491,6 +492,13 @@ internal class Starantula : EverNPC
         });
 
         DrawSpiderBody(spriteBatch, screenPos, drawColor);
+        
+        
+        if (GrappledMeteor != null)
+            if (MeteorPosition.Z >= 0)
+                MeteorHeadRework.Draw(GrappledMeteor, Main.screenPosition,
+                    Lighting.GetColor(GrappledMeteor.Center.ToTileCoordinates()));
+
         return false;
     }
 
