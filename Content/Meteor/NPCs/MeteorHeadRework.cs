@@ -40,7 +40,7 @@ public class MeteorHeadRework : GlobalNPC
             npc.velocity = Vector2.Lerp(npc.velocity, npc.DirectionTo(Main.player[npc.target].Center) * 0.5f, 0.07f);
         }
 
-        npc.rotation = Vector2.Zero.AngleFrom(npc.velocity);
+        npc.rotation = npc.rotation.AngleLerp(Main.player[npc.target].AngleTo(npc.Center), 0.1f);
         npc.ai[0] += 0.5f;
         npc.TargetClosest(false);
         SpawnDust(npc);

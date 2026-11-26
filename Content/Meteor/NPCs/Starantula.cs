@@ -13,7 +13,7 @@ internal class Starantula : EverNPC
 {
     private const int PREFERRED_DISTANCE_GRAB = 800;
     private const int PREFERRED_METEOR_DIST = 180;
-    private const int PREFERRED_HANG_LENGTH = 12 * 16;
+    private const int PREFERRED_HANG_LENGTH = 20 * 16;
     private const float HANG_ANIM_LENGTH = 25f;
     private const float THROW_DELAY = 12f;
 
@@ -186,10 +186,10 @@ internal class Starantula : EverNPC
 
         if (NPC.HasValidTarget)
         {
-            var targetPos = Main.player[NPC.target].Center - 25 * 16 * Vector2.UnitY;
-            targetPos += (LeftHanded ? 1f : -1f) * Vector2.UnitX * 16 * 50;
+            var targetPos = Main.player[NPC.target].Center - 6 * 16 * Vector2.UnitY;
+            targetPos += (LeftHanded ? 1f : -1f) * Vector2.UnitX * 16 * 5;
 
-            HangingPosition = Vector2.Lerp(HangingPosition, targetPos, 0.02f);
+            HangingPosition = Vector2.Lerp(HangingPosition, targetPos, 0.01f);
         }
         else
             return BehaviorState.FindGround;

@@ -609,7 +609,6 @@ public static class MeteorLanding
 
     private static readonly Thread meteor_locator_thread = new(() =>
     {
-        Main.NewText("Meteor position check running...");
         var tries = 100;
 
         bool found = false;
@@ -632,7 +631,6 @@ public static class MeteorLanding
                         Y = p.Y
                     }.Send();
                 }
-                Main.NewText("Meteor position found!");
                 found = true;
                 break;
             }
@@ -642,7 +640,6 @@ public static class MeteorLanding
             if (tries == 0)
             {
                 maxThreshold = 300;
-                Main.NewText("Meteor position unsuccessful...");
                 break;
             }
         }
@@ -653,14 +650,10 @@ public static class MeteorLanding
         }
 
         checkTime = 60 * (maxThreshold < 400 ? 60 : 30);
-        
-        if (!found)
-            Main.NewText("Meteor position unsuccessful...");
     });
 
     public static void FindPosition()
     {
-        Main.NewText("Meteor position check:");
         meteor_locator_thread.Start();
     }
 
