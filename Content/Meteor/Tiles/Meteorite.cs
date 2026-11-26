@@ -31,6 +31,32 @@ public class Meteorite : EverTile
         WorldGen.TileMergeAttempt(-2, ModContent.TileType<CharredSoilTile>(), ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
     }
 
+    public override void ExtraPostDrawEverything()
+    {
+        Point p1 = Main.screenPosition.ToTileCoordinates();
+        Point p2 = Main.ScreenSize.ToVector2().ToTileCoordinates();
+        for (int i = p1.X - 2; i < p1.X + p2.X + 2; i++)
+        {
+            for (int j = p1.Y - 2; j < p1.Y + p2.Y + 2; j++)
+            {
+                if (Main.tile[i, j].TileType == Type)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        var asset = Assets.Textures.Meteor.Tiles.MeteoriteTile_Merge.Asset;
+
+                        Vector2 ii = new Vector2(i, j) + new Vector2(0, 1).RotatedBy(k * MathHelper.PiOver2);
+                        if (Main.tile[ii.ToPoint()].TileType == ModContent.TileType<CharredSoilTile>())
+                        {
+                            Main.EntitySpriteDraw(asset.Value, new Vector2(i * 16, j * 16) + new Vector2(8, 8) - Main.screenPosition,
+                                asset.Frame(), Lighting.GetColor(i, j), k * MathHelper.PiOver2, asset.Frame().Size() / 2, 1f, SpriteEffects.None);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public override void WalkDust(ref int dustType, ref bool makeDust, ref Color color)
     {
         dustType = ModContent.DustType<MeteorScorchDust>();

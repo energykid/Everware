@@ -133,6 +133,16 @@ public abstract class EverTile : ModTile
         Main.spriteBatch.Draw(ExtraTarget.Target, ScreenOffset, ExtraTarget.Target.Bounds, Color.White, 0f, Vector2.Zero, 1f, Main.GameViewMatrix.Effects, 0f);
     }
 
+    /// <summary>
+    /// Calls once per type when UsesExtraDrawing is enabled.
+    /// Used to draw extra things after ExtraTarget is drawn.
+    /// Override this if you want ExtraTarget-reliant tiles to merge with non-ExtraTarget-reliant ones.
+    /// </summary>
+    public virtual void ExtraPostDrawEverything()
+    {
+        
+    }
+
     public Vector2 RoundedScreenPosition;
     public Vector2 ScreenOffset;
 
@@ -171,6 +181,7 @@ public abstract class EverTile : ModTile
 
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             ExtraDrawEverything();
+            ExtraPostDrawEverything();
             Main.spriteBatch.End();
         }
     }

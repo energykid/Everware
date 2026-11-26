@@ -54,7 +54,7 @@ public class SpectralSnail : EverNPC
     }
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
     {
-        base.ApplyDifficultyAndPlayerScaling(1, balance, bossAdjustment);
+        base.ApplyDifficultyAndPlayerScaling(1, 1f, 1f);
     }
     public override void FindFrame(int frameHeight)
     {
@@ -107,9 +107,9 @@ public class SpectralSnail : EverNPC
         {
             NPC.velocity.X *= 1.5f + (NPC.ai[2] * 2.5f);
             NPC.ai[2] += 0.003f;
-            if (NPC.ai[2] > 0.65f)
+            if (NPC.ai[2] > 0.5f)
             {
-                NPC.Opacity -= 0.05f;
+                NPC.Opacity -= 0.015f;
                 if (NPC.Opacity < 0)
                     NPC.active = false;
             }
@@ -141,7 +141,7 @@ public class SpectralSnail : EverNPC
         shader.Parameters.Frames = 14;
         shader.Parameters.Color = Color.Blue.ToVector4();
         shader.Parameters.FrameNum = NPC.frame.Y / NPC.height;
-        shader.Parameters.Progress = MathHelper.Lerp(-1f, 1f, NPC.ai[2]);
+        shader.Parameters.Progress = MathHelper.Lerp(-1f, 0.5f, NPC.ai[2]);
         shader.Parameters.Progress2 = GlobalTimer.Value / 119f;
         shader.Apply();
 
