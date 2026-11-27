@@ -1,10 +1,13 @@
-﻿using Terraria.ID;
+﻿using Everware.Content.Misc.Particles;
+using Terraria.ID;
 
 namespace Everware.Content.Meteor.NPCs;
 
 public class MeteorHeadRework : GlobalNPC
 {
+    public static readonly int ExplosionDamage = 30;
     int Personality = 0;
+    public bool Exploding = false;
     public override bool InstancePerEntity => true;
     public override void SetDefaults(NPC entity)
     {
@@ -17,50 +20,80 @@ public class MeteorHeadRework : GlobalNPC
     }
     public override bool PreAI(NPC npc)
     {
-        if (npc.ai[3] == 1)
+        if (Exploding)
         {
-            npc.ai[0] += 0.5f;
-            SpawnDust(npc);
-            return false;
-        }
-
-        if (npc.ai[1] != 0)
-        {
-            if (!Main.npc[(int)npc.ai[1]].active)
+            new SmallSmoke(npc.Center, npc.velocity / 2f, Color.Black with {A = 150}).Spawn();
+            npc.ai[0] += 2.5f;
+            npc.velocity.Y += 0.2f;
+            Tile t = Main.tile[npc.Center.ToTileCoordinates()];
+            if (t.HasTile && Main.tileSolid[t.TileType])
             {
-                npc.ai[2] = 0;
-                npc.ai[1] = 0;
-                npc.netUpdate = true;
+                Explode(npc);
+                npc.active = false;
+                npc.StrikeInstantKill();
             }
-            npc.velocity = Vector2.Lerp(npc.velocity, npc.DirectionFrom(Main.npc[(int)npc.ai[1]].Center) * 0.5f, 0.07f);
+
+            SpawnDust(npc, 5);
         }
         else
         {
-            npc.ai[2] = 0;
-            npc.velocity = Vector2.Lerp(npc.velocity, npc.DirectionTo(Main.player[npc.target].Center) * 0.5f, 0.07f);
-        }
+            if (npc.ai[3] == 1)
+            {
+                npc.ai[0] += 0.5f;
+                SpawnDust(npc);
+                return false;
+            }
 
-        npc.rotation = npc.rotation.AngleLerp(Main.player[npc.target].AngleTo(npc.Center), 0.1f);
-        npc.ai[0] += 0.5f;
-        npc.TargetClosest(false);
-        SpawnDust(npc);
+            if (npc.ai[1] != 0)
+            {
+                if (!Main.npc[(int)npc.ai[1]].active)
+                {
+                    if (npc.ai[2] < 2)
+                        npc.ai[2] = 0;
+                    npc.ai[1] = 0;
+                    npc.netUpdate = true;
+                }
+                npc.velocity = Vector2.Lerp(npc.velocity, npc.DirectionFrom(Main.npc[(int)npc.ai[1]].Center) * 0.5f, 0.07f);
+            }
+            else
+            {
+                npc.velocity = Vector2.Lerp(npc.velocity, npc.DirectionTo(Main.player[npc.target].Center) * 0.5f, 0.07f);
+            }
+
+            npc.rotation = npc.rotation.AngleLerp(Main.player[npc.target].AngleTo(npc.Center), 0.1f);
+            npc.ai[0] += 0.5f;
+            npc.TargetClosest(false);
+            SpawnDust(npc);
+        }
 
         return false;
     }
 
-    private void SpawnDust(NPC npc)
+    private void SpawnDust(NPC npc, float num = 1)
     {
-        Vector2 pos = npc.Center + new Vector2(14, 0).RotatedBy(npc.rotation).RotatedByRandom(MathHelper.PiOver2);
-        Dust d = Dust.NewDustPerfect(pos, DustID.FlameBurst, Vector2.Zero);
-        d.noGravity = true;
-        if (Main.rand.NextBool(3))
+        for (float i = 0; i < num; i++)
         {
-            Dust d2 = Dust.NewDustPerfect(pos, DustID.Smoke, -npc.velocity * 2f);
-            d2.scale = 0.5f;
-            d2.noGravity = true;
+            Vector2 pos = Vector2.Lerp(npc.Center, npc.oldPosition, i / num) + new Vector2(14, 0).RotatedBy(npc.rotation).RotatedByRandom(MathHelper.PiOver2);
+            Dust d = Dust.NewDustPerfect(pos, DustID.FlameBurst, Vector2.Zero);
+            d.noGravity = true;
+            if (Main.rand.NextBool(3))
+            {
+                Dust d2 = Dust.NewDustPerfect(pos, DustID.Smoke, -npc.velocity * 2f);
+                d2.scale = 0.5f;
+                d2.noGravity = true;
+            }
         }
     }
 
+    public static void Explode(NPC npc)
+    {
+        SoundEngine.PlaySound(SoundID.NPCDeath14.WithPitchVariance(0.2f), npc.Center);
+        
+        if (!Main.dedServ)
+            Projectile.NewProjectile(new EntitySource_Parent(npc), npc.Center, Vector2.Zero,
+                ModContent.ProjectileType<MeteorHeadExplosion>(), ExplosionDamage, 2f);
+    }
+    
     public static void Draw(NPC npc, Vector2 screenPos, Color drawColor)
     {
         Lighting.AddLight(npc.Center, Color.Red.ToVector3() * 0.2f);
@@ -82,6 +115,14 @@ public class MeteorHeadRework : GlobalNPC
 
         if (npc.ai[2] < 1 || npc.ai[3] == 1)
         {
+            Vector2 sc = new Vector2(1.15f);
+            if (npc.GetGlobalNPC<MeteorHeadRework>().Exploding)
+            {
+                npc.rotation = npc.velocity.ToRotation() + MathHelper.Pi;
+                sc.X *= 2f;
+                origin.X = 0;
+            }
+            
             Main.spriteBatch.End(out var sb);
 
             float p1 = MathHelper.Lerp(1f, 0f, npc.ai[0] / 50f % 1f);
@@ -95,7 +136,7 @@ public class MeteorHeadRework : GlobalNPC
             eff1.Apply();
 
             Main.spriteBatch.Begin(sb with { CustomEffect = eff1.Shader });
-            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, 1.15f * npc.scale, Effects);
+            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, sc * npc.scale, Effects);
 
             Main.spriteBatch.End();
             var eff2 = Assets.Effects.Misc.GradientClip.CreateEffect();
@@ -106,7 +147,7 @@ public class MeteorHeadRework : GlobalNPC
             eff2.Apply();
             Main.spriteBatch.Begin(sb with { CustomEffect = eff2.Shader });
 
-            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, 1.15f * npc.scale, Effects);
+            Main.EntitySpriteDraw(FlameAsset.Value, npc.Center - screenPos, FlameAsset.Frame(), Color.White, npc.rotation, origin, sc * npc.scale, Effects);
 
             Main.spriteBatch.Restart(sb);
         }

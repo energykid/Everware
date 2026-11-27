@@ -24,6 +24,7 @@ public class CosmoebaExplosion : EverExplosionProjectile
     }
     public override bool PreDraw(ref Color lightColor)
     {
+        
         var asset = Assets.Textures.Meteor.NPCs.CosmoebaExplosion.Asset;
 
         var fr = asset.Frame(1, FrameCount, 0, Projectile.frame);
@@ -46,6 +47,7 @@ public class CosmoebaExplosion : EverExplosionProjectile
     }
     public override void AI()
     {
+        Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 0.4f);
         Projectile.ai[2] = MathHelper.Lerp(Projectile.ai[2], 1f, 0.08f);
         if (Projectile.frame < 3)
         {

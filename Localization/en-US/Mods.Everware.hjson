@@ -432,6 +432,7 @@ Projectiles: {
 	CosmoebaExplosion.DisplayName: Cosmoeba
 	HungrimoireTeeth.DisplayName: Hungrimoire Teeth
 	HungrimoireToothSpawner.DisplayName: Hungrimoire Tooth Spawner
+	MeteorHeadExplosion.DisplayName: Meteor Head Explosion
 }
 
 Buffs: {

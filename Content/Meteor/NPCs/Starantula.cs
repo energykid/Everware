@@ -12,7 +12,7 @@ namespace Everware.Content.Meteor.NPCs;
 internal class Starantula : EverNPC
 {
     private const int PREFERRED_DISTANCE_GRAB = 800;
-    private const int PREFERRED_METEOR_DIST = 180;
+    private const int PREFERRED_METEOR_DIST = 90;
     private const int PREFERRED_HANG_LENGTH = 20 * 16;
     private const float HANG_ANIM_LENGTH = 25f;
     private const float THROW_DELAY = 12f;
@@ -262,8 +262,8 @@ internal class Starantula : EverNPC
         HangOnString();
 
         // get normal vector to cross product with
-        var duration = 2 * 40f;
-        var multiplier = MathHelper.Clamp((Timer - throwDelay2) / duration, 0, 1);
+        var duration = 2 * 30f;
+        var multiplier = MathHelper.Clamp((Timer - throwDelay2) / duration / 2f, 0, 1);
 
         var x = Vector2.Dot((GrappledMeteor.Center - NPC.Center).SafeNormalize(Vector2.Zero), Vector2.UnitY);
         var y = Vector2.Dot((GrappledMeteor.Center - NPC.Center).SafeNormalize(Vector2.Zero), Vector2.UnitX);
@@ -276,7 +276,7 @@ internal class Starantula : EverNPC
         var velocity = MeteorPosition - OldMeteorPosition - new Vector3(GrappledMeteor.velocity, 0f);
 
         var axis2 = GrappledMeteor.Center - NPC.Center;
-        velocity += new Vector3(axis2.X, axis2.Y, 0f).SafeNormalize(Vector3.Zero).Cross(normal) * 2.75f;
+        velocity += new Vector3(axis2.X, axis2.Y, 0f).SafeNormalize(Vector3.Zero).Cross(normal) * (MathHelper.Lerp(0.1f, 0.55f, Timer / throwDelay2) * Math.Sign(playerPosition.X - NPC.Center.X));
 
         MeteorPosition += velocity;
         OldMeteorPosition = oldPosition;
@@ -302,8 +302,6 @@ internal class Starantula : EverNPC
         GrappledMeteor.rotation = Vector2.Zero.AngleFrom(velocity2D);
         GrappledMeteor.velocity = velocity2D * 0.01f;
 
-        GrappledMeteor.ai[2] = 1;
-
         // Throw the meteor if possible
         var velocityNormal = velocity.SafeNormalize(Vector3.Zero);
         var toTargetNormal = new Vector3(toTarget, 0f);
@@ -316,12 +314,14 @@ internal class Starantula : EverNPC
             Main.player[NPC.target].Center.DistanceSQ(NPC.Center) >= MiscAITimer * MiscAITimer * 4f)
         {
             // ensure that it doesnt miss thje player if they stand still
-            var meteorVelocity = GrappledMeteor.Center.DirectionTo(playerPosition) * velocity.Length();
+            var meteorVelocity = GrappledMeteor.Center.DirectionTo(playerPosition) * (velocity.Length() / 2f);
 
             GrappledMeteor.velocity = meteorVelocity;
             GrappledMeteor.damage = NPC.damage; // make it injherit the weaver's damage number
             GrappledMeteor.scale = 1f;
             GrappledMeteor.ai[2] = 2;
+            GrappledMeteor.GetGlobalNPC<MeteorHeadRework>().Exploding = true;
+            GrappledMeteor.netUpdate = true;
             MiscAITimer = 150;
             NPC.netUpdate = true;
             NPC.ai[3] = 0f; // set z coordinate to 0
@@ -408,7 +408,7 @@ internal class Starantula : EverNPC
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (GrappledMeteor != null)
-            if (MeteorPosition.Z < 0)
+            if (MeteorPosition.Z < 0 && GrappledMeteor.active)
                 MeteorHeadRework.Draw(GrappledMeteor, Main.screenPosition,
                     Lighting.GetColor(GrappledMeteor.Center.ToTileCoordinates()));
         
@@ -467,7 +467,7 @@ internal class Starantula : EverNPC
         var velocity = MeteorPosition - OldMeteorPosition;
         interpolant = Easing.InOutSine(MathHelper.Clamp((Timer) / (THROW_DELAY), 0, 1));
 
-        begin = NPC.Center - screenPos;
+        begin = NPC.Center + new Vector2(0, 34).RotatedBy(NPC.rotation) - screenPos;
         end = Vector2.Lerp(NPC.Center, GrappledMeteor.Center, interpolant) - screenPos;
         middle = (end - begin).SafeNormalize(Vector2.Zero);
         middle = Vector2.Lerp(begin, end, 0.67f) + new Vector2(velocity.X, velocity.Y) * 2f;
@@ -495,7 +495,7 @@ internal class Starantula : EverNPC
         
         
         if (GrappledMeteor != null)
-            if (MeteorPosition.Z >= 0)
+            if (MeteorPosition.Z >= 0 && GrappledMeteor.active)
                 MeteorHeadRework.Draw(GrappledMeteor, Main.screenPosition,
                     Lighting.GetColor(GrappledMeteor.Center.ToTileCoordinates()));
 
