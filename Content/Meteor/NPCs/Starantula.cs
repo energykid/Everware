@@ -407,6 +407,8 @@ internal class Starantula : EverNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
+        if (NPC.IsABestiaryIconDummy) drawColor = Color.White;        
+
         if (GrappledMeteor != null)
             if (MeteorPosition.Z < 0 && GrappledMeteor.active)
                 MeteorHeadRework.Draw(GrappledMeteor, Main.screenPosition,

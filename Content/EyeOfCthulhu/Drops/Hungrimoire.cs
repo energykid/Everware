@@ -61,30 +61,40 @@ public class HungrimoireToothSpawner : EverProjectile
 
     public override void AI()
     {
-        Projectile.ai[0]++;
-        Projectile.velocity.X *= 1.02f;
-        if (Projectile.ai[0] >= 35) Projectile.Kill();
-        else
-        {
-            if (Projectile.ai[0] % 5 == 4)
+        Vector2 oldCenter = Projectile.Center;
+        Projectile.Center = Projectile.Center.Grounded() + new Vector2(0, -50);
+        
+            Projectile.ai[0]++;
+            Projectile.velocity.X *= 1.02f;
+            if (Projectile.ai[0] >= 35) Projectile.Kill();
+            else
             {
-                if (!Main.dedServ)
+                if (Projectile.ai[0] % 5 == 4)
                 {
-                    Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(Owner, "Hungrimoire"),
-                        Projectile.Center.Grounded(), Projectile.velocity * 0.1f, ModContent.ProjectileType<HungrimoireTeeth>(),
-                        20, 5, Projectile.owner);
-                    
-                    (proj.ModProjectile as HungrimoireTeeth).SetFrame((int)Math.Ceiling(Projectile.ai[0] / 5));
+                    if (!Main.dedServ)
+                    {
+                        Projectile proj = Projectile.NewProjectileDirect(new EntitySource_Parent(Owner, "Hungrimoire"),
+                            Projectile.Center.Grounded(), Projectile.velocity * 0.05f,
+                            ModContent.ProjectileType<HungrimoireTeeth>(),
+                            20, 5, Projectile.owner);
+
+                        (proj.ModProjectile as HungrimoireTeeth).SetFrame((int)Math.Ceiling(Projectile.ai[0] / 5));
+                    }
                 }
             }
-        }
     }
 }
 
 public class HungrimoireTeeth : EverProjectile
 {
     private ParticleLayer Blood = new ParticleLayer();
-    
+
+    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+    {
+        base.ModifyHitNPC(target, ref modifiers);
+        modifiers.HitDirectionOverride = Projectile.spriteDirection;
+    }
+
     public override string Texture => "Everware/Assets/Textures/EyeOfCthulhu/Drops/HungrimoireTeeth";
 
     public Rectangle Hitbox;
@@ -93,9 +103,10 @@ public class HungrimoireTeeth : EverProjectile
     {
         base.NetOnSpawn();
         
-        Projectile.spriteDirection = Math.Sign(Projectile.velocity.X);
+        Projectile.direction = Projectile.spriteDirection = Math.Sign(Projectile.velocity.X);
+        Projectile.ai[2] = Math.Sign(Projectile.velocity.X);
         
-        Projectile.Bottom = Projectile.Bottom.Grounded();
+        Projectile.Center = Projectile.Center.Grounded() + new Vector2(0, -Projectile.height);
         
         float y1 = Projectile.BottomRight.Grounded().Y;
         float y2 = Projectile.BottomLeft.Grounded().Y;
@@ -110,6 +121,8 @@ public class HungrimoireTeeth : EverProjectile
         }
         
         SoundEngine.PlaySound(Assets.Sounds.NPC.EoCTendrilEmerge.Asset.WithPitchVariance(0.2f).WithPitchOffset((float)(Projectile.frame / 15f)).WithVolumeScale((Projectile.frame / 14f)) with {MaxInstances = 7}, Projectile.Center);
+        
+        Projectile.velocity = Vector2.Zero;
     }
 
     public override void ModifyDamageHitbox(ref Rectangle hitbox)
@@ -201,19 +214,9 @@ public class HungrimoireTeeth : EverProjectile
         
         Hitbox = new Rectangle((int)Projectile.Bottom.X - 15, (int)Projectile.Bottom.Y - (10 * Frame), 30, 10 * Frame);
         
-        float BottomY = Projectile.Bottom.Grounded().Y;
-        
-        float y1 = new Vector2(Projectile.Bottom.X - (3 * Frame), Projectile.Bottom.Y).Grounded().Y;
-        float y2 = new Vector2(Projectile.Bottom.X + (3 * Frame), Projectile.Bottom.Y).Grounded().Y;
-
-        BottomY = MathHelper.Max(y1, y2);
-
-        Projectile.Bottom = Vector2.Lerp(Projectile.Bottom, new(Projectile.Bottom.X, BottomY), 0.4f);
-        
         Projectile.ai[1]++;
         if (Projectile.ai[1] >= 20) Projectile.damage = 0;
         
-        Projectile.velocity *= 0.7f;
         Blood.Update();
         Blood.Update(); // twice so that the blood looks punchier
         Projectile.ai[1]++;

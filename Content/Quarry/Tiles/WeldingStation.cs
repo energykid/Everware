@@ -93,15 +93,18 @@ public class WeldingStation : EverMultitile
             spriteBatch.Draw(LaserTexture2Glow.Value, BaseVector + LaserX2 - Main.screenPosition, Color.White);
         }
     }
-    class LaserGridTimer : ModSystem
-    {
 
+    [ModSystemHooks.PostUpdateEverything]
+    public static void Update() { LaserGridTimer.Update(); }
+    
+    class LaserGridTimer
+    {
         public static float LaserGridT = 0f;
         public static float LaserGridCurrentX = 0f;
         public static float LaserGridLastX = 0f;
         public static float LaserGridNextX = 0f;
         public static bool LaserGridOn = false;
-        public override void PostUpdateEverything()
+        public static void Update()
         {
             LaserGridT -= 1f;
             if (LaserGridT < 0)
